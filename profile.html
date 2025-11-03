@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | BGMI Market</title>
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+  <header>
+    <h1>🎮 BGMI Market</h1>
+    <nav>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="wallet.html">Wallet</a>
+      <a href="sell.html">Sell ID</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+  </header>
+
+  <main class="profile-container">
+    <h2>My Profile</h2>
+
+    <div class="profile-card">
+      <img src="images/default_avatar.png" id="profile-img" alt="Profile" />
+      <h3 id="profile-name">Loading...</h3>
+      <p id="profile-email">---</p>
+      <p><strong>KYC:</strong> <span id="kyc-status">Pending</span></p>
+      <p><strong>Seller Badge:</strong> <span id="seller-badge">None</span></p>
+
+      <button onclick="updateProfile()">Update Profile</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 BGMI Market | Trusted Gamers Network</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    // === Profile Loader ===
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) window.location.href = "login.html";
+    document.getElementById("profile-name").textContent = user.name;
+    document.getElementById("profile-email").textContent = user.email;
+    document.getElementById("kyc-status").textContent = user.kyc_status || "Pending";
+    document.getElementById("seller-badge").textContent = user.is_verified ? "✔ Verified Seller" : "Standard";
+
+    function updateProfile() {
+      alert("Profile update feature coming soon!");
+    }
+  </script>
+</body>
+</html>
+

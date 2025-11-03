@@ -1,0 +1,49 @@
+/* ===== responsive.css ===== */
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+  }
+
+  header, footer {
+    text-align: center;
+    padding: 1rem;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .item {
+    width: 90%;
+    margin: 1rem auto;
+  }
+
+  .login-box, form {
+    width: 85%;
+    margin: auto;
+    padding: 1rem;
+  }
+
+  button {
+    width: 100%;
+    padding: 0.8rem;
+  }
+}
+
+/* --- Tablet --- */
+@media (max-width: 1024px) {
+  .item {
+    width: 45%;
+  }
+  nav {
+    gap: 1rem;
+  }
+}
+

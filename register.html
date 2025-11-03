@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - BGMI Market</title>
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body>
+  <div class="auth-container">
+    <h2>🆕 Create Account</h2>
+
+    <div class="form-group">
+      <label for="full_name">Full Name</label>
+      <input type="text" id="full_name" placeholder="Enter your full name" required />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Phone Number</label>
+      <input type="text" id="phone" placeholder="Enter your phone number" required />
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" required />
+    </div>
+
+    <button id="registerBtn" onclick="registerUser()">Register</button>
+
+    <p class="text-small">
+      Already have an account? <a href="login.html">Login here</a>
+    </p>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>
