@@ -1,19 +1,16 @@
-// ===== api.js (Unified & Environment Aware) =====
+// ===== api.js (Unified for Vercel + Cloudflare Workers) =====
 
-// ✅ Auto-detect Gateway URL (works locally & in production)
-const BASE_ORIGIN = window.location.origin.includes("localhost")
-  ? "http://127.0.0.1:5000"
-  : window.location.origin;
+// 🛰️ Gateway base URL (use Workers in production)
+const BASE_URL = window.location.hostname.includes("localhost")
+  ? "http://127.0.0.1:5000/api" // local Flask dev (if needed)
+  : "https://gateway.bgmi-gateway.workers.dev/api"; // ✅ Cloudflare Worker gateway
 
-// ✅ All API routes go through the Gateway (port 5000)
-const API_URL = `${BASE_ORIGIN}/api`;
+// Optional direct service paths (through gateway)
+const AUTH_URL = `${BASE_URL}/auth`;
+const MARKET_URL = `${BASE_URL}/market`;
+const WALLET_URL = `${BASE_URL}/wallet`;
 
-// If you ever need to hit a service directly (for debugging only)
-const AUTH_URL = `${BASE_ORIGIN}/api/auth`;
-const MARKET_URL = `${BASE_ORIGIN}/api/market`;
-const WALLET_URL = `${BASE_ORIGIN}/api/wallet`;
-
-// --- Fetch helper (used across frontend scripts) ---
+// --- Universal fetch helper ---
 async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
 
@@ -24,7 +21,7 @@ async function apiRequest(endpoint, options = {}) {
   };
 
   try {
-    const res = await fetch(`${API_URL}/${endpoint}`, {
+    const res = await fetch(`${BASE_URL}/${endpoint}`, {
       ...options,
       headers,
     });
@@ -47,13 +44,13 @@ async function apiRequest(endpoint, options = {}) {
 // --- Simple Connectivity Check ---
 async function checkGateway() {
   try {
-    const res = await fetch(`${BASE_ORIGIN}/health`);
+    const res = await fetch("https://gateway.bgmi-gateway.workers.dev/health");
     if (res.ok) console.log("✅ Gateway connection OK");
     else throw new Error("Gateway not healthy");
   } catch {
-    alert("⚠️ Cannot reach Gateway. Make sure backend services are running.");
+    alert("⚠️ Cannot reach Gateway. Make sure gateway is live.");
   }
 }
 
-// Run health check automatically on page load
+// Auto-run health check
 window.addEventListener("load", checkGateway);
