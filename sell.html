@@ -1,11 +1,246 @@
-<form id="sellForm">
-  <h2>Sell Your BGMI Account</h2>
-  <input type="text" id="username" placeholder="BGMI Username" required>
-  <input type="number" id="level" placeholder="Account Level" required>
-  <input type="number" id="mythicItems" placeholder="Mythic Items Count">
-  <input type="number" id="xSuits" placeholder="X-Suits Count">
-  <button type="button" onclick="estimateValue()">Estimate Price</button>
-  <div id="estimatedPrice"></div>
-  <button type="submit">List for Sale</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sell BGMI Account 💎</title>
 
+<style>
+/* 🩵 GLOBAL RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: url("https://i.ytimg.com/vi/aoV3MROF_OY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCTHZ0jtDKlIZ1O0UfD9GytpmtpXQ")
+    no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  color: #fff;
+}
+
+/* 🌫️ DARK OVERLAY */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 0;
+}
+
+/* 🫧 MULTICOLORED GLOWING BUBBLES */
+.bubble {
+  position: absolute;
+  bottom: -120px;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.8;
+  animation: rise 25s linear infinite;
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120vh) scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* 🌈 Create different color bubbles */
+.bubble:nth-child(1) {
+  left: 10%;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle at 30% 30%, #ff00ff, rgba(0,0,0,0));
+  animation-delay: 0s;
+}
+.bubble:nth-child(2) {
+  left: 30%;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle at 30% 30%, #00ffff, rgba(0,0,0,0));
+  animation-delay: 5s;
+}
+.bubble:nth-child(3) {
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle at 30% 30%, #ff0099, rgba(0,0,0,0));
+  animation-delay: 10s;
+}
+.bubble:nth-child(4) {
+  left: 70%;
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle at 30% 30%, #00ff88, rgba(0,0,0,0));
+  animation-delay: 2s;
+}
+.bubble:nth-child(5) {
+  left: 85%;
+  width: 110px;
+  height: 110px;
+  background: radial-gradient(circle at 30% 30%, #ffd500, rgba(0,0,0,0));
+  animation-delay: 8s;
+}
+.bubble:nth-child(6) {
+  left: 20%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle at 30% 30%, #0077ff, rgba(0,0,0,0));
+  animation-delay: 12s;
+}
+
+/* 💎 GLASS CARD */
+form {
+  position: relative;
+  z-index: 2;
+  width: 370px;
+  padding: 30px;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+  animation: floatIn 1.5s ease, glowBorder 6s linear infinite;
+  overflow: hidden;
+}
+
+@keyframes floatIn {
+  0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes glowBorder {
+  0% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.5); }
+  50% { box-shadow: 0 0 45px rgba(255, 0, 255, 0.8); }
+  100% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.5); }
+}
+
+/* 💫 NEON HEADING (no background-clip used) */
+h2 {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.6em;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+  color: #00ffff;
+  text-shadow:
+    0 0 10px #0ff,
+    0 0 20px #ff00ff,
+    0 0 30px #00ffff;
+}
+
+/* INPUTS & BUTTONS */
+input, button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  margin: 10px 0;
+  font-size: 14px;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+input {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+input:focus {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+  transform: scale(1.03);
+}
+
+/* BUTTONS */
+button {
+  background: linear-gradient(135deg, #00ffff, #ff00ff);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(255, 0, 255, 0.8);
+  filter: brightness(1.2);
+}
+
+#estimatedPrice {
+  text-align: center;
+  color: #00ffff;
+  font-weight: bold;
+  margin: 10px 0;
+  text-shadow: 0 0 10px #0ff;
+}
+
+/* ✨ SHIMMER EFFECT */
+form::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 6s infinite;
+}
+@keyframes shimmer {
+  0% { left: -75%; }
+  50% { left: 125%; }
+  100% { left: 125%; }
+}
+</style>
+</head>
+
+<body>
+  <!-- 🌈 Floating Bubbles -->
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+
+  <!-- 🧊 Glassy Form -->
+  <form id="sellForm">
+    <h2>Sell Your BGMI Account</h2>
+    <input type="text" id="username" placeholder="BGMI Username" required>
+    <input type="number" id="level" placeholder="Account Level" required>
+    <input type="number" id="mythicItems" placeholder="Mythic Items Count">
+    <input type="number" id="xSuits" placeholder="X-Suits Count">
+    <button type="button" onclick="estimateValue()">Estimate Price</button>
+    <div id="estimatedPrice"></div>
+    <button type="submit">List for Sale</button>
+  </form>
+
+  <script>
+    // 💰 Price Estimation
+    function estimateValue() {
+      const level = parseInt(document.getElementById("level").value) || 0;
+      const mythic = parseInt(document.getElementById("mythicItems").value) || 0;
+      const xsuit = parseInt(document.getElementById("xSuits").value) || 0;
+      const price = (level * 10) + (mythic * 500) + (xsuit * 2000);
+      document.getElementById("estimatedPrice").innerText =
+        `💰 Estimated Value: ₹${price}`;
+    }
+  </script>
+</body>
+</html>
