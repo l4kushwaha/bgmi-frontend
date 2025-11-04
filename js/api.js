@@ -1,16 +1,22 @@
-// ===== api.js (Unified for Vercel + Cloudflare Workers) =====
+// ===== api.js (Unified + Auto-dynamic services) =====
 
-// 🛰️ Gateway base URL (use Workers in production)
+// 🌍 Base Gateway URL (auto-switch: local → production)
 const BASE_URL = window.location.hostname.includes("localhost")
-  ? "http://127.0.0.1:5000/api" // local Flask dev (if needed)
-  : "https://gateway.bgmi-gateway.workers.dev/api"; // ✅ Cloudflare Worker gateway
+  ? "http://127.0.0.1:5000/api" // local dev
+  : "https://bgmi-gateway.workers.dev/api"; // Cloudflare production gateway
 
-// Optional direct service paths (through gateway)
-const AUTH_URL = `${BASE_URL}/auth`;
-const MARKET_URL = `${BASE_URL}/market`;
-const WALLET_URL = `${BASE_URL}/wallet`;
+// --- Define service endpoints through gateway ---
+const SERVICES = {
+  auth: `${BASE_URL}/auth`,
+  market: `${BASE_URL}/market`,
+  wallet: `${BASE_URL}/wallet`,
+  verify: `${BASE_URL}/verify`,
+  chat: `${BASE_URL}/chat`,
+  admin: `${BASE_URL}/admin`,
+  notify: `${BASE_URL}/notify`,
+};
 
-// --- Universal fetch helper ---
+// --- Universal Fetch Helper ---
 async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
 
@@ -20,8 +26,11 @@ async function apiRequest(endpoint, options = {}) {
     ...options.headers,
   };
 
+  // If endpoint starts with '/', remove it to prevent double slashes
+  const cleanEndpoint = endpoint.replace(/^\//, "");
+
   try {
-    const res = await fetch(`${BASE_URL}/${endpoint}`, {
+    const res = await fetch(`${BASE_URL}/${cleanEndpoint}`, {
       ...options,
       headers,
     });
@@ -41,16 +50,26 @@ async function apiRequest(endpoint, options = {}) {
   }
 }
 
-// --- Simple Connectivity Check ---
+// --- Health Check for Gateway and Services ---
 async function checkGateway() {
   try {
-    const res = await fetch("https://gateway.bgmi-gateway.workers.dev/health");
-    if (res.ok) console.log("✅ Gateway connection OK");
-    else throw new Error("Gateway not healthy");
-  } catch {
-    alert("⚠️ Cannot reach Gateway. Make sure gateway is live.");
+    const res = await fetch(`${BASE_URL.replace("/api", "")}/health`);
+    if (res.ok) {
+      console.log("✅ Gateway connection OK");
+    } else {
+      throw new Error("Gateway not healthy");
+    }
+
+    // Optional: Check each service
+    for (const [name, url] of Object.entries(SERVICES)) {
+      fetch(`${url}/health`)
+        .then(r => r.ok ? console.log(`✅ ${name} OK`) : console.warn(`⚠️ ${name} DOWN`))
+        .catch(() => console.warn(`❌ ${name} not reachable`));
+    }
+  } catch (err) {
+    alert("⚠️ Cannot reach Gateway. Make sure it's live.");
   }
 }
 
-// Auto-run health check
+// Auto-run health check on load
 window.addEventListener("load", checkGateway);

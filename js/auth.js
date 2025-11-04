@@ -1,25 +1,34 @@
-// ===== auth.js (Final Working Version) =====
+// ===== auth.js (Gateway-Based Final Version) =====
 
-// ✅ Your backend service base URL
-const GATEWAY_BASE = "http://10.84.71.149:5001";
-const AUTH_API = `${GATEWAY_BASE}/api/auth`;
+// 🌐 Gateway URL (auto-detect local or production)
+const BASE_GATEWAY_URL = window.location.hostname.includes("localhost")
+  ? "http://127.0.0.1:5000/api" // Local gateway (Flask/Express dev)
+  : "https://gateway.bgmi-gateway.workers.dev/api"; // ✅ Cloudflare Worker Gateway
+
+// 🎯 Auth API Endpoint through Gateway
+const AUTH_API = `${BASE_GATEWAY_URL}/auth`;
 
 // ===============================
-// 🧩 Unified Fetch Helper
+// 🧩 Universal Fetch Helper
 // ===============================
 async function apiFetch(url, options = {}) {
+  const token = localStorage.getItem("token");
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
+
   try {
-    const res = await fetch(url, {
-      headers: { "Content-Type": "application/json" },
-      ...options,
-    });
+    const res = await fetch(url, { ...options, headers });
     const data = await res.json().catch(() => ({}));
 
-    if (!res.ok) throw new Error(data.error || data.message || "Unknown error");
+    if (!res.ok) throw new Error(data.error || data.message || "Request failed");
     return data;
   } catch (err) {
     console.error("❌ API Error:", err);
-    alert(`⚠️ ${err.message || "Error connecting to server."}`);
+    alert(`⚠️ ${err.message || "Error connecting to Gateway."}`);
     throw err;
   }
 }
@@ -34,7 +43,7 @@ async function registerUser() {
   const password = document.getElementById("password")?.value.trim();
 
   if (!full_name || !email || !phone || !password)
-    return alert("⚠️ Please fill in all fields.");
+    return alert("⚠️ Please fill all fields.");
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     return alert("⚠️ Invalid email format.");
@@ -111,7 +120,7 @@ async function loginUser() {
       return (window.location.href = "index.html");
     }
 
-    // --- FALLBACK ---
+    // --- Fallback ---
     alert("❌ Invalid credentials or account not found.");
   } catch (err) {
     console.error("Login Error:", err);
@@ -132,7 +141,7 @@ async function forgotPassword() {
       method: "POST",
       body: JSON.stringify({ email }),
     });
-    alert("✅ Password reset instructions sent to your email!");
+    alert("✅ Password reset instructions sent!");
   } catch (err) {
     console.error("Forgot Password Error:", err);
   }
@@ -148,7 +157,7 @@ function logout() {
 }
 
 // ===============================
-// 👤 GET CURRENT USER
+// 👤 CURRENT USER UTILITIES
 // ===============================
 function getCurrentUser() {
   try {
@@ -164,16 +173,16 @@ function isAdmin() {
 }
 
 // ===============================
-// 🧠 Quick Server Health Check
+// 🧠 GATEWAY HEALTH CHECK
 // ===============================
-async function testServerConnection() {
+async function testGatewayConnection() {
   try {
-    const res = await fetch(`${GATEWAY_BASE}/`);
-    if (res.ok) console.log("✅ Auth Service connection OK");
-    else throw new Error("Auth service not healthy");
-  } catch (e) {
-    console.warn("⚠️ Cannot reach Auth Service. Make sure it's running.");
+    const res = await fetch(`${BASE_GATEWAY_URL}/health`);
+    if (res.ok) console.log("✅ Gateway connection OK");
+    else throw new Error("Gateway not healthy");
+  } catch {
+    console.warn("⚠️ Cannot reach Gateway. Make sure it's live.");
   }
 }
 
-window.addEventListener("load", testServerConnection);
+window.addEventListener("load", testGatewayConnection);
