@@ -39,6 +39,7 @@
       position: absolute;
       border-radius: 50%;
       background: rgba(255,255,255,0.08);
+      -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
       animation: float 15s infinite ease-in-out;
       pointer-events: none;
@@ -57,6 +58,7 @@
     /* ========== HEADER ========== */
     header {
       width: 100%;
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       backdrop-filter: blur(20px) saturate(180%);
       background: rgba(255,255,255,0.08);
       border-bottom: 1px solid rgba(255,255,255,0.2);
@@ -86,8 +88,10 @@
     header h1 {
       font-size: 1.9rem;
       background: linear-gradient(90deg, #ff8800, #ffcc00, #ff00ff);
-      -webkit-background-: text;
+      -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
+      color: transparent;
       text-shadow: 0 0 20px rgba(255,204,0,0.4);
       font-weight: 700;
     }
@@ -151,6 +155,7 @@
     }
 
     section {
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
       backdrop-filter: blur(25px) saturate(180%);
       background: rgba(255,255,255,0.08);
       padding: 2.5rem;
@@ -177,8 +182,10 @@
       font-size: 2rem;
       margin-bottom: 1rem;
       background: linear-gradient(90deg, #ff6600, #ffcc00, #ff0099);
-      -webkit-background: text;
+      -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
+      color: transparent;
     }
 
     p {
@@ -222,13 +229,14 @@
     }
 
     .card {
+      -webkit-backdrop-filter: blur(25px);
+      backdrop-filter: blur(25px);
       background: rgba(255,255,255,0.12);
       border-radius: 20px;
       padding: 1.5rem;
       transition: 0.4s ease;
       border: 1px solid rgba(255,255,255,0.2);
       cursor: pointer;
-      backdrop-filter: blur(25px);
       box-shadow: 0 4px 30px rgba(0,0,0,0.3);
       transform-style: preserve-3d;
     }
@@ -254,6 +262,7 @@
       text-align: center;
       padding: 1.5rem 1rem;
       background: rgba(255,255,255,0.05);
+      -webkit-backdrop-filter: blur(20px);
       backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255,255,255,0.2);
       box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
@@ -281,6 +290,10 @@
       margin-top: 0.5rem;
       font-size: 0.95rem;
     }
+
+    /* Hidden/Visible Classes */
+    .hidden { display: none; }
+    .visible { display: block; }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -311,20 +324,20 @@
         <li><a href="wallet.html">Wallet</a></li>
         <li><a href="profile.html">Profile</a></li>
         <li><a href="chat.html">Messages</a></li>
-        <li><a href="#" id="logoutBtn" style="display:none;">Logout</a></li>
+        <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
       </ul>
     </nav>
   </header>
 
   <main>
-    <section id="guest-view">
+    <section id="guest-view" class="visible">
       <h2>Welcome to BGMI Market 🎯</h2>
       <p>Buy, sell, and manage BGMI IDs securely with escrow & 2.5% service charge system.</p>
       <button onclick="window.location='login.html'">Login</button>
       <button onclick="window.location='register.html'">Register</button>
     </section>
 
-    <section id="user-dashboard" style="display:none;">
+    <section id="user-dashboard" class="hidden">
       <h2>Welcome back, <span id="username">Player</span> 👋</h2>
       <p>Explore your marketplace, manage your wallet, and track your sales.</p>
 
@@ -353,7 +366,7 @@
     <p>© 2025 BGMI Market | Crafted with ❤️ by <strong>@am_sillent_hunter</strong></p>
     <div class="socials">
       📩 Email: <a href="mailto:l4kushwaha@gmail.com">l4kushwaha@gmail.com</a> |
-      📸 Instagram: <a href="https://instagram.com/am_sillent_hunter" target="_blank">@am_sillent_hunter</a>
+      📸 Instagram: <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener">@am_sillent_hunter</a>
     </div>
   </footer>
 
@@ -363,13 +376,14 @@
     const token = localStorage.getItem("token");
 
     if (user && token) {
-      document.getElementById("guest-view").style.display = "none";
-      document.getElementById("user-dashboard").style.display = "block";
-      document.getElementById("logoutBtn").style.display = "inline";
+      document.getElementById("guest-view").classList.replace("visible", "hidden");
+      document.getElementById("user-dashboard").classList.replace("hidden", "visible");
+      document.getElementById("logoutBtn").classList.replace("hidden", "visible");
       document.getElementById("username").textContent = user.username;
     } else {
-      document.getElementById("guest-view").style.display = "block";
-      document.getElementById("user-dashboard").style.display = "none";
+      document.getElementById("guest-view").classList.replace("hidden", "visible");
+      document.getElementById("user-dashboard").classList.replace("visible", "hidden");
+      document.getElementById("logoutBtn").classList.replace("visible", "hidden");
     }
 
     // Logout functionality

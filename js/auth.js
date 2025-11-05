@@ -1,9 +1,9 @@
-// ===== auth.js (Gateway-Based Final Version) =====
+// ===== auth.js (Extended Final Version for Login/Register/Forgot Password) =====
 
 // 🌐 Gateway URL (auto-detect local or production)
 const BASE_GATEWAY_URL = window.location.hostname.includes("localhost")
-  ? "http://127.0.0.1:5000/api" // Local gateway (Flask/Express dev)
-  : "https://gateway.bgmi-gateway.workers.dev/api"; // ✅ Cloudflare Worker Gateway
+  ? "http://127.0.0.1:5000/api" // Local dev
+  : "https://bgmi-gateway.bgmi-gateway.workers.dev/api"; // Cloudflare Worker Gateway
 
 // 🎯 Auth API Endpoint through Gateway
 const AUTH_API = `${BASE_GATEWAY_URL}/auth`;
@@ -13,7 +13,6 @@ const AUTH_API = `${BASE_GATEWAY_URL}/auth`;
 // ===============================
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem("token");
-
   const headers = {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -52,7 +51,7 @@ async function registerUser() {
   if (btn) btn.innerText = "Registering...";
 
   try {
-    await apiFetch(`${AUTH_API}/register`, {
+    const data = await apiFetch(`${AUTH_API}/register`, {
       method: "POST",
       body: JSON.stringify({ full_name, email, phone, password }),
     });
@@ -132,18 +131,25 @@ async function loginUser() {
 // ===============================
 // 🔁 FORGOT PASSWORD
 // ===============================
-async function forgotPassword() {
+async function sendResetLink() {
   const email = document.getElementById("email")?.value.trim();
   if (!email) return alert("⚠️ Please enter your email.");
 
+  const btn = document.getElementById("forgotBtn");
+  if (btn) btn.innerText = "Sending...";
+
   try {
-    await apiFetch(`${AUTH_API}/forgot-password`, {
+    const data = await apiFetch(`${AUTH_API}/forgot-password`, {
       method: "POST",
       body: JSON.stringify({ email }),
     });
-    alert("✅ Password reset instructions sent!");
+
+    alert("✅ Password reset link sent! Check your email.");
+    window.location.href = "login.html";
   } catch (err) {
     console.error("Forgot Password Error:", err);
+  } finally {
+    if (btn) btn.innerText = "Send Reset Link";
   }
 }
 
