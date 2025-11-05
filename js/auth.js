@@ -1,12 +1,15 @@
-// ===== auth.js (Extended Final Version for Login/Register/Forgot Password) =====
+// ===== auth.js (Auto Fallback: Local / Gateway / Auth Service) =====
 
-// 🌐 Gateway URL (auto-detect local or production)
-const BASE_GATEWAY_URL = window.location.hostname.includes("localhost")
-  ? "http://127.0.0.1:5000/api" // Local dev
-  : "https://bgmi-gateway.bgmi-gateway.workers.dev/api"; // Cloudflare Worker Gateway
+// 🌐 Auto-detect environment & endpoints
+const BASE_LOCAL_API = "http://127.0.0.1:5000/api"; // Local dev
+const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev/api"; // Gateway
+const BASE_AUTH_SERVICE = "https://bgmi-auth-service.bgmi-gateway.workers.dev/api/auth"; // Direct auth
 
-// 🎯 Auth API Endpoint through Gateway
-const AUTH_API = `${BASE_GATEWAY_URL}/auth`;
+// 🎯 Auth API Endpoint (auto fallback)
+const AUTH_API = (() => {
+  if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
+  return BASE_AUTH_SERVICE; // Use direct auth in production
+})();
 
 // ===============================
 // 🧩 Universal Fetch Helper
@@ -27,7 +30,15 @@ async function apiFetch(url, options = {}) {
     return data;
   } catch (err) {
     console.error("❌ API Error:", err);
-    alert(`⚠️ ${err.message || "Error connecting to Gateway."}`);
+
+    // Try fallback to gateway if not using it yet
+    if (!url.includes(BASE_GATEWAY_API)) {
+      console.warn("⚠️ Retrying via Gateway...");
+      const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/auth");
+      return apiFetch(fallbackUrl, options);
+    }
+
+    alert(`⚠️ ${err.message || "Error connecting to Auth Service."}`);
     throw err;
   }
 }
@@ -66,7 +77,7 @@ async function registerUser() {
 }
 
 // ===============================
-// 🔐 LOGIN USER (Admin + User)
+// 🔐 LOGIN USER
 // ===============================
 async function loginUser() {
   const email = document.getElementById("email")?.value.trim();
@@ -84,8 +95,6 @@ async function loginUser() {
       body: JSON.stringify({ email, password }),
     });
 
-    console.log("✅ Login Response:", data);
-
     // --- ADMIN LOGIN ---
     if (data.role === "admin") {
       const adminUser = {
@@ -95,15 +104,13 @@ async function loginUser() {
         phone: data.admin_info?.phone,
         role: "admin",
       };
-
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(adminUser));
-
       alert("👑 Welcome, Admin!");
       return (window.location.href = "admin_dashboard.html");
     }
 
-    // --- NORMAL USER LOGIN ---
+    // --- USER LOGIN ---
     if (data.role === "user" && data.user) {
       const userInfo = {
         id: data.user.id,
@@ -111,15 +118,12 @@ async function loginUser() {
         email: data.user.email,
         role: "user",
       };
-
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(userInfo));
-
       alert("✅ Login successful!");
       return (window.location.href = "index.html");
     }
 
-    // --- Fallback ---
     alert("❌ Invalid credentials or account not found.");
   } catch (err) {
     console.error("Login Error:", err);
@@ -183,7 +187,7 @@ function isAdmin() {
 // ===============================
 async function testGatewayConnection() {
   try {
-    const res = await fetch(`${BASE_GATEWAY_URL}/health`);
+    const res = await fetch(`${BASE_GATEWAY_API}/health`);
     if (res.ok) console.log("✅ Gateway connection OK");
     else throw new Error("Gateway not healthy");
   } catch {
@@ -192,3 +196,4 @@ async function testGatewayConnection() {
 }
 
 window.addEventListener("load", testGatewayConnection);
+    // --- CORS Preflight ---
