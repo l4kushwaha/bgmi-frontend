@@ -1,4 +1,4 @@
-// ===== auth.js (Extended & Backend-Compatible) =====
+// ===== auth.js (Extended + Debug-Friendly) =====
 
 // 🌐 Auto-detect environment & endpoints
 const BASE_LOCAL_API = "http://127.0.0.1:5000/api"; // Local dev
@@ -22,9 +22,13 @@ async function apiFetch(url, options = {}) {
     ...options.headers,
   };
 
+  console.log("🌐 API Request:", url, options);
+
   try {
     const res = await fetch(url, { ...options, headers });
     const data = await res.json().catch(() => ({}));
+
+    console.log("📥 API Response:", data, "Status:", res.status);
 
     if (!res.ok) throw new Error(data.error || data.message || "Request failed");
     return data;
@@ -67,6 +71,8 @@ async function registerUser() {
       body: JSON.stringify({ full_name, email, phone, password }),
     });
 
+    console.log("✅ Registration response:", data);
+
     alert("✅ Registration successful! Please log in.");
     window.location.href = "login.html";
   } catch (err) {
@@ -95,6 +101,8 @@ async function loginUser() {
       body: JSON.stringify({ email, password }),
     });
 
+    console.log("✅ Login response:", data);
+
     // --- ADMIN LOGIN ---
     if (data.role === "admin") {
       const adminUser = {
@@ -114,7 +122,7 @@ async function loginUser() {
     if (data.role === "user" && data.user) {
       const userInfo = {
         id: data.user.id,
-        name: data.user.full_name, // ✅ fixed from backend response
+        name: data.user.full_name,
         email: data.user.email,
         role: "user",
       };
@@ -147,6 +155,8 @@ async function sendResetLink() {
       method: "POST",
       body: JSON.stringify({ email }),
     });
+
+    console.log("✅ Forgot Password response:", data);
 
     alert("✅ Password reset link sent! Check your email.");
     window.location.href = "login.html";
@@ -188,17 +198,20 @@ function isAdmin() {
 async function testGatewayConnection() {
   try {
     const res = await fetch(`${BASE_GATEWAY_API}/health`);
+    const data = await res.json().catch(() => ({}));
+    console.log("🌐 Gateway Health:", data);
+
     if (res.ok) console.log("✅ Gateway connection OK");
     else throw new Error("Gateway not healthy");
-  } catch {
-    console.warn("⚠️ Cannot reach Gateway. Make sure it's live.");
+  } catch (err) {
+    console.warn("⚠️ Cannot reach Gateway. Make sure it's live.", err);
   }
 }
 
 window.addEventListener("load", testGatewayConnection);
 
 // ===============================
-// 📌 Export functions globally (optional)
+// 📌 Export functions globally
 window.registerUser = registerUser;
 window.loginUser = loginUser;
 window.sendResetLink = sendResetLink;
