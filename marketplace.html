@@ -1,9 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGMI Marketplace</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e1e2f, #2e2e4f);
+    color: #fff;
+    padding: 20px;
+  }
+  h2 { text-align: center; margin-bottom: 20px; }
+  #search {
+    display: block;
+    margin: 0 auto 20px auto;
+    padding: 10px;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 5px;
+    border: none;
+  }
+  #items-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  .item-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  }
+  .item-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  .item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .highlight {
+    background: #f39c12;
+    color: #000;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.8em;
+  }
+</style>
+</head>
+<body>
+
 <div id="marketplace">
   <h2>Available BGMI IDs</h2>
-  <input type="text" id="search" placeholder="Search by item or rank">
+  <input type="text" id="search" placeholder="Search by UID, rank, or item">
   <div id="items-container"></div>
 </div>
 
-<script src="js/api.js"></script>
-<script src="js/marketplace.js"></script>
+<script>
+  const API_URL = "https://marketplace-worker.bgmi-gateway.workers.dev/api/market";
 
+  async function fetchItems() {
+    try {
+      const res = await fetch(`${API_URL}/all`);
+      if (!res.ok) throw new Error("Failed to fetch items");
+      const data = await res.json();
+      renderItems(data);
+    } catch (err) {
+      document.getElementById("items-container").innerHTML = `<p style="color:red;">${err.message}</p>`;
+    }
+  }
+
+  function renderItems(items) {
+    const container = document.getElementById("items-container");
+    container.innerHTML = "";
+    if (!items.length) {
+      container.innerHTML = "<p>No items available.</p>";
+      return;
+    }
+    items.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "item-card";
+      const imgUrl = item.images?.[0] || "https://via.placeholder.com/250x150?text=No+Image";
+      card.innerHTML = `
+        <img src="${imgUrl}" alt="BGMI ID Image">
+        <div class="item-info">
+          <strong>UID:</strong> ${item.uid}<br>
+          <strong>Rank:</strong> ${item.rank}<br>
+          <strong>Price:</strong> ₹${item.price}<br>
+          ${item.highlights?.length ? `<div class="highlight">${item.highlights.join(", ")}</div>` : ""}
+          <strong>Status:</strong> ${item.status || "Available"}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  document.getElementById("search").addEventListener("input", (e) => {
+    const query = e.target.value.toLowerCase();
+    const allCards = document.querySelectorAll(".item-card");
+    allCards.forEach(card => {
+      const text = card.querySelector(".item-info").innerText.toLowerCase();
+      card.style.display = text.includes(query) ? "block" : "none";
+    });
+  });
+
+  fetchItems();
+</script>
+</body>
+</html>

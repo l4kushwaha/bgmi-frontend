@@ -53,6 +53,7 @@ async function apiRequest(endpoint, options = {}) {
 // --- Health Check for Gateway and Services ---
 async function checkGateway() {
   try {
+    // Gateway health
     const res = await fetch(`${BASE_URL.replace("/api", "")}/health`);
     if (res.ok) {
       console.log("✅ Gateway connection OK");
@@ -60,11 +61,13 @@ async function checkGateway() {
       throw new Error("Gateway not healthy");
     }
 
-    // Optional: Check each service
-    for (const [name, url] of Object.entries(SERVICES)) {
-      fetch(`${url}/health`)
-        .then(r => r.ok ? console.log(`✅ ${name} OK`) : console.warn(`⚠️ ${name} DOWN`))
-        .catch(() => console.warn(`❌ ${name} not reachable`));
+    // Only check MARKET service health
+    try {
+      const marketRes = await fetch(`${SERVICES.market}/health`);
+      if (marketRes.ok) console.log("✅ Market Service OK");
+      else console.warn("⚠️ Market Service DOWN");
+    } catch {
+      console.warn("❌ Market Service not reachable");
     }
   } catch (err) {
     alert("⚠️ Cannot reach Gateway. Make sure it's live.");
