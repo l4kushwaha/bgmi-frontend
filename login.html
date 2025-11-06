@@ -62,14 +62,8 @@
     }
 
     @keyframes fadeInScale {
-      0% {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
     /* ✨ Title with Gradient + Glow */
@@ -79,33 +73,25 @@
       font-weight: 700;
       color: transparent;
       background: linear-gradient(90deg, #00ffe7, #00c3ff, #b721ff, #ff007c);
-      -moz-background-clip: text;
-      background-clip: text;
+      -webkit-background-clip: text; /* Webkit first */
+      -moz-background-clip: text;    /* optional for Firefox */
+      background-clip: text;          /* standard last */
       animation: textGlow 4s ease-in-out infinite alternate;
     }
 
     @keyframes textGlow {
-      0% {
-        text-shadow: 0 0 10px #00ffe7, 0 0 20px #00c3ff, 0 0 40px #b721ff;
-      }
-      100% {
-        text-shadow: 0 0 20px #b721ff, 0 0 40px #ff007c, 0 0 60px #ff007c;
-      }
+      0% { text-shadow: 0 0 10px #00ffe7, 0 0 20px #00c3ff, 0 0 40px #b721ff; }
+      100% { text-shadow: 0 0 20px #b721ff, 0 0 40px #ff007c, 0 0 60px #ff007c; }
     }
 
     /* 🎨 Form Elements */
-    .form-group {
-      text-align: left;
-      margin-bottom: 1.2rem;
-    }
-
+    .form-group { text-align: left; margin-bottom: 1.2rem; }
     label {
       display: block;
       font-size: 0.9rem;
       margin-bottom: 0.4rem;
       color: #e0e0e0;
     }
-
     input {
       width: 100%;
       padding: 0.7rem;
@@ -117,7 +103,6 @@
       transition: all 0.3s ease;
       box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
     }
-
     input:focus {
       background: rgba(255, 255, 255, 0.25);
       box-shadow: 0 0 10px #00c3ff, 0 0 20px #b721ff;
@@ -138,25 +123,14 @@
       transition: all 0.3s ease;
       box-shadow: 0 0 15px rgba(0, 195, 255, 0.4);
     }
-
     button:hover {
       transform: translateY(-3px);
       box-shadow: 0 0 20px rgba(0, 195, 255, 0.9), 0 0 40px rgba(183, 33, 255, 0.8);
     }
 
-    .text-small {
-      margin-top: 1rem;
-    }
-
-    a {
-      color: #00ffe7;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    a:hover {
-      color: #ff007c;
-    }
+    .text-small { margin-top: 1rem; }
+    a { color: #00ffe7; text-decoration: none; transition: color 0.3s ease; }
+    a:hover { color: #ff007c; }
 
     /* 💫 Tagline */
     .tagline {
@@ -169,16 +143,9 @@
       letter-spacing: 1px;
       animation: fadeIn 3s ease forwards;
     }
-
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>

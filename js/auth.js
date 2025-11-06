@@ -1,4 +1,4 @@
-// ===== auth.js (Auto Fallback: Local / Gateway / Auth Service) =====
+// ===== auth.js (Extended & Backend-Compatible) =====
 
 // 🌐 Auto-detect environment & endpoints
 const BASE_LOCAL_API = "http://127.0.0.1:5000/api"; // Local dev
@@ -114,7 +114,7 @@ async function loginUser() {
     if (data.role === "user" && data.user) {
       const userInfo = {
         id: data.user.id,
-        name: data.user.name,
+        name: data.user.full_name, // ✅ fixed from backend response
         email: data.user.email,
         role: "user",
       };
@@ -196,4 +196,12 @@ async function testGatewayConnection() {
 }
 
 window.addEventListener("load", testGatewayConnection);
-    // --- CORS Preflight ---
+
+// ===============================
+// 📌 Export functions globally (optional)
+window.registerUser = registerUser;
+window.loginUser = loginUser;
+window.sendResetLink = sendResetLink;
+window.logout = logout;
+window.getCurrentUser = getCurrentUser;
+window.isAdmin = isAdmin;
