@@ -1,4 +1,4 @@
-// ===== marketplace.js (Extended + IIFE + Safe DOM + Debug) =====
+// ===== marketplace.js (Extended + Safe DOM + IIFE) =====
 (() => {
   const API_URL = window.SERVICES?.market || "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market";
   window.MARKET_API = API_URL;
@@ -17,9 +17,7 @@
   }
 
   // ===== Modal Helpers =====
-  const modalBg = document.getElementById('modal-bg');
-  const confirmBtn = document.getElementById('confirm-btn');
-  const cancelBtn = document.getElementById('cancel-btn');
+  let modalBg, confirmBtn, cancelBtn;
 
   function openModal(itemId) {
     selectedItemId = itemId;
@@ -30,20 +28,6 @@
     selectedItemId = null;
     if (modalBg) modalBg.classList.remove('active');
   }
-
-  if (confirmBtn) confirmBtn.addEventListener('click', async () => {
-    if (!selectedItemId) return;
-    try {
-      const res = await apiRequest(`buy/${selectedItemId}`, { method: 'POST' });
-      showToast(`✅ Purchase successful: ${res.message}`, true);
-      loadMarketplace();
-    } catch (err) {
-      showToast(`⚠️ Purchase failed: ${err.message}`, false);
-    }
-    closeModal();
-  });
-
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
 
   // ===== Render Marketplace Items =====
   function renderItems(container, items) {
@@ -100,19 +84,42 @@
     }
   }
 
-  // ===== Search Filter =====
+  // ===== DOMContentLoaded: Safe Initialization =====
   document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById("search");
-    if (searchInput) searchInput.addEventListener("input", (e) => {
-      const query = e.target.value.toLowerCase();
-      document.querySelectorAll(".item-card").forEach(card => {
-        const text = card.querySelector(".item-info").innerText.toLowerCase();
-        card.style.display = text.includes(query) ? "block" : "none";
-      });
+    modalBg = document.getElementById('modal-bg');
+    confirmBtn = document.getElementById('confirm-btn');
+    cancelBtn = document.getElementById('cancel-btn');
+
+    // Modal button events
+    if (confirmBtn) confirmBtn.addEventListener('click', async () => {
+      if (!selectedItemId) return;
+      try {
+        const res = await apiRequest(`buy/${selectedItemId}`, { method: 'POST' });
+        showToast(`✅ Purchase successful: ${res.message}`, true);
+        loadMarketplace();
+      } catch (err) {
+        showToast(`⚠️ Purchase failed: ${err.message}`, false);
+      }
+      closeModal();
     });
 
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // Search filter
+    const searchInput = document.getElementById("search");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll(".item-card").forEach(card => {
+          const text = card.querySelector(".item-info").innerText.toLowerCase();
+          card.style.display = text.includes(query) ? "block" : "none";
+        });
+      });
+    }
+
+    // Initial load
     loadMarketplace();
-    setInterval(loadMarketplace, 30000); // auto-refresh
+    setInterval(loadMarketplace, 30000); // auto-refresh every 30s
   });
 
   // ===== Export Globals for Inline Modal Buttons =====
