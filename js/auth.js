@@ -1,16 +1,18 @@
-// ===== auth.js (Extended + Debug-Friendly) =====
+// ===== auth.js (Extended + Fully Fixed + Debug-Friendly) =====
 
-
-// 🌐 Auto-detect environment & endpoints
+// 🌐 Environment & endpoints
 const BASE_LOCAL_API = "http://127.0.0.1:5000/api"; // Local dev
-const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev"; // Gateway
+const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev"; // Main gateway
 const BASE_AUTH_SERVICE = "https://bgmi_auth_service.bgmi-gateway.workers.dev"; // Direct auth
 
 // 🎯 Auth API Endpoint (auto fallback)
 const AUTH_API = (() => {
   if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
-  return BASE_AUTH_SERVICE; // Use direct auth in production
+  return BASE_AUTH_SERVICE; // Direct auth in production
 })();
+
+// 🔹 Gateway Health URL
+const GATEWAY_HEALTH_URL = `${BASE_GATEWAY_API}/health`;
 
 // ===============================
 // 🧩 Universal Fetch Helper
@@ -36,7 +38,7 @@ async function apiFetch(url, options = {}) {
   } catch (err) {
     console.error("❌ API Error:", err);
 
-    // Try fallback to gateway if not using it yet
+    // Retry via gateway if not already using it
     if (!url.includes(BASE_GATEWAY_API)) {
       console.warn("⚠️ Retrying via Gateway...");
       const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/auth");
@@ -57,11 +59,8 @@ async function registerUser() {
   const phone = document.getElementById("phone")?.value.trim();
   const password = document.getElementById("password")?.value.trim();
 
-  if (!full_name || !email || !phone || !password)
-    return alert("⚠️ Please fill all fields.");
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return alert("⚠️ Invalid email format.");
+  if (!full_name || !email || !phone || !password) return alert("⚠️ Please fill all fields.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("⚠️ Invalid email format.");
 
   const btn = document.getElementById("registerBtn");
   if (btn) btn.innerText = "Registering...";
@@ -73,11 +72,11 @@ async function registerUser() {
     });
 
     console.log("✅ Registration response:", data);
-
     alert("✅ Registration successful! Please log in.");
     window.location.href = "login.html";
   } catch (err) {
     console.error("Register Error:", err);
+    alert(`❌ Registration failed: ${err.message}`);
   } finally {
     if (btn) btn.innerText = "Register";
   }
@@ -89,9 +88,7 @@ async function registerUser() {
 async function loginUser() {
   const email = document.getElementById("email")?.value.trim();
   const password = document.getElementById("password")?.value.trim();
-
-  if (!email || !password)
-    return alert("⚠️ Please enter both email and password.");
+  if (!email || !password) return alert("⚠️ Please enter both email and password.");
 
   const btn = document.getElementById("loginBtn");
   if (btn) btn.innerText = "Logging in...";
@@ -136,6 +133,7 @@ async function loginUser() {
     alert("❌ Invalid credentials or account not found.");
   } catch (err) {
     console.error("Login Error:", err);
+    alert(`⚠️ Login failed: ${err.message}`);
   } finally {
     if (btn) btn.innerText = "Login";
   }
@@ -158,11 +156,11 @@ async function sendResetLink() {
     });
 
     console.log("✅ Forgot Password response:", data);
-
     alert("✅ Password reset link sent! Check your email.");
     window.location.href = "login.html";
   } catch (err) {
     console.error("Forgot Password Error:", err);
+    alert(`⚠️ Failed to send reset link: ${err.message}`);
   } finally {
     if (btn) btn.innerText = "Send Reset Link";
   }
@@ -198,11 +196,12 @@ function isAdmin() {
 // ===============================
 async function testGatewayConnection() {
   try {
-    const res = await fetch(API_URL + '/health');
+    console.log("🌐 Running Gateway & Service Health Check...");
+    const res = await fetch(GATEWAY_HEALTH_URL);
     const data = await res.json();
 
     if (res.ok) {
-      console.log("🌐 Gateway Health:", data);
+      console.log("✅ Gateway Health:", data);
       return true;
     } else {
       console.warn("⚠️ Gateway returned error:", data);
@@ -213,7 +212,6 @@ async function testGatewayConnection() {
     return false;
   }
 }
-
 
 window.addEventListener("load", testGatewayConnection);
 

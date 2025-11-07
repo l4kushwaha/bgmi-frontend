@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BGMI Marketplace</title>
+
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -149,27 +150,28 @@
   }
 </style>
 </head>
+
 <body>
-
-<div id="marketplace">
-  <h2>Available BGMI IDs</h2>
-  <input type="text" id="search" placeholder="Search by UID, rank, or item">
-  <div id="items-container"><p>Loading items...</p></div>
-</div>
-
-<!-- Modal -->
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <p>Are you sure you want to buy this item?</p>
-    <button class="confirm-btn" id="confirm-btn">Yes, Buy</button>
-    <button class="cancel-btn" id="cancel-btn">Cancel</button>
+  <div id="marketplace">
+    <h2>Available BGMI IDs</h2>
+    <input type="text" id="search" placeholder="Search by UID, rank, or item">
+    <div id="items-container"><p>Loading items...</p></div>
   </div>
-</div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+  <!-- Modal -->
+  <div class="modal-bg" id="modal-bg">
+    <div class="modal">
+      <p>Are you sure you want to buy this item?</p>
+      <button class="confirm-btn" id="confirm-btn">Yes, Buy</button>
+      <button class="cancel-btn" id="cancel-btn">Cancel</button>
+    </div>
+  </div>
 
-<script src="js/api.js"></script>
-<script src="js/marketplace.js"></script>
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/marketplace.js"></script>
 </body>
 </html>
