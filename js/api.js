@@ -1,86 +1,98 @@
-// ===== api.js =====
+// ===== api.js (Extended + IIFE + Debug-Friendly) =====
+(() => {
+  // 🌍 Base URL auto-detect
+  const BASE_URL = window.BASE_URL || (
+    window.location.hostname.includes("localhost")
+      ? "http://127.0.0.1:5000/api" // local dev
+      : "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api" // production
+  );
 
-// 🌍 Environment auto-detect
-const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
-const BASE_GATEWAY = "https://bgmi-gateway.bgmi-gateway.workers.dev"; // main gateway
-const BASE_MARKET_SERVICE = "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market";
+  window.BASE_URL = BASE_URL; // global access
 
-// Universal service endpoints
-const SERVICES = {
-    auth: "https://bgmi_auth_service.bgmi-gateway.workers.dev",
-    market: BASE_MARKET_SERVICE,
-    wallet: `${BASE_GATEWAY}/wallet`,
-    verify: `${BASE_GATEWAY}/verify`,
-    chat: `${BASE_GATEWAY}/chat`,
-    admin: `${BASE_GATEWAY}/admin`,
-    notify: `${BASE_GATEWAY}/notify`,
-};
+  // --- Service Endpoints ---
+  const SERVICES = {
+    auth: `${BASE_URL}/auth`,
+    market: `${BASE_URL}/market`,
+    wallet: `${BASE_URL}/wallet`,
+    verify: `${BASE_URL}/verify`,
+    chat: `${BASE_URL}/chat`,
+    admin: `${BASE_URL}/admin`,
+    notify: `${BASE_URL}/notify`,
+  };
 
-// 🌐 Universal API request
-async function apiRequest(endpoint, options = {}, service = 'market') {
-    const token = localStorage.getItem("token");
-    const headers = {
+  // --- Health Endpoints ---
+  const GATEWAY_HEALTH = BASE_URL.replace("/api", "") + "/health";
+  const MARKET_HEALTH = `${SERVICES.market}/health`;
+
+  // --- Universal API Fetch Helper ---
+  async function apiRequest(endpoint, options = {}) {
+    try {
+      const token = localStorage.getItem("token") || "";
+      const headers = {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
-    };
+      };
 
-    const baseURL = SERVICES[service] || BASE_MARKET_SERVICE;
-    const cleanEndpoint = endpoint.replace(/^\//, "");
-    const url = `${baseURL}/${cleanEndpoint}`;
+      const cleanEndpoint = endpoint.replace(/^\//, "");
+      const url = `${BASE_URL}/${cleanEndpoint}`;
 
-    console.log("🌐 API Request:", url, options);
+      console.log("🌐 API Request:", url, options);
 
-    try {
-        const res = await fetch(url, { ...options, headers });
-        const data = await res.json().catch(() => ({}));
+      const res = await fetch(url, { ...options, headers });
+      let data = {};
+      try { data = await res.json(); } catch { data = {}; }
 
-        if (!res.ok) {
-            throw new Error(data.error || data.message || "Request failed");
-        }
+      console.log("📥 API Response:", data, "Status:", res.status);
 
-        console.log("📥 API Response:", data);
-        return data;
+      if (!res.ok) {
+        const message = data.error || data.message || `Request to ${endpoint} failed.`;
+        throw new Error(message);
+      }
+
+      return data;
     } catch (err) {
-        console.error(`❌ API Error [${endpoint}]:`, err);
-
-        // Retry via gateway if direct fails
-        if (!url.includes(BASE_GATEWAY)) {
-            console.warn("⚠️ Retrying via Gateway...");
-            const fallbackUrl = url.replace(baseURL, BASE_GATEWAY + `/${service}`);
-            return apiRequest(fallbackUrl, options, service);
-        }
-
-        alert(`⚠️ ${err.message || "Error connecting to service."}`);
-        throw err;
+      console.error(`❌ API Error [${endpoint}]:`, err);
+      return Promise.reject(err); // caller can handle
     }
-}
+  }
 
-// 🌟 Health Check (Gateway + Services)
-async function checkGateway() {
+  // --- Health Check Function ---
+  async function checkGateway() {
     console.log("🌐 Running Gateway & Service Health Check...");
 
+    // Gateway
     try {
-        const res = await fetch(BASE_GATEWAY + '/health');
-        if (!res.ok) throw new Error("Gateway not healthy");
-        console.log("✅ Gateway connection OK");
-
-        // Market Service health
-        try {
-            const marketRes = await fetch(SERVICES.market + '/health');
-            if (marketRes.ok) console.log("✅ Market Service OK");
-            else console.warn("⚠️ Market Service DOWN");
-        } catch {
-            console.warn("❌ Market Service not reachable");
-        }
+      const res = await fetch(GATEWAY_HEALTH);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) console.log("✅ Gateway OK", data);
+      else console.warn("⚠️ Gateway not healthy", data);
     } catch (err) {
-        console.error("⚠️ Cannot reach Gateway:", err);
-        alert("⚠️ Cannot reach Gateway. Make sure it's live.");
+      console.error("❌ Cannot reach Gateway", err);
     }
-}
 
-window.addEventListener("load", checkGateway);
+    // Market Service
+    try {
+      const res = await fetch(MARKET_HEALTH);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) console.log("✅ Market Service OK", data);
+      else console.warn("⚠️ Market Service DOWN or Unhealthy", data);
+    } catch (err) {
+      console.error("❌ Cannot reach Market Service", err);
+    }
+  }
 
-// Export globally
-window.apiRequest = apiRequest;
-window.checkGateway = checkGateway;
+  // --- Convenience Helpers ---
+  async function fetchMarketItems() { return apiRequest("market/items"); }
+  async function buyMarketItem(itemId) { return apiRequest(`market/buy/${itemId}`, { method: "POST" }); }
+
+  // --- Auto-run health check ---
+  window.addEventListener("load", checkGateway);
+
+  // --- Export globally ---
+  window.SERVICES = SERVICES;
+  window.apiRequest = apiRequest;
+  window.fetchMarketItems = fetchMarketItems;
+  window.buyMarketItem = buyMarketItem;
+  window.checkGateway = checkGateway;
+})();
