@@ -3,7 +3,7 @@
 // 🌍 Base Gateway URL (auto-switch: local → production)
 const BASE_URL = window.location.hostname.includes("localhost")
   ? "http://127.0.0.1:5000/api" // local dev
-  : "https://bgmi-gateway.workers.dev/api"; // Cloudflare production gateway
+  : "https://bgmi-gateway.bgmi-gateway.workers.dev/"; // Cloudflare production gateway
 
 // --- Define service endpoints through gateway ---
 const SERVICES = {

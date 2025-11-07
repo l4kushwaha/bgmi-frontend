@@ -2,8 +2,8 @@
 
 // 🌐 Auto-detect environment & endpoints
 const BASE_LOCAL_API = "http://127.0.0.1:5000/api"; // Local dev
-const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev/api"; // Gateway
-const BASE_AUTH_SERVICE = "https://bgmi-auth-service.bgmi-gateway.workers.dev/api/auth"; // Direct auth
+const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev/"; // Gateway
+const BASE_AUTH_SERVICE = "https://bgmi_auth_service.bgmi-gateway.workers.dev/"; // Direct auth
 
 // 🎯 Auth API Endpoint (auto fallback)
 const AUTH_API = (() => {
