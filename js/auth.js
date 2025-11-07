@@ -1,5 +1,4 @@
 // ===== auth.js (Extended + Debug-Friendly) =====
-const API_URL = "https://bgmi-gateway.bgmi-gateway.workers.dev";
 
 
 // 🌐 Auto-detect environment & endpoints

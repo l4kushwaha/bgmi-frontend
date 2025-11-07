@@ -1,32 +1,52 @@
 // ===== marketplace.js =====
 
-const API_URL = "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market";
-
-let previousItemIds = new Set();
-
-async function apiRequest(path, options = {}) {
-    const url = `${API_URL}/${path}`;
-    const res = await fetch(url, options);
-    if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "API request failed");
-    }
-    return await res.json();
-}
+// Uses apiRequest() from api.js
 
 const container = document.getElementById('items-container');
 if (!container) throw new Error("#items-container not found");
 
-async function loadMarketplace() {
-    container.innerHTML = "<p>Loading items...</p>";
-    try {
-        const data = await apiRequest('items');
-        renderItems(data.items || []);
-    } catch (err) {
-        container.innerHTML = `<p style="color:red;">⚠️ Failed to load items: ${err.message}</p>`;
-    }
+let previousItemIds = new Set();
+let selectedItemId = null;
+
+// --- Toast helper ---
+function showToast(message, success = true) {
+    const toast = document.getElementById('toast');
+    toast.innerText = message;
+    toast.style.background = success ? '#27ae60' : '#c0392b';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+// --- Modal helpers ---
+const modalBg = document.getElementById('modal-bg');
+const confirmBtn = document.getElementById('confirm-btn');
+const cancelBtn = document.getElementById('cancel-btn');
+
+function openModal(itemId) {
+    selectedItemId = itemId;
+    modalBg.classList.add('active');
+}
+
+function closeModal() {
+    selectedItemId = null;
+    modalBg.classList.remove('active');
+}
+
+confirmBtn.addEventListener('click', async () => {
+    if (!selectedItemId) return;
+    try {
+        const res = await apiRequest(`buy/${selectedItemId}`, { method: 'POST' });
+        showToast(`✅ Purchase successful: ${res.message}`, true);
+        loadMarketplace();
+    } catch (err) {
+        showToast(`⚠️ Purchase failed: ${err.message}`, false);
+    }
+    closeModal();
+});
+
+cancelBtn.addEventListener('click', closeModal);
+
+// --- Render marketplace items ---
 function renderItems(items) {
     container.innerHTML = "";
     if (!items.length) {
@@ -60,27 +80,27 @@ function renderItems(items) {
                 <strong>Price:</strong> ₹${item.price || "N/A"}<br>
                 ${item.highlights?.length ? `<div class="highlight">${item.highlights.join(", ")}</div>` : ""}
                 <strong>Status:</strong> ${item.status || "Available"}<br>
-                <button class="buy-btn" onclick="buyItem('${item.id}')" ${!isAvailable ? "disabled" : ""}>
+                <button class="buy-btn" onclick="openModal('${item.id}')" ${!isAvailable ? "disabled" : ""}>
                     ${isAvailable ? "Buy" : "Sold Out"}
                 </button>
             </div>
         `;
-
         container.appendChild(card);
     });
 }
 
-async function buyItem(itemId) {
+// --- Load marketplace ---
+async function loadMarketplace() {
+    container.innerHTML = "<p>Loading items...</p>";
     try {
-        const res = await apiRequest(`buy/${itemId}`, { method: 'POST' });
-        alert(`✅ Purchase successful: ${res.message}`);
-        loadMarketplace();
+        const data = await apiRequest('items');
+        renderItems(data.items || []);
     } catch (err) {
-        alert(`⚠️ Purchase failed: ${err.message}`);
+        container.innerHTML = `<p style="color:red;">⚠️ Failed to load items: ${err.message}</p>`;
     }
 }
 
-// Search filter
+// --- Search filter ---
 document.getElementById("search").addEventListener("input", (e) => {
     const query = e.target.value.toLowerCase();
     const allCards = document.querySelectorAll(".item-card");
@@ -90,7 +110,7 @@ document.getElementById("search").addEventListener("input", (e) => {
     });
 });
 
-// Auto-load & refresh
+// --- Auto-load & refresh ---
 document.addEventListener('DOMContentLoaded', () => {
     loadMarketplace();
     setInterval(loadMarketplace, 30000); // refresh every 30s
