@@ -12,6 +12,7 @@
     padding: 20px;
   }
   h2 { text-align: center; margin-bottom: 20px; }
+
   #search {
     display: block;
     margin: 0 auto 20px auto;
@@ -21,15 +22,18 @@
     border-radius: 5px;
     border: none;
   }
+
   #items-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
   }
+
   .item-card {
     background: rgba(255, 255, 255, 0.1);
     padding: 15px;
     border-radius: 10px;
+    position: relative;
     transition: transform 0.2s, box-shadow 0.2s;
   }
   .item-card:hover {
@@ -55,6 +59,94 @@
     border-radius: 3px;
     font-size: 0.8em;
   }
+  .new-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e74c3c;
+    color: #fff;
+    padding: 3px 6px;
+    font-size: 0.8em;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  button.buy-btn {
+    margin-top: 5px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #27ae60;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  button.buy-btn:hover:not(:disabled) {
+    background: #2ecc71;
+  }
+  button.buy-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+  }
+
+  /* Modal styles */
+  .modal-bg {
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .modal-bg.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal {
+    background: #2e2e4f;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    transform: translateY(-50px);
+    transition: transform 0.3s ease;
+  }
+  .modal-bg.active .modal {
+    transform: translateY(0);
+  }
+  .modal button {
+    margin: 10px 5px 0 5px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .confirm-btn { background: #27ae60; color: #fff; }
+  .cancel-btn { background: #c0392b; color: #fff; }
+
+  /* Toast popup */
+  .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #27ae60;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+    z-index: 2000;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
 </style>
 </head>
 <body>
@@ -65,62 +157,18 @@
   <div id="items-container"><p>Loading items...</p></div>
 </div>
 
-<script>
-  // ✅ Make sure no trailing slash
-  const API_URL = "https://marketplace_service.bgmi-gateway.workers.dev/api/market";
+<!-- Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <p>Are you sure you want to buy this item?</p>
+    <button class="confirm-btn" id="confirm-btn">Yes, Buy</button>
+    <button class="cancel-btn" id="cancel-btn">Cancel</button>
+  </div>
+</div>
 
-async function fetchItems() {
-  try {
-    const res = await fetch(`${API_URL}/all`);
-    if (!res.ok) throw new Error("Failed to fetch items");
-    const data = await res.json();
-    renderItems(data.items || []); // <-- note: data has {items: [...]}
-  } catch (err) {
-    document.getElementById("items-container").innerHTML = `<p style="color:red;">${err.message}</p>`;
-  }
-}
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
-
-  function renderItems(items) {
-    const container = document.getElementById("items-container");
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    if (!items || !items.length) {
-      container.innerHTML = "<p>No items available.</p>";
-      return;
-    }
-
-    items.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "item-card";
-      const imgUrl = item.images?.[0] || "https://via.placeholder.com/250x150?text=No+Image";
-      card.innerHTML = `
-        <img src="${imgUrl}" alt="BGMI ID Image">
-        <div class="item-info">
-          <strong>UID:</strong> ${item.uid || "N/A"}<br>
-          <strong>Rank:</strong> ${item.rank || "N/A"}<br>
-          <strong>Price:</strong> ₹${item.price || "N/A"}<br>
-          ${item.highlights?.length ? `<div class="highlight">${item.highlights.join(", ")}</div>` : ""}
-          <strong>Status:</strong> ${item.status || "Available"}
-        </div>
-      `;
-      container.appendChild(card);
-    });
-  }
-
-  // ✅ Search filter
-  document.getElementById("search").addEventListener("input", (e) => {
-    const query = e.target.value.toLowerCase();
-    const allCards = document.querySelectorAll(".item-card");
-    allCards.forEach(card => {
-      const text = card.querySelector(".item-info").innerText.toLowerCase();
-      card.style.display = text.includes(query) ? "block" : "none";
-    });
-  });
-
-  fetchItems();
-</script>
+<script src="js/marketplace.js"></script>
 </body>
 </html>

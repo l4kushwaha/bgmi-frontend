@@ -5,6 +5,10 @@ const BASE_URL = window.location.hostname.includes("localhost")
   ? "http://127.0.0.1:5000/api" // local dev
   : "https://bgmi_marketplace-service.bgmi-gateway.workers.dev"; // Cloudflare production gateway
 
+const MARKET_URL = "https://bgmi-marketplace-service.bgmi-gateway.workers.dev/api/market/items";
+const MARKET_HEALTH = "https://bgmi-marketplace-service.bgmi-gateway.workers.dev/api/health";
+
+
 // --- Define service endpoints through gateway ---
 const SERVICES = {
   auth: `${BASE_URL}/auth`,
