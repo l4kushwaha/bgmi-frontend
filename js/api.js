@@ -1,11 +1,9 @@
 // ===== api.js (Unified + Auto-dynamic services) =====
-const API_URL = "https://marketplace_service.bgmi-gateway.workers.dev/api/market";
-
 
 // 🌍 Base Gateway URL (auto-switch: local → production)
 const BASE_URL = window.location.hostname.includes("localhost")
   ? "http://127.0.0.1:5000/api" // local dev
-  : "https://bgmi-gateway.bgmi-gateway.workers.dev"; // Cloudflare production gateway
+  : "https://bgmi_marketplace-service.bgmi-gateway.workers.dev"; // Cloudflare production gateway
 
 // --- Define service endpoints through gateway ---
 const SERVICES = {
@@ -75,27 +73,6 @@ async function checkGateway() {
     alert("⚠️ Cannot reach Gateway. Make sure it's live.");
   }
 }
-async function loadMarketplace() {
-  try {
-    const response = await fetch(`${API_URL}/all`);
-    const data = await response.json();
-
-    const container = document.getElementById('items-container');
-    container.innerHTML = data.items.map(item => `
-      <div class="item-card">
-        <img src="${item.images?.[0] || 'https://via.placeholder.com/250x150?text=No+Image'}" alt="BGMI ID">
-        <div class="item-info">
-          <strong>UID:</strong> ${item.uid}<br>
-          <strong>Title:</strong> ${item.title}<br>
-          <strong>Price:</strong> ₹${item.price}<br>
-        </div>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.error("❌ API Error [market/all]:", err);
-  }
-}
-
 
 // Auto-run health check on load
 window.addEventListener("load", checkGateway);
