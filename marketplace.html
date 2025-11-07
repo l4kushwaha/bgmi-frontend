@@ -1,160 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BGMI Marketplace</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BGMI Marketplace</title>
+  <style>
+    /* ===== Basic Styles ===== */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1abc9c, #3498db);
+      margin: 0;
+      padding: 0;
+    }
+    h1 { text-align: center; color: #fff; margin-top: 20px; }
 
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #1e1e2f, #2e2e4f);
-    color: #fff;
-    padding: 20px;
-  }
-  h2 { text-align: center; margin-bottom: 20px; }
+    /* ===== Items Container ===== */
+    #items-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+    }
+    .item-card {
+      background: #fff;
+      border-radius: 10px;
+      width: 250px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    .item-card:hover { transform: scale(1.03); }
+    .item-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .item-info {
+      padding: 10px;
+    }
+    .item-info strong { display: inline-block; width: 70px; }
+    .highlight { margin: 5px 0; color: #e67e22; font-weight: bold; }
 
-  #search {
-    display: block;
-    margin: 0 auto 20px auto;
-    padding: 10px;
-    width: 80%;
-    max-width: 400px;
-    border-radius: 5px;
-    border: none;
-  }
+    /* ===== New Badge ===== */
+    .new-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #e74c3c;
+      color: #fff;
+      padding: 3px 6px;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 3px;
+    }
 
-  #items-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-  }
+    /* ===== Buy Button ===== */
+    .buy-btn {
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .buy-btn:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+    }
 
-  .item-card {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 15px;
-    border-radius: 10px;
-    position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .item-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-  }
-  .item-card img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 5px;
-    margin-bottom: 10px;
-  }
-  .item-info { display: flex; flex-direction: column; gap: 5px; }
-  .highlight {
-    background: #f39c12;
-    color: #000;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 0.8em;
-  }
-  .new-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #e74c3c;
-    color: #fff;
-    padding: 3px 6px;
-    font-size: 0.8em;
-    border-radius: 5px;
-    font-weight: bold;
-  }
-  button.buy-btn {
-    margin-top: 5px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    background: #27ae60;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  button.buy-btn:hover:not(:disabled) { background: #2ecc71; }
-  button.buy-btn:disabled { background: #95a5a6; cursor: not-allowed; }
+    /* ===== Modal ===== */
+    #modal-bg {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #modal-bg.active { display: flex; }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      min-width: 300px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .modal-content button {
+      margin: 10px;
+      padding: 7px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #confirm-btn { background: #27ae60; color: #fff; }
+    #cancel-btn { background: #c0392b; color: #fff; }
 
-  /* Modal */
-  .modal-bg {
-    position: fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-  .modal-bg.active { opacity: 1; pointer-events: all; }
-  .modal {
-    background: #2e2e4f;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-    text-align: center;
-    transform: translateY(-50px);
-    transition: transform 0.3s ease;
-  }
-  .modal-bg.active .modal { transform: translateY(0); }
-  .modal button {
-    margin: 10px 5px 0 5px;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .confirm-btn { background: #27ae60; color: #fff; }
-  .cancel-btn { background: #c0392b; color: #fff; }
+    /* ===== Toast ===== */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #27ae60;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      display: none;
+      z-index: 1100;
+    }
+    #toast.show { display: block; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
+    @keyframes fadein { from {opacity:0;} to {opacity:1;} }
+    @keyframes fadeout { from {opacity:1;} to {opacity:0;} }
 
-  /* Toast */
-  .toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #27ae60;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.5s ease;
-    z-index: 2000;
-  }
-  .toast.show { opacity: 1; transform: translateX(0); }
-</style>
+    /* ===== Search Input ===== */
+    #search {
+      display: block;
+      width: 90%;
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 10px;
+      border-radius: 25px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+  </style>
 </head>
-
 <body>
-  <div id="marketplace">
-    <h2>Available BGMI IDs</h2>
-    <input type="text" id="search" placeholder="Search by UID, rank, or item">
-    <div id="items-container"></div>
+
+<h1>BGMI Marketplace</h1>
+<input type="text" id="search" placeholder="Search items...">
+<div id="items-container">
+  <p>Loading items...</p>
+</div>
+
+<!-- ===== Modal ===== -->
+<div id="modal-bg">
+  <div class="modal-content">
+    <p>Confirm purchase?</p>
+    <button id="confirm-btn">Confirm</button>
+    <button id="cancel-btn">Cancel</button>
   </div>
+</div>
 
-  <!-- Modal -->
-  <div class="modal-bg" id="modal-bg">
-    <div class="modal">
-      <p>Are you sure you want to buy this item?</p>
-      <button class="confirm-btn" id="confirm-btn">Yes, Buy</button>
-      <button class="cancel-btn" id="cancel-btn">Cancel</button>
-    </div>
-  </div>
+<!-- ===== Toast ===== -->
+<div id="toast"></div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+<!-- ===== JS ===== -->
+<script src="marketplace.js"></script>
+<script>
+  // Example: Optional override of API URL
+  window.SERVICES = { market: "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market" };
+</script>
 
-  <!-- Scripts -->
-  <script src="js/api.js"></script>
-  <script src="js/marketplace.js"></script>
 </body>
 </html>

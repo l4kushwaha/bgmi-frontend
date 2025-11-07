@@ -7,47 +7,123 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins", sans-serif; }
 body {
-  height:100vh; overflow:hidden;
+  min-height:100vh;
   background: url("https://i.ytimg.com/vi/aoV3MROF_OY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCTHZ0jtDKlIZ1O0UfD9GytpmtpXQ") 
     no-repeat center center/cover;
   display:flex; justify-content:center; align-items:center; position:relative; color:#fff;
 }
 body::before { content:""; position:absolute; inset:0; background: rgba(0,0,0,0.45); z-index:0; }
+
 form {
-  position:relative; z-index:2; width:370px; padding:30px; border-radius:25px;
+  position:relative; z-index:2; width:480px; max-width:95%; padding:30px; border-radius:25px;
   background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.25);
   box-shadow: 0 0 40px rgba(0,255,255,0.2);
 }
 h2 { text-align:center; font-weight:700; font-size:1.6em; margin-bottom:18px; color:#00ffff;
   text-shadow:0 0 10px #0ff,0 0 20px #ff00ff,0 0 30px #00ffff;
 }
-input, button {
-  width:100%; padding:12px; border-radius:12px; margin:10px 0; font-size:14px; border:none; outline:none;
-}
+input, button { width:100%; padding:12px; border-radius:12px; margin:10px 0; font-size:14px; border:none; outline:none; }
 input { background: rgba(255,255,255,0.12); color:white; }
 input::placeholder { color: rgba(255,255,255,0.7); }
 input:focus { background: rgba(255,255,255,0.25); box-shadow:0 0 15px rgba(0,255,255,0.6); }
 button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-weight:700; cursor:pointer; }
 #estimatedPrice { text-align:center; color:#00ffff; font-weight:bold; margin:10px 0; text-shadow:0 0 10px #0ff; }
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #27ae60;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  display: none;
+  z-index: 1100;
+}
+#toast.show { display: block; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
+@keyframes fadein { from {opacity:0;} to {opacity:1;} }
+@keyframes fadeout { from {opacity:1;} to {opacity:0;} }
+
+/* Drag & Drop Multiple Images */
+#drop-area {
+  border: 2px dashed #0ff;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: #0ff;
+  margin:10px 0;
+  cursor: pointer;
+}
+#drop-area.hover { background: rgba(0,255,255,0.1); }
+
+#preview {
+  margin-top:10px;
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+}
+.preview-img {
+  width: 80px; height:80px; object-fit:cover; border-radius:12px; border:1px solid #0ff; position:relative; cursor:pointer;
+}
+.preview-img span { 
+  position:absolute; top:2px; right:2px; background:red; color:#fff; font-size:12px; border-radius:50%; width:18px; height:18px;
+  text-align:center; line-height:18px; cursor:pointer;
+}
+.preview-img .number {
+  position:absolute; bottom:2px; left:2px; background:rgba(0,255,255,0.7); color:#000; font-size:12px; border-radius:6px; width:18px; height:18px;
+  text-align:center; line-height:18px;
+}
+.preview-img.dragging { opacity:0.5; }
+
+/* Fullscreen Modal */
+#fullModal {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:1200; justify-content:center; align-items:center;
+}
+#fullModal img { max-width:90%; max-height:90%; border-radius:12px; box-shadow:0 0 20px #0ff; }
+#fullModal span { position:absolute; top:20px; right:30px; font-size:30px; color:#fff; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <form id="sellForm">
   <h2>Sell Your BGMI Account</h2>
-  <input type="text" id="username" placeholder="BGMI Username" required>
+  <input type="text" id="uid" placeholder="BGMI UID" required>
+  <input type="text" id="rank" placeholder="Account Rank" required>
   <input type="number" id="level" placeholder="Account Level" required>
   <input type="number" id="mythicItems" placeholder="Mythic Items Count">
   <input type="number" id="xSuits" placeholder="X-Suits Count">
   <input type="text" id="highlights" placeholder="Highlights (comma separated)">
+
+  <div id="drop-area">
+    Drag & Drop Images Here or Click to Upload
+    <input type="file" id="fileElem" accept="image/*" multiple style="display:none">
+  </div>
+  <div id="preview"></div>
+
   <button type="button" onclick="estimateValue()">Estimate Price</button>
   <div id="estimatedPrice"></div>
   <button type="submit">List for Sale</button>
 </form>
 
-<script>
-const API_URL = "https://marketplace-worker.bgmi-gateway.workers.dev/api/market";
+<div id="toast"></div>
 
+<!-- Fullscreen Modal -->
+<div id="fullModal"><span onclick="closeModal()">×</span><img id="modalImg"></div>
+
+<script>
+const API_URL = "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market";
+let uploadedImages = [];
+
+// ===== Toast =====
+function showToast(message, success=true){
+  const toast = document.getElementById('toast');
+  toast.innerText = message;
+  toast.style.background = success ? '#27ae60' : '#c0392b';
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),3000);
+}
+
+// ===== Price Estimation =====
 function estimateValue() {
   const level = parseInt(document.getElementById("level").value)||0;
   const mythic = parseInt(document.getElementById("mythicItems").value)||0;
@@ -57,16 +133,97 @@ function estimateValue() {
   document.getElementById("estimatedPrice").innerText = `💰 Estimated Value: ₹${price}`;
 }
 
+// ===== Drag & Drop Multiple Images =====
+const dropArea = document.getElementById("drop-area");
+const fileInput = document.getElementById("fileElem");
+const preview = document.getElementById("preview");
+
+dropArea.addEventListener("click", () => fileInput.click());
+dropArea.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("hover"); });
+dropArea.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
+dropArea.addEventListener("drop", e => {
+  e.preventDefault();
+  dropArea.classList.remove("hover");
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener("change", e => handleFiles(e.target.files));
+
+function handleFiles(files){
+  for(let file of files){
+    if(!file.type.startsWith("image/")) { showToast("❌ Only images allowed", false); continue; }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedImages.push(e.target.result);
+      updatePreview();
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function updatePreview(){
+  preview.innerHTML = "";
+  uploadedImages.forEach((img, index) => {
+    const div = document.createElement("div");
+    div.className = "preview-img";
+    div.draggable = true;
+    div.dataset.index = index;
+
+    const imageElem = document.createElement("img");
+    imageElem.src = img;
+    imageElem.addEventListener("click", ()=>openModal(img));
+    div.appendChild(imageElem);
+
+    const del = document.createElement("span");
+    del.innerText = "×";
+    del.addEventListener("click", ()=>{
+      uploadedImages.splice(index,1);
+      updatePreview();
+    });
+    div.appendChild(del);
+
+    const num = document.createElement("div");
+    num.className = "number";
+    num.innerText = index+1;
+    div.appendChild(num);
+
+    // Drag & drop reorder
+    div.addEventListener("dragstart", e => div.classList.add("dragging"));
+    div.addEventListener("dragend", e => {
+      div.classList.remove("dragging");
+      const newOrder = [...preview.querySelectorAll(".preview-img img")].map(img=>img.src);
+      uploadedImages = newOrder;
+      updatePreview();
+    });
+
+    preview.appendChild(div);
+  });
+}
+
+// ===== Fullscreen Modal =====
+const fullModal = document.getElementById("fullModal");
+const modalImg = document.getElementById("modalImg");
+function openModal(src){
+  modalImg.src = src;
+  fullModal.style.display = "flex";
+}
+function closeModal(){
+  fullModal.style.display = "none";
+}
+
+// ===== Form Submit =====
 document.getElementById("sellForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const username = document.getElementById("username").value.trim();
+
+  const uid = document.getElementById("uid").value.trim();
+  const rank = document.getElementById("rank").value.trim();
   const level = parseInt(document.getElementById("level").value)||0;
   const mythic = parseInt(document.getElementById("mythicItems").value)||0;
   const xsuit = parseInt(document.getElementById("xSuits").value)||0;
   const highlights = document.getElementById("highlights").value.split(",").filter(h=>h.trim());
   const price = (level*10) + (mythic*500) + (xsuit*2000) + (highlights.length*100);
 
-  const payload = { username, level, mythic, xsuit, highlights, price, status:"Available" };
+  const payload = { uid, rank, level, mythic, xsuit, highlights, images: uploadedImages.length ? uploadedImages : ["https://via.placeholder.com/250x150?text=No+Image"], price, status:"Available" };
 
   try {
     const res = await fetch(`${API_URL}/list`, {
@@ -75,11 +232,14 @@ document.getElementById("sellForm").addEventListener("submit", async (e)=>{
       body: JSON.stringify(payload)
     });
     if(!res.ok) throw new Error("Failed to list account");
-    alert("🎉 Account listed successfully!");
+    showToast("🎉 Account listed successfully!", true);
+
     document.getElementById("sellForm").reset();
     document.getElementById("estimatedPrice").innerText="";
+    uploadedImages = [];
+    preview.innerHTML="";
   } catch(err) {
-    alert("❌ "+err.message);
+    showToast("❌ "+err.message, false);
   }
 });
 </script>
