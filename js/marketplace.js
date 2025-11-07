@@ -1,12 +1,12 @@
-// ===== marketplace.js (Safe DOM + Retry for #items-container) =====
+// ===== marketplace.js (Final Safe Version) =====
 (() => {
   const API_URL = window.SERVICES?.market || "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market";
   window.MARKET_API = API_URL;
 
   let previousItemIds = new Set();
   let selectedItemId = null;
-  let modalBg, confirmBtn, cancelBtn;
 
+  // ===== Toast Helper =====
   function showToast(message, success = true) {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -15,6 +15,9 @@
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
+
+  // ===== Modal Helpers =====
+  let modalBg, confirmBtn, cancelBtn;
 
   function openModal(itemId) {
     selectedItemId = itemId;
@@ -26,6 +29,7 @@
     if (modalBg) modalBg.classList.remove('active');
   }
 
+  // ===== Render Items =====
   function renderItems(container, items) {
     container.innerHTML = "";
     if (!items.length) { container.innerHTML = "<p>No items available.</p>"; return; }
@@ -65,10 +69,10 @@
     });
   }
 
+  // ===== Load Marketplace =====
   async function loadMarketplace() {
     const container = document.getElementById('items-container');
     if (!container) return console.error("#items-container not found");
-
     container.innerHTML = "<p>Loading items...</p>";
     try {
       const data = await apiRequest('items');
@@ -79,6 +83,7 @@
     }
   }
 
+  // ===== Initialize =====
   function initMarketplace() {
     modalBg = document.getElementById('modal-bg');
     confirmBtn = document.getElementById('confirm-btn');
@@ -113,22 +118,12 @@
     setInterval(loadMarketplace, 30000);
   }
 
-  // ===== Wait until #items-container exists =====
-  function waitForContainer(retries = 50, interval = 500) {
-    const container = document.getElementById('items-container');
-    if (container) {
-      initMarketplace();
-    } else if (retries > 0) {
-      console.warn("#items-container not found yet. Retrying in 500ms...");
-      setTimeout(() => waitForContainer(retries - 1, interval), interval);
-    } else {
-      console.error("#items-container not found after multiple retries. Cannot initialize marketplace.");
-    }
+  // ===== DOM Ready =====
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMarketplace);
+  } else {
+    initMarketplace();
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    waitForContainer();
-  });
 
   window.openModal = openModal;
 })();
