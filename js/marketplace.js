@@ -1,4 +1,4 @@
-// ===== marketplace.js (Extended + Safe DOM + IIFE) =====
+// ===== marketplace.js (Fixed + Safe DOM + IIFE) =====
 (() => {
   const API_URL = window.SERVICES?.market || "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market";
   window.MARKET_API = API_URL;
@@ -72,7 +72,12 @@
   // ===== Load Marketplace =====
   async function loadMarketplace() {
     const container = document.getElementById('items-container');
-    if (!container) return console.error("#items-container not found");
+    if (!container) {
+      console.error("#items-container not found yet. Retrying in 500ms...");
+      // Retry after 500ms in case DOM not ready yet
+      setTimeout(loadMarketplace, 500);
+      return;
+    }
 
     container.innerHTML = "<p>Loading items...</p>";
     try {
@@ -84,8 +89,8 @@
     }
   }
 
-  // ===== DOMContentLoaded: Safe Initialization =====
-  document.addEventListener('DOMContentLoaded', () => {
+  // ===== Safe Initialization =====
+  function initMarketplace() {
     modalBg = document.getElementById('modal-bg');
     confirmBtn = document.getElementById('confirm-btn');
     cancelBtn = document.getElementById('cancel-btn');
@@ -117,11 +122,18 @@
       });
     }
 
-    // Initial load
     loadMarketplace();
     setInterval(loadMarketplace, 30000); // auto-refresh every 30s
-  });
+  }
 
-  // ===== Export Globals for Inline Modal Buttons =====
+  // ===== DOM Ready =====
+  if (document.readyState === "loading") {
+    document.addEventListener('DOMContentLoaded', initMarketplace);
+  } else {
+    initMarketplace(); // DOM already loaded
+  }
+
+  // ===== Export for inline buttons =====
   window.openModal = openModal;
+
 })();

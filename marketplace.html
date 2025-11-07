@@ -48,11 +48,7 @@
     border-radius: 5px;
     margin-bottom: 10px;
   }
-  .item-info {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
+  .item-info { display: flex; flex-direction: column; gap: 5px; }
   .highlight {
     background: #f39c12;
     color: #000;
@@ -81,15 +77,10 @@
     cursor: pointer;
     transition: background 0.2s;
   }
-  button.buy-btn:hover:not(:disabled) {
-    background: #2ecc71;
-  }
-  button.buy-btn:disabled {
-    background: #95a5a6;
-    cursor: not-allowed;
-  }
+  button.buy-btn:hover:not(:disabled) { background: #2ecc71; }
+  button.buy-btn:disabled { background: #95a5a6; cursor: not-allowed; }
 
-  /* Modal styles */
+  /* Modal */
   .modal-bg {
     position: fixed;
     top:0; left:0;
@@ -103,10 +94,7 @@
     pointer-events: none;
     transition: opacity 0.3s ease;
   }
-  .modal-bg.active {
-    opacity: 1;
-    pointer-events: all;
-  }
+  .modal-bg.active { opacity: 1; pointer-events: all; }
   .modal {
     background: #2e2e4f;
     padding: 20px;
@@ -116,9 +104,7 @@
     transform: translateY(-50px);
     transition: transform 0.3s ease;
   }
-  .modal-bg.active .modal {
-    transform: translateY(0);
-  }
+  .modal-bg.active .modal { transform: translateY(0); }
   .modal button {
     margin: 10px 5px 0 5px;
     padding: 8px 15px;
@@ -129,7 +115,7 @@
   .confirm-btn { background: #27ae60; color: #fff; }
   .cancel-btn { background: #c0392b; color: #fff; }
 
-  /* Toast popup */
+  /* Toast */
   .toast {
     position: fixed;
     top: 20px;
@@ -144,10 +130,7 @@
     transition: all 0.5s ease;
     z-index: 2000;
   }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  .toast.show { opacity: 1; transform: translateX(0); }
 </style>
 </head>
 
@@ -155,7 +138,7 @@
   <div id="marketplace">
     <h2>Available BGMI IDs</h2>
     <input type="text" id="search" placeholder="Search by UID, rank, or item">
-    <div id="items-container"><p>Loading items...</p></div>
+    <div id="items-container"></div>
   </div>
 
   <!-- Modal -->
