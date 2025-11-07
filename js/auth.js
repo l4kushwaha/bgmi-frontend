@@ -3,7 +3,7 @@
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
   const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev";
-  const BASE_AUTH_SERVICE = "https://bgmi_auth_service.bgmi-gateway.workers.dev";
+  const BASE_AUTH_SERVICE = "https://bgmi_auth_service.bgmi-gateway.workers.dev/api/auth";
 
   // 🎯 Auth API Endpoint (auto fallback)
   const AUTH_API = window.AUTH_API || (() => {
@@ -40,7 +40,7 @@
       // Fallback via Gateway if not already using it
       if (!url.includes(BASE_GATEWAY_API)) {
         console.warn("⚠️ Retrying via Gateway...");
-        const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/auth");
+       const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth");
         return apiFetch(fallbackUrl, options);
       }
 
