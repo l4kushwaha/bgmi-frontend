@@ -1,4 +1,6 @@
 // ===== auth.js (Extended + Debug-Friendly) =====
+const API_URL = "https://bgmi-gateway.bgmi-gateway.workers.dev";
+
 
 // 🌐 Auto-detect environment & endpoints
 const BASE_LOCAL_API = "http://127.0.0.1:5000/api"; // Local dev
