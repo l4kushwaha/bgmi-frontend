@@ -2,8 +2,8 @@
 
 // 🌐 Auto-detect environment & endpoints
 const BASE_LOCAL_API = "http://127.0.0.1:5000/api"; // Local dev
-const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev/"; // Gateway
-const BASE_AUTH_SERVICE = "https://bgmi_auth_service.bgmi-gateway.workers.dev/"; // Direct auth
+const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev"; // Gateway
+const BASE_AUTH_SERVICE = "https://bgmi_auth_service.bgmi-gateway.workers.dev"; // Direct auth
 
 // 🎯 Auth API Endpoint (auto fallback)
 const AUTH_API = (() => {
@@ -197,16 +197,22 @@ function isAdmin() {
 // ===============================
 async function testGatewayConnection() {
   try {
-    const res = await fetch(`${BASE_GATEWAY_API}/health`);
-    const data = await res.json().catch(() => ({}));
-    console.log("🌐 Gateway Health:", data);
+    const res = await fetch(API_URL + '/health');
+    const data = await res.json();
 
-    if (res.ok) console.log("✅ Gateway connection OK");
-    else throw new Error("Gateway not healthy");
+    if (res.ok) {
+      console.log("🌐 Gateway Health:", data);
+      return true;
+    } else {
+      console.warn("⚠️ Gateway returned error:", data);
+      return false;
+    }
   } catch (err) {
-    console.warn("⚠️ Cannot reach Gateway. Make sure it's live.", err);
+    console.error("⚠️ Cannot reach Gateway:", err);
+    return false;
   }
 }
+
 
 window.addEventListener("load", testGatewayConnection);
 

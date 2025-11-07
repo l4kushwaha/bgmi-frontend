@@ -62,30 +62,36 @@
 <div id="marketplace">
   <h2>Available BGMI IDs</h2>
   <input type="text" id="search" placeholder="Search by UID, rank, or item">
-  <div id="items-container"></div>
+  <div id="items-container"><p>Loading items...</p></div>
 </div>
 
 <script>
-  const API_URL = "https://marketplace-worker.bgmi-gateway.workers.dev/api/market";
+  // ✅ Make sure no trailing slash
+  const API_URL = "https://marketplace_service.bgmi-gateway.workers.dev/api/market";
 
-  async function fetchItems() {
-    try {
-      const res = await fetch(`${API_URL}/all`);
-      if (!res.ok) throw new Error("Failed to fetch items");
-      const data = await res.json();
-      renderItems(data);
-    } catch (err) {
-      document.getElementById("items-container").innerHTML = `<p style="color:red;">${err.message}</p>`;
-    }
+async function fetchItems() {
+  try {
+    const res = await fetch(`${API_URL}/all`);
+    if (!res.ok) throw new Error("Failed to fetch items");
+    const data = await res.json();
+    renderItems(data.items || []); // <-- note: data has {items: [...]}
+  } catch (err) {
+    document.getElementById("items-container").innerHTML = `<p style="color:red;">${err.message}</p>`;
   }
+}
+
 
   function renderItems(items) {
     const container = document.getElementById("items-container");
+    if (!container) return;
+
     container.innerHTML = "";
-    if (!items.length) {
+
+    if (!items || !items.length) {
       container.innerHTML = "<p>No items available.</p>";
       return;
     }
+
     items.forEach(item => {
       const card = document.createElement("div");
       card.className = "item-card";
@@ -93,9 +99,9 @@
       card.innerHTML = `
         <img src="${imgUrl}" alt="BGMI ID Image">
         <div class="item-info">
-          <strong>UID:</strong> ${item.uid}<br>
-          <strong>Rank:</strong> ${item.rank}<br>
-          <strong>Price:</strong> ₹${item.price}<br>
+          <strong>UID:</strong> ${item.uid || "N/A"}<br>
+          <strong>Rank:</strong> ${item.rank || "N/A"}<br>
+          <strong>Price:</strong> ₹${item.price || "N/A"}<br>
           ${item.highlights?.length ? `<div class="highlight">${item.highlights.join(", ")}</div>` : ""}
           <strong>Status:</strong> ${item.status || "Available"}
         </div>
@@ -104,6 +110,7 @@
     });
   }
 
+  // ✅ Search filter
   document.getElementById("search").addEventListener("input", (e) => {
     const query = e.target.value.toLowerCase();
     const allCards = document.querySelectorAll(".item-card");
