@@ -1,4 +1,4 @@
-// ===== auth.js (Extended + Fixed + Safe + Debug-Friendly) =====
+// ===== auth.js (Fully Fixed + Backend-Safe) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -8,10 +8,9 @@
   // 🎯 Auth API Endpoint (auto fallback)
   const AUTH_API = window.AUTH_API || (() => {
     if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
-    return BASE_AUTH_SERVICE; // Use direct auth in production
+    return BASE_AUTH_SERVICE;
   })();
-
-  window.AUTH_API = AUTH_API; // expose globally
+  window.AUTH_API = AUTH_API;
 
   // ===============================
   // 🧩 Universal Fetch Helper
@@ -19,7 +18,7 @@
   async function apiFetch(url, options = {}, retry = true) {
     const token = localStorage.getItem("token");
     const headers = {
-      "Content-Type": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     };
@@ -37,11 +36,11 @@
     } catch (err) {
       console.error("❌ API Error:", err);
 
-      // Fallback via Gateway if not already using it
+      // Retry via Gateway if not already using it
       if (retry && !url.includes(BASE_GATEWAY_API)) {
         console.warn("⚠️ Retrying via Gateway...");
         const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth");
-        return apiFetch(fallbackUrl, options, false); // only retry once
+        return apiFetch(fallbackUrl, options, false);
       }
 
       alert(`⚠️ ${err.message || "Error connecting to Auth Service."}`);
@@ -50,7 +49,7 @@
   }
 
   // ===============================
-  // 🧾 REGISTER USER (FIXED + SAFE)
+  // 🧾 REGISTER USER
   // ===============================
   async function registerUser() {
     const full_name = document.getElementById("full_name")?.value.trim();
@@ -65,12 +64,12 @@
     if (btn) btn.innerText = "Registering...";
 
     try {
-      const payload = { full_name, email, phone, password };
-      console.log("➡️ Sending registration payload:", payload);
+      const payload = new URLSearchParams({ full_name, email, phone, password });
+      console.log("➡️ Sending registration payload:", payload.toString());
 
       const data = await apiFetch(`${AUTH_API}/register`, {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: payload.toString(),
       });
 
       console.log("✅ Registration response:", data);
@@ -85,7 +84,7 @@
   }
 
   // ===============================
-  // 🔐 LOGIN USER (FIXED + SAFE)
+  // 🔐 LOGIN USER
   // ===============================
   async function loginUser() {
     const email = document.getElementById("email")?.value.trim();
@@ -96,9 +95,11 @@
     if (btn) btn.innerText = "Logging in...";
 
     try {
+      const payload = new URLSearchParams({ email, password });
+
       const data = await apiFetch(`${AUTH_API}/login`, {
         method: "POST",
-        body: JSON.stringify({ email, password }),
+        body: payload.toString(),
       });
       console.log("✅ Login response:", data);
 
@@ -141,7 +142,7 @@
   }
 
   // ===============================
-  // 🔁 FORGOT PASSWORD (Optional)
+  // 🔁 FORGOT PASSWORD
   // ===============================
   async function sendResetLink() {
     const email = document.getElementById("email")?.value.trim();
@@ -151,9 +152,11 @@
     if (btn) btn.innerText = "Sending...";
 
     try {
+      const payload = new URLSearchParams({ email });
+
       const data = await apiFetch(`${AUTH_API}/forgot-password`, {
         method: "POST",
-        body: JSON.stringify({ email }),
+        body: payload.toString(),
       });
       console.log("✅ Forgot Password response:", data);
       alert("✅ Password reset link sent! Check your email.");
@@ -179,11 +182,8 @@
   // 👤 CURRENT USER UTILITIES
   // ===============================
   function getCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem("user")) || null;
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(localStorage.getItem("user")) || null; }
+    catch { return null; }
   }
 
   function isAdmin() {
