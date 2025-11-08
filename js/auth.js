@@ -1,4 +1,4 @@
-// ===== auth.js (Extended + Fixed + IIFE + Safe + Debug-Friendly) =====
+// ===== auth.js (Extended + Fixed + Safe + Debug-Friendly) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -50,12 +50,12 @@
   }
 
   // ===============================
-  // 🧾 REGISTER USER
+  // 🧾 REGISTER USER (FIXED)
   // ===============================
   async function registerUser() {
     const full_name = document.getElementById("full_name")?.value.trim();
     const email = document.getElementById("email")?.value.trim();
-    const phone = document.getElementById("phone")?.value.trim() || ""; // FIX: never undefined
+    const phone = document.getElementById("phone")?.value.trim() || "";
     const password = document.getElementById("password")?.value.trim();
 
     if (!full_name || !email || !phone || !password) return alert("⚠️ Please fill all fields.");
@@ -85,7 +85,7 @@
   }
 
   // ===============================
-  // 🔐 LOGIN USER
+  // 🔐 LOGIN USER (FIXED)
   // ===============================
   async function loginUser() {
     const email = document.getElementById("email")?.value.trim();
@@ -141,7 +141,7 @@
   }
 
   // ===============================
-  // 🔁 FORGOT PASSWORD (Optional, backend must implement)
+  // 🔁 FORGOT PASSWORD (Optional)
   // ===============================
   async function sendResetLink() {
     const email = document.getElementById("email")?.value.trim();
