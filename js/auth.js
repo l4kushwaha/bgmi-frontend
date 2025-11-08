@@ -50,7 +50,7 @@
   }
 
   // ===============================
-  // 🧾 REGISTER USER (FIXED)
+  // 🧾 REGISTER USER (FIXED + SAFE)
   // ===============================
   async function registerUser() {
     const full_name = document.getElementById("full_name")?.value.trim();
@@ -85,7 +85,7 @@
   }
 
   // ===============================
-  // 🔐 LOGIN USER (FIXED)
+  // 🔐 LOGIN USER (FIXED + SAFE)
   // ===============================
   async function loginUser() {
     const email = document.getElementById("email")?.value.trim();
