@@ -1,15 +1,15 @@
-// ===== api.js (Extended + IIFE + Debug-Friendly) =====
+// ===== api.js (Full Stable + Gateway Compatible + Debug Logs) =====
 (() => {
-  // 🌍 Base URL auto-detect
-  const BASE_URL = window.BASE_URL || (
-    window.location.hostname.includes("localhost")
-      ? "http://127.0.0.1:5000/api" // local dev
-      : "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api" // production
-  );
+  // 🌍 Base URL Auto-Detect
+  const BASE_URL =
+    window.BASE_URL ||
+    (window.location.hostname.includes("localhost")
+      ? "http://127.0.0.1:5000/api" // Local Dev Gateway
+      : "https://bgmi-gateway.bgmi-gateway.workers.dev/api"); // Live Gateway
 
-  window.BASE_URL = BASE_URL; // global access
+  window.BASE_URL = BASE_URL; // Global Access
 
-  // --- Service Endpoints ---
+  // --- 🌐 Service Endpoints ---
   const SERVICES = {
     auth: `${BASE_URL}/auth`,
     market: `${BASE_URL}/market`,
@@ -20,11 +20,19 @@
     notify: `${BASE_URL}/notify`,
   };
 
-  // --- Health Endpoints ---
-  const GATEWAY_HEALTH = BASE_URL.replace("/api", "") + "/health";
-  const MARKET_HEALTH = `${SERVICES.market}/health`;
+  // --- 🩺 Health Endpoints ---
+  const HEALTH_ENDPOINTS = {
+    gateway: BASE_URL.replace("/api", "") + "/health",
+    auth: `${SERVICES.auth}/health`,
+    market: `${SERVICES.market}/health`,
+    wallet: `${SERVICES.wallet}/health`,
+    verify: `${SERVICES.verify}/health`,
+    chat: `${SERVICES.chat}/health`,
+    admin: `${SERVICES.admin}/health`,
+    notify: `${SERVICES.notify}/health`,
+  };
 
-  // --- Universal API Fetch Helper ---
+  // --- 📦 Universal Fetch Helper ---
   async function apiRequest(endpoint, options = {}) {
     try {
       const token = localStorage.getItem("token") || "";
@@ -41,55 +49,60 @@
 
       const res = await fetch(url, { ...options, headers });
       let data = {};
-      try { data = await res.json(); } catch { data = {}; }
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
 
       console.log("📥 API Response:", data, "Status:", res.status);
 
       if (!res.ok) {
-        const message = data.error || data.message || `Request to ${endpoint} failed.`;
+        const message =
+          data.error || data.message || `Request to ${endpoint} failed.`;
         throw new Error(message);
       }
 
       return data;
     } catch (err) {
       console.error(`❌ API Error [${endpoint}]:`, err);
-      return Promise.reject(err); // caller can handle
+      return Promise.reject(err);
     }
   }
 
-  // --- Health Check Function ---
+  // --- 🩺 Comprehensive Health Check ---
   async function checkGateway() {
-    console.log("🌐 Running Gateway & Service Health Check...");
+    console.log("🌐 Running Gateway & All Service Health Checks...");
 
-    // Gateway
-    try {
-      const res = await fetch(GATEWAY_HEALTH);
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) console.log("✅ Gateway OK", data);
-      else console.warn("⚠️ Gateway not healthy", data);
-    } catch (err) {
-      console.error("❌ Cannot reach Gateway", err);
-    }
-
-    // Market Service
-    try {
-      const res = await fetch(MARKET_HEALTH);
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) console.log("✅ Market Service OK", data);
-      else console.warn("⚠️ Market Service DOWN or Unhealthy", data);
-    } catch (err) {
-      console.error("❌ Cannot reach Market Service", err);
+    for (const [name, url] of Object.entries(HEALTH_ENDPOINTS)) {
+      try {
+        const res = await fetch(url);
+        const data = await res.json().catch(() => ({}));
+        if (res.ok)
+          console.log(`✅ ${name.charAt(0).toUpperCase() + name.slice(1)} OK`, data);
+        else
+          console.warn(
+            `⚠️ ${name.charAt(0).toUpperCase() + name.slice(1)} DOWN`,
+            data
+          );
+      } catch (err) {
+        console.error(`❌ Cannot reach ${name} service`, err);
+      }
     }
   }
 
-  // --- Convenience Helpers ---
-  async function fetchMarketItems() { return apiRequest("market/items"); }
-  async function buyMarketItem(itemId) { return apiRequest(`market/buy/${itemId}`, { method: "POST" }); }
+  // --- 🛍️ Marketplace Functions ---
+  async function fetchMarketItems() {
+    return apiRequest("market/items");
+  }
+  async function buyMarketItem(itemId) {
+    return apiRequest(`market/buy/${itemId}`, { method: "POST" });
+  }
 
-  // --- Auto-run health check ---
+  // --- 🔁 Auto-run Health Check on Page Load ---
   window.addEventListener("load", checkGateway);
 
-  // --- Export globally ---
+  // --- 🌎 Global Export for Other Scripts ---
   window.SERVICES = SERVICES;
   window.apiRequest = apiRequest;
   window.fetchMarketItems = fetchMarketItems;
