@@ -1,4 +1,4 @@
-// ===== auth.js (Extended + IIFE + Safe + Debug-Friendly) =====
+// ===== auth.js (Extended + Fixed + IIFE + Safe + Debug-Friendly) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -16,7 +16,7 @@
   // ===============================
   // 🧩 Universal Fetch Helper
   // ===============================
-  async function apiFetch(url, options = {}) {
+  async function apiFetch(url, options = {}, retry = true) {
     const token = localStorage.getItem("token");
     const headers = {
       "Content-Type": "application/json",
@@ -38,10 +38,10 @@
       console.error("❌ API Error:", err);
 
       // Fallback via Gateway if not already using it
-      if (!url.includes(BASE_GATEWAY_API)) {
+      if (retry && !url.includes(BASE_GATEWAY_API)) {
         console.warn("⚠️ Retrying via Gateway...");
-       const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth");
-        return apiFetch(fallbackUrl, options);
+        const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth");
+        return apiFetch(fallbackUrl, options, false); // only retry once
       }
 
       alert(`⚠️ ${err.message || "Error connecting to Auth Service."}`);
@@ -55,7 +55,7 @@
   async function registerUser() {
     const full_name = document.getElementById("full_name")?.value.trim();
     const email = document.getElementById("email")?.value.trim();
-    const phone = document.getElementById("phone")?.value.trim();
+    const phone = document.getElementById("phone")?.value.trim() || ""; // FIX: never undefined
     const password = document.getElementById("password")?.value.trim();
 
     if (!full_name || !email || !phone || !password) return alert("⚠️ Please fill all fields.");
@@ -65,10 +65,14 @@
     if (btn) btn.innerText = "Registering...";
 
     try {
+      const payload = { full_name, email, phone, password };
+      console.log("➡️ Sending registration payload:", payload);
+
       const data = await apiFetch(`${AUTH_API}/register`, {
         method: "POST",
-        body: JSON.stringify({ full_name, email, phone, password }),
+        body: JSON.stringify(payload),
       });
+
       console.log("✅ Registration response:", data);
       alert("✅ Registration successful! Please log in.");
       window.location.href = "login.html";
@@ -137,7 +141,7 @@
   }
 
   // ===============================
-  // 🔁 FORGOT PASSWORD
+  // 🔁 FORGOT PASSWORD (Optional, backend must implement)
   // ===============================
   async function sendResetLink() {
     const email = document.getElementById("email")?.value.trim();
