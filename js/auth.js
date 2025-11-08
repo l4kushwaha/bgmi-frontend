@@ -1,4 +1,4 @@
-// ===== auth.js (Fully Fixed + Backend-Safe) =====
+// ===== auth.js (Fixed + JSON-safe + Gateway-ready) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -8,8 +8,9 @@
   // 🎯 Auth API Endpoint (auto fallback)
   const AUTH_API = window.AUTH_API || (() => {
     if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
-    return BASE_AUTH_SERVICE;
+    return BASE_AUTH_SERVICE; // Use direct auth in production
   })();
+
   window.AUTH_API = AUTH_API;
 
   // ===============================
@@ -18,7 +19,7 @@
   async function apiFetch(url, options = {}, retry = true) {
     const token = localStorage.getItem("token");
     const headers = {
-      "Content-Type": "application/x-www-form-urlencoded",
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     };
@@ -36,7 +37,6 @@
     } catch (err) {
       console.error("❌ API Error:", err);
 
-      // Retry via Gateway if not already using it
       if (retry && !url.includes(BASE_GATEWAY_API)) {
         console.warn("⚠️ Retrying via Gateway...");
         const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth");
@@ -64,12 +64,12 @@
     if (btn) btn.innerText = "Registering...";
 
     try {
-      const payload = new URLSearchParams({ full_name, email, phone, password });
-      console.log("➡️ Sending registration payload:", payload.toString());
+      const payload = { full_name, email, phone, password };
+      console.log("➡️ Sending registration payload:", payload);
 
       const data = await apiFetch(`${AUTH_API}/register`, {
         method: "POST",
-        body: payload.toString(),
+        body: JSON.stringify(payload), // ✅ Send as JSON
       });
 
       console.log("✅ Registration response:", data);
@@ -95,11 +95,9 @@
     if (btn) btn.innerText = "Logging in...";
 
     try {
-      const payload = new URLSearchParams({ email, password });
-
       const data = await apiFetch(`${AUTH_API}/login`, {
         method: "POST",
-        body: payload.toString(),
+        body: JSON.stringify({ email, password }), // ✅ Send as JSON
       });
       console.log("✅ Login response:", data);
 
@@ -152,11 +150,9 @@
     if (btn) btn.innerText = "Sending...";
 
     try {
-      const payload = new URLSearchParams({ email });
-
       const data = await apiFetch(`${AUTH_API}/forgot-password`, {
         method: "POST",
-        body: payload.toString(),
+        body: JSON.stringify({ email }),
       });
       console.log("✅ Forgot Password response:", data);
       alert("✅ Password reset link sent! Check your email.");
@@ -185,7 +181,6 @@
     try { return JSON.parse(localStorage.getItem("user")) || null; }
     catch { return null; }
   }
-
   function isAdmin() {
     const user = getCurrentUser();
     return user?.role === "admin";
@@ -204,7 +199,6 @@
       console.error("⚠️ Cannot reach Gateway:", err);
     }
   }
-
   window.addEventListener("load", testGatewayConnection);
 
   // ===============================
