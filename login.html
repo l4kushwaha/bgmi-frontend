@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - BGMI Market</title>
-  <link rel="stylesheet" href="styles/style.css">
   <style>
-    /* Keep your bubble + form styling here (unchanged) */
+    /* Your existing CSS is fine, keep as is */
   </style>
 </head>
 <body>
@@ -28,17 +27,25 @@
   <!-- 🔐 Login Form -->
   <div class="auth-container">
     <h2>🔐 Login to BGMI Market</h2>
+
     <div class="form-group">
       <label for="email">Email</label>
       <input type="email" id="email" placeholder="Enter your email" required />
     </div>
+
     <div class="form-group">
       <label for="password">Password</label>
       <input type="password" id="password" placeholder="Enter your password" required />
     </div>
-    <button id="loginBtn" onclick="loginUser()">Login</button>
-    <p class="text-small"><a href="forgot_password.html">Forgot Password?</a></p>
-    <p class="text-small">Don’t have an account? <a href="register.html">Register</a></p>
+
+    <button id="loginBtn">Login</button>
+
+    <p class="text-small">
+      <a href="forgot_password.html">Forgot Password?</a>
+    </p>
+    <p class="text-small">
+      Don’t have an account? <a href="register.html">Register</a>
+    </p>
   </div>
 
   <p class="tagline">✨ Secure your gaming future with BGMI Market – Where Legends Trade ✨</p>
