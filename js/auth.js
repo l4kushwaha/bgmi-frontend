@@ -1,4 +1,4 @@
-// ===== auth.js (Extended BGMI Market v2.2) =====
+// ===== auth.js (Extended BGMI Market v2.3) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -92,6 +92,7 @@
       const data = await apiFetch(`${AUTH_API}/login`, { method: "POST", body: JSON.stringify({ email, password }) });
       console.log("✅ Login response:", data);
 
+      // ✅ Admin login
       if (data.role === "admin") {
         const adminUser = {
           id: 0,
@@ -103,23 +104,24 @@
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(adminUser));
         alert("👑 Welcome, Admin!");
-        return (window.location.href = "admin_dashboard.html");
+        return window.location.href = "admin_dashboard.html";
       }
 
-      if (data.role === "user" && data.user) {
+      // ✅ Normal user login
+      if (data.role === "user") {
         const userInfo = {
-          id: data.user.id,
-          name: data.user.full_name,
-          email: data.user.email,
+          id: data.user?.id || 0,
+          name: data.user?.full_name || "Player",
+          email: data.user?.email,
           role: "user",
-          kyc_status: data.user.kyc_status,
-          is_verified: data.user.is_verified,
+          kyc_status: data.user?.kyc_status || "pending",
+          is_verified: data.user?.is_verified || false,
         };
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(userInfo));
         alert("✅ Login successful!");
-        updateFrontendAuth(); // immediately update frontend
-        return;
+        // 🔹 Redirect to homepage
+        return window.location.href = "index.html";
       }
 
       alert("❌ Invalid credentials or account not found.");
@@ -160,7 +162,7 @@
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    updateFrontendAuth(); 
+    updateFrontendAuth();
     if (!window.location.href.includes("index.html")) window.location.href = "login.html";
   }
 
@@ -184,7 +186,7 @@
     if (!user) return;
     const updated = { ...user, ...data };
     localStorage.setItem("user", JSON.stringify(updated));
-    updateFrontendAuth(); 
+    updateFrontendAuth();
   }
 
   // ===============================
@@ -198,14 +200,14 @@
     const usernameEl = document.getElementById("username");
 
     if (user) {
-      guestView?.classList.replace("visible","hidden");
-      userDashboard?.classList.replace("hidden","visible");
-      logoutBtn?.classList.replace("hidden","visible");
-      if(usernameEl) usernameEl.textContent = user.name || "Player";
+      guestView?.classList.replace("visible", "hidden");
+      userDashboard?.classList.replace("hidden", "visible");
+      logoutBtn?.classList.replace("hidden", "visible");
+      if (usernameEl) usernameEl.textContent = user.name || "Player";
     } else {
-      guestView?.classList.replace("hidden","visible");
-      userDashboard?.classList.replace("visible","hidden");
-      logoutBtn?.classList.replace("visible","hidden");
+      guestView?.classList.replace("hidden", "visible");
+      userDashboard?.classList.replace("visible", "hidden");
+      logoutBtn?.classList.replace("visible", "hidden");
     }
   }
 
