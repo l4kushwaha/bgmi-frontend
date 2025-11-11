@@ -1,11 +1,11 @@
-// ===== auth.js (Extended BGMI Market) =====
+// ===== auth.js (Extended BGMI Market v2.0) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
   const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev";
   const BASE_AUTH_SERVICE = "https://auth-service.bgmi-gateway.workers.dev/api/auth";
 
-  // 🎯 Determine Auth API Endpoint
+  // 🎯 Determine Auth API Endpoint dynamically
   const AUTH_API = window.AUTH_API || (() => {
     if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
     return BASE_AUTH_SERVICE;
@@ -21,7 +21,6 @@
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     };
-
     if (!(options.body instanceof FormData)) headers["Content-Type"] = "application/json";
 
     console.log("🌐 API Request:", url, options);
@@ -29,20 +28,17 @@
     try {
       const res = await fetch(url, { ...options, headers });
       const data = await res.json().catch(() => ({}));
-
       console.log("📥 API Response:", data, "Status:", res.status);
 
       if (!res.ok) throw new Error(data.error || data.message || "Request failed");
       return data;
     } catch (err) {
       console.error("❌ API Error:", err);
-
       if (retry && !url.includes(BASE_GATEWAY_API)) {
         console.warn("⚠️ Retrying via Gateway...");
         const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth");
         return apiFetch(fallbackUrl, options, false);
       }
-
       alert(`⚠️ ${err.message || "Error connecting to Auth Service."}`);
       throw err;
     }
@@ -67,12 +63,9 @@
       const payload = { full_name, email, phone, password };
       console.log("➡️ Sending registration payload:", payload);
 
-      const data = await apiFetch(`${AUTH_API}/register`, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-
+      const data = await apiFetch(`${AUTH_API}/register`, { method: "POST", body: JSON.stringify(payload) });
       console.log("✅ Registration response:", data);
+
       alert("✅ Registration successful! Please log in.");
       window.location.href = "login.html";
     } catch (err) {
@@ -95,10 +88,7 @@
     if (btn) btn.innerText = "Logging in...";
 
     try {
-      const data = await apiFetch(`${AUTH_API}/login`, {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await apiFetch(`${AUTH_API}/login`, { method: "POST", body: JSON.stringify({ email, password }) });
       console.log("✅ Login response:", data);
 
       if (data.role === "admin") {
@@ -127,7 +117,8 @@
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(userInfo));
         alert("✅ Login successful!");
-        return (window.location.href = "index.html");
+        updateFrontendAuth(); // <--- immediately update frontend without reload
+        return;
       }
 
       alert("❌ Invalid credentials or account not found.");
@@ -150,10 +141,7 @@
     if (btn) btn.innerText = "Sending...";
 
     try {
-      const data = await apiFetch(`${AUTH_API}/forgot-password`, {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      });
+      const data = await apiFetch(`${AUTH_API}/forgot-password`, { method: "POST", body: JSON.stringify({ email }) });
       console.log("✅ Forgot Password response:", data);
       alert("✅ Password reset link sent! Check your email.");
       window.location.href = "login.html";
@@ -171,7 +159,8 @@
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "login.html";
+    updateFrontendAuth(); // refresh homepage/dashboard view
+    if (!window.location.href.includes("index.html")) window.location.href = "login.html";
   }
 
   // ===============================
@@ -194,6 +183,39 @@
     if (!user) return;
     const updated = { ...user, ...data };
     localStorage.setItem("user", JSON.stringify(updated));
+    updateFrontendAuth(); // update frontend after profile change
+  }
+
+  // ===============================
+  // 🧠 FRONTEND AUTH STATE (HOME PAGE / DASHBOARD)
+  // ===============================
+  function updateFrontendAuth() {
+    const user = getCurrentUser();
+    const guestView = document.getElementById("guest-view");
+    const userDashboard = document.getElementById("user-dashboard");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const usernameEl = document.getElementById("username");
+
+    if (user) {
+      guestView?.classList.replace("visible","hidden");
+      userDashboard?.classList.replace("hidden","visible");
+      logoutBtn?.classList.replace("hidden","visible");
+      if(usernameEl) usernameEl.textContent = user.name || user.username || "Player";
+    } else {
+      guestView?.classList.replace("hidden","visible");
+      userDashboard?.classList.replace("visible","hidden");
+      logoutBtn?.classList.replace("visible","hidden");
+    }
+  }
+
+  // ===============================
+  // 🧪 TOKEN / SESSION REFRESH PLACEHOLDER
+  // ===============================
+  async function refreshToken() {
+    // TODO: Implement token refresh with backend endpoint
+    // Example:
+    // const data = await apiFetch(`${AUTH_API}/refresh`, { method: "POST" });
+    // localStorage.setItem("token", data.token);
   }
 
   // ===============================
@@ -209,7 +231,14 @@
       console.error("⚠️ Cannot reach Gateway:", err);
     }
   }
-  window.addEventListener("load", testGatewayConnection);
+
+  // ===============================
+  // 🚀 AUTO-RUN ON PAGE LOAD
+  // ===============================
+  window.addEventListener("load", () => {
+    updateFrontendAuth();
+    testGatewayConnection();
+  });
 
   // ===============================
   // 📌 Export functions globally
@@ -220,4 +249,5 @@
   window.getCurrentUser = getCurrentUser;
   window.isAdmin = isAdmin;
   window.updateLocalUser = updateLocalUser;
+  window.updateFrontendAuth = updateFrontendAuth; // optional export
 })();

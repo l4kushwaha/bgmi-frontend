@@ -38,17 +38,13 @@
     .bubble {
       position: absolute;
       border-radius: 50%;
-      background: rgba(255,255,255,0.08);
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,204,0,0.1));
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
       animation: float 15s infinite ease-in-out;
       pointer-events: none;
+      z-index: 0;
     }
-
-    .bubble:nth-child(1) { width: 120px; height: 120px; top: 20%; left: 15%; animation-delay: 0s; }
-    .bubble:nth-child(2) { width: 80px; height: 80px; top: 65%; left: 75%; animation-delay: 4s; }
-    .bubble:nth-child(3) { width: 150px; height: 150px; top: 45%; left: 40%; animation-delay: 8s; }
-    .bubble:nth-child(4) { width: 90px; height: 90px; top: 80%; left: 25%; animation-delay: 12s; }
 
     @keyframes float {
       0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
@@ -91,7 +87,6 @@
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      color: transparent;
       text-shadow: 0 0 20px rgba(255,204,0,0.4);
       font-weight: 700;
     }
@@ -125,10 +120,7 @@
       transition: 0.3s;
     }
 
-    nav a:hover {
-      color: #ffcc00;
-    }
-
+    nav a:hover { color: #ffcc00; }
     nav a::after {
       content: "";
       position: absolute;
@@ -139,19 +131,48 @@
       background: linear-gradient(90deg, #ff9900, #ff00ff);
       transition: width 0.3s;
     }
-
-    nav a:hover::after {
-      width: 100%;
-    }
+    nav a:hover::after { width: 100%; }
 
     /* ========== MAIN ========== */
     main {
       flex: 1;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 2rem;
       width: 100%;
+      z-index: 1;
+      position: relative;
+    }
+
+    /* ANNOUNCEMENTS */
+    .announcement-bar {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      -webkit-backdrop-filter: blur(15px);
+      backdrop-filter: blur(15px);
+      border-radius: 15px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .announcement-bar p {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scrollText 15s linear infinite;
+      font-size: 0.95rem;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    @keyframes scrollText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
     }
 
     section {
@@ -167,135 +188,36 @@
       animation: fadeIn 1.3s ease-out forwards;
       transform: translateY(20px);
       opacity: 0;
+      margin-bottom: 2rem;
     }
 
     @keyframes fadeIn {
       to { opacity: 1; transform: translateY(0); }
     }
 
-    section:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 50px rgba(255,255,255,0.15);
-    }
+    h2 { font-size: 2rem; margin-bottom: 1rem; background: linear-gradient(90deg, #ff6600, #ffcc00, #ff0099); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+    p { color: #e2e2e2; margin-bottom: 1.5rem; font-size: 1rem; }
+    button { background: linear-gradient(90deg, #ff8800, #ff00ff); border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; color: #fff; margin: 0.5rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 20px rgba(255,0,255,0.4); }
+    button:hover { transform: scale(1.07); box-shadow: 0 0 40px rgba(255,0,255,0.8); }
 
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(90deg, #ff6600, #ffcc00, #ff0099);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-    }
+    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 2rem; animation: cardsFade 1.5s ease forwards; }
+    @keyframes cardsFade { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-    p {
-      color: #e2e2e2;
-      margin-bottom: 1.5rem;
-      font-size: 1rem;
-    }
+    .card { -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px); background: rgba(255,255,255,0.12); border-radius: 20px; padding: 1.5rem; transition: 0.4s ease; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; box-shadow: 0 4px 30px rgba(0,0,0,0.3); transform-style: preserve-3d; }
+    .card:hover { transform: translateY(-10px) scale(1.05) rotateX(3deg); box-shadow: 0 0 35px rgba(255,204,0,0.6); }
+    .card h3 { color: #ffcc00; margin-bottom: 0.5rem; }
+    .card p { color: #ddd; font-size: 0.9rem; }
 
-    /* Buttons */
-    button {
-      background: linear-gradient(90deg, #ff8800, #ff00ff);
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 1rem;
-      color: #fff;
-      margin: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px rgba(255,0,255,0.4);
-    }
+    /* FOOTER */
+    footer { width: 100%; text-align: center; padding: 1.5rem 1rem; background: rgba(255,255,255,0.05); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.2); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); color: #ccc; animation: fadeUp 1.5s ease-in-out; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    footer a { color: #ffcc00; text-decoration: none; transition: 0.3s; }
+    footer a:hover { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }
+    .socials { margin-top: 0.5rem; font-size: 0.95rem; }
 
-    button:hover {
-      transform: scale(1.07);
-      box-shadow: 0 0 40px rgba(255,0,255,0.8);
-    }
-
-    /* Dashboard Cards */
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-      animation: cardsFade 1.5s ease forwards;
-    }
-
-    @keyframes cardsFade {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .card {
-      -webkit-backdrop-filter: blur(25px);
-      backdrop-filter: blur(25px);
-      background: rgba(255,255,255,0.12);
-      border-radius: 20px;
-      padding: 1.5rem;
-      transition: 0.4s ease;
-      border: 1px solid rgba(255,255,255,0.2);
-      cursor: pointer;
-      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-      transform-style: preserve-3d;
-    }
-
-    .card:hover {
-      transform: translateY(-10px) scale(1.05) rotateX(3deg);
-      box-shadow: 0 0 35px rgba(255,204,0,0.6);
-    }
-
-    .card h3 {
-      color: #ffcc00;
-      margin-bottom: 0.5rem;
-    }
-
-    .card p {
-      color: #ddd;
-      font-size: 0.9rem;
-    }
-
-    /* ========== FOOTER ========== */
-    footer {
-      width: 100%;
-      text-align: center;
-      padding: 1.5rem 1rem;
-      background: rgba(255,255,255,0.05);
-      -webkit-backdrop-filter: blur(20px);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-      color: #ccc;
-      animation: fadeUp 1.5s ease-in-out;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(50px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    footer a {
-      color: #ffcc00;
-      text-decoration: none;
-      transition: 0.3s;
-    }
-
-    footer a:hover {
-      color: #ff00ff;
-      text-shadow: 0 0 10px #ff00ff;
-    }
-
-    .socials {
-      margin-top: 0.5rem;
-      font-size: 0.95rem;
-    }
-
-    /* Hidden/Visible Classes */
     .hidden { display: none; }
     .visible { display: block; }
 
-    /* Responsive */
     @media (max-width: 768px) {
       h2 { font-size: 1.6rem; }
       header h1 { font-size: 1.5rem; }
@@ -306,12 +228,23 @@
 </head>
 
 <body>
-  <!-- Animated Background -->
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  <div class="bubble"></div>
-  <div class="bubble"></div>
+  <!-- Floating Bubbles -->
+  <script>
+    for(let i=0;i<25;i++){
+      const bubble = document.createElement("div");
+      bubble.classList.add("bubble");
+      const size = Math.random()*100+20;
+      bubble.style.width = `${size}px`;
+      bubble.style.height = `${size}px`;
+      bubble.style.left = `${Math.random()*100}vw`;
+      bubble.style.top = `${Math.random()*100}vh`;
+      bubble.style.animationDelay = `${Math.random()*10}s`;
+      bubble.style.background = `radial-gradient(circle, rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.1), rgba(255,255,255,0))`;
+      document.body.appendChild(bubble);
+    }
+  </script>
 
+  <!-- HEADER -->
   <header>
     <div class="header-left">
       <h1>🎮 BGMI Market</h1>
@@ -323,6 +256,7 @@
         <li><a href="sell.html">Sell ID</a></li>
         <li><a href="wallet.html">Wallet</a></li>
         <li><a href="profile.html">Profile</a></li>
+        <li><a href="popularity.html">Popularity</a></li>
         <li><a href="chat.html">Messages</a></li>
         <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
       </ul>
@@ -330,6 +264,12 @@
   </header>
 
   <main>
+    <!-- ANNOUNCEMENTS -->
+    <div class="announcement-bar">
+      <p id="announcement-text">🎉 Welcome to BGMI Market! | New IDs added daily! | Popularity section coming soon!</p>
+    </div>
+
+    <!-- Guest View -->
     <section id="guest-view" class="visible">
       <h2>Welcome to BGMI Market 🎯</h2>
       <p>Buy, sell, and manage BGMI IDs securely with escrow & 2.5% service charge system.</p>
@@ -337,8 +277,9 @@
       <button onclick="window.location='register.html'">Register</button>
     </section>
 
+    <!-- User Dashboard -->
     <section id="user-dashboard" class="hidden">
-      <h2>Welcome back, <span id="username">Player</span> 👋</h2>
+      <h2 id="greeting">Welcome back, Player 👋</h2>
       <p>Explore your marketplace, manage your wallet, and track your sales.</p>
 
       <div class="quick-actions">
@@ -358,6 +299,10 @@
           <h3>👤 Profile</h3>
           <p>Manage your KYC & info</p>
         </div>
+        <div class="card" onclick="window.location='popularity.html'">
+          <h3>⭐ Popularity</h3>
+          <p>Check trending IDs (Coming Soon!)</p>
+        </div>
       </div>
     </section>
   </main>
@@ -370,32 +315,65 @@
     </div>
   </footer>
 
+  <!-- SCRIPTS -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/marketplace.js"></script>
   <script>
-    // Detect login
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
+    // ======== Dashboard & Greeting ========
+    function updateDashboard() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("token");
 
-    if (user && token) {
-      document.getElementById("guest-view").classList.replace("visible", "hidden");
-      document.getElementById("user-dashboard").classList.replace("hidden", "visible");
-      document.getElementById("logoutBtn").classList.replace("hidden", "visible");
-      document.getElementById("username").textContent = user.username;
-    } else {
-      document.getElementById("guest-view").classList.replace("hidden", "visible");
-      document.getElementById("user-dashboard").classList.replace("visible", "hidden");
-      document.getElementById("logoutBtn").classList.replace("visible", "hidden");
+      const guestView = document.getElementById("guest-view");
+      const userDashboard = document.getElementById("user-dashboard");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const greetingEl = document.getElementById("greeting");
+
+      if (user && token) {
+        guestView.classList.replace("visible","hidden");
+        userDashboard.classList.replace("hidden","visible");
+        logoutBtn.classList.replace("hidden","visible");
+
+        const hour = new Date().getHours();
+        let timeGreeting = "Hello";
+        if(hour < 12) timeGreeting = "Good Morning";
+        else if(hour < 18) timeGreeting = "Good Afternoon";
+        else timeGreeting = "Good Evening";
+
+        greetingEl.textContent = `${timeGreeting}, ${user.name || user.username || "Player"} 👋`;
+      } else {
+        guestView.classList.replace("hidden","visible");
+        userDashboard.classList.replace("visible","hidden");
+        logoutBtn.classList.replace("visible","hidden");
+      }
     }
 
-    // Logout functionality
+    updateDashboard(); // initial
+
+    // ======== Logout ========
     document.getElementById("logoutBtn").addEventListener("click", () => {
+      if(window.logout) window.logout(); // auth.js logout if available
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-      window.location.reload();
+      updateDashboard();
     });
-  </script>
-  <script src="js/api.js"></script>       <!-- must be first -->
-   <script src="js/auth.js"></script>
-     <script src="js/marketplace.js"></script>
 
+    // ======== Announcements ========
+    const announcements = [
+      "🎉 Welcome to BGMI Market!",
+      "🆕 New IDs added daily!",
+      "⭐ Popularity section coming soon!",
+      "💼 Sell your ID securely!",
+      "💰 Track wallet transactions in real-time!"
+    ];
+
+    let index = 0;
+    const announcementText = document.getElementById("announcement-text");
+    setInterval(() => {
+      index = (index + 1) % announcements.length;
+      announcementText.textContent = announcements[index];
+    }, 5000);
+  </script>
 </body>
 </html>
