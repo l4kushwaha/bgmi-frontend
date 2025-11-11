@@ -1,4 +1,4 @@
-// ===== auth.js (Extended BGMI Market v2.0) =====
+// ===== auth.js (Extended BGMI Market v2.2) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -11,6 +11,7 @@
     return BASE_AUTH_SERVICE;
   })();
   window.AUTH_API = AUTH_API;
+  console.log("🔑 Using AUTH_API:", AUTH_API);
 
   // ===============================
   // 🧩 Universal Fetch Helper
@@ -117,7 +118,7 @@
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(userInfo));
         alert("✅ Login successful!");
-        updateFrontendAuth(); // <--- immediately update frontend without reload
+        updateFrontendAuth(); // immediately update frontend
         return;
       }
 
@@ -159,7 +160,7 @@
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    updateFrontendAuth(); // refresh homepage/dashboard view
+    updateFrontendAuth(); 
     if (!window.location.href.includes("index.html")) window.location.href = "login.html";
   }
 
@@ -183,11 +184,11 @@
     if (!user) return;
     const updated = { ...user, ...data };
     localStorage.setItem("user", JSON.stringify(updated));
-    updateFrontendAuth(); // update frontend after profile change
+    updateFrontendAuth(); 
   }
 
   // ===============================
-  // 🧠 FRONTEND AUTH STATE (HOME PAGE / DASHBOARD)
+  // 🧠 FRONTEND AUTH STATE
   // ===============================
   function updateFrontendAuth() {
     const user = getCurrentUser();
@@ -200,7 +201,7 @@
       guestView?.classList.replace("visible","hidden");
       userDashboard?.classList.replace("hidden","visible");
       logoutBtn?.classList.replace("hidden","visible");
-      if(usernameEl) usernameEl.textContent = user.name || user.username || "Player";
+      if(usernameEl) usernameEl.textContent = user.name || "Player";
     } else {
       guestView?.classList.replace("hidden","visible");
       userDashboard?.classList.replace("visible","hidden");
@@ -213,9 +214,6 @@
   // ===============================
   async function refreshToken() {
     // TODO: Implement token refresh with backend endpoint
-    // Example:
-    // const data = await apiFetch(`${AUTH_API}/refresh`, { method: "POST" });
-    // localStorage.setItem("token", data.token);
   }
 
   // ===============================
@@ -249,5 +247,5 @@
   window.getCurrentUser = getCurrentUser;
   window.isAdmin = isAdmin;
   window.updateLocalUser = updateLocalUser;
-  window.updateFrontendAuth = updateFrontendAuth; // optional export
+  window.updateFrontendAuth = updateFrontendAuth;
 })();

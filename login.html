@@ -4,27 +4,128 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - BGMI Market</title>
+
   <style>
-    /* Your existing CSS is fine, keep as is */
+    /* ========== GLOBAL RESET ========== */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+
+    body {
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: radial-gradient(circle at top left, #150026, #08080f, #140023);
+      overflow:hidden;
+      color:#fff;
+      position:relative;
+    }
+
+    /* Floating bubbles */
+    .bubble {
+      position:absolute;
+      border-radius:50%;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,204,0,0.1));
+      animation: float 15s infinite ease-in-out;
+      pointer-events:none;
+      z-index:0;
+    }
+    @keyframes float {
+      0%,100%{ transform: translateY(0) scale(1); opacity:0.5; }
+      50%{ transform: translateY(-30px) scale(1.1); opacity:1; }
+    }
+
+    /* Auth container */
+    .auth-container {
+      position: relative;
+      z-index: 10;
+      background: rgba(255,255,255,0.08);
+
+      padding: 2rem;
+      border-radius: 20px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: fadeIn 1s ease forwards;
+    }
+    @keyframes fadeIn { from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
+
+    .auth-container h2 {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg,#ff8800,#ffcc00,#ff00ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .form-group { margin-bottom: 1rem; text-align:left; }
+    .form-group label { display:block; font-size:0.9rem; margin-bottom:0.3rem; color:#ffc; }
+    .form-group input {
+      width:100%;
+      padding:0.6rem 0.8rem;
+      border-radius:10px;
+      border:none;
+      outline:none;
+      font-size:0.95rem;
+      background: rgba(255,255,255,0.1);
+      color:#fff;
+    }
+    .form-group input::placeholder { color: #ccc; }
+
+    button {
+      width:100%;
+      padding:0.8rem;
+      border:none;
+      border-radius:30px;
+      font-size:1rem;
+      font-weight:600;
+      background: linear-gradient(90deg,#ff8800,#ff00ff);
+      color:#fff;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      margin-top:0.5rem;
+      box-shadow: 0 0 20px rgba(255,0,255,0.4);
+    }
+    button:hover { transform: scale(1.05); box-shadow:0 0 40px rgba(255,0,255,0.8); }
+
+    .text-small { font-size:0.85rem; margin-top:0.5rem; }
+    .text-small a { color:#ffcc00; text-decoration:none; transition:0.3s; }
+    .text-small a:hover { color:#ff00ff; text-shadow:0 0 8px #ff00ff; }
+
+    .tagline {
+      position:absolute;
+      bottom:20px;
+      width:100%;
+      text-align:center;
+      font-size:0.9rem;
+      color:#ccc;
+      animation: glowPulse 3s infinite ease-in-out;
+    }
+    @keyframes glowPulse {
+      0%,100%{ opacity:0.8; text-shadow: 0 0 10px #ffcc00; }
+      50%{ opacity:1; text-shadow: 0 0 20px #ff00ff; }
+    }
   </style>
 </head>
+
 <body>
-  <!-- 🌌 Floating Bubbles -->
+  <!-- Floating Bubbles -->
   <script>
-    for(let i=0;i<15;i++){
+    for(let i=0;i<20;i++){
       const bubble=document.createElement("div");
       bubble.classList.add("bubble");
       const size=Math.random()*80+20;
       bubble.style.width=`${size}px`;
       bubble.style.height=`${size}px`;
       bubble.style.left=`${Math.random()*100}vw`;
+      bubble.style.top=`${Math.random()*100}vh`;
       bubble.style.animationDuration=`${10+Math.random()*8}s`;
       bubble.style.animationDelay=`${Math.random()*4}s`;
       document.body.appendChild(bubble);
     }
   </script>
 
-  <!-- 🔐 Login Form -->
+  <!-- Login Form -->
   <div class="auth-container">
     <h2>🔐 Login to BGMI Market</h2>
 
@@ -38,19 +139,15 @@
       <input type="password" id="password" placeholder="Enter your password" required />
     </div>
 
-    <button id="loginBtn">Login</button>
+    <button id="loginBtn" onclick="loginUser()">Login</button>
 
-    <p class="text-small">
-      <a href="forgot_password.html">Forgot Password?</a>
-    </p>
-    <p class="text-small">
-      Don’t have an account? <a href="register.html">Register</a>
-    </p>
+    <p class="text-small"><a href="forgot_password.html">Forgot Password?</a></p>
+    <p class="text-small">Don’t have an account? <a href="register.html">Register</a></p>
   </div>
 
   <p class="tagline">✨ Secure your gaming future with BGMI Market – Where Legends Trade ✨</p>
 
-  <!-- 🔑 Auth JS -->
+  <!-- Auth JS -->
   <script src="js/auth.js"></script>
 </body>
 </html>
