@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BGMI Chat</title>
+  <title>BGMI Chat Pro</title>
+
   <style>
     body {
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #0a0a0a, #1f1f1f);
+      background: radial-gradient(circle at top left, #0f0f0f, #1a1a1a);
       color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
 
     .chat-container {
@@ -20,27 +22,32 @@
       flex-direction: column;
       background: #222;
       border-radius: 16px;
-      width: 380px;
-      height: 620px;
+      width: 420px;
+      height: 720px;
       overflow: hidden;
-      box-shadow: 0 0 25px rgba(0,0,0,0.4);
+      box-shadow: 0 0 35px rgba(0,0,0,0.5);
+      position: relative;
     }
 
+    /* Header */
     .chat-header {
-      padding: 15px;
       background: #333;
+      padding: 10px 15px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       border-bottom: 1px solid #444;
     }
 
     .chat-header input {
-      width: 70%;
+      flex: 1 1 70%;
       padding: 6px 10px;
       border: none;
       border-radius: 6px;
       outline: none;
+      background: #2a2a2a;
+      color: white;
     }
 
     .chat-header button {
@@ -51,72 +58,20 @@
       border-radius: 6px;
       cursor: pointer;
       transition: 0.2s;
+      margin-left: 8px;
     }
 
     .chat-header button:hover {
       background: #45a049;
     }
 
-    .chat-box {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background: #1c1c1c;
-    }
-
-    .message {
-      max-width: 75%;
-      padding: 10px;
-      border-radius: 12px;
-      word-wrap: break-word;
-      font-size: 14px;
-    }
-
-    .sent {
-      background: #007bff;
-      align-self: flex-end;
-    }
-
-    .received {
-      background: #444;
-      align-self: flex-start;
-    }
-
-    .chat-input {
-      display: flex;
-      border-top: 1px solid #444;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      outline: none;
-      background: #2a2a2a;
-      color: white;
-    }
-
-    .chat-input button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 15px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .chat-input button:hover {
-      background: #0056b3;
-    }
-
+    /* Search results */
     .search-results {
       background: #111;
-      max-height: 100px;
+      max-height: 120px;
       overflow-y: auto;
       border-top: 1px solid #333;
+      border-bottom: 1px solid #333;
     }
 
     .search-results div {
@@ -129,25 +84,189 @@
       background: #333;
     }
 
+    /* Current chat */
+    .current-chat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #2c2c2c;
+      padding: 10px;
+      border-bottom: 1px solid #444;
+    }
+
+    #chatWith {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    #userStatus {
+      font-size: 12px;
+      color: #7fff7f;
+    }
+
+    #typingIndicator {
+      color: #ccc;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+
+    /* Chat messages */
+    .chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #1a1a1a;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 10px;
+      border-radius: 12px;
+      word-wrap: break-word;
+      font-size: 14px;
+      line-height: 1.4;
+      position: relative;
+    }
+
+    .sent {
+      background: #007bff;
+      align-self: flex-end;
+    }
+
+    .received {
+      background: #444;
+      align-self: flex-start;
+    }
+
+    .message time {
+      font-size: 10px;
+      color: #aaa;
+      position: absolute;
+      bottom: -14px;
+      right: 8px;
+    }
+
+    .chat-media {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 4px;
+      cursor: pointer;
+    }
+
+    /* Chat input area */
+    .chat-input {
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #444;
+      background: #2a2a2a;
+      padding: 8px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      border-radius: 6px;
+      color: white;
+      background: #1e1e1e;
+    }
+
+    .chat-input button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-left: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .chat-input button:hover {
+      background: #0056b3;
+    }
+
+    #emojiPicker {
+      position: absolute;
+      bottom: 60px;
+      right: 60px;
+      background: #333;
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px;
+      font-size: 20px;
+      z-index: 100;
+    }
+
+    #emojiPicker span {
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #emojiPicker span:hover {
+      transform: scale(1.2);
+    }
+
+    #status {
+      text-align: center;
+      font-size: 12px;
+      color: #bbb;
+      padding: 5px;
+      border-top: 1px solid #333;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="chat-container">
+    <!-- 🔍 Search Users -->
     <div class="chat-header">
-      <input type="text" id="searchInput" placeholder="Search user..." />
+      <input type="text" id="searchUser" placeholder="Search user..." />
       <button id="searchBtn">Search</button>
     </div>
 
-    <div class="search-results" id="searchResults"></div>
+    <div class="search-results" id="userList"></div>
 
-    <div class="chat-box" id="chatBox">
+    <!-- 💬 Current Chat Info -->
+    <div class="current-chat">
+      <div>
+        <span id="chatWith">No user selected</span><br />
+        <small id="userStatus">Offline</small>
+      </div>
+      <small id="typingIndicator"></small>
+    </div>
+
+    <!-- 📩 Messages -->
+    <div class="chat-box" id="messages">
       <p class="chat-placeholder">Start chatting 👋</p>
     </div>
 
+    <!-- 😀 Emoji Picker -->
+    <div id="emojiPicker">
+      <span>😀</span><span>😁</span><span>😂</span><span>😍</span><span>😎</span><span>😢</span>
+      <span>😡</span><span>😇</span><span>🥳</span><span>😴</span><span>🤯</span><span>❤️</span>
+    </div>
+
+    <!-- 📝 Input -->
     <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type your message..." />
+      <input type="text" id="msgInput" placeholder="Type your message..." />
+      <label for="fileInput" title="Attach file">📎</label>
+      <input type="file" id="fileInput" accept="image/*,video/*,application/pdf" />
+      <button id="emojiBtn">😊</button>
       <button id="sendBtn">Send</button>
     </div>
+
+    <div id="status">Connecting to chat service...</div>
   </div>
 
   <script src="chat.js"></script>
