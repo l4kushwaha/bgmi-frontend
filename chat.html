@@ -3,142 +3,153 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>💬 BGMI Chat - Buyer Seller</title>
-  <link rel="stylesheet" href="styles/style.css" />
+  <title>BGMI Chat</title>
   <style>
-    /* 🌙 Dark Chat Theme */
     body {
       font-family: "Poppins", sans-serif;
-      background: radial-gradient(circle at top left, #111, #000);
+      background: linear-gradient(135deg, #0a0a0a, #1f1f1f);
       color: #fff;
-      margin: 0;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       height: 100vh;
     }
 
-    header {
-      background: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
-      padding: 15px;
-      text-align: center;
-      font-size: 22px;
-      letter-spacing: 1px;
-      color: #fff;
-      font-weight: bold;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    }
-
-    #chat-container {
-      flex: 1;
+    .chat-container {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      width: 95%;
-      max-width: 600px;
-      margin: 20px auto;
-      background: rgba(255,255,255,0.05);
-      border-radius: 15px;
-      padding: 15px;
-      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+      background: #222;
+      border-radius: 16px;
+      width: 380px;
+      height: 620px;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0,0,0,0.4);
     }
 
-    #messages {
+    .chat-header {
+      padding: 15px;
+      background: #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #444;
+    }
+
+    .chat-header input {
+      width: 70%;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .chat-header button {
+      background: #4caf50;
+      border: none;
+      color: white;
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .chat-header button:hover {
+      background: #45a049;
+    }
+
+    .chat-box {
       flex: 1;
+      padding: 15px;
       overflow-y: auto;
-      margin-bottom: 10px;
-      padding-right: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #1c1c1c;
     }
 
     .message {
-      margin: 8px 0;
-      padding: 10px 14px;
-      border-radius: 10px;
-      max-width: 70%;
-      line-height: 1.4;
+      max-width: 75%;
+      padding: 10px;
+      border-radius: 12px;
       word-wrap: break-word;
+      font-size: 14px;
     }
 
     .sent {
-      background: #4caf50;
+      background: #007bff;
       align-self: flex-end;
-      border-top-right-radius: 0;
     }
 
     .received {
-      background: #555;
+      background: #444;
       align-self: flex-start;
-      border-top-left-radius: 0;
     }
 
-    #chat-input {
+    .chat-input {
       display: flex;
-      gap: 10px;
+      border-top: 1px solid #444;
     }
 
-    #msgInput {
+    .chat-input input {
       flex: 1;
-      padding: 10px;
-      border-radius: 10px;
+      padding: 12px;
       border: none;
       outline: none;
-      background: rgba(255,255,255,0.1);
-      color: #fff;
+      background: #2a2a2a;
+      color: white;
     }
 
-    #sendBtn {
-      background: #4caf50;
+    .chat-input button {
+      background: #007bff;
+      color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 10px;
-      color: #fff;
-      font-weight: bold;
+      padding: 12px 15px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.2s;
     }
 
-    #sendBtn:hover {
-      background: #43a047;
+    .chat-input button:hover {
+      background: #0056b3;
     }
 
-    #status {
-      text-align: center;
-      font-size: 14px;
-      color: #bbb;
-      margin-bottom: 8px;
+    .search-results {
+      background: #111;
+      max-height: 100px;
+      overflow-y: auto;
+      border-top: 1px solid #333;
     }
 
-    nav a {
-      color: #bbb;
-      margin: 0 5px;
-      text-decoration: none;
+    .search-results div {
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: 0.2s;
     }
 
-    nav a:hover {
-      color: #fff;
+    .search-results div:hover {
+      background: #333;
     }
+
   </style>
 </head>
 <body>
-  <header>
-    💬 BGMI Market Chat
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="marketplace.html">Marketplace</a>
-      <a href="profile.html">Profile</a>
-      <a href="#" id="logoutBtn">Logout</a>
-    </nav>
-  </header>
+  <div class="chat-container">
+    <div class="chat-header">
+      <input type="text" id="searchInput" placeholder="Search user..." />
+      <button id="searchBtn">Search</button>
+    </div>
 
-  <div id="chat-container">
-    <div id="status">Connecting to chat service...</div>
-    <div id="messages"></div>
+    <div class="search-results" id="searchResults"></div>
 
-    <div id="chat-input">
-      <input type="text" id="msgInput" placeholder="Type a message..." />
+    <div class="chat-box" id="chatBox">
+      <p class="chat-placeholder">Start chatting 👋</p>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type your message..." />
       <button id="sendBtn">Send</button>
     </div>
   </div>
 
-  <script src="js/chat.js"></script>
+  <script src="chat.js"></script>
 </body>
 </html>
