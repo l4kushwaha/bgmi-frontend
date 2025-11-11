@@ -1,16 +1,15 @@
-// ===== auth.js (Fixed + JSON-safe + Gateway-ready) =====
+// ===== auth.js (Extended BGMI Market) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
   const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev";
   const BASE_AUTH_SERVICE = "https://auth-service.bgmi-gateway.workers.dev/api/auth";
 
-  // 🎯 Auth API Endpoint (auto fallback)
+  // 🎯 Determine Auth API Endpoint
   const AUTH_API = window.AUTH_API || (() => {
     if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
-    return BASE_AUTH_SERVICE; // Use direct auth in production
+    return BASE_AUTH_SERVICE;
   })();
-
   window.AUTH_API = AUTH_API;
 
   // ===============================
@@ -19,10 +18,11 @@
   async function apiFetch(url, options = {}, retry = true) {
     const token = localStorage.getItem("token");
     const headers = {
-      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     };
+
+    if (!(options.body instanceof FormData)) headers["Content-Type"] = "application/json";
 
     console.log("🌐 API Request:", url, options);
 
@@ -57,7 +57,7 @@
     const phone = document.getElementById("phone")?.value.trim() || "";
     const password = document.getElementById("password")?.value.trim();
 
-    if (!full_name || !email || !phone || !password) return alert("⚠️ Please fill all fields.");
+    if (!full_name || !email || !password) return alert("⚠️ Please fill all required fields.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("⚠️ Invalid email format.");
 
     const btn = document.getElementById("registerBtn");
@@ -69,7 +69,7 @@
 
       const data = await apiFetch(`${AUTH_API}/register`, {
         method: "POST",
-        body: JSON.stringify(payload), // ✅ Send as JSON
+        body: JSON.stringify(payload),
       });
 
       console.log("✅ Registration response:", data);
@@ -97,11 +97,10 @@
     try {
       const data = await apiFetch(`${AUTH_API}/login`, {
         method: "POST",
-        body: JSON.stringify({ email, password }), // ✅ Send as JSON
+        body: JSON.stringify({ email, password }),
       });
       console.log("✅ Login response:", data);
 
-      // --- ADMIN LOGIN ---
       if (data.role === "admin") {
         const adminUser = {
           id: 0,
@@ -116,13 +115,14 @@
         return (window.location.href = "admin_dashboard.html");
       }
 
-      // --- USER LOGIN ---
       if (data.role === "user" && data.user) {
         const userInfo = {
           id: data.user.id,
           name: data.user.full_name,
           email: data.user.email,
           role: "user",
+          kyc_status: data.user.kyc_status,
+          is_verified: data.user.is_verified,
         };
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(userInfo));
@@ -187,6 +187,16 @@
   }
 
   // ===============================
+  // 🧠 PROFILE/KYC HELPERS
+  // ===============================
+  function updateLocalUser(data = {}) {
+    const user = getCurrentUser();
+    if (!user) return;
+    const updated = { ...user, ...data };
+    localStorage.setItem("user", JSON.stringify(updated));
+  }
+
+  // ===============================
   // 🧠 GATEWAY HEALTH CHECK
   // ===============================
   async function testGatewayConnection() {
@@ -209,4 +219,5 @@
   window.logout = logout;
   window.getCurrentUser = getCurrentUser;
   window.isAdmin = isAdmin;
+  window.updateLocalUser = updateLocalUser;
 })();

@@ -59,6 +59,8 @@
     a{color:#00ffe7;text-decoration:none;transition:color 0.3s ease;}
     a:hover{color:#ff007c;}
     .tagline{font-size:0.85rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;}
+    .message{margin-top:0.8rem;font-size:0.9rem;color:#ffcc00;}
+    .message.error{color:#ff4c4c;}
   </style>
 </head>
 <body>
@@ -91,15 +93,12 @@
       <input type="email" id="email" placeholder="Enter your email" required />
     </div>
     <div class="form-group">
-      <label for="phone">Phone Number</label>
-      <input type="text" id="phone" placeholder="Enter your phone number" required />
-    </div>
-    <div class="form-group">
       <label for="password">Password</label>
       <input type="password" id="password" placeholder="Enter your password" required />
     </div>
 
-    <button id="registerBtn" onclick="registerUser()">Register</button>
+    <button id="registerBtn">Register</button>
+    <p class="message" id="msg"></p>
 
     <p class="text-small">
       Already have an account? <a href="login.html">Login here</a>
@@ -107,6 +106,42 @@
   </div>
 
   <!-- 🔑 Auth JS -->
-  <script src="js/auth.js"></script>
+  <script>
+    const msg = document.getElementById("msg");
+    const registerBtn = document.getElementById("registerBtn");
+
+    registerBtn.addEventListener("click", async () => {
+      const full_name = document.getElementById("full_name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if(!full_name || !email || !password){
+        msg.textContent = "Please fill all fields!";
+        msg.classList.add("error");
+        return;
+      }
+
+      try {
+        const response = await fetch("https://auth-service.bgmi-gateway.workers.dev/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, username: full_name, password })
+        });
+        const data = await response.json();
+
+        if(response.ok){
+          msg.textContent = data.message || "Registration successful!";
+          msg.classList.remove("error");
+        } else {
+          msg.textContent = data.error || "Something went wrong!";
+          msg.classList.add("error");
+        }
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "Network error, try again later.";
+        msg.classList.add("error");
+      }
+    });
+  </script>
 </body>
 </html>

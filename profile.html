@@ -22,12 +22,7 @@
       align-items: center;
     }
     header h1 { font-size: 1.5rem; color: #0ff; }
-    nav a {
-      color: #fff;
-      margin-left: 1rem;
-      text-decoration: none;
-      transition: 0.2s;
-    }
+    nav a { color: #fff; margin-left: 1rem; text-decoration: none; transition: 0.2s; }
     nav a:hover { color: #0ff; }
 
     main.profile-container { text-align: center; padding: 2rem; }
@@ -44,8 +39,11 @@
     .profile-card:hover { transform: scale(1.02); }
     .profile-card img {
       width: 100px;
+      height: 100px;
       border-radius: 50%;
       margin-bottom: 1rem;
+      object-fit: cover;
+      border: 2px solid #0ff;
     }
     input, button, label {
       display: block;
@@ -56,10 +54,7 @@
       max-width: 320px;
       border: none;
     }
-    input[type="file"] {
-      background: #2a2a2a;
-      color: #ccc;
-    }
+    input[type="file"] { background: #2a2a2a; color: #ccc; }
     button {
       background: #00ffff;
       color: #000;
@@ -76,6 +71,8 @@
       margin-top: 2rem;
       color: #ccc;
     }
+    .success-msg { color: #0f0; margin-top: 0.5rem; }
+    .error-msg { color: #f00; margin-top: 0.5rem; }
   </style>
 </head>
 
@@ -111,6 +108,7 @@
         <input type="file" id="kyc-file" name="id_image" accept="image/*" title="Upload ID proof image" required />
 
         <button type="submit">Submit KYC for Verification</button>
+        <p id="kyc-msg" class="text-small"></p>
       </form>
 
       <button id="update-btn" onclick="updateProfile()">Update Profile</button>
@@ -122,30 +120,41 @@
   </footer>
 
   <script>
-    // === ⚙️ Constants ===
     const VERIFICATION_API = "https://verification_service.bgmi-gateway.workers.dev/api/verify";
 
-    // === 👤 Load User Data ===
+    // Load User
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) window.location.href = "login.html";
 
-    document.getElementById("profile-name").textContent = user.name;
-    document.getElementById("profile-email").textContent = user.email;
-    document.getElementById("kyc-status").textContent = user.kyc_status || "Pending";
-    document.getElementById("seller-badge").textContent = user.is_verified ? "✔ Verified Seller" : "Standard";
+    const profileName = document.getElementById("profile-name");
+    const profileEmail = document.getElementById("profile-email");
+    const kycStatus = document.getElementById("kyc-status");
+    const sellerBadge = document.getElementById("seller-badge");
+    const profileImg = document.getElementById("profile-img");
 
-    // === 🚪 Logout ===
+    profileName.textContent = user.name;
+    profileEmail.textContent = user.email;
+    kycStatus.textContent = user.kyc_status || "Pending";
+    sellerBadge.textContent = user.is_verified ? "✔ Verified Seller" : "Standard";
+
+    // Preview Profile Image (Optional)
+    document.getElementById("kyc-file").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) profileImg.src = URL.createObjectURL(file);
+    });
+
+    // Logout
     function logout() {
       localStorage.removeItem("user");
       window.location.href = "login.html";
     }
 
-    // === 🔧 Update Profile (placeholder) ===
+    // Placeholder Profile Update
     function updateProfile() {
       alert("Profile update feature coming soon!");
     }
 
-    // === 🧾 KYC Submission ===
+    // KYC Submission
     document.getElementById("kyc-form").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -156,43 +165,35 @@
       formData.append("id_image", document.getElementById("kyc-file").files[0]);
 
       const btn = e.target.querySelector("button");
+      const msg = document.getElementById("kyc-msg");
       btn.disabled = true;
       btn.textContent = "Submitting...";
+      msg.textContent = "";
 
       try {
         const res = await fetch(VERIFICATION_API, { method: "POST", body: formData });
         const result = await res.json();
 
         if (result.success) {
+          kycStatus.textContent = "Under Review";
           alert("✅ KYC submitted successfully! Awaiting admin approval.");
-          document.getElementById("kyc-status").textContent = "Under Review";
         } else {
-          alert("❌ " + (result.error || "Submission failed"));
+          msg.textContent = result.error || "Submission failed";
+          msg.className = "error-msg";
         }
       } catch (err) {
         console.error("⚠️ Verification Error:", err);
-        alert("⚠️ Error connecting to verification service");
+        msg.textContent = "Error connecting to verification service";
+        msg.className = "error-msg";
       } finally {
         btn.disabled = false;
         btn.textContent = "Submit KYC for Verification";
       }
     });
 
-    // ================================================================
-    // 🧠 TODO: Admin Dashboard Integration (Future)
-    // ------------------------------------------------
-    // ➤ Fetch pending KYCs:
-    //     GET https://verification_service.bgmi-gateway.workers.dev/api/pending
-    //
-    // ➤ Approve/Reject KYC:
-    //     POST https://verification_service.bgmi-gateway.workers.dev/api/update_status
-    //     Body: { user_id, status: "approved" | "rejected" }
-    //
-    // ➤ On Approval:
-    //     document.getElementById("kyc-status").textContent = "✅ Verified";
-    //     document.getElementById("seller-badge").textContent = "✔ Verified Seller";
-    //
-    // ================================================================
+    // TODO: Admin Dashboard Integration Hooks
+    // GET pending KYCs: https://verification_service.bgmi-gateway.workers.dev/api/pending
+    // POST approve/reject KYC: https://verification_service.bgmi-gateway.workers.dev/api/update_status
   </script>
 </body>
 </html>
