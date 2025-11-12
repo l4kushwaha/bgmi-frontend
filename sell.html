@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sell BGMI Account 💎</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 /* ==== Basic Reset ==== */
 * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins", sans-serif; }
@@ -24,10 +25,10 @@ form {
 h2 { text-align:center; font-weight:700; font-size:1.6em; margin-bottom:18px; color:#00ffff;
   text-shadow:0 0 10px #0ff,0 0 20px #ff00ff,0 0 30px #00ffff;
 }
-input, button { width:100%; padding:12px; border-radius:12px; margin:10px 0; font-size:14px; border:none; outline:none; }
+input, button, textarea { width:100%; padding:12px; border-radius:12px; margin:10px 0; font-size:14px; border:none; outline:none; }
 input { background: rgba(255,255,255,0.12); color:white; }
-input::placeholder { color: rgba(255,255,255,0.7); }
-input:focus { background: rgba(255,255,255,0.25); box-shadow:0 0 15px rgba(0,255,255,0.6); }
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.7); }
+input:focus, textarea:focus { background: rgba(255,255,255,0.25); box-shadow:0 0 15px rgba(0,255,255,0.6); }
 button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-weight:700; cursor:pointer; }
 #estimatedPrice { text-align:center; color:#00ffff; font-weight:bold; margin:10px 0; text-shadow:0 0 10px #0ff; }
 
@@ -54,28 +55,60 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 #fullModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:1200; justify-content:center; align-items:center; }
 #fullModal img { max-width:90%; max-height:90%; border-radius:12px; box-shadow:0 0 20px #0ff; }
 #fullModal span { position:absolute; top:20px; right:30px; font-size:30px; color:#fff; cursor:pointer; }
+
+/* ==== Accessibility: visually hidden labels ==== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
 </style>
 </head>
 <body>
 
 <form id="sellForm">
   <h2>Sell Your BGMI Account</h2>
-  <input type="text" id="uid" placeholder="BGMI UID" required>
-  <input type="text" id="title" placeholder="Account Title" required>
-  <input type="text" id="rank" placeholder="Account Rank" required>
-  <input type="number" id="level" placeholder="Account Level" required>
-  <input type="number" id="mythic_count" placeholder="Mythic Items Count">
-  <input type="number" id="legendary_count" placeholder="Legendary Items Count">
-  <input type="number" id="xsuit_count" placeholder="X-Suits Count">
-  <input type="number" id="gilt_count" placeholder="Gilt Count">
-  <input type="number" id="honor_gilt_set" placeholder="Honor Gilt Set">
-  <input type="number" id="upgradable_guns" placeholder="Upgradable Guns">
-  <input type="number" id="rare_glider" placeholder="Rare Glider">
-  <input type="number" id="vehicle_skin" placeholder="Vehicle Skin">
-  <input type="number" id="special_titles" placeholder="Special Titles">
-  <input type="text" id="highlights" placeholder="Highlights (comma separated)">
 
-  <div id="drop-area">Drag & Drop Images Here or Click to Upload
+  <div class="form-group">
+    <label for="uid" class="sr-only">BGMI UID</label>
+    <input type="text" id="uid" placeholder="BGMI UID" required>
+  </div>
+
+  <div class="form-group">
+    <label for="title" class="sr-only">Account Title</label>
+    <input type="text" id="title" placeholder="Account Title" required>
+  </div>
+
+  <div class="form-group">
+    <label for="rank" class="sr-only">Account Rank</label>
+    <input type="text" id="rank" placeholder="Account Rank" required>
+  </div>
+
+  <div class="form-group">
+    <label for="level" class="sr-only">Account Level</label>
+    <input type="number" id="level" placeholder="Account Level" required>
+  </div>
+
+  <!-- Additional attributes -->
+  <div class="form-group"><label class="sr-only" for="mythic_count">Mythic Count</label><input type="number" id="mythic_count" placeholder="Mythic Items Count"></div>
+  <div class="form-group"><label class="sr-only" for="legendary_count">Legendary Count</label><input type="number" id="legendary_count" placeholder="Legendary Items Count"></div>
+  <div class="form-group"><label class="sr-only" for="xsuit_count">X-Suits Count</label><input type="number" id="xsuit_count" placeholder="X-Suits Count"></div>
+  <div class="form-group"><label class="sr-only" for="gilt_count">Gilt Count</label><input type="number" id="gilt_count" placeholder="Gilt Count"></div>
+  <div class="form-group"><label class="sr-only" for="honor_gilt_set">Honor Gilt Set</label><input type="number" id="honor_gilt_set" placeholder="Honor Gilt Set"></div>
+  <div class="form-group"><label class="sr-only" for="upgradable_guns">Upgradable Guns</label><input type="number" id="upgradable_guns" placeholder="Upgradable Guns"></div>
+  <div class="form-group"><label class="sr-only" for="rare_glider">Rare Glider</label><input type="number" id="rare_glider" placeholder="Rare Glider"></div>
+  <div class="form-group"><label class="sr-only" for="vehicle_skin">Vehicle Skin</label><input type="number" id="vehicle_skin" placeholder="Vehicle Skin"></div>
+  <div class="form-group"><label class="sr-only" for="special_titles">Special Titles</label><input type="number" id="special_titles" placeholder="Special Titles"></div>
+  <div class="form-group"><label class="sr-only" for="highlights">Highlights</label><input type="text" id="highlights" placeholder="Highlights (comma separated)"></div>
+
+  <!-- Drag & Drop Images -->
+  <div id="drop-area" tabindex="0">Drag & Drop Images Here or Click to Upload
     <input type="file" id="fileElem" multiple style="display:none;">
   </div>
   <div id="preview"></div>
@@ -222,5 +255,6 @@ document.getElementById("sellForm").addEventListener("submit", async e=>{
   }catch(err){ showToast("❌ "+err.message,false); }
 });
 </script>
+
 </body>
 </html>
