@@ -1,135 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BGMI Marketplace</title>
-  <style>
-    /* ===== Basic Styles ===== */
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1abc9c, #3498db);
-      margin: 0;
-      padding: 0;
-    }
-    h1 { text-align: center; color: #fff; margin-top: 20px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGMI Marketplace</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1abc9c, #3498db);
+    margin: 0;
+    padding: 0;
+  }
+  h1 { text-align: center; color: #fff; margin-top: 20px; }
 
-    /* ===== Items Container ===== */
-    #items-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      padding: 20px;
-    }
-    .item-card {
-      background: #fff;
-      border-radius: 10px;
-      width: 250px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      overflow: hidden;
-      position: relative;
-      transition: transform 0.2s;
-    }
-    .item-card:hover { transform: scale(1.03); }
-    .item-card img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-    }
-    .item-info {
-      padding: 10px;
-    }
-    .item-info strong { display: inline-block; width: 70px; }
-    .highlight { margin: 5px 0; color: #e67e22; font-weight: bold; }
+  #items-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+  }
+  .item-card {
+    background: #fff;
+    border-radius: 10px;
+    width: 250px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s;
+  }
+  .item-card:hover { transform: scale(1.03); }
+  .item-info { padding: 10px; }
+  .item-info strong { display: inline-block; width: 70px; }
+  .highlight { margin: 5px 0; color: #e67e22; font-weight: bold; }
 
-    /* ===== New Badge ===== */
-    .new-badge {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: #e74c3c;
-      color: #fff;
-      padding: 3px 6px;
-      font-size: 12px;
-      font-weight: bold;
-      border-radius: 3px;
-    }
+  .new-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #e74c3c;
+    color: #fff;
+    padding: 3px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 3px;
+  }
 
-    /* ===== Buy Button ===== */
-    .buy-btn {
-      background: #27ae60;
-      color: #fff;
-      border: none;
-      padding: 7px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 5px;
-    }
-    .buy-btn:disabled {
-      background: #95a5a6;
-      cursor: not-allowed;
-    }
+  .buy-btn {
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 5px;
+  }
+  .buy-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+  }
 
-    /* ===== Modal ===== */
-    #modal-bg {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #modal-bg.active { display: flex; }
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      min-width: 300px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    .modal-content button {
-      margin: 10px;
-      padding: 7px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #confirm-btn { background: #27ae60; color: #fff; }
-    #cancel-btn { background: #c0392b; color: #fff; }
+  #modal-bg {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #modal-bg.active { display: flex; }
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 300px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .modal-content button {
+    margin: 10px;
+    padding: 7px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  #confirm-btn { background: #27ae60; color: #fff; }
+  #cancel-btn { background: #c0392b; color: #fff; }
 
-    /* ===== Toast ===== */
-    #toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #27ae60;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 20px;
-      display: none;
-      z-index: 1100;
-    }
-    #toast.show { display: block; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
-    @keyframes fadein { from {opacity:0;} to {opacity:1;} }
-    @keyframes fadeout { from {opacity:1;} to {opacity:0;} }
+  #toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #27ae60;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    display: none;
+    z-index: 1100;
+  }
+  #toast.show { display: block; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
+  @keyframes fadein { from {opacity:0;} to {opacity:1;} }
+  @keyframes fadeout { from {opacity:1;} to {opacity:0;} }
 
-    /* ===== Search Input ===== */
-    #search {
-      display: block;
-      width: 90%;
-      max-width: 400px;
-      margin: 20px auto;
-      padding: 10px;
-      border-radius: 25px;
-      border: none;
-      outline: none;
-      font-size: 16px;
-    }
-  </style>
+  #search {
+    display: block;
+    width: 90%;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+  }
+</style>
 </head>
 <body>
 
@@ -139,7 +125,6 @@
   <p>Loading items...</p>
 </div>
 
-<!-- ===== Modal ===== -->
 <div id="modal-bg">
   <div class="modal-content">
     <p>Confirm purchase?</p>
@@ -148,16 +133,19 @@
   </div>
 </div>
 
-<!-- ===== Toast ===== -->
 <div id="toast"></div>
 
-<!-- ===== JS ===== -->
 <script>
 const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 let selectedListingId = null;
 
-// ===== JWT for testing (admin/user) =====
-const JWT = "YOUR_JWT_HERE"; // replace with your admin/user JWT
+// ===== JWT from logged-in user =====
+const user = JSON.parse(localStorage.getItem("user"));
+const JWT = user?.token;
+if (!JWT) {
+  alert("Please login first!");
+  window.location.href = "login.html";
+}
 
 // ===== Toast =====
 function showToast(msg) {
@@ -169,24 +157,37 @@ function showToast(msg) {
 
 // ===== Fetch Listings =====
 async function loadListings() {
-  const res = await fetch(`${API_URL}/market/list`);
-  const items = await res.json();
-  const container = document.getElementById("items-container");
-  container.innerHTML = "";
-  items.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "item-card";
-    card.innerHTML = `
-      ${item.status === 'available' ? '<div class="new-badge">NEW</div>' : ''}
-      <div class="item-info">
-        <p><strong>Title:</strong> ${item.title}</p>
-        <p><strong>UID:</strong> ${item.uid}</p>
-        <p class="highlight"><strong>Price:</strong> ${item.price}</p>
-        <button class="buy-btn" ${item.status !== 'available' ? 'disabled' : ''} onclick="confirmPurchase(${item.id})">Buy</button>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+  try {
+    const res = await fetch(`${API_URL}/market/list`, {
+      headers: { "Authorization": `Bearer ${JWT}` }
+    });
+    const items = await res.json();
+    const container = document.getElementById("items-container");
+    container.innerHTML = "";
+
+    if (!items.length) {
+      container.innerHTML = "<p>No items available</p>";
+      return;
+    }
+
+    items.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "item-card";
+      card.innerHTML = `
+        ${item.status === 'available' ? '<div class="new-badge">NEW</div>' : ''}
+        <div class="item-info">
+          <p><strong>Title:</strong> ${item.title}</p>
+          <p><strong>UID:</strong> ${item.uid}</p>
+          <p class="highlight"><strong>Price:</strong> ${item.price}</p>
+          <button class="buy-btn" ${item.status !== 'available' ? 'disabled' : ''} onclick="confirmPurchase(${item.id})">Buy</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    console.error(err);
+    document.getElementById("items-container").innerHTML = "<p>Failed to load items</p>";
+  }
 }
 
 // ===== Purchase Flow =====
@@ -200,28 +201,38 @@ document.getElementById("cancel-btn").addEventListener("click", () => {
 });
 document.getElementById("confirm-btn").addEventListener("click", async () => {
   if (!selectedListingId) return;
-  const res = await fetch(`${API_URL}/market/purchase/${selectedListingId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${JWT}`,
-    },
-    body: JSON.stringify({ payment_method: "wallet" })
-  });
-  const data = await res.json();
-  showToast(data.message || "Purchase initiated");
-  selectedListingId = null;
-  document.getElementById("modal-bg").classList.remove("active");
-  loadListings(); // refresh list
+  try {
+    const res = await fetch(`${API_URL}/market/purchase/${selectedListingId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${JWT}`,
+      },
+      body: JSON.stringify({ payment_method: "wallet" })
+    });
+    const data = await res.json();
+    showToast(data.message || "Purchase initiated");
+    selectedListingId = null;
+    document.getElementById("modal-bg").classList.remove("active");
+    loadListings(); // refresh after purchase
+  } catch (err) {
+    console.error(err);
+    showToast("Purchase failed");
+  }
 });
 
 // ===== Search =====
 document.getElementById("search").addEventListener("input", (e) => {
   const query = e.target.value.toLowerCase();
+  let visible = 0;
   document.querySelectorAll(".item-card").forEach(card => {
-    const title = card.querySelector("p").textContent.toLowerCase();
-    card.style.display = title.includes(query) ? "block" : "none";
+    const text = card.innerText.toLowerCase();
+    if (text.includes(query)) {
+      card.style.display = "block";
+      visible++;
+    } else card.style.display = "none";
   });
+  if (visible === 0) document.getElementById("items-container").innerHTML = "<p>No items found</p>";
 });
 
 // ===== Initial Load =====

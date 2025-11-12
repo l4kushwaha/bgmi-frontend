@@ -29,7 +29,6 @@ input:focus { background: rgba(255,255,255,0.25); box-shadow:0 0 15px rgba(0,255
 button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-weight:700; cursor:pointer; }
 #estimatedPrice { text-align:center; color:#00ffff; font-weight:bold; margin:10px 0; text-shadow:0 0 10px #0ff; }
 
-/* Toast */
 #toast {
   position: fixed;
   bottom: 20px;
@@ -46,7 +45,6 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 @keyframes fadein { from {opacity:0;} to {opacity:1;} }
 @keyframes fadeout { from {opacity:1;} to {opacity:0;} }
 
-/* Drag & Drop Multiple Images */
 #drop-area {
   border: 2px dashed #0ff;
   border-radius: 12px;
@@ -75,7 +73,6 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 }
 .preview-img.dragging { opacity:0.5; }
 
-/* Fullscreen Modal */
 #fullModal {
   display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:1200; justify-content:center; align-items:center;
 }
@@ -108,8 +105,6 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
   </div>
   <div id="preview"></div>
 
-  <input type="text" id="adminJWT" placeholder="Admin JWT (Required)" required>
-
   <button type="button" onclick="estimateValue()">Estimate Price</button>
   <div id="estimatedPrice"></div>
   <button type="submit">List for Sale</button>
@@ -117,12 +112,16 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 
 <div id="toast"></div>
 
-<!-- Fullscreen Modal -->
 <div id="fullModal"><span onclick="closeModal()">×</span><img id="modalImg"></div>
 
 <script>
-const API_URL = "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market";
+const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
 let uploadedImages = [];
+
+// ===== JWT from logged-in admin =====
+const admin = JSON.parse(localStorage.getItem("user"));
+const adminJWT = admin?.token;
+if(!adminJWT){ alert("Login required!"); window.location.href="login.html"; }
 
 // ===== Toast =====
 function showToast(message, success=true){
@@ -164,7 +163,6 @@ fileInput.addEventListener("change", e => handleFiles(e.target.files));
 function handleFiles(files){
   for(let file of files){
     if(!file.type.startsWith("image/")) { showToast("❌ Only images allowed", false); continue; }
-
     const reader = new FileReader();
     reader.onload = e => { uploadedImages.push(e.target.result); updatePreview(); };
     reader.readAsDataURL(file);
@@ -186,10 +184,7 @@ function updatePreview(){
 
     const del = document.createElement("span");
     del.innerText = "×";
-    del.addEventListener("click", ()=>{
-      uploadedImages.splice(index,1);
-      updatePreview();
-    });
+    del.addEventListener("click", ()=>{ uploadedImages.splice(index,1); updatePreview(); });
     div.appendChild(del);
 
     const num = document.createElement("div");
@@ -198,12 +193,7 @@ function updatePreview(){
     div.appendChild(num);
 
     div.addEventListener("dragstart", e => div.classList.add("dragging"));
-    div.addEventListener("dragend", e => {
-      div.classList.remove("dragging");
-      const newOrder = [...preview.querySelectorAll(".preview-img img")].map(img=>img.src);
-      uploadedImages = newOrder;
-      updatePreview();
-    });
+    div.addEventListener("dragend", e => { div.classList.remove("dragging"); const newOrder=[...preview.querySelectorAll(".preview-img img")].map(img=>img.src); uploadedImages=newOrder; updatePreview(); });
 
     preview.appendChild(div);
   });
@@ -218,12 +208,8 @@ function closeModal(){ fullModal.style.display = "none"; }
 // ===== Form Submit =====
 document.getElementById("sellForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
-
-  const adminJWT = document.getElementById("adminJWT").value.trim();
-  if(!adminJWT){ showToast("❌ Admin JWT required", false); return; }
-
   const payload = {
-    seller_id: "admin_user", // can be dynamic from JWT if decoded
+    seller_id: admin?.username || "admin_user",
     uid: document.getElementById("uid").value.trim(),
     title: document.getElementById("title").value.trim(),
     description: document.getElementById("highlights").value.trim(),
@@ -244,7 +230,7 @@ document.getElementById("sellForm").addEventListener("submit", async (e)=>{
   try {
     const res = await fetch(`${API_URL}/create`, {
       method:"POST",
-      headers: {
+      headers:{
         "Content-Type":"application/json",
         "Authorization": `Bearer ${adminJWT}`
       },
@@ -252,18 +238,15 @@ document.getElementById("sellForm").addEventListener("submit", async (e)=>{
     });
 
     const data = await res.json();
-    if(res.ok){ 
-      showToast("🎉 Account listed successfully!", true);
+    if(res.ok){
+      showToast("🎉 Account listed successfully!");
       document.getElementById("sellForm").reset();
       uploadedImages=[]; preview.innerHTML=""; document.getElementById("estimatedPrice").innerText="";
-    } else {
-      throw new Error(data.error || "Failed to list account");
-    }
+    } else throw new Error(data.error || "Failed to list account");
   } catch(err){
-    showToast("❌ "+err.message, false);
+    showToast("❌ "+err.message,false);
   }
 });
 </script>
-
 </body>
 </html>

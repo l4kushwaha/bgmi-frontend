@@ -1,229 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard | BGMI Store</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsive.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      background: #0b0b0b;
-      color: white;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Dashboard | BGMI Store</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="responsive.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: #0b0b0b;
+    color: white;
+  }
 
-    header {
-      background: #111;
-      padding: 15px 25px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #333;
-    }
+  header {
+    background: #111;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+  }
 
-    header h1 {
-      font-size: 22px;
-      color: #00ffc6;
-    }
+  header h1 { font-size: 22px; color: #00ffc6; }
 
-    .logout-btn {
-      background: crimson;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+  .logout-btn {
+    background: crimson;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
 
-    main {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-      padding: 25px;
-    }
+  main {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    padding: 25px;
+  }
 
-    section {
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-    }
+  section {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  }
 
-    h2 {
-      border-bottom: 2px solid #00ffc6;
-      padding-bottom: 5px;
-      margin-bottom: 10px;
-    }
+  h2 {
+    border-bottom: 2px solid #00ffc6;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+  }
 
-    .user-list li {
-      border-bottom: 1px solid #333;
-      padding: 6px 0;
-      display: flex;
-      justify-content: space-between;
-    }
+  .user-list li {
+    border-bottom: 1px solid #333;
+    padding: 6px 0;
+    display: flex;
+    justify-content: space-between;
+  }
 
-    .toggle-btn {
-      background: #00ffc6;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      color: black;
-      font-weight: 600;
-    }
+  .toggle-btn, .refresh-btn {
+    background: #00ffc6;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: black;
+    font-weight: 600;
+    margin-left: 5px;
+  }
 
-    .wallet-card {
-      background: #111;
-      padding: 15px;
-      border-radius: 10px;
-      text-align: center;
-    }
+  .wallet-card {
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+  }
 
-    .wallet-balance {
-      font-size: 30px;
-      color: #00ffc6;
-    }
+  .wallet-balance { font-size: 30px; color: #00ffc6; }
 
-    @media(max-width:900px){
-      main{
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  @media(max-width:900px){
+    main { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
-
 <body>
-  <header>
-    <h1>👑 Admin Dashboard</h1>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </header>
+<header>
+  <h1>👑 Admin Dashboard</h1>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
 
-  <main>
-    <!-- Left Panel -->
-    <section>
-      <h2>Admin Wallet (Service Charges)</h2>
-      <div class="wallet-card">
-        <p>💰 Total Balance</p>
-        <div class="wallet-balance" id="walletBalance">₹0.00</div>
-      </div>
-      <br>
-      <h2>Module Control</h2>
-      <div id="modules">
-        <p>Loading module statuses...</p>
-      </div>
-    </section>
+<main>
+  <!-- Left Panel -->
+  <section>
+    <h2>Admin Wallet (Service Charges)
+      <button class="refresh-btn" onclick="fetchWallet()">Refresh</button>
+    </h2>
+    <div class="wallet-card">
+      <p>💰 Total Balance</p>
+      <div class="wallet-balance" id="walletBalance">₹0.00</div>
+    </div>
 
-    <!-- Right Panel -->
-    <section>
-      <h2>Registered Users</h2>
-      <ul id="userList" class="user-list">
-        <li>Loading users...</li>
-      </ul>
-    </section>
-  </main>
+    <h2>Module Control
+      <button class="refresh-btn" onclick="fetchModules()">Refresh</button>
+    </h2>
+    <div id="modules"><p>Loading module statuses...</p></div>
+  </section>
 
-  <script>
-    const GATEWAY_URL = "http://localhost:5000";
-    const ADMIN_KEY = "ELEGENT1832";
+  <!-- Right Panel -->
+  <section>
+    <h2>Registered Users
+      <button class="refresh-btn" onclick="fetchUsers()">Refresh</button>
+    </h2>
+    <ul id="userList" class="user-list"><li>Loading users...</li></ul>
+  </section>
+</main>
 
-    // Check if admin logged in
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || user.role !== "admin") {
-      alert("❌ Unauthorized access. Redirecting...");
-      window.location.href = "login.html";
+<script>
+  const GATEWAY_URL = "http://localhost:5000";
+  const ADMIN_KEY = "ELEGENT1832";
+
+  // Check JWT token in localStorage
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user || user.role !== "admin" || !user.token) {
+    alert("❌ Unauthorized access. Redirecting...");
+    window.location.href = "login.html";
+  }
+
+  // Logout function
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+
+  // Fetch wallet balance
+  async function fetchWallet() {
+    try {
+      const res = await fetch(`${GATEWAY_URL}/api/wallet/admin-balance`, {
+        headers: { "Authorization": `Bearer ${user.token}` }
+      });
+      const data = await res.json();
+      document.getElementById("walletBalance").innerText = res.ok ? `₹${data.balance.toFixed(2)}` : "Error fetching balance";
+    } catch (err) {
+      console.error(err);
+      document.getElementById("walletBalance").innerText = "Server unreachable";
     }
+  }
 
-    // Logout
-    function logout() {
-      localStorage.clear();
-      window.location.href = "login.html";
-    }
-
-    // Fetch wallet balance (from wallet service)
-    async function fetchWallet() {
-      try {
-        const res = await fetch(`${GATEWAY_URL}/api/wallet/admin-balance`);
-        const data = await res.json();
-        if (res.ok) {
-          document.getElementById("walletBalance").innerText = `₹${data.balance.toFixed(2)}`;
-        } else {
-          document.getElementById("walletBalance").innerText = "Error fetching balance";
-        }
-      } catch (err) {
-        console.error(err);
-        document.getElementById("walletBalance").innerText = "Server unreachable";
+  // Fetch modules
+  async function fetchModules() {
+    try {
+      const res = await fetch(`${GATEWAY_URL}/health/modules`);
+      const data = await res.json();
+      const modulesDiv = document.getElementById("modules");
+      modulesDiv.innerHTML = "";
+      for (const [name, status] of Object.entries(data)) {
+        const color = status === "running" ? "lime" : "crimson";
+        modulesDiv.innerHTML += `
+          <div style="margin-bottom:8px;">
+            <b>${name}</b> — <span style="color:${color}">${status}</span>
+            <button class="toggle-btn" onclick="toggleModule('${name}')">
+              ${status === "running" ? "Stop" : "Start"}
+            </button>
+          </div>`;
       }
+    } catch (err) {
+      console.error(err);
+      document.getElementById("modules").innerHTML = "<p>Failed to load modules</p>";
     }
+  }
 
-    // Fetch module statuses
-    async function fetchModules() {
-      try {
-        const res = await fetch(`${GATEWAY_URL}/health/modules`);
-        const data = await res.json();
-        const modulesDiv = document.getElementById("modules");
-        modulesDiv.innerHTML = "";
-
-        for (const [name, status] of Object.entries(data)) {
-          const color = status === "running" ? "lime" : "crimson";
-          modulesDiv.innerHTML += `
-            <div style="margin-bottom:8px;">
-              <b>${name}</b> — <span style="color:${color}">${status}</span>
-              <button class="toggle-btn" onclick="toggleModule('${name}')">
-                ${status === "running" ? "Stop" : "Start"}
-              </button>
-            </div>
-          `;
-        }
-      } catch (err) {
-        console.error(err);
-        document.getElementById("modules").innerHTML = "<p>Failed to load modules</p>";
-      }
+  // Toggle module
+  async function toggleModule(name) {
+    try {
+      const res = await fetch(`${GATEWAY_URL}/api/admin/module/${name}/toggle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ admin_key: ADMIN_KEY })
+      });
+      const data = await res.json();
+      alert(data.message || "Toggled successfully!");
+      fetchModules();
+    } catch (err) {
+      alert("⚠️ Error toggling module");
     }
+  }
 
-    // Toggle module (simulate maintenance mode)
-    async function toggleModule(name) {
-      try {
-        const res = await fetch(`${GATEWAY_URL}/api/admin/module/${name}/toggle`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ admin_key: ADMIN_KEY })
-        });
-        const data = await res.json();
-        alert(data.message || "Toggled successfully!");
-        fetchModules();
-      } catch (err) {
-        alert("⚠️ Error toggling module");
-      }
+  // Fetch registered users
+  async function fetchUsers() {
+    try {
+      const res = await fetch(`${GATEWAY_URL}/api/auth/all-users`, {
+        headers: { "Authorization": `Bearer ${user.token}` }
+      });
+      const users = await res.json();
+      const userList = document.getElementById("userList");
+      userList.innerHTML = "";
+      users.forEach(u => {
+        userList.innerHTML += `<li>
+          <span>${u.full_name} (${u.email})</span>
+          <span>${u.phone || "N/A"}</span>
+        </li>`;
+      });
+    } catch (err) {
+      console.error(err);
+      document.getElementById("userList").innerHTML = "<li>Failed to load users</li>";
     }
+  }
 
-    // Fetch registered users
-    async function fetchUsers() {
-      try {
-        const res = await fetch(`${GATEWAY_URL}/api/auth/all-users`);
-        const users = await res.json();
-        const userList = document.getElementById("userList");
-        userList.innerHTML = "";
-
-        users.forEach(u => {
-          userList.innerHTML += `
-            <li>
-              <span>${u.full_name} (${u.email})</span>
-              <span>${u.phone}</span>
-            </li>`;
-        });
-      } catch (err) {
-        console.error(err);
-        document.getElementById("userList").innerHTML = "<li>Failed to load users</li>";
-      }
-    }
-
-    // Initialize dashboard
-    fetchWallet();
-    fetchModules();
-    fetchUsers();
-  </script>
+  // Initialize dashboard
+  fetchWallet();
+  fetchModules();
+  fetchUsers();
+</script>
 </body>
 </html>

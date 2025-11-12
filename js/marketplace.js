@@ -1,4 +1,4 @@
-// ===== marketplace.js (Extended with Admin Section) =====
+// ===== marketplace.js (Extended & Refined) =====
 (() => {
   const API_URL = window.SERVICES?.market || "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
   window.MARKET_API = API_URL;
@@ -9,8 +9,19 @@
 
   // ===== Toast Helper =====
   function showToast(message, success = true) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.padding = '10px 20px';
+      toast.style.borderRadius = '20px';
+      toast.style.zIndex = 1100;
+      document.body.appendChild(toast);
+    }
     toast.innerText = message;
     toast.style.background = success ? '#27ae60' : '#c0392b';
     toast.classList.add('show');
@@ -35,8 +46,8 @@
     const url = endpoint.startsWith("http") ? endpoint : `${API_URL}/${endpoint}`;
     const res = await fetch(url, {
       ...options,
-      headers: { 
-        "Content-Type": "application/json", 
+      headers: {
+        "Content-Type": "application/json",
         ...(options.headers || {}),
         ...(ADMIN_JWT ? { "Authorization": `Bearer ${ADMIN_JWT}` } : {})
       },
@@ -66,10 +77,7 @@
 
     const imgUrl = item.images?.[0] || "https://via.placeholder.com/250x150?text=No+Image";
     const isAvailable = item.status?.toLowerCase() === "available";
-
-    const highlightsText = Array.isArray(item.highlights)
-      ? item.highlights.join(", ")
-      : item.highlights || "";
+    const highlightsText = Array.isArray(item.highlights) ? item.highlights.join(", ") : (item.highlights || "");
 
     card.innerHTML += `
       <img src="${imgUrl}" alt="BGMI ID Image">
@@ -90,9 +98,9 @@
   // ===== Render All Items =====
   function renderItems(container, items) {
     container.innerHTML = "";
-    if (!items.length) { 
-      container.innerHTML = "<p>No items available.</p>"; 
-      return; 
+    if (!items.length) {
+      container.innerHTML = "<p>No items available.</p>";
+      return;
     }
     items.forEach(item => container.appendChild(renderItem(item)));
   }
@@ -130,14 +138,14 @@
   function renderAdminSection() {
     const adminDiv = document.createElement("div");
     adminDiv.id = "admin-section";
-    adminDiv.style = "margin: 20px; padding: 15px; background: #f5f5f5; border-radius: 10px;";
+    adminDiv.style = "margin: 20px; padding: 15px; background: #1a1a1a; color:#fff; border-radius: 10px;";
 
     adminDiv.innerHTML = `
-      <h3>Admin Panel</h3>
+      <h3 style="color:#00ffc6;">Admin Panel</h3>
       <label>JWT Token:</label>
       <input type="text" id="admin-jwt-input" placeholder="Enter admin JWT" style="width:90%;padding:5px;"><br><br>
       <button id="admin-login-btn">Login as Admin</button>
-      <hr>
+      <hr style="border-color:#333;">
       <h4>Create Listing</h4>
       <input type="text" id="admin-uid" placeholder="UID" style="width:45%;margin-right:5px;">
       <input type="text" id="admin-title" placeholder="Title" style="width:45%;"><br><br>
@@ -154,7 +162,7 @@
       const token = document.getElementById('admin-jwt-input').value.trim();
       if (!token) return showToast("Enter a valid JWT", false);
       ADMIN_JWT = token;
-      showToast("Admin logged in");
+      showToast("✅ Admin logged in");
     });
 
     document.getElementById('admin-create-listing-btn').addEventListener('click', async () => {
@@ -168,7 +176,11 @@
 
       if (!uid || !title) return showToast("UID and Title required", false);
 
-      const body = { seller_id: "admin_user", uid, title, description, price, rank, level, mythic_count:0, legendary_count:0, xsuit_count:0, gilt_count:0, honor_gilt_set:0, upgradable_guns:0, rare_glider:0, vehicle_skin:0, special_titles:0 };
+      const body = { 
+        seller_id: "admin_user", uid, title, description, price, rank, level, 
+        mythic_count:0, legendary_count:0, xsuit_count:0, gilt_count:0, honor_gilt_set:0,
+        upgradable_guns:0, rare_glider:0, vehicle_skin:0, special_titles:0
+      };
 
       try {
         const res = await apiRequest('create', {
@@ -219,7 +231,7 @@
 
     renderAdminSection();
     loadMarketplace();
-    setInterval(loadMarketplace, 30000); // optional refresh
+    setInterval(loadMarketplace, 30000); // auto-refresh every 30s
   }
 
   // ===== DOM Ready =====
@@ -230,4 +242,6 @@
   }
 
   window.openModal = openModal;
+  window.closeModal = closeModal;
+
 })();
