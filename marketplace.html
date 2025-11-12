@@ -13,172 +13,43 @@
     min-height: 100vh;
   }
   h1 { text-align: center; color: #fff; margin: 20px 0; }
-
-  #items-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-    padding: 20px;
-    min-height: 200px;
-  }
-  .item-card {
-    background: #fff;
-    border-radius: 10px;
-    width: 250px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.2s;
-  }
+  #items-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px; min-height: 200px; }
+  .item-card { background: #fff; border-radius: 10px; width: 250px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); overflow: hidden; position: relative; transition: transform 0.2s; }
   .item-card:hover { transform: scale(1.03); }
   .item-info { padding: 10px; }
   .item-info strong { display: inline-block; width: 70px; }
   .highlight { margin: 5px 0; color: #e67e22; font-weight: bold; }
-
-  .new-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #e74c3c;
-    color: #fff;
-    padding: 3px 6px;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 3px;
-  }
-
-  .buy-btn, .edit-btn {
-    background: #27ae60;
-    color: #fff;
-    border: none;
-    padding: 7px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 5px;
-    width: 100%;
-  }
-  .buy-btn:disabled, .edit-btn:disabled { background: #95a5a6; cursor: not-allowed; }
-
-  #modal-bg, #edit-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  #modal-bg.active, #edit-modal.active { display: flex; }
-  .modal-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    min-width: 300px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  }
-  .modal-content input, .modal-content textarea {
-    width: 90%; padding: 5px; margin: 5px 0; border-radius:5px; border:1px solid #ccc;
-  }
-  .modal-content button {
-    margin: 10px;
-    padding: 7px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+  .new-badge { position: absolute; top: 10px; left: 10px; background: #e74c3c; color: #fff; padding: 3px 6px; font-size: 12px; font-weight: bold; border-radius: 3px; }
+  .buy-btn, .edit-btn { padding: 7px 12px; border-radius: 5px; border: none; cursor: pointer; margin-top: 5px; width: 100%; }
+  .buy-btn { background: #27ae60; color: #fff; }
+  .buy-btn:disabled { background: #95a5a6; cursor: not-allowed; }
+  .edit-btn { background: #3498db; color: #fff; }
+  #modal-bg { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; }
+  #modal-bg.active { display: flex; }
+  .modal-content { background: #fff; padding: 20px; border-radius: 10px; text-align: center; min-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+  .modal-content button { margin: 10px; padding: 7px 15px; border: none; border-radius: 5px; cursor: pointer; }
   #confirm-btn { background: #27ae60; color: #fff; }
-  #cancel-btn, #edit-cancel { background: #c0392b; color: #fff; }
-  #save-edit { background: #3498db; color: #fff; }
-
-  #toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #27ae60;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 20px;
-    display: none;
-    z-index: 1100;
-  }
+  #cancel-btn { background: #c0392b; color: #fff; }
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #27ae60; color: #fff; padding: 10px 20px; border-radius: 20px; display: none; z-index: 1100; }
   #toast.show { display: block; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
   @keyframes fadein { from {opacity:0;} to {opacity:1;} }
   @keyframes fadeout { from {opacity:1;} to {opacity:0;} }
-
-  #search {
-    display: block;
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-    padding: 10px;
-    border-radius: 25px;
-    border: none;
-    outline: none;
-    font-size: 16px;
-  }
-
-  /* User Add Listing Section */
-  #user-listing {
-    background: #1a1a1a;
-    color: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-  }
-  #user-listing input, #user-listing textarea, #user-listing button {
-    width: 100%; margin: 5px 0; padding: 7px; border-radius:5px; border:1px solid #ccc;
-  }
-  #user-listing button { background: #27ae60; color: #fff; border:none; cursor:pointer; }
+  #search { display: block; width: 90%; max-width: 400px; margin: 20px auto; padding: 10px; border-radius: 25px; border: none; outline: none; font-size: 16px; }
 </style>
 </head>
 <body>
 
 <h1>BGMI Marketplace</h1>
 <input type="text" id="search" placeholder="Search items...">
-
-<!-- User Add Listing Section -->
-<div id="user-listing">
-  <h3>Add Your BGMI ID</h3>
-  <input type="text" id="uid" placeholder="UID">
-  <input type="text" id="title" placeholder="Title">
-  <textarea id="description" placeholder="Description"></textarea>
-  <input type="number" id="level" placeholder="Level">
-  <input type="text" id="rank" placeholder="Rank">
-  <input type="number" id="mythic_count" placeholder="Mythic Count">
-  <input type="number" id="legendary_count" placeholder="Legendary Count">
-  <input type="number" id="xsuit_count" placeholder="X-Suit Count">
-  <button id="add-listing-btn">Add Listing</button>
-</div>
-
 <div id="items-container">
   <p>Loading items...</p>
 </div>
 
-<!-- Purchase Modal -->
 <div id="modal-bg">
   <div class="modal-content">
-    <p>Confirm purchase?</p>
+    <p id="modal-text">Confirm purchase?</p>
     <button id="confirm-btn">Confirm</button>
     <button id="cancel-btn">Cancel</button>
-  </div>
-</div>
-
-<!-- Edit Listing Modal -->
-<div id="edit-modal">
-  <div class="modal-content">
-    <h3>Edit Listing</h3>
-    <input type="text" id="edit-title" placeholder="Title">
-    <textarea id="edit-description" placeholder="Description"></textarea>
-    <input type="number" id="edit-level" placeholder="Level">
-    <input type="text" id="edit-rank" placeholder="Rank">
-    <input type="number" id="edit-price" placeholder="Price">
-    <button id="save-edit">Save</button>
-    <button id="edit-cancel">Cancel</button>
   </div>
 </div>
 
@@ -187,7 +58,7 @@
 <script>
 const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
 let selectedListingId = null;
-let editingListingId = null;
+let selectedAction = null; // "purchase" or "edit"
 
 // ===== Check login =====
 function checkLogin() {
@@ -201,8 +72,10 @@ function checkLogin() {
   return { token, user };
 }
 
-const auth = checkLogin();
-if (!auth) throw new Error("Not logged in");
+const session = checkLogin();
+if (!session) throw new Error("Not logged in");
+const JWT = session.token;
+const USER = session.user;
 
 // ===== Toast =====
 function showToast(msg, success=true) {
@@ -213,11 +86,11 @@ function showToast(msg, success=true) {
   setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
-// ===== Fetch Listings =====
+// ===== Render Listings =====
 async function loadListings() {
   try {
     const res = await fetch(`${API_URL}/list`, {
-      headers: { "Authorization": `Bearer ${auth.token}` }
+      headers: { "Authorization": `Bearer ${JWT}` }
     });
     const items = await res.json();
     const container = document.getElementById("items-container");
@@ -233,7 +106,18 @@ async function loadListings() {
       card.className = "item-card";
 
       const isNew = item.status === "available";
-      const canEdit = auth.user.role === "admin" || auth.user.id === item.seller_id;
+      let buttonsHTML = '';
+      
+      if (item.status === "available") {
+        buttonsHTML += `<button class="buy-btn" onclick="openModal(${item.id}, 'purchase')">Buy</button>`;
+      } else {
+        buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
+      }
+
+      // If current user is seller or admin => allow edit
+      if (USER.role === "admin" || USER.id === item.seller_id) {
+        buttonsHTML += `<button class="edit-btn" onclick="openModal(${item.id}, 'edit')">Edit</button>`;
+      }
 
       card.innerHTML = `
         ${isNew ? '<div class="new-badge">NEW</div>' : ''}
@@ -243,14 +127,12 @@ async function loadListings() {
           ${item.highlights ? `<p class="highlight">${item.highlights.join(", ")}</p>` : ""}
           <p class="highlight"><strong>Price:</strong> ₹${item.price || 0}</p>
           <p><strong>Status:</strong> ${item.status || "Available"}</p>
-          <button class="buy-btn" ${item.status !== 'available' ? 'disabled' : ''} onclick="confirmPurchase(${item.id})">
-            ${item.status === 'available' ? 'Buy' : 'Sold Out'}
-          </button>
-          ${canEdit ? `<button class="edit-btn" onclick="openEditModal(${item.id})">Edit</button>` : ''}
+          ${buttonsHTML}
         </div>
       `;
       container.appendChild(card);
     });
+
   } catch (err) {
     console.error(err);
     showToast("Failed to load items", false);
@@ -258,123 +140,78 @@ async function loadListings() {
   }
 }
 
-// ===== Purchase Flow =====
-function confirmPurchase(id) {
+// ===== Modal =====
+function openModal(id, action) {
   selectedListingId = id;
+  selectedAction = action;
+  const modalText = document.getElementById("modal-text");
+  modalText.textContent = action === "purchase" ? "Confirm purchase?" : "Edit your listing?";
   document.getElementById("modal-bg").classList.add("active");
+
+  // If edit, prompt for new price
+  if (action === "edit") {
+    const newPrice = prompt("Enter new price (₹):");
+    if (newPrice !== null) updateListingPrice(id, parseInt(newPrice));
+  }
 }
 document.getElementById("cancel-btn").addEventListener("click", () => {
   selectedListingId = null;
+  selectedAction = null;
   document.getElementById("modal-bg").classList.remove("active");
 });
+
 document.getElementById("confirm-btn").addEventListener("click", async () => {
-  if (!selectedListingId) return;
+  if (!selectedListingId || !selectedAction) return;
+  if (selectedAction === "purchase") {
+    try {
+      const res = await fetch(`${API_URL}/purchase/${selectedListingId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
+        body: JSON.stringify({ payment_method: "wallet" })
+      });
+      const data = await res.json();
+      showToast(data.message || "Purchase successful");
+      loadListings();
+    } catch (err) {
+      console.error(err);
+      showToast("Purchase failed", false);
+    }
+  }
+  selectedListingId = null;
+  selectedAction = null;
+  document.getElementById("modal-bg").classList.remove("active");
+});
+
+// ===== Update Listing Price =====
+async function updateListingPrice(id, price) {
+  if (!price || isNaN(price)) return showToast("Invalid price", false);
   try {
-    const res = await fetch(`${API_URL}/purchase/${selectedListingId}`, {
+    const res = await fetch(`${API_URL}/update/${id}`, {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${auth.token}`
-      },
-      body: JSON.stringify({ payment_method: "wallet" })
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
+      body: JSON.stringify({ price })
     });
     const data = await res.json();
-    showToast(data.message || "Purchase initiated");
-    selectedListingId = null;
-    document.getElementById("modal-bg").classList.remove("active");
+    showToast(data.message || "Price updated");
     loadListings();
   } catch (err) {
     console.error(err);
-    showToast("Purchase failed", false);
+    showToast("Failed to update price", false);
   }
-});
+}
 
 // ===== Search =====
 document.getElementById("search").addEventListener("input", (e) => {
   const query = e.target.value.toLowerCase();
+  let found = false;
   document.querySelectorAll(".item-card").forEach(card => {
     const text = card.innerText.toLowerCase();
-    card.style.display = text.includes(query) ? "block" : "none";
+    if (text.includes(query)) {
+      card.style.display = "block";
+      found = true;
+    } else card.style.display = "none";
   });
-});
-
-// ===== Add Listing =====
-document.getElementById("add-listing-btn").addEventListener("click", async () => {
-  const body = {
-    uid: document.getElementById("uid").value.trim(),
-    title: document.getElementById("title").value.trim(),
-    description: document.getElementById("description").value.trim(),
-    level: parseInt(document.getElementById("level").value) || 0,
-    rank: document.getElementById("rank").value.trim(),
-    mythic_count: parseInt(document.getElementById("mythic_count").value) || 0,
-    legendary_count: parseInt(document.getElementById("legendary_count").value) || 0,
-    xsuit_count: parseInt(document.getElementById("xsuit_count").value) || 0,
-    seller_id: auth.user.id
-  };
-  if (!body.uid || !body.title) return showToast("UID and Title required", false);
-
-  try {
-    const res = await fetch(`${API_URL}/create`, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${auth.token}`
-      },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    showToast(data.message || "Listing added successfully");
-    loadListings();
-  } catch (err) {
-    console.error(err);
-    showToast("Failed to add listing", false);
-  }
-});
-
-// ===== Edit Listing =====
-function openEditModal(id) {
-  editingListingId = id;
-  const card = document.querySelector(`.item-card button[onclick='openEditModal(${id})']`).closest(".item-card");
-  document.getElementById("edit-title").value = card.querySelector("p:nth-child(1)").innerText.replace("Title: ", "");
-  document.getElementById("edit-description").value = card.querySelector("p:nth-child(3)")?.innerText || "";
-  document.getElementById("edit-level").value = card.querySelector("p:nth-child(4)")?.innerText.replace("Level: ","") || 0;
-  document.getElementById("edit-rank").value = card.querySelector("p:nth-child(5)")?.innerText.replace("Rank: ","") || "";
-  document.getElementById("edit-price").value = parseInt(card.querySelector(".highlight strong")?.innerText.replace("Price:₹","")) || 0;
-  document.getElementById("edit-modal").classList.add("active");
-}
-
-document.getElementById("edit-cancel").addEventListener("click", () => {
-  editingListingId = null;
-  document.getElementById("edit-modal").classList.remove("active");
-});
-
-document.getElementById("save-edit").addEventListener("click", async () => {
-  if (!editingListingId) return;
-  const body = {
-    title: document.getElementById("edit-title").value.trim(),
-    description: document.getElementById("edit-description").value.trim(),
-    level: parseInt(document.getElementById("edit-level").value) || 0,
-    rank: document.getElementById("edit-rank").value.trim(),
-    price: parseInt(document.getElementById("edit-price").value) || 0
-  };
-  try {
-    const res = await fetch(`${API_URL}/update/${editingListingId}`, {
-      method: "PATCH",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${auth.token}`
-      },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    showToast(data.message || "Listing updated");
-    editingListingId = null;
-    document.getElementById("edit-modal").classList.remove("active");
-    loadListings();
-  } catch (err) {
-    console.error(err);
-    showToast("Failed to update listing", false);
-  }
+  if (!found) document.getElementById("items-container").innerHTML = "<p>No items found</p>";
 });
 
 // ===== Initial Load =====
