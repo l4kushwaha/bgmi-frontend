@@ -1,4 +1,4 @@
-// ===== marketplace.js (Extended & Refined) =====
+// ===== marketplace.js (Inline CSS Version) =====
 (() => {
   const API_URL = window.SERVICES?.market || "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
   window.MARKET_API = API_URL;
@@ -20,12 +20,15 @@
       toast.style.padding = '10px 20px';
       toast.style.borderRadius = '20px';
       toast.style.zIndex = 1100;
+      toast.style.fontFamily = 'Poppins, sans-serif';
+      toast.style.color = '#fff';
+      toast.style.transition = 'opacity 0.3s';
       document.body.appendChild(toast);
     }
     toast.innerText = message;
     toast.style.background = success ? '#27ae60' : '#c0392b';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 3000);
   }
 
   // ===== Modal Helpers =====
@@ -33,12 +36,12 @@
 
   function openModal(id) {
     selectedItemId = id;
-    if (modalBg) modalBg.classList.add('active');
+    if (modalBg) modalBg.style.display = 'flex';
   }
 
   function closeModal() {
     selectedItemId = null;
-    if (modalBg) modalBg.classList.remove('active');
+    if (modalBg) modalBg.style.display = 'none';
   }
 
   // ===== API Request Helper =====
@@ -62,15 +65,35 @@
   // ===== Render Single Item =====
   function renderItem(item) {
     const card = document.createElement("div");
-    card.className = "item-card";
     card.dataset.id = item.id;
     card.dataset.uid = item.uid;
+
+    // Inline styles
+    card.style.border = "1px solid #00ffff";
+    card.style.borderRadius = "12px";
+    card.style.padding = "10px";
+    card.style.margin = "10px";
+    card.style.width = "250px";
+    card.style.display = "inline-block";
+    card.style.verticalAlign = "top";
+    card.style.background = "rgba(0,0,0,0.5)";
+    card.style.color = "#fff";
+    card.style.fontFamily = "Poppins, sans-serif";
+    card.style.position = "relative";
 
     const isNew = !previousItemUids.has(item.uid);
     if (isNew) {
       const badge = document.createElement("div");
-      badge.className = "new-badge";
       badge.innerText = "NEW";
+      badge.style.position = "absolute";
+      badge.style.top = "5px";
+      badge.style.right = "5px";
+      badge.style.background = "#ff00ff";
+      badge.style.color = "#fff";
+      badge.style.padding = "2px 6px";
+      badge.style.borderRadius = "6px";
+      badge.style.fontSize = "12px";
+      badge.style.fontWeight = "700";
       card.appendChild(badge);
     }
     previousItemUids.add(item.uid);
@@ -79,19 +102,41 @@
     const isAvailable = item.status?.toLowerCase() === "available";
     const highlightsText = Array.isArray(item.highlights) ? item.highlights.join(", ") : (item.highlights || "");
 
-    card.innerHTML += `
-      <img src="${imgUrl}" alt="BGMI ID Image">
-      <div class="item-info">
-        <strong>UID:</strong> ${item.uid || "N/A"}<br>
-        <strong>Rank:</strong> ${item.rank || "N/A"}<br>
-        <strong>Price:</strong> ₹${item.price || "N/A"}<br>
-        ${highlightsText ? `<div class="highlight">${highlightsText}</div>` : ""}
-        <strong>Status:</strong> <span class="item-status">${item.status || "Available"}</span><br>
-        <button class="buy-btn" onclick="openModal(${item.id})" ${!isAvailable ? "disabled" : ""}>
-          ${isAvailable ? "Buy" : "Sold Out"}
-        </button>
-      </div>
+    const img = document.createElement("img");
+    img.src = imgUrl;
+    img.style.width = "100%";
+    img.style.borderRadius = "8px";
+    img.style.marginBottom = "8px";
+    card.appendChild(img);
+
+    const infoDiv = document.createElement("div");
+    infoDiv.style.fontSize = "14px";
+    infoDiv.style.lineHeight = "1.4em";
+
+    infoDiv.innerHTML = `
+      <strong>UID:</strong> ${item.uid || "N/A"}<br>
+      <strong>Rank:</strong> ${item.rank || "N/A"}<br>
+      <strong>Price:</strong> ₹${item.price || "N/A"}<br>
+      ${highlightsText ? `<div style="color:#00ffff;font-size:12px;">${highlightsText}</div>` : ""}
+      <strong>Status:</strong> <span class="item-status">${item.status || "Available"}</span><br>
     `;
+
+    const btn = document.createElement("button");
+    btn.innerText = isAvailable ? "Buy" : "Sold Out";
+    btn.disabled = !isAvailable;
+    btn.style.padding = "6px 12px";
+    btn.style.marginTop = "5px";
+    btn.style.width = "100%";
+    btn.style.border = "none";
+    btn.style.borderRadius = "8px";
+    btn.style.background = isAvailable ? "linear-gradient(135deg,#00ffff,#ff00ff)" : "#888";
+    btn.style.color = "#fff";
+    btn.style.cursor = isAvailable ? "pointer" : "not-allowed";
+    btn.addEventListener("click", () => openModal(item.id));
+
+    infoDiv.appendChild(btn);
+    card.appendChild(infoDiv);
+
     return card;
   }
 
@@ -121,39 +166,44 @@
 
   // ===== Update Single Item in DOM =====
   function updateItemInDOM(item) {
-    const card = document.querySelector(`.item-card[data-id="${item.id}"]`);
+    const card = document.querySelector(`div[data-id='${item.id}']`);
     if (!card) return;
 
     const statusEl = card.querySelector(".item-status");
-    const buyBtn = card.querySelector(".buy-btn");
-
+    const buyBtn = card.querySelector("button");
     statusEl.innerText = item.status || "Available";
     if (item.status?.toLowerCase() !== "available") {
       buyBtn.disabled = true;
       buyBtn.innerText = "Sold Out";
+      buyBtn.style.background = "#888";
+      buyBtn.style.cursor = "not-allowed";
     }
   }
 
   // ===== Admin Section =====
   function renderAdminSection() {
     const adminDiv = document.createElement("div");
-    adminDiv.id = "admin-section";
-    adminDiv.style = "margin: 20px; padding: 15px; background: #1a1a1a; color:#fff; border-radius: 10px;";
+    adminDiv.style.margin = "20px";
+    adminDiv.style.padding = "15px";
+    adminDiv.style.background = "#1a1a1a";
+    adminDiv.style.color = "#fff";
+    adminDiv.style.borderRadius = "10px";
+    adminDiv.style.fontFamily = "Poppins, sans-serif";
 
     adminDiv.innerHTML = `
       <h3 style="color:#00ffc6;">Admin Panel</h3>
       <label>JWT Token:</label>
-      <input type="text" id="admin-jwt-input" placeholder="Enter admin JWT" style="width:90%;padding:5px;"><br><br>
-      <button id="admin-login-btn">Login as Admin</button>
-      <hr style="border-color:#333;">
+      <input type="text" id="admin-jwt-input" placeholder="Enter admin JWT" style="width:90%;padding:5px;margin-bottom:10px;"><br>
+      <button id="admin-login-btn" style="padding:5px 10px;">Login as Admin</button>
+      <hr style="border-color:#333;margin:10px 0;">
       <h4>Create Listing</h4>
-      <input type="text" id="admin-uid" placeholder="UID" style="width:45%;margin-right:5px;">
-      <input type="text" id="admin-title" placeholder="Title" style="width:45%;"><br><br>
-      <textarea id="admin-desc" placeholder="Description" style="width:90%;height:50px;"></textarea><br><br>
-      <input type="number" id="admin-price" placeholder="Price" style="width:30%; margin-right:5px;">
-      <input type="text" id="admin-rank" placeholder="Rank" style="width:30%; margin-right:5px;">
-      <input type="number" id="admin-level" placeholder="Level" style="width:30%;"><br><br>
-      <button id="admin-create-listing-btn">Create Listing</button>
+      <input type="text" id="admin-uid" placeholder="UID" style="width:45%;margin-right:5px;padding:5px;">
+      <input type="text" id="admin-title" placeholder="Title" style="width:45%;padding:5px;"><br><br>
+      <textarea id="admin-desc" placeholder="Description" style="width:90%;height:50px;padding:5px;"></textarea><br><br>
+      <input type="number" id="admin-price" placeholder="Price" style="width:30%; margin-right:5px;padding:5px;">
+      <input type="text" id="admin-rank" placeholder="Rank" style="width:30%; margin-right:5px;padding:5px;">
+      <input type="number" id="admin-level" placeholder="Level" style="width:30%;padding:5px;"><br><br>
+      <button id="admin-create-listing-btn" style="padding:5px 10px;">Create Listing</button>
     `;
 
     document.body.prepend(adminDiv);
@@ -222,9 +272,9 @@
     if (searchInput) {
       searchInput.addEventListener("input", (e) => {
         const query = e.target.value.toLowerCase();
-        document.querySelectorAll(".item-card").forEach(card => {
-          const text = card.querySelector(".item-info").innerText.toLowerCase();
-          card.style.display = text.includes(query) ? "block" : "none";
+        document.querySelectorAll("div[data-id]").forEach(card => {
+          const text = card.innerText.toLowerCase();
+          card.style.display = text.includes(query) ? "inline-block" : "none";
         });
       });
     }
