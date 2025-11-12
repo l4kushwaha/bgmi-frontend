@@ -8,18 +8,17 @@
 
   // ===== Session / JWT =====
   const session = {
-  token: localStorage.getItem("token"), // use the correct key
-  user: JSON.parse(localStorage.getItem("user") || "null")
-};
+    token: localStorage.getItem("token"), // ✅ correct key
+    user: JSON.parse(localStorage.getItem("user") || "null")
+  };
 
-if (!session.token || !session.user) {
-  alert("Login required!");
-  window.location.href = "login.html";
-} else {
-  console.log("✅ User is logged in:", session.user.name || session.user.id || "No name/id");
-  console.log("JWT Token:", session.token);
-}
-
+  if (!session.token || !session.user) {
+    alert("Login required!");
+    window.location.href = "login.html";
+  } else {
+    console.log("✅ User is logged in:", session.user.name || session.user.id || "No name/id");
+    console.log("JWT Token:", session.token);
+  }
 
   // ===== Toast =====
   function showToast(msg, success = true) {
@@ -143,7 +142,7 @@ if (!session.token || !session.user) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.token}`
+          "Authorization": `Bearer ${session.token}` // ✅ fixed token key
         },
         body: JSON.stringify(payload)
       });

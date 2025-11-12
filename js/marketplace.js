@@ -20,7 +20,7 @@
 
   // ===== Session helpers =====
   function getSession() {
-    const token = localStorage.getItem("token"); // use correct key
+    const token = localStorage.getItem("token"); // ✅ correct key
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!token || !user) return null;
     return { token, user };
