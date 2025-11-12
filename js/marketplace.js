@@ -1,6 +1,6 @@
-// ===== marketplace.js (Inline CSS Version) =====
+// ===== marketplace.js (Extended Version with JWT Login) =====
 (() => {
-  const API_URL = window.SERVICES?.market || "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
+  const API_URL = window.SERVICES?.market || "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
   window.MARKET_API = API_URL;
 
   let previousItemUids = new Set();
@@ -47,11 +47,13 @@
   // ===== API Request Helper =====
   async function apiRequest(endpoint, options = {}) {
     const url = endpoint.startsWith("http") ? endpoint : `${API_URL}/${endpoint}`;
+    const token = localStorage.getItem("jwt_token"); // ✅ User token automatically
     const res = await fetch(url, {
       ...options,
       headers: {
         "Content-Type": "application/json",
         ...(options.headers || {}),
+        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
         ...(ADMIN_JWT ? { "Authorization": `Bearer ${ADMIN_JWT}` } : {})
       },
     });
@@ -156,7 +158,7 @@
     if (!container) return console.error("#items-container not found");
     container.innerHTML = "<p>Loading items...</p>";
     try {
-      const data = await apiRequest('list');
+      const data = await apiRequest('listings');
       renderItems(container, data || []);
     } catch (err) {
       container.innerHTML = `<p style="color:red;">⚠️ Failed to load items: ${err.message}</p>`;
@@ -180,6 +182,29 @@
     }
   }
 
+  // ===== User Login =====
+  async function loginUser(email, password) {
+    try {
+      const res = await fetch("https://bgmi_auth_service.bgmi-gateway.workers.dev/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem("jwt_token", data.token); // ✅ Store JWT
+        showToast("Login successful");
+        return data.token;
+      } else {
+        showToast("Login failed", false);
+        return null;
+      }
+    } catch (err) {
+      showToast("Login error: " + err.message, false);
+      return null;
+    }
+  }
+
   // ===== Admin Section =====
   function renderAdminSection() {
     const adminDiv = document.createElement("div");
@@ -192,7 +217,7 @@
 
     adminDiv.innerHTML = `
       <h3 style="color:#00ffc6;">Admin Panel</h3>
-      <label>JWT Token:</label>
+      <label>Admin JWT:</label>
       <input type="text" id="admin-jwt-input" placeholder="Enter admin JWT" style="width:90%;padding:5px;margin-bottom:10px;"><br>
       <button id="admin-login-btn" style="padding:5px 10px;">Login as Admin</button>
       <hr style="border-color:#333;margin:10px 0;">
@@ -233,7 +258,7 @@
       };
 
       try {
-        const res = await apiRequest('create', {
+        const res = await apiRequest('listings/create', {
           method: 'POST',
           body: JSON.stringify(body)
         });
@@ -254,7 +279,7 @@
     if (confirmBtn) confirmBtn.addEventListener('click', async () => {
       if (!selectedItemId) return;
       try {
-        const res = await apiRequest(`purchase/${selectedItemId}`, {
+        const res = await apiRequest(`listings/purchase/${selectedItemId}`, {
           method: 'POST',
           body: JSON.stringify({ payment_method: "wallet" })
         });
