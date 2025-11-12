@@ -7,16 +7,19 @@
   let uploadedImages = [];
 
   // ===== Session / JWT =====
-  const session = {
-    token: localStorage.getItem("token"), // ✅ correct key
-    user: JSON.parse(localStorage.getItem("user") || "null")
-  };
+  function getSession() {
+    const token = localStorage.getItem("token"); // ✅ correct
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!token || !user) return null;
+    return { token, user };
+  }
 
-  if (!session.token || !session.user) {
+  const session = getSession();
+  if (!session) {
     alert("Login required!");
     window.location.href = "login.html";
   } else {
-    console.log("✅ User is logged in:", session.user.name || session.user.id || "No name/id");
+    console.log("✅ User logged in:", session.user.name || session.user.id);
     console.log("JWT Token:", session.token);
   }
 
@@ -57,11 +60,11 @@
   const fileInput = document.getElementById("fileElem");
   const preview = document.getElementById("preview");
 
-  dropArea.addEventListener("click", () => fileInput.click());
-  dropArea.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("hover"); });
-  dropArea.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
-  dropArea.addEventListener("drop", e => { e.preventDefault(); dropArea.classList.remove("hover"); handleFiles(e.dataTransfer.files); });
-  fileInput.addEventListener("change", e => handleFiles(e.target.files));
+  dropArea?.addEventListener("click", () => fileInput.click());
+  dropArea?.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("hover"); });
+  dropArea?.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
+  dropArea?.addEventListener("drop", e => { e.preventDefault(); dropArea.classList.remove("hover"); handleFiles(e.dataTransfer.files); });
+  fileInput?.addEventListener("change", e => handleFiles(e.target.files));
 
   function handleFiles(files) {
     for (let file of files) {
@@ -73,11 +76,11 @@
   }
 
   function updatePreview() {
+    if (!preview) return;
     preview.innerHTML = "";
     uploadedImages.forEach((img, index) => {
       const div = document.createElement("div");
       div.className = "preview-img";
-      div.draggable = true;
       div.dataset.index = index;
 
       const imageElem = document.createElement("img");
@@ -107,7 +110,6 @@
     modalImg.src = src;
     fullModal.style.display = "flex";
   };
-
   window.closeModal = () => fullModal.style.display = "none";
 
   // ===== Estimate Price Button =====
@@ -117,9 +119,10 @@
   // ===== Form Submit =====
   form.addEventListener("submit", async e => {
     e.preventDefault();
+    if (!session) return;
 
     const payload = {
-      seller_id: session.user?.username || session.user?.id || "admin_user",
+      seller_id: session.user?.id || "admin_user",
       uid: document.getElementById("uid").value.trim(),
       title: document.getElementById("title").value.trim(),
       description: document.getElementById("highlights").value.trim(),
@@ -142,7 +145,7 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.token}` // ✅ fixed token key
+          "Authorization": `Bearer ${session.token}`
         },
         body: JSON.stringify(payload)
       });
@@ -161,4 +164,5 @@
       showToast("❌ " + err.message, false);
     }
   });
+
 })();

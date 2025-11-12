@@ -1,11 +1,10 @@
 (() => {
-  // ===== Only run if marketplace DOM exists =====
   const container = document.getElementById("items-container");
-  if (!container) return; // Prevent JS errors on sell.html
+  if (!container) return;
 
   const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
   let selectedListingId = null;
-  let selectedAction = null; // "purchase" or "edit"
+  let selectedAction = null;
   let currentSearchQuery = "";
 
   // ===== Toast =====
@@ -18,9 +17,9 @@
     setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
-  // ===== Session helpers =====
+  // ===== Session =====
   function getSession() {
-    const token = localStorage.getItem("token"); // ✅ correct key
+    const token = localStorage.getItem("token"); // ✅ use correct key
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!token || !user) return null;
     return { token, user };
@@ -36,7 +35,7 @@
     return session;
   }
 
-  // ===== Render Listings =====
+  // ===== Load Listings =====
   async function loadListings() {
     const session = getSession();
     const JWT = session?.token;
@@ -53,7 +52,6 @@
         return;
       }
 
-      // Filter by search query
       const filteredItems = items.filter(item => {
         const text = (item.title + " " + item.uid + " " + (item.highlights || []).join(", ")).toLowerCase();
         return text.includes(currentSearchQuery.toLowerCase());
@@ -68,21 +66,16 @@
         const card = document.createElement("div");
         card.className = "item-card";
 
-        const isNew = item.status === "available";
         let buttonsHTML = "";
-
-        if (item.status === "available") {
-          buttonsHTML += `<button class="buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
-        } else {
-          buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
-        }
+        if (item.status === "available") buttonsHTML += `<button class="buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
+        else buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
 
         if (session && (session.user.role === "admin" || session.user.id === item.seller_id)) {
           buttonsHTML += `<button class="edit-btn" onclick="openListingModal(${item.id}, 'edit')">Edit</button>`;
         }
 
         card.innerHTML = `
-          ${isNew ? '<div class="new-badge">NEW</div>' : ''}
+          ${item.status === "available" ? '<div class="new-badge">NEW</div>' : ''}
           <div class="item-info">
             <p><strong>Title:</strong> ${item.title || "N/A"}</p>
             <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
@@ -121,13 +114,13 @@
     }
   };
 
-  document.getElementById("cancel-btn").addEventListener("click", () => {
+  document.getElementById("cancel-btn")?.addEventListener("click", () => {
     selectedListingId = null;
     selectedAction = null;
-    document.getElementById("modal-bg").classList.remove("active");
+    document.getElementById("modal-bg")?.classList.remove("active");
   });
 
-  document.getElementById("confirm-btn").addEventListener("click", async () => {
+  document.getElementById("confirm-btn")?.addEventListener("click", async () => {
     const session = requireLogin();
     if (!session) return;
     const JWT = session.token;
@@ -152,10 +145,10 @@
 
     selectedListingId = null;
     selectedAction = null;
-    document.getElementById("modal-bg").classList.remove("active");
+    document.getElementById("modal-bg")?.classList.remove("active");
   });
 
-  // ===== Update Listing Price =====
+  // ===== Update Price =====
   async function updateListingPrice(id, price, JWT) {
     if (!JWT) return;
     if (!price || isNaN(price)) return showToast("Invalid price", false);
@@ -176,15 +169,12 @@
 
   // ===== Search =====
   const searchInput = document.getElementById("search");
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      currentSearchQuery = e.target.value.toLowerCase();
-      loadListings(); // Filtered reload
-    });
-  }
+  searchInput?.addEventListener("input", e => {
+    currentSearchQuery = e.target.value.toLowerCase();
+    loadListings();
+  });
 
-  // ===== Initial Load & Auto-refresh =====
+  // ===== Initial load & auto-refresh =====
   loadListings();
-  setInterval(() => loadListings(), 30000); // 30s auto-refresh
-
+  setInterval(loadListings, 30000);
 })();
