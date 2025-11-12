@@ -1,11 +1,12 @@
-// ===== marketplace.js (Clean & Extended Version) =====
+// ===== marketplace.js (Fixed + Extended with JWT auto-fetch) =====
 (() => {
   const API_URL = window.SERVICES?.market || "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
   window.MARKET_API = API_URL;
 
   let previousItemUids = new Set();
   let selectedItemId = null;
-  let ADMIN_JWT = null;
+  let ADMIN_JWT = localStorage.getItem("admin_jwt") || null; // auto-fetch admin JWT
+  const USER_JWT = localStorage.getItem("jwt_token"); // auto-fetch user JWT
 
   // ===== Toast Helper =====
   function showToast(message, success = true) {
@@ -13,14 +14,12 @@
     if (!toast) {
       toast = document.createElement('div');
       toast.id = 'toast';
-      toast.classList.add('toast');
+      toast.className = success ? 'toast-success' : 'toast-error'; // use CSS
       document.body.appendChild(toast);
     }
     toast.innerText = message;
-    toast.classList.toggle('toast-success', success);
-    toast.classList.toggle('toast-error', !success);
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 3000);
+    toast.className = success ? 'toast-success show' : 'toast-error show';
+    setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
   // ===== Modal Helpers =====
@@ -28,23 +27,26 @@
 
   function openModal(id) {
     selectedItemId = id;
-    if (modalBg) modalBg.classList.add('modal-show');
+    if (modalBg) modalBg.style.display = 'flex';
   }
 
   function closeModal() {
     selectedItemId = null;
-    if (modalBg) modalBg.classList.remove('modal-show');
+    if (modalBg) modalBg.style.display = 'none';
   }
 
   // ===== API Request Helper =====
   async function apiRequest(endpoint, options = {}) {
     const url = endpoint.startsWith("http") ? endpoint : `${API_URL}/${endpoint}`;
-    const token = localStorage.getItem("jwt_token");
-    const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    if (ADMIN_JWT) headers["Authorization"] = `Bearer ${ADMIN_JWT}`;
-    
-    const res = await fetch(url, { ...options, headers });
+    const token = ADMIN_JWT || USER_JWT || null;
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+      },
+    });
     if (!res.ok) {
       const text = await res.text();
       throw new Error(text || res.statusText);
@@ -57,12 +59,13 @@
     const card = document.createElement("div");
     card.dataset.id = item.id;
     card.dataset.uid = item.uid;
-    card.classList.add('card'); // Use CSS from your HTML
+    card.className = "market-card"; // use CSS classes instead of inline styles
 
-    if (!previousItemUids.has(item.uid)) {
+    const isNew = !previousItemUids.has(item.uid);
+    if (isNew) {
       const badge = document.createElement("div");
+      badge.className = "market-badge";
       badge.innerText = "NEW";
-      badge.classList.add('badge-new');
       card.appendChild(badge);
     }
     previousItemUids.add(item.uid);
@@ -73,24 +76,23 @@
 
     const img = document.createElement("img");
     img.src = imgUrl;
-    img.classList.add('card-img');
+    img.className = "market-img";
     card.appendChild(img);
 
     const infoDiv = document.createElement("div");
-    infoDiv.classList.add('card-info');
+    infoDiv.className = "market-info";
     infoDiv.innerHTML = `
       <strong>UID:</strong> ${item.uid || "N/A"}<br>
       <strong>Rank:</strong> ${item.rank || "N/A"}<br>
       <strong>Price:</strong> ₹${item.price || "N/A"}<br>
-      ${highlightsText ? `<div class="highlights">${highlightsText}</div>` : ""}
+      ${highlightsText ? `<div class="market-highlights">${highlightsText}</div>` : ""}
       <strong>Status:</strong> <span class="item-status">${item.status || "Available"}</span><br>
     `;
 
     const btn = document.createElement("button");
     btn.innerText = isAvailable ? "Buy" : "Sold Out";
     btn.disabled = !isAvailable;
-    btn.classList.add('btn-buy');
-    if (!isAvailable) btn.classList.add('btn-disabled');
+    btn.className = isAvailable ? "btn-buy" : "btn-sold";
     btn.addEventListener("click", () => openModal(item.id));
 
     infoDiv.appendChild(btn);
@@ -127,54 +129,50 @@
   function updateItemInDOM(item) {
     const card = document.querySelector(`div[data-id='${item.id}']`);
     if (!card) return;
-
     const statusEl = card.querySelector(".item-status");
     const buyBtn = card.querySelector("button");
     statusEl.innerText = item.status || "Available";
     if (item.status?.toLowerCase() !== "available") {
       buyBtn.disabled = true;
       buyBtn.innerText = "Sold Out";
-      buyBtn.classList.add('btn-disabled');
+      buyBtn.className = "btn-sold";
     }
   }
 
   // ===== Admin Section =====
   function renderAdminSection() {
+    if (!ADMIN_JWT) return; // show only if admin JWT exists
     const adminDiv = document.createElement("div");
-    adminDiv.id = 'admin-panel';
-    adminDiv.innerHTML = document.getElementById('admin-panel-template')?.innerHTML || '';
+    adminDiv.className = "admin-panel";
+    adminDiv.innerHTML = `
+      <h3>Admin Panel</h3>
+      <h4>Create Listing</h4>
+      <input type="text" id="admin-uid" placeholder="UID">
+      <input type="text" id="admin-title" placeholder="Title"><br><br>
+      <textarea id="admin-desc" placeholder="Description"></textarea><br><br>
+      <input type="number" id="admin-price" placeholder="Price">
+      <input type="text" id="admin-rank" placeholder="Rank">
+      <input type="number" id="admin-level" placeholder="Level"><br><br>
+      <button id="admin-create-listing-btn">Create Listing</button>
+    `;
     document.body.prepend(adminDiv);
 
-    document.getElementById('admin-login-btn')?.addEventListener('click', () => {
-      const token = document.getElementById('admin-jwt-input').value.trim();
-      if (!token) return showToast("Enter a valid JWT", false);
-      ADMIN_JWT = token;
-      showToast("✅ Admin logged in");
-    });
-
-    document.getElementById('admin-create-listing-btn')?.addEventListener('click', async () => {
-      if (!ADMIN_JWT) return showToast("Login first with Admin JWT", false);
-
+    document.getElementById('admin-create-listing-btn').addEventListener('click', async () => {
       const uid = document.getElementById('admin-uid').value.trim();
       const title = document.getElementById('admin-title').value.trim();
-      const description = document.getElementById('admin-desc').value.trim();
-      const price = parseInt(document.getElementById('admin-price').value) || 0;
-      const rank = document.getElementById('admin-rank').value.trim();
-      const level = parseInt(document.getElementById('admin-level').value) || 0;
-
       if (!uid || !title) return showToast("UID and Title required", false);
-
-      const body = { seller_id:"admin_user", uid, title, description, price, rank, level,
+      const body = {
+        seller_id: "admin_user", uid, title,
+        description: document.getElementById('admin-desc').value.trim(),
+        price: parseInt(document.getElementById('admin-price').value) || 0,
+        rank: document.getElementById('admin-rank').value.trim(),
+        level: parseInt(document.getElementById('admin-level').value) || 0,
         mythic_count:0, legendary_count:0, xsuit_count:0, gilt_count:0, honor_gilt_set:0,
         upgradable_guns:0, rare_glider:0, vehicle_skin:0, special_titles:0
       };
-
       try {
-        const res = await apiRequest('listings/create', {
-          method: 'POST',
-          body: JSON.stringify(body)
-        });
-        showToast("✅ Listing created: " + (res.message || "Success"));
+        const res = await apiRequest('listings/create', { method: 'POST', body: JSON.stringify(body) });
+        showToast("✅ Listing created");
         loadMarketplace();
       } catch (err) {
         showToast(`⚠️ Failed: ${err.message}`, false);
@@ -188,14 +186,14 @@
     confirmBtn = document.getElementById('confirm-btn');
     cancelBtn = document.getElementById('cancel-btn');
 
-    confirmBtn?.addEventListener('click', async () => {
+    if (confirmBtn) confirmBtn.addEventListener('click', async () => {
       if (!selectedItemId) return;
       try {
         const res = await apiRequest(`listings/purchase/${selectedItemId}`, {
           method: 'POST',
           body: JSON.stringify({ payment_method: "wallet" })
         });
-        showToast(`✅ Purchase successful: ${res.message}`, true);
+        showToast(`✅ Purchase successful`);
         updateItemInDOM({ id: selectedItemId, status: "Sold Out" });
       } catch (err) {
         showToast(`⚠️ Purchase failed: ${err.message}`, false);
@@ -203,21 +201,24 @@
       closeModal();
     });
 
-    cancelBtn?.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
 
     const searchInput = document.getElementById("search");
-    searchInput?.addEventListener("input", (e) => {
-      const query = e.target.value.toLowerCase();
-      document.querySelectorAll("div[data-id]").forEach(card => {
-        card.style.display = card.innerText.toLowerCase().includes(query) ? "inline-block" : "none";
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll(".market-card").forEach(card => {
+          card.style.display = card.innerText.toLowerCase().includes(query) ? "inline-block" : "none";
+        });
       });
-    });
+    }
 
     renderAdminSection();
     loadMarketplace();
-    setInterval(loadMarketplace, 30000); // auto-refresh
+    setInterval(loadMarketplace, 30000);
   }
 
+  // ===== DOM Ready =====
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initMarketplace);
   } else {
