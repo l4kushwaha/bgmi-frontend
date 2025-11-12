@@ -152,10 +152,80 @@
 <div id="toast"></div>
 
 <!-- ===== JS ===== -->
-<script src="js/marketplace.js"></script>
 <script>
-  // Example: Optional override of API URL
-  window.SERVICES = { market: "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api/market" };
+const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+let selectedListingId = null;
+
+// ===== JWT for testing (admin/user) =====
+const JWT = "YOUR_JWT_HERE"; // replace with your admin/user JWT
+
+// ===== Toast =====
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+}
+
+// ===== Fetch Listings =====
+async function loadListings() {
+  const res = await fetch(`${API_URL}/market/list`);
+  const items = await res.json();
+  const container = document.getElementById("items-container");
+  container.innerHTML = "";
+  items.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "item-card";
+    card.innerHTML = `
+      ${item.status === 'available' ? '<div class="new-badge">NEW</div>' : ''}
+      <div class="item-info">
+        <p><strong>Title:</strong> ${item.title}</p>
+        <p><strong>UID:</strong> ${item.uid}</p>
+        <p class="highlight"><strong>Price:</strong> ${item.price}</p>
+        <button class="buy-btn" ${item.status !== 'available' ? 'disabled' : ''} onclick="confirmPurchase(${item.id})">Buy</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ===== Purchase Flow =====
+function confirmPurchase(id) {
+  selectedListingId = id;
+  document.getElementById("modal-bg").classList.add("active");
+}
+document.getElementById("cancel-btn").addEventListener("click", () => {
+  selectedListingId = null;
+  document.getElementById("modal-bg").classList.remove("active");
+});
+document.getElementById("confirm-btn").addEventListener("click", async () => {
+  if (!selectedListingId) return;
+  const res = await fetch(`${API_URL}/market/purchase/${selectedListingId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${JWT}`,
+    },
+    body: JSON.stringify({ payment_method: "wallet" })
+  });
+  const data = await res.json();
+  showToast(data.message || "Purchase initiated");
+  selectedListingId = null;
+  document.getElementById("modal-bg").classList.remove("active");
+  loadListings(); // refresh list
+});
+
+// ===== Search =====
+document.getElementById("search").addEventListener("input", (e) => {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll(".item-card").forEach(card => {
+    const title = card.querySelector("p").textContent.toLowerCase();
+    card.style.display = title.includes(query) ? "block" : "none";
+  });
+});
+
+// ===== Initial Load =====
+loadListings();
 </script>
 
 </body>

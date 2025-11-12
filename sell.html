@@ -88,16 +88,27 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 <form id="sellForm">
   <h2>Sell Your BGMI Account</h2>
   <input type="text" id="uid" placeholder="BGMI UID" required>
+  <input type="text" id="title" placeholder="Account Title" required>
   <input type="text" id="rank" placeholder="Account Rank" required>
   <input type="number" id="level" placeholder="Account Level" required>
-  <input type="number" id="mythicItems" placeholder="Mythic Items Count">
-  <input type="number" id="xSuits" placeholder="X-Suits Count">
+  <input type="number" id="mythic_count" placeholder="Mythic Items Count">
+  <input type="number" id="legendary_count" placeholder="Legendary Items Count">
+  <input type="number" id="xsuit_count" placeholder="X-Suits Count">
+  <input type="number" id="gilt_count" placeholder="Gilt Count">
+  <input type="number" id="honor_gilt_set" placeholder="Honor Gilt Set">
+  <input type="number" id="upgradable_guns" placeholder="Upgradable Guns">
+  <input type="number" id="rare_glider" placeholder="Rare Glider">
+  <input type="number" id="vehicle_skin" placeholder="Vehicle Skin">
+  <input type="number" id="special_titles" placeholder="Special Titles">
   <input type="text" id="highlights" placeholder="Highlights (comma separated)">
 
   <div id="drop-area">
     Drag & Drop Images Here or Click to Upload
+    <input type="file" id="fileElem" multiple style="display:none;">
   </div>
   <div id="preview"></div>
+
+  <input type="text" id="adminJWT" placeholder="Admin JWT (Required)" required>
 
   <button type="button" onclick="estimateValue()">Estimate Price</button>
   <div id="estimatedPrice"></div>
@@ -125,10 +136,17 @@ function showToast(message, success=true){
 // ===== Price Estimation =====
 function estimateValue() {
   const level = parseInt(document.getElementById("level").value)||0;
-  const mythic = parseInt(document.getElementById("mythicItems").value)||0;
-  const xsuit = parseInt(document.getElementById("xSuits").value)||0;
-  const highlights = document.getElementById("highlights").value.split(",").filter(h=>h.trim());
-  const price = (level*10) + (mythic*500) + (xsuit*2000) + (highlights.length*100);
+  const mythic = parseInt(document.getElementById("mythic_count").value)||0;
+  const legendary = parseInt(document.getElementById("legendary_count").value)||0;
+  const xsuit = parseInt(document.getElementById("xsuit_count").value)||0;
+  const gilt = parseInt(document.getElementById("gilt_count").value)||0;
+  const honor = parseInt(document.getElementById("honor_gilt_set").value)||0;
+  const upgradable = parseInt(document.getElementById("upgradable_guns").value)||0;
+  const rare_glider = parseInt(document.getElementById("rare_glider").value)||0;
+  const vehicle_skin = parseInt(document.getElementById("vehicle_skin").value)||0;
+  const special_titles = parseInt(document.getElementById("special_titles").value)||0;
+
+  const price = (level*10)+(mythic*500)+(legendary*300)+(xsuit*2000)+(gilt*150)+(honor*200)+(upgradable*100)+(rare_glider*150)+(vehicle_skin*100)+(special_titles*200);
   document.getElementById("estimatedPrice").innerText = `💰 Estimated Value: ₹${price}`;
 }
 
@@ -140,11 +158,7 @@ const preview = document.getElementById("preview");
 dropArea.addEventListener("click", () => fileInput.click());
 dropArea.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("hover"); });
 dropArea.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
-dropArea.addEventListener("drop", e => {
-  e.preventDefault();
-  dropArea.classList.remove("hover");
-  handleFiles(e.dataTransfer.files);
-});
+dropArea.addEventListener("drop", e => { e.preventDefault(); dropArea.classList.remove("hover"); handleFiles(e.dataTransfer.files); });
 fileInput.addEventListener("change", e => handleFiles(e.target.files));
 
 function handleFiles(files){
@@ -152,10 +166,7 @@ function handleFiles(files){
     if(!file.type.startsWith("image/")) { showToast("❌ Only images allowed", false); continue; }
 
     const reader = new FileReader();
-    reader.onload = e => {
-      uploadedImages.push(e.target.result);
-      updatePreview();
-    };
+    reader.onload = e => { uploadedImages.push(e.target.result); updatePreview(); };
     reader.readAsDataURL(file);
   }
 }
@@ -186,7 +197,6 @@ function updatePreview(){
     num.innerText = index+1;
     div.appendChild(num);
 
-    // Drag & drop reorder
     div.addEventListener("dragstart", e => div.classList.add("dragging"));
     div.addEventListener("dragend", e => {
       div.classList.remove("dragging");
@@ -202,42 +212,54 @@ function updatePreview(){
 // ===== Fullscreen Modal =====
 const fullModal = document.getElementById("fullModal");
 const modalImg = document.getElementById("modalImg");
-function openModal(src){
-  modalImg.src = src;
-  fullModal.style.display = "flex";
-}
-function closeModal(){
-  fullModal.style.display = "none";
-}
+function openModal(src){ modalImg.src = src; fullModal.style.display = "flex"; }
+function closeModal(){ fullModal.style.display = "none"; }
 
 // ===== Form Submit =====
 document.getElementById("sellForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
-  const uid = document.getElementById("uid").value.trim();
-  const rank = document.getElementById("rank").value.trim();
-  const level = parseInt(document.getElementById("level").value)||0;
-  const mythic = parseInt(document.getElementById("mythicItems").value)||0;
-  const xsuit = parseInt(document.getElementById("xSuits").value)||0;
-  const highlights = document.getElementById("highlights").value.split(",").filter(h=>h.trim());
-  const price = (level*10) + (mythic*500) + (xsuit*2000) + (highlights.length*100);
+  const adminJWT = document.getElementById("adminJWT").value.trim();
+  if(!adminJWT){ showToast("❌ Admin JWT required", false); return; }
 
-  const payload = { uid, rank, level, mythic, xsuit, highlights, images: uploadedImages.length ? uploadedImages : ["https://via.placeholder.com/250x150?text=No+Image"], price, status:"Available" };
+  const payload = {
+    seller_id: "admin_user", // can be dynamic from JWT if decoded
+    uid: document.getElementById("uid").value.trim(),
+    title: document.getElementById("title").value.trim(),
+    description: document.getElementById("highlights").value.trim(),
+    rank: document.getElementById("rank").value.trim(),
+    level: parseInt(document.getElementById("level").value)||0,
+    mythic_count: parseInt(document.getElementById("mythic_count").value)||0,
+    legendary_count: parseInt(document.getElementById("legendary_count").value)||0,
+    xsuit_count: parseInt(document.getElementById("xsuit_count").value)||0,
+    gilt_count: parseInt(document.getElementById("gilt_count").value)||0,
+    honor_gilt_set: parseInt(document.getElementById("honor_gilt_set").value)||0,
+    upgradable_guns: parseInt(document.getElementById("upgradable_guns").value)||0,
+    rare_glider: parseInt(document.getElementById("rare_glider").value)||0,
+    vehicle_skin: parseInt(document.getElementById("vehicle_skin").value)||0,
+    special_titles: parseInt(document.getElementById("special_titles").value)||0,
+    images: uploadedImages.length ? uploadedImages : ["https://via.placeholder.com/250x150?text=No+Image"],
+  };
 
   try {
-    const res = await fetch(`${API_URL}/list`, {
+    const res = await fetch(`${API_URL}/create`, {
       method:"POST",
-      headers: {"Content-Type":"application/json"},
+      headers: {
+        "Content-Type":"application/json",
+        "Authorization": `Bearer ${adminJWT}`
+      },
       body: JSON.stringify(payload)
     });
-    if(!res.ok) throw new Error("Failed to list account");
-    showToast("🎉 Account listed successfully!", true);
 
-    document.getElementById("sellForm").reset();
-    document.getElementById("estimatedPrice").innerText="";
-    uploadedImages = [];
-    preview.innerHTML="";
-  } catch(err) {
+    const data = await res.json();
+    if(res.ok){ 
+      showToast("🎉 Account listed successfully!", true);
+      document.getElementById("sellForm").reset();
+      uploadedImages=[]; preview.innerHTML=""; document.getElementById("estimatedPrice").innerText="";
+    } else {
+      throw new Error(data.error || "Failed to list account");
+    }
+  } catch(err){
     showToast("❌ "+err.message, false);
   }
 });
