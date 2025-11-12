@@ -1,15 +1,14 @@
 (() => {
   // ===== Only run if sellForm exists =====
   const form = document.getElementById("sellForm");
-  if (!form) return; // Prevent JS errors on marketplace.html
+  if (!form) return; // Prevent JS errors on other pages
 
   const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings";
-
   let uploadedImages = [];
 
   // ===== Session / JWT =====
   function getSession() {
-    const token = localStorage.getItem("token"); // ✅ correct
+    const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!token || !user) return null;
     return { token, user };
@@ -24,7 +23,7 @@
     console.log("JWT Token:", session.token);
   }
 
-  // ===== Toast =====
+  // ===== Toast Notifications =====
   function showToast(msg, success = true) {
     const toast = document.getElementById("toast");
     if (!toast) return;
@@ -36,7 +35,11 @@
 
   // ===== Price Estimation =====
   function estimateValue() {
-    const fields = ["level","mythic_count","legendary_count","xsuit_count","gilt_count","honor_gilt_set","upgradable_guns","rare_glider","vehicle_skin","special_titles"];
+    const fields = [
+      "level","mythic_count","legendary_count","xsuit_count","gilt_count",
+      "honor_gilt_set","upgradable_guns","rare_glider","vehicle_skin","special_titles"
+    ];
+
     let price = 0;
     fields.forEach(f => {
       const val = parseInt(document.getElementById(f).value) || 0;
@@ -53,19 +56,15 @@
         case "special_titles": price += val * 200; break;
       }
     });
-    document.getElementById("estimatedPrice").innerText = `💰 Estimated Value: ₹${price}`;
+
+    const estimated = document.getElementById("estimatedPrice");
+    if (estimated) estimated.innerText = `💰 Estimated Value: ₹${price}`;
   }
 
   // ===== Drag & Drop Images =====
   const dropArea = document.getElementById("drop-area");
   const fileInput = document.getElementById("fileElem");
   const preview = document.getElementById("preview");
-
-  dropArea?.addEventListener("click", () => fileInput.click());
-  dropArea?.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("hover"); });
-  dropArea?.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
-  dropArea?.addEventListener("drop", e => { e.preventDefault(); dropArea.classList.remove("hover"); handleFiles(e.dataTransfer.files); });
-  fileInput?.addEventListener("change", e => handleFiles(e.target.files));
 
   function handleFiles(files) {
     for (let file of files) {
@@ -103,21 +102,23 @@
     });
   }
 
+  dropArea?.addEventListener("click", () => fileInput.click());
+  dropArea?.addEventListener("dragover", e => { e.preventDefault(); dropArea.classList.add("hover"); });
+  dropArea?.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
+  dropArea?.addEventListener("drop", e => { e.preventDefault(); dropArea.classList.remove("hover"); handleFiles(e.dataTransfer.files); });
+  fileInput?.addEventListener("change", e => handleFiles(e.target.files));
+
   // ===== Fullscreen Modal =====
   const fullModal = document.getElementById("fullModal");
   const modalImg = document.getElementById("modalImg");
-
-  window.openFullModal = (src) => {
-    modalImg.src = src;
-    fullModal.style.display = "flex";
-  };
+  window.openFullModal = src => { modalImg.src = src; fullModal.style.display = "flex"; };
   window.closeModal = () => fullModal.style.display = "none";
 
   // ===== Estimate Price Button =====
   const estimateBtn = form.querySelector("button[onclick='estimateValue()']");
   if (estimateBtn) estimateBtn.addEventListener("click", estimateValue);
 
-  // ===== Form Submit =====
+  // ===== Form Submission =====
   form.addEventListener("submit", async e => {
     e.preventDefault();
     if (!session) return;
@@ -158,7 +159,7 @@
         uploadedImages = [];
         preview.innerHTML = "";
         document.getElementById("estimatedPrice").innerText = "";
-      } else throw new Error(data.error || "Failed to list account");
+      } else throw new Error(data.error || data.message || "Failed to list account");
 
     } catch (err) {
       console.error(err);
