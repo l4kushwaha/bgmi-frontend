@@ -20,7 +20,7 @@
 
   // ===== Session helpers =====
   function getSession() {
-    const token = localStorage.getItem("token"); // fixed key
+    const token = localStorage.getItem("token"); // use correct key
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!token || !user) return null;
     return { token, user };
@@ -68,10 +68,10 @@
         const card = document.createElement("div");
         card.className = "item-card";
 
-        const isAvailable = item.status === "available";
+        const isNew = item.status === "available";
         let buttonsHTML = "";
 
-        if (isAvailable) {
+        if (item.status === "available") {
           buttonsHTML += `<button class="buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
         } else {
           buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
@@ -82,7 +82,7 @@
         }
 
         card.innerHTML = `
-          ${isAvailable ? '<div class="new-badge">NEW</div>' : ''}
+          ${isNew ? '<div class="new-badge">NEW</div>' : ''}
           <div class="item-info">
             <p><strong>Title:</strong> ${item.title || "N/A"}</p>
             <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
@@ -112,28 +112,22 @@
 
     const modalBg = document.getElementById("modal-bg");
     const modalText = document.getElementById("modal-text");
-    if (!modalBg || !modalText) return;
-
     modalText.textContent = action === "purchase" ? "Confirm purchase?" : "Edit your listing?";
     modalBg.classList.add("active");
 
     if (action === "edit") {
-      // use a modal input instead of prompt for better UX
-      const priceInput = document.getElementById("edit-price-input");
-      if (priceInput) {
-        priceInput.value = "";
-        priceInput.focus();
-      }
+      const newPrice = prompt("Enter new price (₹):");
+      if (newPrice !== null) updateListingPrice(id, parseInt(newPrice), session.token);
     }
   };
 
-  document.getElementById("cancel-btn")?.addEventListener("click", () => {
+  document.getElementById("cancel-btn").addEventListener("click", () => {
     selectedListingId = null;
     selectedAction = null;
-    document.getElementById("modal-bg")?.classList.remove("active");
+    document.getElementById("modal-bg").classList.remove("active");
   });
 
-  document.getElementById("confirm-btn")?.addEventListener("click", async () => {
+  document.getElementById("confirm-btn").addEventListener("click", async () => {
     const session = requireLogin();
     if (!session) return;
     const JWT = session.token;
@@ -158,14 +152,13 @@
 
     selectedListingId = null;
     selectedAction = null;
-    document.getElementById("modal-bg")?.classList.remove("active");
+    document.getElementById("modal-bg").classList.remove("active");
   });
 
   // ===== Update Listing Price =====
   async function updateListingPrice(id, price, JWT) {
     if (!JWT) return;
     if (!price || isNaN(price)) return showToast("Invalid price", false);
-
     try {
       const res = await fetch(`${API_URL}/update/${id}`, {
         method: "POST",
@@ -183,12 +176,15 @@
 
   // ===== Search =====
   const searchInput = document.getElementById("search");
-  searchInput?.addEventListener("input", (e) => {
-    currentSearchQuery = e.target.value.toLowerCase();
-    loadListings(); // Filtered reload
-  });
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      currentSearchQuery = e.target.value.toLowerCase();
+      loadListings(); // Filtered reload
+    });
+  }
 
   // ===== Initial Load & Auto-refresh =====
   loadListings();
   setInterval(() => loadListings(), 30000); // 30s auto-refresh
+
 })();
