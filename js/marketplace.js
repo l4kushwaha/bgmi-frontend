@@ -1,6 +1,7 @@
-// ===== marketplace.js (Extended Version with JWT Login) =====
+// ===== marketplace.js (Extended & Fixed Version) =====
 (() => {
   const API_URL = window.SERVICES?.market || "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+  const AUTH_URL = "https://bgmi_auth_service.bgmi-gateway.workers.dev/api/auth";
   window.MARKET_API = API_URL;
 
   let previousItemUids = new Set();
@@ -47,21 +48,23 @@
   // ===== API Request Helper =====
   async function apiRequest(endpoint, options = {}) {
     const url = endpoint.startsWith("http") ? endpoint : `${API_URL}/${endpoint}`;
-    const token = localStorage.getItem("jwt_token"); // ✅ User token automatically
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers || {}),
-        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-        ...(ADMIN_JWT ? { "Authorization": `Bearer ${ADMIN_JWT}` } : {})
-      },
-    });
+    const token = localStorage.getItem("jwt_token"); // user JWT
+    const headers = {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    };
+    if (ADMIN_JWT) headers["Authorization"] = `Bearer ${ADMIN_JWT}`;
+    else if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(url, { ...options, headers });
     if (!res.ok) {
       const text = await res.text();
       throw new Error(text || res.statusText);
     }
-    return res.json();
+    const data = await res.json();
+    // Handle response structure {status:"success", data: [...]}
+    if (data.data) return data.data;
+    return data;
   }
 
   // ===== Render Single Item =====
@@ -69,8 +72,6 @@
     const card = document.createElement("div");
     card.dataset.id = item.id;
     card.dataset.uid = item.uid;
-
-    // Inline styles
     card.style.border = "1px solid #00ffff";
     card.style.borderRadius = "12px";
     card.style.padding = "10px";
@@ -135,10 +136,24 @@
     btn.style.color = "#fff";
     btn.style.cursor = isAvailable ? "pointer" : "not-allowed";
     btn.addEventListener("click", () => openModal(item.id));
-
     infoDiv.appendChild(btn);
-    card.appendChild(infoDiv);
 
+    // ===== User Edit Option on Sell Page =====
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (window.location.pathname.includes("sell.html") && user.id === item.seller_id) {
+      const editBtn = document.createElement("button");
+      editBtn.innerText = "Edit";
+      editBtn.style.marginTop = "5px";
+      editBtn.style.background = "#3498db";
+      editBtn.addEventListener("click", () => {
+        // Redirect to sell.html form with item prefilled
+        localStorage.setItem("edit_item", JSON.stringify(item));
+        window.location.href = "sell.html";
+      });
+      infoDiv.appendChild(editBtn);
+    }
+
+    card.appendChild(infoDiv);
     return card;
   }
 
@@ -158,7 +173,7 @@
     if (!container) return console.error("#items-container not found");
     container.innerHTML = "<p>Loading items...</p>";
     try {
-      const data = await apiRequest('listings');
+      const data = await apiRequest('listings'); // ✅ works for backend returning {data:[...]}
       renderItems(container, data || []);
     } catch (err) {
       container.innerHTML = `<p style="color:red;">⚠️ Failed to load items: ${err.message}</p>`;
@@ -170,7 +185,6 @@
   function updateItemInDOM(item) {
     const card = document.querySelector(`div[data-id='${item.id}']`);
     if (!card) return;
-
     const statusEl = card.querySelector(".item-status");
     const buyBtn = card.querySelector("button");
     statusEl.innerText = item.status || "Available";
@@ -182,27 +196,43 @@
     }
   }
 
-  // ===== User Login =====
-  async function loginUser(email, password) {
-    try {
-      const res = await fetch("https://bgmi_auth_service.bgmi-gateway.workers.dev/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (data.token) {
-        localStorage.setItem("jwt_token", data.token); // ✅ Store JWT
-        showToast("Login successful");
-        return data.token;
-      } else {
-        showToast("Login failed", false);
-        return null;
+  // ===== Initialize Marketplace =====
+  function initMarketplace() {
+    modalBg = document.getElementById('modal-bg');
+    confirmBtn = document.getElementById('confirm-btn');
+    cancelBtn = document.getElementById('cancel-btn');
+
+    if (confirmBtn) confirmBtn.addEventListener('click', async () => {
+      if (!selectedItemId) return;
+      try {
+        const res = await apiRequest(`listings/purchase/${selectedItemId}`, {
+          method: 'POST',
+          body: JSON.stringify({ payment_method: "wallet" })
+        });
+        showToast(`✅ Purchase successful: ${res.message}`, true);
+        updateItemInDOM({ id: selectedItemId, status: "Sold Out" });
+      } catch (err) {
+        showToast(`⚠️ Purchase failed: ${err.message}`, false);
       }
-    } catch (err) {
-      showToast("Login error: " + err.message, false);
-      return null;
+      closeModal();
+    });
+
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    const searchInput = document.getElementById("search");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll("div[data-id]").forEach(card => {
+          const text = card.innerText.toLowerCase();
+          card.style.display = text.includes(query) ? "inline-block" : "none";
+        });
+      });
     }
+
+    renderAdminSection();
+    loadMarketplace();
+    setInterval(loadMarketplace, 30000); // auto-refresh every 30s
   }
 
   // ===== Admin Section =====
@@ -248,73 +278,21 @@
       const price = parseInt(document.getElementById('admin-price').value) || 0;
       const rank = document.getElementById('admin-rank').value.trim();
       const level = parseInt(document.getElementById('admin-level').value) || 0;
-
       if (!uid || !title) return showToast("UID and Title required", false);
 
-      const body = { 
-        seller_id: "admin_user", uid, title, description, price, rank, level, 
-        mythic_count:0, legendary_count:0, xsuit_count:0, gilt_count:0, honor_gilt_set:0,
-        upgradable_guns:0, rare_glider:0, vehicle_skin:0, special_titles:0
-      };
-
+      const body = { seller_id:"admin_user", uid, title, description, price, rank, level };
       try {
-        const res = await apiRequest('listings/create', {
-          method: 'POST',
-          body: JSON.stringify(body)
-        });
+        const res = await apiRequest('listings/create', { method:'POST', body: JSON.stringify(body) });
         showToast("✅ Listing created: " + (res.message || "Success"));
-        loadMarketplace(); // refresh items
-      } catch (err) {
-        showToast(`⚠️ Failed: ${err.message}`, false);
-      }
+        loadMarketplace();
+      } catch (err) { showToast("⚠️ Failed: " + err.message, false); }
     });
-  }
-
-  // ===== Initialize Marketplace =====
-  function initMarketplace() {
-    modalBg = document.getElementById('modal-bg');
-    confirmBtn = document.getElementById('confirm-btn');
-    cancelBtn = document.getElementById('cancel-btn');
-
-    if (confirmBtn) confirmBtn.addEventListener('click', async () => {
-      if (!selectedItemId) return;
-      try {
-        const res = await apiRequest(`listings/purchase/${selectedItemId}`, {
-          method: 'POST',
-          body: JSON.stringify({ payment_method: "wallet" })
-        });
-        showToast(`✅ Purchase successful: ${res.message}`, true);
-        updateItemInDOM({ id: selectedItemId, status: "Sold Out" });
-      } catch (err) {
-        showToast(`⚠️ Purchase failed: ${err.message}`, false);
-      }
-      closeModal();
-    });
-
-    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-
-    const searchInput = document.getElementById("search");
-    if (searchInput) {
-      searchInput.addEventListener("input", (e) => {
-        const query = e.target.value.toLowerCase();
-        document.querySelectorAll("div[data-id]").forEach(card => {
-          const text = card.innerText.toLowerCase();
-          card.style.display = text.includes(query) ? "inline-block" : "none";
-        });
-      });
-    }
-
-    renderAdminSection();
-    loadMarketplace();
-    setInterval(loadMarketplace, 30000); // auto-refresh every 30s
   }
 
   // ===== DOM Ready =====
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initMarketplace);
-  } else {
-    initMarketplace();
-  }
+  } else { initMarketplace(); }
 
   window.openModal = openModal;
   window.closeModal = closeModal;
