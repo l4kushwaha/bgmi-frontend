@@ -97,16 +97,16 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
   </div>
 
   <!-- Additional Attributes -->
-  <div class="form-group"><label class="sr-only" for="mythic_count">Mythic Count</label><input type="number" id="mythic_count" placeholder="Mythic Items Count"></div>
-  <div class="form-group"><label class="sr-only" for="legendary_count">Legendary Count</label><input type="number" id="legendary_count" placeholder="Legendary Items Count"></div>
-  <div class="form-group"><label class="sr-only" for="xsuit_count">X-Suits Count</label><input type="number" id="xsuit_count" placeholder="X-Suits Count"></div>
-  <div class="form-group"><label class="sr-only" for="gilt_count">Gilt Count</label><input type="number" id="gilt_count" placeholder="Gilt Count"></div>
-  <div class="form-group"><label class="sr-only" for="honor_gilt_set">Honor Gilt Set</label><input type="number" id="honor_gilt_set" placeholder="Honor Gilt Set"></div>
-  <div class="form-group"><label class="sr-only" for="upgradable_guns">Upgradable Guns</label><input type="number" id="upgradable_guns" placeholder="Upgradable Guns"></div>
-  <div class="form-group"><label class="sr-only" for="rare_glider">Rare Glider</label><input type="number" id="rare_glider" placeholder="Rare Glider"></div>
-  <div class="form-group"><label class="sr-only" for="vehicle_skin">Vehicle Skin</label><input type="number" id="vehicle_skin" placeholder="Vehicle Skin"></div>
-  <div class="form-group"><label class="sr-only" for="special_titles">Special Titles</label><input type="number" id="special_titles" placeholder="Special Titles"></div>
-  <div class="form-group"><label class="sr-only" for="highlights">Highlights</label><input type="text" id="highlights" placeholder="Highlights (comma separated)"></div>
+  <div class="form-group"><input type="number" id="mythic_count" placeholder="Mythic Items Count"></div>
+  <div class="form-group"><input type="number" id="legendary_count" placeholder="Legendary Items Count"></div>
+  <div class="form-group"><input type="number" id="xsuit_count" placeholder="X-Suits Count"></div>
+  <div class="form-group"><input type="number" id="gilt_count" placeholder="Gilt Count"></div>
+  <div class="form-group"><input type="number" id="honor_gilt_set" placeholder="Honor Gilt Set"></div>
+  <div class="form-group"><input type="number" id="upgradable_guns" placeholder="Upgradable Guns"></div>
+  <div class="form-group"><input type="number" id="rare_glider" placeholder="Rare Glider"></div>
+  <div class="form-group"><input type="number" id="vehicle_skin" placeholder="Vehicle Skin"></div>
+  <div class="form-group"><input type="number" id="special_titles" placeholder="Special Titles"></div>
+  <div class="form-group"><input type="text" id="highlights" placeholder="Highlights (comma separated)"></div>
 
   <!-- Drag & Drop Images -->
   <div id="drop-area" tabindex="0">Drag & Drop Images Here or Click to Upload
@@ -127,8 +127,8 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
 let uploadedImages = [];
 
-// ===== Login Check =====
-const token = localStorage.getItem("jwt_token");
+// ===== LOGIN FIX =====
+const token = localStorage.getItem("token"); // ✅ Use correct token key
 const user = JSON.parse(localStorage.getItem("user") || "null");
 if (!token || !user) { alert("Login required!"); window.location.href = "login.html"; }
 
