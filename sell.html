@@ -8,6 +8,7 @@
 <style>
 /* ==== Basic Reset ==== */
 * { margin:0; padding:0; box-sizing:border-box; font-family:"Poppins", sans-serif; }
+
 body {
   min-height:100vh;
   background: url("https://i.ytimg.com/vi/aoV3MROF_OY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCTHZ0jtDKlIZ1O0UfD9GytpmtpXQ") 
@@ -56,7 +57,7 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 #fullModal img { max-width:90%; max-height:90%; border-radius:12px; box-shadow:0 0 20px #0ff; }
 #fullModal span { position:absolute; top:20px; right:30px; font-size:30px; color:#fff; cursor:pointer; }
 
-/* ==== Accessibility: visually hidden labels ==== */
+/* ==== Accessibility ==== */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -95,7 +96,7 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
     <input type="number" id="level" placeholder="Account Level" required>
   </div>
 
-  <!-- Additional attributes -->
+  <!-- Additional Attributes -->
   <div class="form-group"><label class="sr-only" for="mythic_count">Mythic Count</label><input type="number" id="mythic_count" placeholder="Mythic Items Count"></div>
   <div class="form-group"><label class="sr-only" for="legendary_count">Legendary Count</label><input type="number" id="legendary_count" placeholder="Legendary Items Count"></div>
   <div class="form-group"><label class="sr-only" for="xsuit_count">X-Suits Count</label><input type="number" id="xsuit_count" placeholder="X-Suits Count"></div>
@@ -122,16 +123,14 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 <div id="fullModal"><span onclick="closeModal()">×</span><img id="modalImg"></div>
 
 <script>
+(() => {
 const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
 let uploadedImages = [];
 
 // ===== Login Check =====
-const token = localStorage.getItem("token");
+const token = localStorage.getItem("jwt_token");
 const user = JSON.parse(localStorage.getItem("user") || "null");
-if (!token || !user) {
-  alert("Login required!");
-  window.location.href = "login.html";
-}
+if (!token || !user) { alert("Login required!"); window.location.href = "login.html"; }
 
 // ===== Toast =====
 function showToast(msg, success=true){
@@ -143,11 +142,11 @@ function showToast(msg, success=true){
 }
 
 // ===== Estimate Price =====
-function estimateValue() {
+window.estimateValue = () => {
   const fields = ["level","mythic_count","legendary_count","xsuit_count","gilt_count","honor_gilt_set","upgradable_guns","rare_glider","vehicle_skin","special_titles"];
   let price=0;
   fields.forEach(f=>{
-    const val = parseInt(document.getElementById(f).value)||0;
+    const val=parseInt(document.getElementById(f).value)||0;
     switch(f){
       case "level": price+=val*10; break;
       case "mythic_count": price+=val*500; break;
@@ -187,24 +186,16 @@ function handleFiles(files){
 function updatePreview(){
   preview.innerHTML="";
   uploadedImages.forEach((img,index)=>{
-    const div = document.createElement("div");
-    div.className="preview-img";
-    div.draggable=true;
-    div.dataset.index=index;
+    const div=document.createElement("div"); div.className="preview-img";
+    div.draggable=true; div.dataset.index=index;
 
-    const imageElem=document.createElement("img");
-    imageElem.src=img;
-    imageElem.addEventListener("click", ()=>openModal(img));
+    const imageElem=document.createElement("img"); imageElem.src=img; imageElem.addEventListener("click", ()=>openModal(img));
     div.appendChild(imageElem);
 
-    const del = document.createElement("span");
-    del.innerText="×";
-    del.addEventListener("click",()=>{ uploadedImages.splice(index,1); updatePreview(); });
+    const del=document.createElement("span"); del.innerText="×"; del.addEventListener("click",()=>{ uploadedImages.splice(index,1); updatePreview(); });
     div.appendChild(del);
 
-    const num = document.createElement("div");
-    num.className="number";
-    num.innerText=index+1;
+    const num=document.createElement("div"); num.className="number"; num.innerText=index+1;
     div.appendChild(num);
 
     preview.appendChild(div);
@@ -212,14 +203,14 @@ function updatePreview(){
 }
 
 // ===== Fullscreen Modal =====
-function openModal(src){ document.getElementById("modalImg").src=src; document.getElementById("fullModal").style.display="flex"; }
-function closeModal(){ document.getElementById("fullModal").style.display="none"; }
+window.openModal = src=>{ document.getElementById("modalImg").src=src; document.getElementById("fullModal").style.display="flex"; }
+window.closeModal = ()=>{ document.getElementById("fullModal").style.display="none"; }
 
 // ===== Form Submit =====
 document.getElementById("sellForm").addEventListener("submit", async e=>{
   e.preventDefault();
   const payload={
-    seller_id:user?.username||user?.name||"admin_user",
+    seller_id:user?.username||user?.id||"admin_user",
     uid:document.getElementById("uid").value.trim(),
     title:document.getElementById("title").value.trim(),
     description:document.getElementById("highlights").value.trim(),
@@ -254,7 +245,8 @@ document.getElementById("sellForm").addEventListener("submit", async e=>{
     }else throw new Error(data.error||"Failed to list account");
   }catch(err){ showToast("❌ "+err.message,false); }
 });
+})();
 </script>
- <script src="js/marketplace.js"></script>
+<script src="js/sell.js"></script>
 </body>
 </html>
