@@ -19,19 +19,12 @@
   }
 
   // ===== Session helpers =====
-  const session = {
-  token: localStorage.getItem("token"), // use the correct key
-  user: JSON.parse(localStorage.getItem("user") || "null")
-};
-
-if (!session.token || !session.user) {
-  alert("Login required!");
-  window.location.href = "login.html";
-} else {
-  console.log("✅ User is logged in:", session.user.name || session.user.id || "No name/id");
-  console.log("JWT Token:", session.token);
-}
-
+  function getSession() {
+    const token = localStorage.getItem("token"); // fixed key
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!token || !user) return null;
+    return { token, user };
+  }
 
   function requireLogin() {
     const session = getSession();
@@ -75,10 +68,10 @@ if (!session.token || !session.user) {
         const card = document.createElement("div");
         card.className = "item-card";
 
-        const isNew = item.status === "available";
+        const isAvailable = item.status === "available";
         let buttonsHTML = "";
 
-        if (item.status === "available") {
+        if (isAvailable) {
           buttonsHTML += `<button class="buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
         } else {
           buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
@@ -89,7 +82,7 @@ if (!session.token || !session.user) {
         }
 
         card.innerHTML = `
-          ${isNew ? '<div class="new-badge">NEW</div>' : ''}
+          ${isAvailable ? '<div class="new-badge">NEW</div>' : ''}
           <div class="item-info">
             <p><strong>Title:</strong> ${item.title || "N/A"}</p>
             <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
@@ -119,27 +112,34 @@ if (!session.token || !session.user) {
 
     const modalBg = document.getElementById("modal-bg");
     const modalText = document.getElementById("modal-text");
+    if (!modalBg || !modalText) return;
+
     modalText.textContent = action === "purchase" ? "Confirm purchase?" : "Edit your listing?";
     modalBg.classList.add("active");
 
     if (action === "edit") {
-      const newPrice = prompt("Enter new price (₹):");
-      if (newPrice !== null) updateListingPrice(id, parseInt(newPrice), session.token);
+      // use a modal input instead of prompt for better UX
+      const priceInput = document.getElementById("edit-price-input");
+      if (priceInput) {
+        priceInput.value = "";
+        priceInput.focus();
+      }
     }
-  }
+  };
 
-  document.getElementById("cancel-btn").addEventListener("click", () => {
+  document.getElementById("cancel-btn")?.addEventListener("click", () => {
     selectedListingId = null;
     selectedAction = null;
-    document.getElementById("modal-bg").classList.remove("active");
+    document.getElementById("modal-bg")?.classList.remove("active");
   });
 
-  document.getElementById("confirm-btn").addEventListener("click", async () => {
+  document.getElementById("confirm-btn")?.addEventListener("click", async () => {
     const session = requireLogin();
     if (!session) return;
     const JWT = session.token;
 
     if (!selectedListingId || !selectedAction) return;
+
     if (selectedAction === "purchase") {
       try {
         const res = await fetch(`${API_URL}/purchase/${selectedListingId}`, {
@@ -158,13 +158,14 @@ if (!session.token || !session.user) {
 
     selectedListingId = null;
     selectedAction = null;
-    document.getElementById("modal-bg").classList.remove("active");
+    document.getElementById("modal-bg")?.classList.remove("active");
   });
 
   // ===== Update Listing Price =====
   async function updateListingPrice(id, price, JWT) {
     if (!JWT) return;
     if (!price || isNaN(price)) return showToast("Invalid price", false);
+
     try {
       const res = await fetch(`${API_URL}/update/${id}`, {
         method: "POST",
@@ -182,7 +183,7 @@ if (!session.token || !session.user) {
 
   // ===== Search =====
   const searchInput = document.getElementById("search");
-  searchInput.addEventListener("input", (e) => {
+  searchInput?.addEventListener("input", (e) => {
     currentSearchQuery = e.target.value.toLowerCase();
     loadListings(); // Filtered reload
   });
@@ -190,5 +191,4 @@ if (!session.token || !session.user) {
   // ===== Initial Load & Auto-refresh =====
   loadListings();
   setInterval(() => loadListings(), 30000); // 30s auto-refresh
-
 })();
