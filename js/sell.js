@@ -8,13 +8,18 @@
 
   // ===== Session / JWT =====
   const session = {
-    token: localStorage.getItem("jwt_token"),
-    user: JSON.parse(localStorage.getItem("user") || "null")
-  };
-  if (!session.token || !session.user) {
-    alert("Login required!");
-    window.location.href = "login.html";
-  }
+  token: localStorage.getItem("token"), // use the correct key
+  user: JSON.parse(localStorage.getItem("user") || "null")
+};
+
+if (!session.token || !session.user) {
+  alert("Login required!");
+  window.location.href = "login.html";
+} else {
+  console.log("✅ User is logged in:", session.user.name || session.user.id || "No name/id");
+  console.log("JWT Token:", session.token);
+}
+
 
   // ===== Toast =====
   function showToast(msg, success = true) {

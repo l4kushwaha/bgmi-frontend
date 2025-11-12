@@ -19,12 +19,19 @@
   }
 
   // ===== Session helpers =====
-  function getSession() {
-    const token = localStorage.getItem("jwt_token");
-    const user = JSON.parse(localStorage.getItem("user") || "null");
-    if (!token || !user) return null;
-    return { token, user };
-  }
+  const session = {
+  token: localStorage.getItem("token"), // use the correct key
+  user: JSON.parse(localStorage.getItem("user") || "null")
+};
+
+if (!session.token || !session.user) {
+  alert("Login required!");
+  window.location.href = "login.html";
+} else {
+  console.log("✅ User is logged in:", session.user.name || session.user.id || "No name/id");
+  console.log("JWT Token:", session.token);
+}
+
 
   function requireLogin() {
     const session = getSession();
