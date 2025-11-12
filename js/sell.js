@@ -1,7 +1,7 @@
 (() => {
   // ===== Only run if sellForm exists =====
   const form = document.getElementById("sellForm");
-  if (!form) return; // Prevent JS errors on other pages
+  if (!form) return;
 
   const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings";
   let uploadedImages = [];
@@ -19,7 +19,7 @@
     alert("Login required!");
     window.location.href = "login.html";
   } else {
-    console.log("✅ User logged in:", session.user.name || session.user.id);
+    console.log("✅ User logged in:", session.user.username || session.user.id);
     console.log("JWT Token:", session.token);
   }
 
@@ -124,7 +124,9 @@
     if (!session) return;
 
     const payload = {
-      seller_id: session.user?.id || "admin_user",
+      seller_id: session.user.id,
+      seller_email: session.user.email,
+      seller_username: session.user.username,
       uid: document.getElementById("uid").value.trim(),
       title: document.getElementById("title").value.trim(),
       description: document.getElementById("highlights").value.trim(),
@@ -166,5 +168,4 @@
       showToast("❌ " + err.message, false);
     }
   });
-
 })();

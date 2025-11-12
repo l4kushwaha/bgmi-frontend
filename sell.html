@@ -52,39 +52,22 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 <form id="sellForm">
   <h2>Sell Your BGMI Account</h2>
 
-  <div class="form-group">
-    <label for="uid" class="sr-only">BGMI UID</label>
-    <input type="text" id="uid" placeholder="BGMI UID" required>
-  </div>
+  <input type="text" id="uid" placeholder="BGMI UID" required>
+  <input type="text" id="title" placeholder="Account Title" required>
+  <input type="text" id="rank" placeholder="Account Rank" required>
+  <input type="number" id="level" placeholder="Account Level" required>
 
-  <div class="form-group">
-    <label for="title" class="sr-only">Account Title</label>
-    <input type="text" id="title" placeholder="Account Title" required>
-  </div>
+  <input type="number" id="mythic_count" placeholder="Mythic Items Count">
+  <input type="number" id="legendary_count" placeholder="Legendary Items Count">
+  <input type="number" id="xsuit_count" placeholder="X-Suits Count">
+  <input type="number" id="gilt_count" placeholder="Gilt Count">
+  <input type="number" id="honor_gilt_set" placeholder="Honor Gilt Set">
+  <input type="number" id="upgradable_guns" placeholder="Upgradable Guns">
+  <input type="number" id="rare_glider" placeholder="Rare Glider">
+  <input type="number" id="vehicle_skin" placeholder="Vehicle Skin">
+  <input type="number" id="special_titles" placeholder="Special Titles">
+  <input type="text" id="highlights" placeholder="Highlights (comma separated)">
 
-  <div class="form-group">
-    <label for="rank" class="sr-only">Account Rank</label>
-    <input type="text" id="rank" placeholder="Account Rank" required>
-  </div>
-
-  <div class="form-group">
-    <label for="level" class="sr-only">Account Level</label>
-    <input type="number" id="level" placeholder="Account Level" required>
-  </div>
-
-  <!-- Additional Attributes -->
-  <div class="form-group"><input type="number" id="mythic_count" placeholder="Mythic Items Count"></div>
-  <div class="form-group"><input type="number" id="legendary_count" placeholder="Legendary Items Count"></div>
-  <div class="form-group"><input type="number" id="xsuit_count" placeholder="X-Suits Count"></div>
-  <div class="form-group"><input type="number" id="gilt_count" placeholder="Gilt Count"></div>
-  <div class="form-group"><input type="number" id="honor_gilt_set" placeholder="Honor Gilt Set"></div>
-  <div class="form-group"><input type="number" id="upgradable_guns" placeholder="Upgradable Guns"></div>
-  <div class="form-group"><input type="number" id="rare_glider" placeholder="Rare Glider"></div>
-  <div class="form-group"><input type="number" id="vehicle_skin" placeholder="Vehicle Skin"></div>
-  <div class="form-group"><input type="number" id="special_titles" placeholder="Special Titles"></div>
-  <div class="form-group"><input type="text" id="highlights" placeholder="Highlights (comma separated)"></div>
-
-  <!-- Drag & Drop Images -->
   <div id="drop-area" tabindex="0">Drag & Drop Images Here or Click to Upload
     <input type="file" id="fileElem" multiple style="display:none;">
   </div>
@@ -100,129 +83,134 @@ button { background: linear-gradient(135deg,#00ffff,#ff00ff); color:#fff; font-w
 
 <script>
 (() => {
-const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings";
-let uploadedImages = [];
+  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings";
+  let uploadedImages = [];
 
-// ===== LOGIN & USER =====
-const token = localStorage.getItem("token");
-const user = JSON.parse(localStorage.getItem("user") || "null");
-if (!token || !user) { alert("Login required!"); window.location.href = "login.html"; }
+  // ===== LOGIN & USER =====
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  if (!token || !user) {
+    alert("Login required!");
+    window.location.href = "login.html";
+  }
 
-// ===== Toast =====
-function showToast(msg, success=true){
-  const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.style.background = success ? "#27ae60" : "#c0392b";
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),3000);
-}
+  // ===== Toast =====
+  function showToast(msg, success=true){
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.style.background = success ? "#27ae60" : "#c0392b";
+    toast.classList.add("show");
+    setTimeout(()=>toast.classList.remove("show"),3000);
+  }
 
-// ===== Estimate Price =====
-window.estimateValue = () => {
-  const fields = ["level","mythic_count","legendary_count","xsuit_count","gilt_count","honor_gilt_set","upgradable_guns","rare_glider","vehicle_skin","special_titles"];
-  let price=0;
-  fields.forEach(f=>{
-    const val=parseInt(document.getElementById(f).value)||0;
-    switch(f){
-      case "level": price+=val*10; break;
-      case "mythic_count": price+=val*500; break;
-      case "legendary_count": price+=val*150; break;
-      case "xsuit_count": price+=val*1500; break;
-      case "gilt_count": price+=val*2000; break;
-      case "honor_gilt_set": price+=val*2500; break;
-      case "upgradable_guns": price+=val*500; break;
-      case "rare_glider": price+=val*250; break;
-      case "vehicle_skin": price+=val*200; break;
-      case "special_titles": price+=val*100; break;
+  // ===== Estimate Price =====
+  window.estimateValue = () => {
+    const fields = ["level","mythic_count","legendary_count","xsuit_count","gilt_count","honor_gilt_set","upgradable_guns","rare_glider","vehicle_skin","special_titles"];
+    let price=0;
+    fields.forEach(f=>{
+      const val=parseInt(document.getElementById(f).value)||0;
+      switch(f){
+        case "level": price+=val*10; break;
+        case "mythic_count": price+=val*500; break;
+        case "legendary_count": price+=val*150; break;
+        case "xsuit_count": price+=val*1500; break;
+        case "gilt_count": price+=val*2000; break;
+        case "honor_gilt_set": price+=val*2500; break;
+        case "upgradable_guns": price+=val*500; break;
+        case "rare_glider": price+=val*250; break;
+        case "vehicle_skin": price+=val*200; break;
+        case "special_titles": price+=val*100; break;
+      }
+    });
+    document.getElementById("estimatedPrice").innerText = `💰 Estimated Value: ₹${price}`;
+  }
+
+  // ===== Drag & Drop Images =====
+  const dropArea = document.getElementById("drop-area");
+  const fileInput = document.getElementById("fileElem");
+  const preview = document.getElementById("preview");
+
+  dropArea.addEventListener("click",()=>fileInput.click());
+  dropArea.addEventListener("dragover", e=>{ e.preventDefault(); dropArea.classList.add("hover"); });
+  dropArea.addEventListener("dragleave", e=>{ e.preventDefault(); dropArea.classList.remove("hover"); });
+  dropArea.addEventListener("drop", e=>{ e.preventDefault(); dropArea.classList.remove("hover"); handleFiles(e.dataTransfer.files); });
+  fileInput.addEventListener("change", e=>handleFiles(e.target.files));
+
+  function handleFiles(files){
+    for(let file of files){
+      if(!file.type.startsWith("image/")) { showToast("❌ Only images allowed",false); continue; }
+      const reader = new FileReader();
+      reader.onload = e=>{ uploadedImages.push(e.target.result); updatePreview(); };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function updatePreview(){
+    preview.innerHTML="";
+    uploadedImages.forEach((img,index)=>{
+      const div=document.createElement("div"); div.className="preview-img";
+      div.draggable=true; div.dataset.index=index;
+
+      const imageElem=document.createElement("img"); imageElem.src=img; imageElem.addEventListener("click", ()=>openModal(img));
+      div.appendChild(imageElem);
+
+      const del=document.createElement("span"); del.innerText="×"; del.addEventListener("click",()=>{ uploadedImages.splice(index,1); updatePreview(); });
+      div.appendChild(del);
+
+      const num=document.createElement("div"); num.className="number"; num.innerText=index+1;
+      div.appendChild(num);
+
+      preview.appendChild(div);
+    });
+  }
+
+  // ===== Fullscreen Modal =====
+  window.openModal = src=>{ document.getElementById("modalImg").src=src; document.getElementById("fullModal").style.display="flex"; }
+  window.closeModal = ()=>{ document.getElementById("fullModal").style.display="none"; }
+
+  // ===== Form Submit =====
+  document.getElementById("sellForm").addEventListener("submit", async e=>{
+    e.preventDefault();
+    const payload={
+      seller_id: user.id,  // ✅ auto fetch
+      seller_email: user.email,
+      seller_username: user.username,
+      uid: document.getElementById("uid").value.trim(),
+      title: document.getElementById("title").value.trim(),
+      description: document.getElementById("highlights").value.trim(),
+      rank: document.getElementById("rank").value.trim(),
+      level: parseInt(document.getElementById("level").value)||0,
+      mythic_count: parseInt(document.getElementById("mythic_count").value)||0,
+      legendary_count: parseInt(document.getElementById("legendary_count").value)||0,
+      xsuit_count: parseInt(document.getElementById("xsuit_count").value)||0,
+      gilt_count: parseInt(document.getElementById("gilt_count").value)||0,
+      honor_gilt_set: parseInt(document.getElementById("honor_gilt_set").value)||0,
+      upgradable_guns: parseInt(document.getElementById("upgradable_guns").value)||0,
+      rare_glider: parseInt(document.getElementById("rare_glider").value)||0,
+      vehicle_skin: parseInt(document.getElementById("vehicle_skin").value)||0,
+      special_titles: parseInt(document.getElementById("special_titles").value)||0,
+      images: uploadedImages.length ? uploadedImages : ["https://via.placeholder.com/250x150?text=No+Image"]
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/create`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body:JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(res.ok){
+        showToast("🎉 Account listed successfully!");
+        document.getElementById("sellForm").reset();
+        uploadedImages=[]; preview.innerHTML=""; document.getElementById("estimatedPrice").innerText="";
+      }else throw new Error(data.error || data.message || "Failed to list account");
+    } catch(err){
+      showToast("❌ " + err.message,false);
     }
   });
-  document.getElementById("estimatedPrice").innerText = `💰 Estimated Value: ₹${price}`;
-}
-
-// ===== Drag & Drop Images =====
-const dropArea = document.getElementById("drop-area");
-const fileInput = document.getElementById("fileElem");
-const preview = document.getElementById("preview");
-
-dropArea.addEventListener("click",()=>fileInput.click());
-dropArea.addEventListener("dragover", e=>{ e.preventDefault(); dropArea.classList.add("hover"); });
-dropArea.addEventListener("dragleave", e=>{ e.preventDefault(); dropArea.classList.remove("hover"); });
-dropArea.addEventListener("drop", e=>{ e.preventDefault(); dropArea.classList.remove("hover"); handleFiles(e.dataTransfer.files); });
-fileInput.addEventListener("change", e=>handleFiles(e.target.files));
-
-function handleFiles(files){
-  for(let file of files){
-    if(!file.type.startsWith("image/")) { showToast("❌ Only images allowed",false); continue; }
-    const reader = new FileReader();
-    reader.onload = e=>{ uploadedImages.push(e.target.result); updatePreview(); };
-    reader.readAsDataURL(file);
-  }
-}
-
-function updatePreview(){
-  preview.innerHTML="";
-  uploadedImages.forEach((img,index)=>{
-    const div=document.createElement("div"); div.className="preview-img";
-    div.draggable=true; div.dataset.index=index;
-
-    const imageElem=document.createElement("img"); imageElem.src=img; imageElem.addEventListener("click", ()=>openModal(img));
-    div.appendChild(imageElem);
-
-    const del=document.createElement("span"); del.innerText="×"; del.addEventListener("click",()=>{ uploadedImages.splice(index,1); updatePreview(); });
-    div.appendChild(del);
-
-    const num=document.createElement("div"); num.className="number"; num.innerText=index+1;
-    div.appendChild(num);
-
-    preview.appendChild(div);
-  });
-}
-
-// ===== Fullscreen Modal =====
-window.openModal = src=>{ document.getElementById("modalImg").src=src; document.getElementById("fullModal").style.display="flex"; }
-window.closeModal = ()=>{ document.getElementById("fullModal").style.display="none"; }
-
-// ===== Form Submit =====
-document.getElementById("sellForm").addEventListener("submit", async e=>{
-  e.preventDefault();
-  const payload={
-    seller_id: user.id,  // ✅ use actual user id
-    uid: document.getElementById("uid").value.trim(),
-    title: document.getElementById("title").value.trim(),
-    description: document.getElementById("highlights").value.trim(),
-    rank: document.getElementById("rank").value.trim(),
-    level: parseInt(document.getElementById("level").value)||0,
-    mythic_count: parseInt(document.getElementById("mythic_count").value)||0,
-    legendary_count: parseInt(document.getElementById("legendary_count").value)||0,
-    xsuit_count: parseInt(document.getElementById("xsuit_count").value)||0,
-    gilt_count: parseInt(document.getElementById("gilt_count").value)||0,
-    honor_gilt_set: parseInt(document.getElementById("honor_gilt_set").value)||0,
-    upgradable_guns: parseInt(document.getElementById("upgradable_guns").value)||0,
-    rare_glider: parseInt(document.getElementById("rare_glider").value)||0,
-    vehicle_skin: parseInt(document.getElementById("vehicle_skin").value)||0,
-    special_titles: parseInt(document.getElementById("special_titles").value)||0,
-    images: uploadedImages.length ? uploadedImages : ["https://via.placeholder.com/250x150?text=No+Image"]
-  };
-
-  try {
-    const res = await fetch(`${API_URL}/create`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body:JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if(res.ok){
-      showToast("🎉 Account listed successfully!");
-      document.getElementById("sellForm").reset();
-      uploadedImages=[]; preview.innerHTML=""; document.getElementById("estimatedPrice").innerText="";
-    }else throw new Error(data.error || data.message || "Failed to list account");
-  } catch(err){
-    showToast("❌ " + err.message,false);
-  }
-});
 })();
 </script>
 
