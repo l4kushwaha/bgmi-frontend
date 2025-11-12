@@ -1,7 +1,7 @@
 (() => {
   // ===== Only run if sellForm exists =====
   const form = document.getElementById("sellForm");
-  if (!form) return;
+  if (!form) return; // Prevent JS errors on other pages
 
   const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings";
   let uploadedImages = [];
@@ -21,6 +21,11 @@
   } else {
     console.log("✅ User logged in:", session.user.username || session.user.id);
     console.log("JWT Token:", session.token);
+
+    // ===== Expose for console testing =====
+    window.currentUser = session.user;
+    window.currentToken = session.token;
+    console.log("🌐 currentUser and currentToken are now globally available for console testing");
   }
 
   // ===== Toast Notifications =====
@@ -168,4 +173,5 @@
       showToast("❌ " + err.message, false);
     }
   });
+
 })();
