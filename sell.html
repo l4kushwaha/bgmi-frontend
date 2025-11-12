@@ -150,14 +150,14 @@ window.estimateValue = () => {
     switch(f){
       case "level": price+=val*10; break;
       case "mythic_count": price+=val*500; break;
-      case "legendary_count": price+=val*300; break;
-      case "xsuit_count": price+=val*2000; break;
-      case "gilt_count": price+=val*150; break;
-      case "honor_gilt_set": price+=val*200; break;
-      case "upgradable_guns": price+=val*100; break;
-      case "rare_glider": price+=val*150; break;
-      case "vehicle_skin": price+=val*100; break;
-      case "special_titles": price+=val*200; break;
+      case "legendary_count": price+=val*150; break;
+      case "xsuit_count": price+=val*1500; break;
+      case "gilt_count": price+=val*2000; break;
+      case "honor_gilt_set": price+=val*2500; break;
+      case "upgradable_guns": price+=val*500; break;
+      case "rare_glider": price+=val*250; break;
+      case "vehicle_skin": price+=val*200; break;
+      case "special_titles": price+=val*100; break;
     }
   });
   document.getElementById("estimatedPrice").innerText = `💰 Estimated Value: ₹${price}`;
