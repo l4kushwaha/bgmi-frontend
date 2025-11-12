@@ -13,12 +13,8 @@
     min-height: 100vh;
   }
   h1 { text-align: center; color: #fff; margin: 20px 0; }
-  #search { display: block; width: 90%; max-width: 400px; margin: 20px auto; padding: 10px; border-radius: 25px; border: none; outline: none; font-size: 16px; }
   #items-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px; min-height: 200px; }
-  .item-card {
-    background: #fff; border-radius: 10px; width: 250px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    overflow: hidden; position: relative; transition: transform 0.2s;
-  }
+  .item-card { background: #fff; border-radius: 10px; width: 250px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); overflow: hidden; position: relative; transition: transform 0.2s; }
   .item-card:hover { transform: scale(1.03); }
   .item-info { padding: 10px; }
   .item-info strong { display: inline-block; width: 70px; }
@@ -38,6 +34,7 @@
   #toast.show { display: block; animation: fadein 0.3s, fadeout 0.3s 2.7s; }
   @keyframes fadein { from {opacity:0;} to {opacity:1;} }
   @keyframes fadeout { from {opacity:1;} to {opacity:0;} }
+  #search { display: block; width: 90%; max-width: 400px; margin: 20px auto; padding: 10px; border-radius: 25px; border: none; outline: none; font-size: 16px; }
 </style>
 </head>
 <body>
@@ -50,7 +47,7 @@
 
 <div id="modal-bg">
   <div class="modal-content">
-    <p id="modal-text">Confirm purchase?</p>
+    <p id="modal-text">Confirm action?</p>
     <button id="confirm-btn">Confirm</button>
     <button id="cancel-btn">Cancel</button>
   </div>
@@ -59,158 +56,177 @@
 <div id="toast"></div>
 
 <script>
-const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
-let selectedListingId = null;
-let selectedAction = null;
+(() => {
+  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
+  let selectedListingId = null;
+  let selectedAction = null; // "purchase" or "edit"
 
-// ===== Check login =====
-function checkLogin() {
-  const token = localStorage.getItem("jwt_token");
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  if (!token || !user) {
-    alert("Please login first!");
-    window.location.href = "login.html";
-    return null;
+  // ===== Toast =====
+  function showToast(msg, success = true) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.style.background = success ? "#27ae60" : "#c0392b";
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
   }
-  return { token, user };
-}
-const session = checkLogin();
-if (!session) throw new Error("Not logged in");
-const JWT = session.token;
-const USER = session.user;
 
-// ===== Toast =====
-function showToast(msg, success=true) {
-  const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.style.background = success ? "#27ae60" : "#c0392b";
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 3000);
-}
+  // ===== Session helpers =====
+  function getSession() {
+    const token = localStorage.getItem("jwt_token");
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!token || !user) return null;
+    return { token, user };
+  }
 
-// ===== Load Listings =====
-async function loadListings() {
-  try {
-    const res = await fetch(`${API_URL}/list`, {
-      headers: { "Authorization": `Bearer ${JWT}` }
-    });
-    const items = await res.json();
-    const container = document.getElementById("items-container");
-    container.innerHTML = "";
-
-    if (!items || items.length === 0) {
-      container.innerHTML = "<p>No items available</p>";
-      return;
+  function requireLogin() {
+    const session = getSession();
+    if (!session) {
+      alert("Please login first!");
+      window.location.href = "login.html";
+      return null;
     }
-
-    items.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "item-card";
-
-      const isNew = item.status === "available";
-      let buttonsHTML = '';
-      
-      if (item.status === "available") {
-        buttonsHTML += `<button class="buy-btn" onclick="openModal(${item.id}, 'purchase')">Buy</button>`;
-      } else {
-        buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
-      }
-
-      if (USER.role === "admin" || USER.id === item.seller_id) {
-        buttonsHTML += `<button class="edit-btn" onclick="openModal(${item.id}, 'edit')">Edit</button>`;
-      }
-
-      card.innerHTML = `
-        ${isNew ? '<div class="new-badge">NEW</div>' : ''}
-        <div class="item-info">
-          <p><strong>Title:</strong> ${item.title || "N/A"}</p>
-          <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
-          ${item.highlights ? `<p class="highlight">${item.highlights.join(", ")}</p>` : ""}
-          <p class="highlight"><strong>Price:</strong> ₹${item.price || 0}</p>
-          <p><strong>Status:</strong> ${item.status || "Available"}</p>
-          ${buttonsHTML}
-        </div>
-      `;
-      container.appendChild(card);
-    });
-
-  } catch (err) {
-    console.error(err);
-    showToast("Failed to load items", false);
-    document.getElementById("items-container").innerHTML = "<p>Failed to load items</p>";
+    return session;
   }
-}
 
-// ===== Modal =====
-function openModal(id, action) {
-  selectedListingId = id;
-  selectedAction = action;
-  const modalText = document.getElementById("modal-text");
-  modalText.textContent = action === "purchase" ? "Confirm purchase?" : "Edit your listing?";
-  document.getElementById("modal-bg").classList.add("active");
-
-  if (action === "edit") {
-    const newPrice = prompt("Enter new price (₹):");
-    if (newPrice !== null) updateListingPrice(id, parseInt(newPrice));
-  }
-}
-document.getElementById("cancel-btn").addEventListener("click", () => {
-  selectedListingId = null;
-  selectedAction = null;
-  document.getElementById("modal-bg").classList.remove("active");
-});
-document.getElementById("confirm-btn").addEventListener("click", async () => {
-  if (!selectedListingId || !selectedAction) return;
-  if (selectedAction === "purchase") {
+  // ===== Render Listings =====
+  async function loadListings() {
+    const session = getSession();
+    const JWT = session?.token;
     try {
-      const res = await fetch(`${API_URL}/purchase/${selectedListingId}`, {
+      const res = await fetch(`${API_URL}/list`, {
+        headers: JWT ? { "Authorization": `Bearer ${JWT}` } : {}
+      });
+      const items = await res.json();
+      const container = document.getElementById("items-container");
+      container.innerHTML = "";
+      if (!items || items.length === 0) {
+        container.innerHTML = "<p>No items available</p>";
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "item-card";
+
+        const isNew = item.status === "available";
+        let buttonsHTML = '';
+        
+        if (item.status === "available") {
+          buttonsHTML += `<button class="buy-btn" onclick="openModal(${item.id}, 'purchase')">Buy</button>`;
+        } else {
+          buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
+        }
+
+        if (session && (session.user.role === "admin" || session.user.id === item.seller_id)) {
+          buttonsHTML += `<button class="edit-btn" onclick="openModal(${item.id}, 'edit')">Edit</button>`;
+        }
+
+        card.innerHTML = `
+          ${isNew ? '<div class="new-badge">NEW</div>' : ''}
+          <div class="item-info">
+            <p><strong>Title:</strong> ${item.title || "N/A"}</p>
+            <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
+            ${item.highlights ? `<p class="highlight">${item.highlights.join(", ")}</p>` : ""}
+            <p class="highlight"><strong>Price:</strong> ₹${item.price || 0}</p>
+            <p><strong>Status:</strong> ${item.status || "Available"}</p>
+            ${buttonsHTML}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to load items", false);
+      document.getElementById("items-container").innerHTML = "<p>Failed to load items</p>";
+    }
+  }
+
+  // ===== Modal =====
+  window.openModal = (id, action) => {
+    const session = requireLogin();
+    if (!session) return;
+
+    selectedListingId = id;
+    selectedAction = action;
+    const modalText = document.getElementById("modal-text");
+    modalText.textContent = action === "purchase" ? "Confirm purchase?" : "Edit your listing?";
+    document.getElementById("modal-bg").classList.add("active");
+
+    if (action === "edit") {
+      const newPrice = prompt("Enter new price (₹):");
+      if (newPrice !== null) updateListingPrice(id, parseInt(newPrice), session.token);
+    }
+  }
+
+  document.getElementById("cancel-btn").addEventListener("click", () => {
+    selectedListingId = null;
+    selectedAction = null;
+    document.getElementById("modal-bg").classList.remove("active");
+  });
+
+  document.getElementById("confirm-btn").addEventListener("click", async () => {
+    const session = requireLogin();
+    if (!session) return;
+    const JWT = session.token;
+
+    if (!selectedListingId || !selectedAction) return;
+    if (selectedAction === "purchase") {
+      try {
+        const res = await fetch(`${API_URL}/purchase/${selectedListingId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
+          body: JSON.stringify({ payment_method: "wallet" })
+        });
+        const data = await res.json();
+        showToast(data.message || "Purchase successful");
+        loadListings();
+      } catch (err) {
+        console.error(err);
+        showToast("Purchase failed", false);
+      }
+    }
+    selectedListingId = null;
+    selectedAction = null;
+    document.getElementById("modal-bg").classList.remove("active");
+  });
+
+  // ===== Update Listing Price =====
+  async function updateListingPrice(id, price, JWT) {
+    if (!JWT) return;
+    if (!price || isNaN(price)) return showToast("Invalid price", false);
+    try {
+      const res = await fetch(`${API_URL}/update/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
-        body: JSON.stringify({ payment_method: "wallet" })
+        body: JSON.stringify({ price })
       });
       const data = await res.json();
-      showToast(data.message || "Purchase successful");
+      showToast(data.message || "Price updated");
       loadListings();
     } catch (err) {
       console.error(err);
-      showToast("Purchase failed", false);
+      showToast("Failed to update price", false);
     }
   }
-  selectedListingId = null;
-  selectedAction = null;
-  document.getElementById("modal-bg").classList.remove("active");
-});
 
-// ===== Update Listing Price =====
-async function updateListingPrice(id, price) {
-  if (!price || isNaN(price)) return showToast("Invalid price", false);
-  try {
-    const res = await fetch(`${API_URL}/update/${id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
-      body: JSON.stringify({ price })
+  // ===== Search =====
+  document.getElementById("search").addEventListener("input", (e) => {
+    const query = e.target.value.toLowerCase();
+    let found = false;
+    document.querySelectorAll(".item-card").forEach(card => {
+      const text = card.innerText.toLowerCase();
+      if (text.includes(query)) {
+        card.style.display = "block";
+        found = true;
+      } else card.style.display = "none";
     });
-    const data = await res.json();
-    showToast(data.message || "Price updated");
-    loadListings();
-  } catch (err) {
-    console.error(err);
-    showToast("Failed to update price", false);
-  }
-}
-
-// ===== Search =====
-document.getElementById("search").addEventListener("input", (e) => {
-  const query = e.target.value.toLowerCase();
-  document.querySelectorAll(".item-card").forEach(card => {
-    card.style.display = card.innerText.toLowerCase().includes(query) ? "block" : "none";
+    if (!found) document.getElementById("items-container").innerHTML = "<p>No items found</p>";
   });
-});
 
-// ===== Auto-refresh =====
-loadListings();
-setInterval(loadListings, 30000);
+  // ===== Initial Load =====
+  loadListings();
+  setInterval(loadListings, 30000); // auto-refresh every 30s
+})();
 </script>
-<script src="js/marketplace.js"></script>
 </body>
 </html>
