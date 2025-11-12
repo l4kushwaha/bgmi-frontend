@@ -23,14 +23,13 @@
     min-height: 200px;
   }
   .item-card {
-    background: #222;
+    background: #fff;
     border-radius: 10px;
     width: 250px;
-    color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     overflow: hidden;
     position: relative;
     transition: transform 0.2s;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   }
   .item-card:hover { transform: scale(1.03); }
   .item-info { padding: 10px; }
@@ -49,8 +48,8 @@
     border-radius: 3px;
   }
 
-  .buy-btn {
-    background: linear-gradient(135deg, #00ffff, #ff00ff);
+  .buy-btn, .edit-btn {
+    background: #27ae60;
     color: #fff;
     border: none;
     padding: 7px 12px;
@@ -59,12 +58,9 @@
     margin-top: 5px;
     width: 100%;
   }
-  .buy-btn:disabled {
-    background: #95a5a6;
-    cursor: not-allowed;
-  }
+  .buy-btn:disabled, .edit-btn:disabled { background: #95a5a6; cursor: not-allowed; }
 
-  #modal-bg {
+  #modal-bg, #edit-modal {
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -73,15 +69,17 @@
     align-items: center;
     z-index: 1000;
   }
-  #modal-bg.active { display: flex; }
+  #modal-bg.active, #edit-modal.active { display: flex; }
   .modal-content {
-    background: #111;
+    background: #fff;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     min-width: 300px;
-    color: #fff;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  .modal-content input, .modal-content textarea {
+    width: 90%; padding: 5px; margin: 5px 0; border-radius:5px; border:1px solid #ccc;
   }
   .modal-content button {
     margin: 10px;
@@ -91,7 +89,8 @@
     cursor: pointer;
   }
   #confirm-btn { background: #27ae60; color: #fff; }
-  #cancel-btn { background: #c0392b; color: #fff; }
+  #cancel-btn, #edit-cancel { background: #c0392b; color: #fff; }
+  #save-edit { background: #3498db; color: #fff; }
 
   #toast {
     position: fixed;
@@ -121,39 +120,41 @@
     font-size: 16px;
   }
 
-  /* Admin panel */
-  #admin-panel {
-    background: #111;
+  /* User Add Listing Section */
+  #user-listing {
+    background: #1a1a1a;
     color: #fff;
     padding: 15px;
-    margin: 20px auto;
     border-radius: 10px;
     width: 90%;
-    max-width: 500px;
+    max-width: 400px;
+    margin: 20px auto;
   }
-  #admin-panel input, #admin-panel textarea {
-    width: 90%;
-    padding: 5px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: none;
+  #user-listing input, #user-listing textarea, #user-listing button {
+    width: 100%; margin: 5px 0; padding: 7px; border-radius:5px; border:1px solid #ccc;
   }
-  #admin-panel button {
-    padding: 7px 15px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    background: linear-gradient(135deg, #00ffff, #ff00ff);
-    color: #fff;
-    margin-top: 5px;
-  }
+  #user-listing button { background: #27ae60; color: #fff; border:none; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <h1>BGMI Marketplace</h1>
-
 <input type="text" id="search" placeholder="Search items...">
+
+<!-- User Add Listing Section -->
+<div id="user-listing">
+  <h3>Add Your BGMI ID</h3>
+  <input type="text" id="uid" placeholder="UID">
+  <input type="text" id="title" placeholder="Title">
+  <textarea id="description" placeholder="Description"></textarea>
+  <input type="number" id="level" placeholder="Level">
+  <input type="text" id="rank" placeholder="Rank">
+  <input type="number" id="mythic_count" placeholder="Mythic Count">
+  <input type="number" id="legendary_count" placeholder="Legendary Count">
+  <input type="number" id="xsuit_count" placeholder="X-Suit Count">
+  <button id="add-listing-btn">Add Listing</button>
+</div>
+
 <div id="items-container">
   <p>Loading items...</p>
 </div>
@@ -167,44 +168,41 @@
   </div>
 </div>
 
-<!-- Toast -->
-<div id="toast"></div>
-
-<!-- Admin Panel -->
-<div id="admin-panel">
-  <h3>Admin Panel</h3>
-  <input type="text" id="admin-jwt" placeholder="Enter Admin JWT"><br>
-  <button id="admin-login-btn">Login as Admin</button>
-  <hr>
-  <h4>Create Listing</h4>
-  <input type="text" id="admin-uid" placeholder="UID"><br>
-  <input type="text" id="admin-title" placeholder="Title"><br>
-  <textarea id="admin-desc" placeholder="Description"></textarea><br>
-  <input type="number" id="admin-price" placeholder="Price"><br>
-  <input type="text" id="admin-rank" placeholder="Rank"><br>
-  <input type="number" id="admin-level" placeholder="Level"><br>
-  <button id="admin-create-listing-btn">Create Listing</button>
+<!-- Edit Listing Modal -->
+<div id="edit-modal">
+  <div class="modal-content">
+    <h3>Edit Listing</h3>
+    <input type="text" id="edit-title" placeholder="Title">
+    <textarea id="edit-description" placeholder="Description"></textarea>
+    <input type="number" id="edit-level" placeholder="Level">
+    <input type="text" id="edit-rank" placeholder="Rank">
+    <input type="number" id="edit-price" placeholder="Price">
+    <button id="save-edit">Save</button>
+    <button id="edit-cancel">Cancel</button>
+  </div>
 </div>
+
+<div id="toast"></div>
 
 <script>
 const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
 let selectedListingId = null;
-let ADMIN_JWT = null;
+let editingListingId = null;
 
-// ===== Check Login =====
+// ===== Check login =====
 function checkLogin() {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "null");
-
   if (!token || !user) {
     alert("Please login first!");
     window.location.href = "login.html";
     return null;
   }
-  return token;
+  return { token, user };
 }
-const JWT = checkLogin();
-if (!JWT) throw new Error("Not logged in");
+
+const auth = checkLogin();
+if (!auth) throw new Error("Not logged in");
 
 // ===== Toast =====
 function showToast(msg, success=true) {
@@ -215,10 +213,12 @@ function showToast(msg, success=true) {
   setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
-// ===== Load Listings =====
+// ===== Fetch Listings =====
 async function loadListings() {
   try {
-    const res = await fetch(`${API_URL}/list`, { headers: { "Authorization": `Bearer ${JWT}` } });
+    const res = await fetch(`${API_URL}/list`, {
+      headers: { "Authorization": `Bearer ${auth.token}` }
+    });
     const items = await res.json();
     const container = document.getElementById("items-container");
     container.innerHTML = "";
@@ -232,20 +232,21 @@ async function loadListings() {
       const card = document.createElement("div");
       card.className = "item-card";
 
-      const highlightsText = item.highlights?.join(", ") || "";
-      const isAvailable = item.status === "available";
+      const isNew = item.status === "available";
+      const canEdit = auth.user.role === "admin" || auth.user.id === item.seller_id;
 
       card.innerHTML = `
-        ${isAvailable ? '<div class="new-badge">NEW</div>' : ''}
+        ${isNew ? '<div class="new-badge">NEW</div>' : ''}
         <div class="item-info">
-          <p><strong>Title:</strong> ${item.title}</p>
-          <p><strong>UID:</strong> ${item.uid}</p>
-          ${highlightsText ? `<p class="highlight">${highlightsText}</p>` : ""}
-          <p class="highlight"><strong>Price:</strong> ₹${item.price}</p>
-          <p><strong>Status:</strong> ${item.status}</p>
-          <button class="buy-btn" ${!isAvailable ? "disabled" : ""} onclick="confirmPurchase(${item.id})">
-            ${isAvailable ? "Buy" : "Sold Out"}
+          <p><strong>Title:</strong> ${item.title || "N/A"}</p>
+          <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
+          ${item.highlights ? `<p class="highlight">${item.highlights.join(", ")}</p>` : ""}
+          <p class="highlight"><strong>Price:</strong> ₹${item.price || 0}</p>
+          <p><strong>Status:</strong> ${item.status || "Available"}</p>
+          <button class="buy-btn" ${item.status !== 'available' ? 'disabled' : ''} onclick="confirmPurchase(${item.id})">
+            ${item.status === 'available' ? 'Buy' : 'Sold Out'}
           </button>
+          ${canEdit ? `<button class="edit-btn" onclick="openEditModal(${item.id})">Edit</button>` : ''}
         </div>
       `;
       container.appendChild(card);
@@ -253,10 +254,11 @@ async function loadListings() {
   } catch (err) {
     console.error(err);
     showToast("Failed to load items", false);
+    document.getElementById("items-container").innerHTML = "<p>Failed to load items</p>";
   }
 }
 
-// ===== Purchase =====
+// ===== Purchase Flow =====
 function confirmPurchase(id) {
   selectedListingId = id;
   document.getElementById("modal-bg").classList.add("active");
@@ -270,14 +272,14 @@ document.getElementById("confirm-btn").addEventListener("click", async () => {
   try {
     const res = await fetch(`${API_URL}/purchase/${selectedListingId}`, {
       method: "POST",
-      headers: {
+      headers: { 
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${JWT}`,
+        "Authorization": `Bearer ${auth.token}`
       },
       body: JSON.stringify({ payment_method: "wallet" })
     });
     const data = await res.json();
-    showToast(data.message || "Purchase successful");
+    showToast(data.message || "Purchase initiated");
     selectedListingId = null;
     document.getElementById("modal-bg").classList.remove("active");
     loadListings();
@@ -296,49 +298,84 @@ document.getElementById("search").addEventListener("input", (e) => {
   });
 });
 
-// ===== Admin =====
-document.getElementById("admin-login-btn").addEventListener("click", () => {
-  const token = document.getElementById("admin-jwt").value.trim();
-  if (!token) return showToast("Enter Admin JWT", false);
-  ADMIN_JWT = token;
-  showToast("Admin logged in");
-});
-
-document.getElementById("admin-create-listing-btn").addEventListener("click", async () => {
-  if (!ADMIN_JWT) return showToast("Login as Admin first", false);
-
+// ===== Add Listing =====
+document.getElementById("add-listing-btn").addEventListener("click", async () => {
   const body = {
-    seller_id: "admin_user",
-    uid: document.getElementById("admin-uid").value,
-    title: document.getElementById("admin-title").value,
-    description: document.getElementById("admin-desc").value,
-    price: parseInt(document.getElementById("admin-price").value) || 0,
-    rank: document.getElementById("admin-rank").value,
-    level: parseInt(document.getElementById("admin-level").value) || 0,
-    mythic_count:0, legendary_count:0, xsuit_count:0, gilt_count:0,
-    honor_gilt_set:0, upgradable_guns:0, rare_glider:0, vehicle_skin:0, special_titles:0
+    uid: document.getElementById("uid").value.trim(),
+    title: document.getElementById("title").value.trim(),
+    description: document.getElementById("description").value.trim(),
+    level: parseInt(document.getElementById("level").value) || 0,
+    rank: document.getElementById("rank").value.trim(),
+    mythic_count: parseInt(document.getElementById("mythic_count").value) || 0,
+    legendary_count: parseInt(document.getElementById("legendary_count").value) || 0,
+    xsuit_count: parseInt(document.getElementById("xsuit_count").value) || 0,
+    seller_id: auth.user.id
   };
+  if (!body.uid || !body.title) return showToast("UID and Title required", false);
 
   try {
     const res = await fetch(`${API_URL}/create`, {
       method: "POST",
-      headers: {
+      headers: { 
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${ADMIN_JWT}`
+        "Authorization": `Bearer ${auth.token}`
       },
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    showToast(data.message || "Listing created");
+    showToast(data.message || "Listing added successfully");
     loadListings();
   } catch (err) {
     console.error(err);
-    showToast("Failed to create listing", false);
+    showToast("Failed to add listing", false);
   }
 });
 
-// ===== Auto-refresh =====
-setInterval(loadListings, 30000);
+// ===== Edit Listing =====
+function openEditModal(id) {
+  editingListingId = id;
+  const card = document.querySelector(`.item-card button[onclick='openEditModal(${id})']`).closest(".item-card");
+  document.getElementById("edit-title").value = card.querySelector("p:nth-child(1)").innerText.replace("Title: ", "");
+  document.getElementById("edit-description").value = card.querySelector("p:nth-child(3)")?.innerText || "";
+  document.getElementById("edit-level").value = card.querySelector("p:nth-child(4)")?.innerText.replace("Level: ","") || 0;
+  document.getElementById("edit-rank").value = card.querySelector("p:nth-child(5)")?.innerText.replace("Rank: ","") || "";
+  document.getElementById("edit-price").value = parseInt(card.querySelector(".highlight strong")?.innerText.replace("Price:₹","")) || 0;
+  document.getElementById("edit-modal").classList.add("active");
+}
+
+document.getElementById("edit-cancel").addEventListener("click", () => {
+  editingListingId = null;
+  document.getElementById("edit-modal").classList.remove("active");
+});
+
+document.getElementById("save-edit").addEventListener("click", async () => {
+  if (!editingListingId) return;
+  const body = {
+    title: document.getElementById("edit-title").value.trim(),
+    description: document.getElementById("edit-description").value.trim(),
+    level: parseInt(document.getElementById("edit-level").value) || 0,
+    rank: document.getElementById("edit-rank").value.trim(),
+    price: parseInt(document.getElementById("edit-price").value) || 0
+  };
+  try {
+    const res = await fetch(`${API_URL}/update/${editingListingId}`, {
+      method: "PATCH",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${auth.token}`
+      },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    showToast(data.message || "Listing updated");
+    editingListingId = null;
+    document.getElementById("edit-modal").classList.remove("active");
+    loadListings();
+  } catch (err) {
+    console.error(err);
+    showToast("Failed to update listing", false);
+  }
+});
 
 // ===== Initial Load =====
 loadListings();
