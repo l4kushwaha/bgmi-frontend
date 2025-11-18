@@ -2,8 +2,7 @@
   const container = document.getElementById("items-container");
   if (!container) return;
 
-  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings";
-
+  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
   let selectedListingId = null;
   let selectedAction = null;
   let currentSearchQuery = "";

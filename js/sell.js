@@ -19,13 +19,8 @@
     alert("Login required!");
     window.location.href = "login.html";
   } else {
-    console.log("✅ User logged in:", session.user.username || session.user.id);
+    console.log("✅ User logged in:", session.user.name || session.user.id);
     console.log("JWT Token:", session.token);
-
-    // ===== Expose for console testing =====
-    window.currentUser = session.user;
-    window.currentToken = session.token;
-    console.log("🌐 currentUser and currentToken are now globally available for console testing");
   }
 
   // ===== Toast Notifications =====
@@ -129,9 +124,7 @@
     if (!session) return;
 
     const payload = {
-      seller_id: session.user.id,
-      seller_email: session.user.email,
-      seller_username: session.user.username,
+      seller_id: session.user?.id || "admin_user",
       uid: document.getElementById("uid").value.trim(),
       title: document.getElementById("title").value.trim(),
       description: document.getElementById("highlights").value.trim(),
