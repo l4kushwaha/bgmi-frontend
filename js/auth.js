@@ -1,4 +1,4 @@
-// ===== auth.js (Extended BGMI Market v2.3 + Reset Password) =====
+// ===== auth.js (Extended BGMI Market v2.4 + OTP Reset Password) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -147,17 +147,15 @@
       const data = await apiFetch(`${AUTH_API}/forgot-password`, { method: "POST", body: JSON.stringify({ email }) });
       console.log("✅ Forgot Password response:", data);
 
-      // For dev/testing, show token in alert
-      if (data.reset_token) alert(`✅ Password reset token (for testing): ${data.reset_token}`);
-      else alert("✅ Password reset link sent! Check your email.");
+      alert("✅ OTP sent to your email. Please check your inbox.");
 
       // Redirect to reset page (optional)
-      window.location.href = `reset.html?token=${data.reset_token || ""}`;
+      window.location.href = `reset.html`;
     } catch (err) {
       console.error("Forgot Password Error:", err);
-      alert(`⚠️ Failed to send reset link: ${err.message}`);
+      alert(`⚠️ Failed to send OTP: ${err.message}`);
     } finally {
-      if (btn) btn.innerText = "Send Reset Link";
+      if (btn) btn.innerText = "Send OTP";
     }
   }
 
@@ -165,9 +163,9 @@
   // 🔄 RESET PASSWORD
   // ===============================
   async function resetPassword() {
-    const tokenInput = document.getElementById("resetToken")?.value.trim();
+    const otpInput = document.getElementById("resetToken")?.value.trim();
     const new_password = document.getElementById("newPassword")?.value.trim();
-    if (!tokenInput || !new_password) return alert("⚠️ Token and new password are required.");
+    if (!otpInput || !new_password) return alert("⚠️ OTP and new password are required.");
 
     const btn = document.getElementById("resetBtn");
     if (btn) btn.innerText = "Resetting...";
@@ -175,7 +173,7 @@
     try {
       const data = await apiFetch(`${AUTH_API}/reset-password`, {
         method: "POST",
-        body: JSON.stringify({ token: tokenInput, new_password })
+        body: JSON.stringify({ otp: otpInput, new_password }) // <-- send otp instead of token
       });
       console.log("✅ Reset Password response:", data);
 
@@ -272,11 +270,11 @@
     updateFrontendAuth();
     testGatewayConnection();
 
-    // Auto-fill token from URL for reset page
+    // Auto-fill OTP from URL for reset page (optional)
     const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-    if (token && document.getElementById("resetToken")) {
-      document.getElementById("resetToken").value = token;
+    const otp = params.get("otp");
+    if (otp && document.getElementById("resetToken")) {
+      document.getElementById("resetToken").value = otp;
     }
   });
 
