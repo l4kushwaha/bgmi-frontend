@@ -178,7 +178,6 @@
       console.log("✅ Reset Password response:", data);
 
       alert("✅ Password reset successful! Please log in.");
-      window.location.href = "login.html";
     } catch (err) {
       console.error("Reset Password Error:", err);
       alert(`⚠️ Failed to reset password: ${err.message}`);
