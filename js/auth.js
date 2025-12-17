@@ -1,4 +1,4 @@
-// ===== auth.js (Extended BGMI Market v2.4 + OTP Reset Password) =====
+// ===== auth.js (Extended BGMI Market v2.4 + OTP Reset Password, No redirect) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -120,7 +120,6 @@
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(userInfo));
         alert("✅ Login successful!");
-        // 🔹 Redirect to homepage
         return window.location.href = "index.html";
       }
 
@@ -149,8 +148,8 @@
 
       alert("✅ OTP sent to your email. Please check your inbox.");
 
-      // Redirect to reset page (optional)
-      window.location.href = `reset.html`;
+      // ❌ Removed redirect to reset.html
+      // OTP & New Password fields are expected to be visible on the same page
     } catch (err) {
       console.error("Forgot Password Error:", err);
       alert(`⚠️ Failed to send OTP: ${err.message}`);
@@ -173,7 +172,7 @@
     try {
       const data = await apiFetch(`${AUTH_API}/reset-password`, {
         method: "POST",
-        body: JSON.stringify({ otp: otpInput, new_password }) // <-- send otp instead of token
+        body: JSON.stringify({ otp: otpInput, new_password })
       });
       console.log("✅ Reset Password response:", data);
 
@@ -239,13 +238,6 @@
       userDashboard?.classList.replace("visible", "hidden");
       logoutBtn?.classList.replace("visible", "hidden");
     }
-  }
-
-  // ===============================
-  // 🧪 TOKEN / SESSION REFRESH PLACEHOLDER
-  // ===============================
-  async function refreshToken() {
-    // TODO: Implement token refresh with backend endpoint
   }
 
   // ===============================
