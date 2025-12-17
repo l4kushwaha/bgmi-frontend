@@ -1,4 +1,4 @@
-// ===== auth.js (Extended BGMI Market v2.3) =====
+// ===== auth.js (Extended BGMI Market v2.3 + Reset Password) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -146,13 +146,46 @@
     try {
       const data = await apiFetch(`${AUTH_API}/forgot-password`, { method: "POST", body: JSON.stringify({ email }) });
       console.log("✅ Forgot Password response:", data);
-      alert("✅ Password reset link sent! Check your email.");
-      window.location.href = "login.html";
+
+      // For dev/testing, show token in alert
+      if (data.reset_token) alert(`✅ Password reset token (for testing): ${data.reset_token}`);
+      else alert("✅ Password reset link sent! Check your email.");
+
+      // Redirect to reset page (optional)
+      window.location.href = `reset.html?token=${data.reset_token || ""}`;
     } catch (err) {
       console.error("Forgot Password Error:", err);
       alert(`⚠️ Failed to send reset link: ${err.message}`);
     } finally {
       if (btn) btn.innerText = "Send Reset Link";
+    }
+  }
+
+  // ===============================
+  // 🔄 RESET PASSWORD
+  // ===============================
+  async function resetPassword() {
+    const tokenInput = document.getElementById("resetToken")?.value.trim();
+    const new_password = document.getElementById("newPassword")?.value.trim();
+    if (!tokenInput || !new_password) return alert("⚠️ Token and new password are required.");
+
+    const btn = document.getElementById("resetBtn");
+    if (btn) btn.innerText = "Resetting...";
+
+    try {
+      const data = await apiFetch(`${AUTH_API}/reset-password`, {
+        method: "POST",
+        body: JSON.stringify({ token: tokenInput, new_password })
+      });
+      console.log("✅ Reset Password response:", data);
+
+      alert("✅ Password reset successful! Please log in.");
+      window.location.href = "login.html";
+    } catch (err) {
+      console.error("Reset Password Error:", err);
+      alert(`⚠️ Failed to reset password: ${err.message}`);
+    } finally {
+      if (btn) btn.innerText = "Reset Password";
     }
   }
 
@@ -238,6 +271,13 @@
   window.addEventListener("load", () => {
     updateFrontendAuth();
     testGatewayConnection();
+
+    // Auto-fill token from URL for reset page
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    if (token && document.getElementById("resetToken")) {
+      document.getElementById("resetToken").value = token;
+    }
   });
 
   // ===============================
@@ -245,6 +285,7 @@
   window.registerUser = registerUser;
   window.loginUser = loginUser;
   window.sendResetLink = sendResetLink;
+  window.resetPassword = resetPassword;
   window.logout = logout;
   window.getCurrentUser = getCurrentUser;
   window.isAdmin = isAdmin;
