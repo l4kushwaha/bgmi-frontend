@@ -152,7 +152,7 @@
     modalBg.classList.add("active");
 
     if (action === "edit") {
-      fetch(`${API_URL}/listings/search?q=&limit=1000`, { headers: { "Authorization": `Bearer ${session.token}` } })
+      fetch(`${API_URL}/listings?q=&limit=1000`, { headers: { "Authorization": `Bearer ${session.token}` } })
         .then(r => r.json())
         .then(listings => {
           const item = listings.find(l => l.id === id);
