@@ -108,20 +108,35 @@
       }
 
       // ✅ Normal user login
-      if (data.role === "user") {
-        const userInfo = {
-          id: data.user?.id || 0,
-          name: data.user?.full_name || "Player",
-          email: data.user?.email,
-          role: "user",
-          kyc_status: data.user?.kyc_status || "pending",
-          is_verified: data.user?.is_verified || false,
-        };
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(userInfo));
-        alert("✅ Login successful!");
-        return window.location.href = "index.html";
-      }
+      if (data.role === "user" || data.user) {
+  const userInfo = {
+    id: Number(data.user?.id),                 // 🔥 force real ID
+    name: data.user?.full_name                 // if future me aaye
+          || data.user?.username               // 🔥 CURRENT BACKEND FIELD
+          || "Player",
+    email: data.user?.email || "",
+    role: data.user?.role || "user",
+    kyc_status: data.user?.kyc_status ?? "pending",
+    is_verified: data.user?.is_verified ?? false,
+  };
+
+  // 🛡 Safety check
+  if (!userInfo.id || userInfo.id <= 0) {
+    console.error("❌ INVALID USER ID FROM AUTH:", data);
+    alert("Login error: Invalid user ID");
+    return;
+  }
+
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(userInfo));
+
+  console.log("✅ USER SAVED:", userInfo);
+  console.log("🆔 USER ID:", userInfo.id);
+
+  alert("✅ Login successful!");
+  return window.location.href = "index.html";
+}
+
 
       alert("❌ Invalid credentials or account not found.");
     } catch (err) {
