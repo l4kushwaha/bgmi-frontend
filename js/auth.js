@@ -1,4 +1,4 @@
-// ===== auth.js (Extended BGMI Market v2.4 + OTP Reset Password, No redirect) =====
+// ===== auth.js (Fixed BGMI Market v2.4 + OTP Reset Password, No redirect) =====
 (() => {
   // 🌐 Base URLs
   const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
@@ -14,19 +14,23 @@
   console.log("🔑 Using AUTH_API:", AUTH_API);
 
   // ===============================
+  // 🔓 JWT Decode Helper (GLOBAL)
+  // ===============================
+  function decodeJWT(token) {
+    try {
+      const payload = token.split(".")[1];
+      return JSON.parse(atob(payload));
+    } catch (err) {
+      console.error("JWT decode failed", err);
+      return null;
+    }
+  }
+
+  // ===============================
   // 🧩 Universal Fetch Helper
   // ===============================
   async function apiFetch(url, options = {}, retry = true) {
     const token = localStorage.getItem("token");
-    function decodeJWT(token) {
-  try {
-    const payload = token.split(".")[1];
-    return JSON.parse(atob(payload));
-  } catch {
-    return null;
-  }
-}
-
     const headers = {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
@@ -104,7 +108,7 @@
       // ✅ Admin login
       if (data.role === "admin") {
         const adminUser = {
-          id: 21,
+          id: 0,
           name: data.admin_info?.name || "Admin",
           email: data.admin_info?.email,
           phone: data.admin_info?.phone,
@@ -117,37 +121,32 @@
       }
 
       // ✅ Normal user login
-    // ✅ Normal user login
-if (data.role === "user") {
+      if (data.role === "user") {
+        const jwtPayload = decodeJWT(data.token);
+        console.log("🔓 JWT Payload:", jwtPayload);
 
-  const jwtPayload = decodeJWT(data.token);
-  console.log("🔓 JWT Payload:", jwtPayload);
+        const userInfo = {
+          id: Number(jwtPayload?.id) || 0,          // 🔥 REAL ID
+          name: jwtPayload?.email?.split("@")[0] || "Player",
+          email: jwtPayload?.email || "",
+          role: jwtPayload?.role || "user",
+          kyc_status: "pending",
+          is_verified: false,
+        };
 
-  const userInfo = {
-    id: Number(jwtPayload?.id),          // 🔥 REAL ID (19)
-    name: jwtPayload?.email?.split("@")[0] || "Player",
-    email: jwtPayload?.email || "",
-    role: jwtPayload?.role || "user",
-    kyc_status: "pending",
-    is_verified: false,
-  };
+        if (!userInfo.id || userInfo.id <= 0) {
+          console.error("❌ INVALID USER ID EVEN AFTER JWT:", jwtPayload);
+          alert("Login failed: Invalid session");
+          return;
+        }
 
-  if (!userInfo.id || userInfo.id <= 0) {
-    console.error("❌ INVALID USER ID EVEN AFTER JWT:", jwtPayload);
-    alert("Login failed: Invalid session");
-    return;
-  }
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(userInfo));
+        console.log("✅ USER SAVED FROM JWT:", userInfo);
 
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(userInfo));
-
-  console.log("✅ USER SAVED FROM JWT:", userInfo);
-
-  alert("✅ Login successful!");
-  return window.location.href = "index.html";
-}
-
-
+        alert("✅ Login successful!");
+        return window.location.href = "index.html";
+      }
 
       alert("❌ Invalid credentials or account not found.");
     } catch (err) {
@@ -171,11 +170,7 @@ if (data.role === "user") {
     try {
       const data = await apiFetch(`${AUTH_API}/forgot-password`, { method: "POST", body: JSON.stringify({ email }) });
       console.log("✅ Forgot Password response:", data);
-
       alert("✅ OTP sent to your email. Please check your inbox.");
-
-      // ❌ Removed redirect to reset.html
-      // OTP & New Password fields are expected to be visible on the same page
     } catch (err) {
       console.error("Forgot Password Error:", err);
       alert(`⚠️ Failed to send OTP: ${err.message}`);
@@ -201,7 +196,6 @@ if (data.role === "user") {
         body: JSON.stringify({ otp: otpInput, new_password })
       });
       console.log("✅ Reset Password response:", data);
-
       alert("✅ Password reset successful! Please log in.");
     } catch (err) {
       console.error("Reset Password Error:", err);
