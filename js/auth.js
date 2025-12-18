@@ -108,18 +108,20 @@
       }
 
       // ✅ Normal user login
-      if (data.user && data.user.id) {
-  // 🔥 SAVE EXACT USER OBJECT FROM BACKEND
-  localStorage.setItem("token", data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-
-  console.log("✅ User saved:", data.user);
-  console.log("🆔 User ID saved:", data.user.id);
-
-  alert("✅ Login successful!");
-  return window.location.href = "index.html";
-}
-
+      if (data.role === "user") {
+        const userInfo = {
+          id: data.user?.id || 0,
+          name: data.user?.full_name || "Player",
+          email: data.user?.email,
+          role: "user",
+          kyc_status: data.user?.kyc_status || "pending",
+          is_verified: data.user?.is_verified || false,
+        };
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(userInfo));
+        alert("✅ Login successful!");
+        return window.location.href = "index.html";
+      }
 
       alert("❌ Invalid credentials or account not found.");
     } catch (err) {
