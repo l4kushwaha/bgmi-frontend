@@ -3,100 +3,144 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Sell BGMI Account — Sell</title>
+<title>Sell BGMI Account</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;font-family:"Poppins",sans-serif}
-  body{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: url("https://i.ytimg.com/vi/aoV3MROF_OY/hq720.jpg") center/cover no-repeat;
-    color:#fff; position:relative;
-  }
-  body::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,0.45);z-index:0}
-  form{position:relative;z-index:2;width:520px;max-width:96%;padding:28px;border-radius:16px;
-       background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12)}
-  h2{color:#00ffff;text-shadow:0 0 6px #0ff;margin-bottom:12px;text-align:center}
-  input,textarea,select,button{width:100%;padding:10px;border-radius:10px;border:none;outline:none;margin:8px 0}
-  input,textarea{background:rgba(255,255,255,0.08);color:#fff}
-  input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.7)}
-  button.primary{background:linear-gradient(135deg,#00ffff,#ff00ff);color:#fff;font-weight:700;cursor:pointer}
-  button.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.12);cursor:pointer}
-  #drop-area{border:2px dashed rgba(0,255,255,0.25);padding:14px;border-radius:10px;text-align:center;color:#0ff;cursor:pointer}
-  #drop-area.hover{background:rgba(0,255,255,0.05)}
-  #preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .preview-img{width:72px;height:72px;border-radius:8px;overflow:hidden;position:relative;border:1px solid rgba(0,255,255,0.15)}
-  .preview-img img{width:100%;height:100%;object-fit:cover;display:block}
-  .preview-img .remove{position:absolute;top:4px;right:4px;background:#ff4d4d;color:#fff;border-radius:50%;width:18px;height:18px;line-height:18px;text-align:center;font-size:12px;cursor:pointer}
-  #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;padding:10px 16px;border-radius:20px;background:#27ae60;color:#fff;display:none;z-index:9999}
-  #toast.err{background:#c0392b}
-  #fullModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1200;align-items:center;justify-content:center}
-  #fullModal img{max-width:92%;max-height:92%;border-radius:10px}
-  .helper-row{display:flex;gap:8px;align-items:center;justify-content:space-between}
-  small.hint{color:rgba(255,255,255,0.7)}
-  .muted{color:rgba(255,255,255,0.6);font-size:13px;margin-top:6px}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Poppins",sans-serif}
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:url("https://i.ytimg.com/vi/aoV3MROF_OY/hq720.jpg") center/cover no-repeat;
+  position:relative;
+  color:#fff;
+}
+body::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.5)}
+form{
+  position:relative;z-index:2;
+  width:540px;max-width:96%;
+  padding:26px;border-radius:16px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.15)
+}
+h2{text-align:center;color:#00ffff;text-shadow:0 0 6px #0ff;margin-bottom:14px}
+
+input,textarea,button{
+  width:100%;padding:10px;
+  border-radius:10px;border:none;outline:none;margin:7px 0
+}
+input,textarea{
+  background:rgba(255,255,255,.08);
+  color:#fff
+}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.7)}
+
+.row{display:flex;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+
+button.primary{
+  background:linear-gradient(135deg,#00ffff,#ff00ff);
+  color:#fff;font-weight:700;cursor:pointer
+}
+button.ghost{
+  background:transparent;color:#fff;
+  border:1px solid rgba(255,255,255,.2);
+  cursor:pointer
+}
+
+/* Drag & drop */
+#drop-area{
+  border:2px dashed rgba(0,255,255,.3);
+  padding:14px;border-radius:10px;
+  text-align:center;color:#0ff;cursor:pointer
+}
+#drop-area.hover{background:rgba(0,255,255,.08)}
+
+#preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.preview-img{
+  width:70px;height:70px;
+  border-radius:8px;overflow:hidden;
+  position:relative;border:1px solid rgba(0,255,255,.2)
+}
+.preview-img img{width:100%;height:100%;object-fit:cover}
+.preview-img .remove{
+  position:absolute;top:3px;right:3px;
+  background:#ff4d4d;color:#fff;
+  width:18px;height:18px;border-radius:50%;
+  font-size:12px;line-height:18px;
+  text-align:center;cursor:pointer
+}
+
+#estimatedPrice{font-size:14px;color:#0ff;margin-top:4px}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%);
+  padding:10px 18px;border-radius:20px;
+  background:#27ae60;color:#fff;
+  display:none;z-index:9999
+}
+#toast.err{background:#c0392b}
+
+/* Mobile */
+@media(max-width:600px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
+
 <body>
 
-<form id="sellForm" autocomplete="off" novalidate>
+<form id="sellForm" novalidate>
   <h2>Sell Your BGMI Account</h2>
 
-  <!-- Basic Info -->
-  <input id="uid" placeholder="BGMI UID (required)" required />
-  <input id="title" placeholder="Account title (e.g. Elite Plat Account)" required />
+  <!-- Required -->
+  <input id="uid" placeholder="BGMI UID (required)" required>
+  <input id="title" placeholder="Account Title (required)" required>
 
   <!-- Level & Rank -->
-  <div style="display:flex;gap:8px">
-    <input id="level" type="number" placeholder="Level" />
-    <input id="highest_rank" placeholder="Highest Rank (Gold/Platinum/etc.)" />
+  <div class="row">
+    <input id="level" type="number" placeholder="Account Level">
+    <input id="rank" placeholder="Highest Rank">
   </div>
 
-  <!-- Items -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-    <input id="mythic_items" placeholder="Mythic Items (comma separated)" />
-    <input id="legendary_items" placeholder="Legendary Items (comma separated)" />
-    <input id="gift_items" placeholder="Gift Items (comma separated)" />
-    <input id="upgraded_guns" placeholder="Upgraded Guns (comma separated)" />
-    <input id="titles" placeholder="Titles (comma separated)" />
+  <!-- Items (IDs MATCH sell.js) -->
+  <div class="grid">
+    <input id="mythic" placeholder="Mythic Items">
+    <input id="legendary" placeholder="Legendary Items">
+    <input id="gift" placeholder="Gift Items">
+    <input id="guns" placeholder="Upgraded Guns">
+    <input id="titles" placeholder="Titles">
   </div>
 
-  <!-- Highlights / Description -->
-  <textarea id="highlights" placeholder="Highlights / Description"></textarea>
+  <!-- Description -->
+  <textarea id="highlights" placeholder="Account highlights / description"></textarea>
 
-  <!-- Drag & Drop Images -->
-  <div id="drop-area" tabindex="0">
-    <input id="fileElem" type="file" multiple accept="image/*" style="display:none"/>
+  <!-- Images -->
+  <div id="drop-area">
+    <input id="fileElem" type="file" multiple accept="image/*" hidden>
     Drag & drop images here or click to upload (optional)
   </div>
-  <div id="preview" aria-live="polite"></div>
+  <div id="preview"></div>
 
   <!-- Estimate & Submit -->
-  <div class="helper-row" style="margin-top:8px">
+  <div class="row" style="margin-top:10px">
     <div style="flex:1">
       <button type="button" id="estimateBtn" class="ghost">Estimate Price</button>
-      <div id="estimatedPrice" class="muted"></div>
+      <div id="estimatedPrice"></div>
     </div>
     <div style="width:160px">
       <button type="submit" id="submitBtn" class="primary">List for Sale</button>
     </div>
   </div>
-
-  <div class="muted" style="margin-top:10px">
-    <small>Note: you must be logged in. This page uses the 'token' key from localStorage.</small>
-  </div>
 </form>
 
-<div id="toast" role="status" aria-live="polite"></div>
+<div id="toast"></div>
 
-<div id="fullModal" onclick="document.getElementById('fullModal').style.display='none'">
-  <img id="modalImg" alt="preview"/>
-</div>
-
-<!-- Include sell.js -->
 <script src="js/sell.js"></script>
-
 </body>
 </html>

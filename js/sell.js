@@ -1,145 +1,152 @@
 (() => {
   const API_BASE = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings";
-  const form = document.getElementById('sellForm');
-  const estimateBtn = document.getElementById('estimateBtn');
-  const submitBtn = document.getElementById('submitBtn');
-  const dropArea = document.getElementById('drop-area');
-  const fileElem = document.getElementById('fileElem');
-  const preview = document.getElementById('preview');
-  const toastEl = document.getElementById('toast');
+  const form = document.getElementById("sellForm");
+  const estimateBtn = document.getElementById("estimateBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const preview = document.getElementById("preview");
+  const toast = document.getElementById("toast");
 
-  // ===== Session =====
+  /* ========== SESSION ========== */
   function getSession() {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    return token && user ? { token, user } : null;
+    try {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      return token && user ? { token, user } : null;
+    } catch {
+      return null;
+    }
   }
+
   const session = getSession();
-  if(!session){
-    alert('Login required!');
-    window.location.href = 'login.html';
+  if (!session) {
+    alert("Login required");
+    location.href = "login.html";
     return;
   }
 
-  function showToast(msg, isError=false){
-    toastEl.textContent = msg;
-    toastEl.className = isError ? 'err' : '';
-    toastEl.style.display = 'block';
-    setTimeout(()=> toastEl.style.display = 'none', 3200);
+  /* ========== TOAST ========== */
+  function showToast(msg, err = false) {
+    toast.textContent = msg;
+    toast.className = err ? "err" : "";
+    toast.style.display = "block";
+    setTimeout(() => (toast.style.display = "none"), 3000);
   }
 
-  // ===== Drag & drop image handling =====
-  let uploaded = [];
-  function handleFiles(files){
-    for(const f of files){
-      if(!f.type.startsWith('image/')) { showToast('Only images allowed', true); continue; }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        uploaded.push(e.target.result);
+  /* ========== IMAGE UPLOAD (OPTIONAL) ========== */
+  let images = [];
+  const dropArea = document.getElementById("drop-area");
+  const fileElem = document.getElementById("fileElem");
+
+  function renderPreview() {
+    preview.innerHTML = "";
+    images.forEach((src, i) => {
+      const d = document.createElement("div");
+      d.className = "preview-img";
+      d.innerHTML = `<img src="${src}"><div class="x">×</div>`;
+      d.querySelector(".x").onclick = () => {
+        images.splice(i, 1);
         renderPreview();
       };
-      reader.readAsDataURL(f);
-    }
-  }
-  function renderPreview(){
-    preview.innerHTML = '';
-    uploaded.forEach((src, idx) => {
-      const d = document.createElement('div');
-      d.className = 'preview-img';
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = 'image ' + (idx+1);
-      const rem = document.createElement('div');
-      rem.className = 'remove';
-      rem.innerText = '×';
-      rem.title = 'Remove';
-      rem.addEventListener('click', ()=> {
-        uploaded.splice(idx, 1);
-        renderPreview();
-      });
-      d.appendChild(img);
-      d.appendChild(rem);
       preview.appendChild(d);
     });
   }
-  dropArea.addEventListener('click', ()=> fileElem.click());
-  dropArea.addEventListener('dragover', (e)=> { e.preventDefault(); dropArea.classList.add('hover'); });
-  dropArea.addEventListener('dragleave', (e)=> { e.preventDefault(); dropArea.classList.remove('hover'); });
-  dropArea.addEventListener('drop', (e)=> { e.preventDefault(); dropArea.classList.remove('hover'); handleFiles(e.dataTransfer.files); });
-  fileElem.addEventListener('change', (e)=> handleFiles(e.target.files));
 
-  // ===== Validation =====
-  function validate(){
-    let ok = true;
-    const uidEl = document.getElementById('uid');
-    const titleEl = document.getElementById('title');
-    const levelEl = document.getElementById('level');
-
-    [uidEl,titleEl,levelEl].forEach(el=> el.classList.remove('invalid'));
-
-    if(!uidEl.value.trim()){ uidEl.classList.add('invalid'); ok=false; }
-    if(!titleEl.value.trim()){ titleEl.classList.add('invalid'); ok=false; }
-    if(levelEl.value && isNaN(Number(levelEl.value))){ levelEl.classList.add('invalid'); ok=false; }
-
-    return ok;
+  function handleFiles(files) {
+    [...files].forEach(f => {
+      if (!f.type.startsWith("image/")) return;
+      const r = new FileReader();
+      r.onload = e => {
+        images.push(e.target.result);
+        renderPreview();
+      };
+      r.readAsDataURL(f);
+    });
   }
 
-  // ===== Submit handler =====
-  form.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    if(!session){ showToast('Login required', true); return; }
-    if(!validate()){ showToast('Fix validation errors first', true); return; }
+  dropArea.onclick = () => fileElem.click();
+  dropArea.ondrop = e => {
+    e.preventDefault();
+    handleFiles(e.dataTransfer.files);
+  };
+  dropArea.ondragover = e => e.preventDefault();
+  fileElem.onchange = e => handleFiles(e.target.files);
+
+  /* ========== AI-STYLE PRICE ESTIMATOR ========== */
+  function estimatePrice() {
+    const level = +document.getElementById("level").value || 0;
+    const mythic = +document.getElementById("mythic_count").value || 0;
+    const legendary = +document.getElementById("legendary_count").value || 0;
+    const xsuit = +document.getElementById("xsuit_count").value || 0;
+    const guns = +document.getElementById("upgradable_guns").value || 0;
+    const titles = +document.getElementById("special_titles").value || 0;
+
+    let price =
+      level * 8 +
+      mythic * 550 +
+      legendary * 280 +
+      xsuit * 1800 +
+      guns * 900 +
+      titles * 150;
+
+    price = Math.max(999, Math.round(price / 50) * 50);
+
+    const out = document.getElementById("estimatedPrice");
+    out.textContent = `Estimated price: ₹${price}`;
+    out.dataset.value = price;
+    return price;
+  }
+
+  estimateBtn.onclick = estimatePrice;
+
+  /* ========== SUBMIT ========== */
+  form.onsubmit = async e => {
+    e.preventDefault();
+
+    const price = estimatePrice();
 
     const payload = {
-      uid: document.getElementById('uid').value.trim(),
-      title: document.getElementById('title').value.trim(),
-      description: document.getElementById('highlights').value.trim(),
-      price: parseInt(document.getElementById('estimatedPrice').dataset.value) || 0,
-      level: parseInt(document.getElementById('level').value) || 0,
-      highest_rank: document.getElementById('rank')?.value || "",
-      mythic_items: (document.getElementById('mythic')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
-      legendary_items: (document.getElementById('legendary')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
-      gift_items: (document.getElementById('gift')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
-      upgraded_guns: (document.getElementById('guns')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
-      titles: (document.getElementById('titles')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
-      images: uploaded
+      uid: uid.value.trim(),
+      title: title.value.trim(),
+      description: highlights.value.trim(),
+      price,
+      level: +level.value || 0,
+      highest_rank: rank.value || "",
+      mythic_items: Array(+mythic_count.value || 0).fill("Mythic"),
+      legendary_items: Array(+legendary_count.value || 0).fill("Legendary"),
+      gift_items: [],
+      upgraded_guns: Array(+upgradable_guns.value || 0).fill("Gun"),
+      titles: Array(+special_titles.value || 0).fill("Title"),
+      images
     };
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Listing...';
+    submitBtn.textContent = "Listing...";
 
     try {
       const res = await fetch(`${API_BASE}/create`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`
         },
         body: JSON.stringify(payload)
       });
-      const data = await res.json().catch(()=>({}));
 
-      if(res.ok){
-        showToast('🎉 Account listed successfully');
-        form.reset();
-        uploaded = [];
-        renderPreview();
-        document.getElementById('estimatedPrice').innerText = '';
-      } else {
-        console.error('Server returned', res.status, data);
-        if(res.status === 401){
-          showToast('Unauthorized — please login again', true);
-          setTimeout(()=> window.location.href = 'login.html', 900);
-        } else {
-          showToast(data.error || data.message || 'Failed to list account', true);
-        }
-      }
-    } catch(err){
-      console.error('Network request failed', err);
-      showToast('Network request failed', true);
+      const data = await res.json();
+
+      if (!res.ok) throw data;
+
+      showToast("🎉 Account listed successfully");
+      form.reset();
+      images = [];
+      renderPreview();
+      document.getElementById("estimatedPrice").textContent = "";
+    } catch (err) {
+      console.error(err);
+      showToast(err.error || "Listing failed", true);
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'List for Sale';
+      submitBtn.textContent = "List for Sale";
     }
-  });
+  };
 })();

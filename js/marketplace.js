@@ -1,11 +1,13 @@
 (() => {
   const container = document.getElementById("items-container");
-  if (!container) return;
+  const searchInput = document.getElementById("search");
+  const filterSelect = document.getElementById("filter");
 
   const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
   let selectedListingId = null;
   let selectedAction = null;
   let currentSearchQuery = "";
+  let currentFilter = "";
 
   // ===== Toast =====
   function showToast(msg, success = true) {
@@ -44,39 +46,55 @@
       const res = await fetch(`${API_URL}/listings`, {
         headers: JWT ? { "Authorization": `Bearer ${JWT}` } : {}
       });
-      const items = await res.json();
-      container.innerHTML = "";
+      let items = await res.json();
 
       if (!items || items.length === 0) {
-        container.innerHTML = "<p>No items available</p>";
+        container.innerHTML = "<p style='color:white'>No items available</p>";
         return;
       }
 
-      const filteredItems = items.filter(item => {
-        const text = (item.title + " " + item.uid).toLowerCase();
+      // ===== FILTER & SEARCH =====
+      items = items.filter(item => {
+        const text = (item.title + " " + item.uid + " " + item.highest_rank).toLowerCase();
         return text.includes(currentSearchQuery.toLowerCase());
       });
 
-      if (filteredItems.length === 0) {
-        container.innerHTML = "<p>No items found</p>";
+      if (currentFilter === "own" && session) {
+        items = items.filter(item => item.seller_id === session.user.id);
+      } else if (currentFilter === "price_high") {
+        items.sort((a, b) => (b.price || 0) - (a.price || 0));
+      } else if (currentFilter === "price_low") {
+        items.sort((a, b) => (a.price || 0) - (b.price || 0));
+      } else if (currentFilter === "new") {
+        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+
+      if (items.length === 0) {
+        container.innerHTML = "<p style='color:white'>No items found</p>";
         return;
       }
 
-      filteredItems.forEach(item => {
+      container.innerHTML = "";
+      items.forEach(item => {
         const card = document.createElement("div");
         card.className = "item-card";
 
         let buttonsHTML = "";
-        if (item.status === "available") 
-          buttonsHTML += `<button class="buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
-        else 
-          buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
+        const isOwner = session && session.user.id === item.seller_id;
+        const isAdmin = session && session.user.role === "admin";
 
-        if (session && (session.user.role === "admin" || session.user.id === item.seller_id)) {
-          buttonsHTML += `<button class="edit-btn" onclick="openListingModal(${item.id}, 'edit')">Edit</button>`;
+        if (item.status === "available") {
+          buttonsHTML += `<button class="btn buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
+        } else {
+          buttonsHTML += `<button class="btn buy-btn" disabled>Sold Out</button>`;
         }
 
-        // parse JSON arrays safely
+        if (isOwner || isAdmin) {
+          buttonsHTML += `<button class="btn edit-btn" onclick="openListingModal(${item.id}, 'edit')">Edit</button>`;
+          buttonsHTML += `<button class="btn delete-btn" onclick="openListingModal(${item.id}, 'delete')">Delete</button>`;
+        }
+
+        // Parse JSON arrays safely
         const mythic = item.mythic_items ? JSON.parse(item.mythic_items) : [];
         const legendary = item.legendary_items ? JSON.parse(item.legendary_items) : [];
         const gift = item.gift_items ? JSON.parse(item.gift_items) : [];
@@ -84,21 +102,22 @@
         const titles = item.titles ? JSON.parse(item.titles) : [];
         const images = item.images ? JSON.parse(item.images) : [];
 
-        const imagesHTML = images.length > 0 ? images.map(src => `<img src="${src}" class="listing-img">`).join('') : '';
+        const imagesHTML = images.length > 0 ? images.map(src => `<img src="${src}" onclick="showImageModal('${src}')">`).join('') : '';
 
         card.innerHTML = `
           ${item.status === "available" ? '<div class="new-badge">NEW</div>' : ''}
+          ${(isOwner || isAdmin) ? '<div class="owner-badge">OWNER</div>' : ''}
           <div class="item-info">
             <p><strong>Title:</strong> ${item.title || "N/A"}</p>
             <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
-            <p class="highlight"><strong>Price:</strong> ₹${item.price || 0}</p>
+            <p class="price"><strong>Price:</strong> ₹${item.price || 0}</p>
             <p><strong>Status:</strong> ${item.status || "Available"}</p>
             <p><strong>Level:</strong> ${item.level || 0}</p>
             <p><strong>Highest Rank:</strong> ${item.highest_rank || "N/A"}</p>
-            <p><strong>Mythic Items:</strong> ${mythic.join(', ')}</p>
-            <p><strong>Legendary Items:</strong> ${legendary.join(', ')}</p>
-            <p><strong>Gift Items:</strong> ${gift.join(', ')}</p>
-            <p><strong>Upgraded Guns:</strong> ${guns.join(', ')}</p>
+            <p><strong>Mythic:</strong> ${mythic.join(', ')}</p>
+            <p><strong>Legendary:</strong> ${legendary.join(', ')}</p>
+            <p><strong>Gift:</strong> ${gift.join(', ')}</p>
+            <p><strong>Guns:</strong> ${guns.join(', ')}</p>
             <p><strong>Titles:</strong> ${titles.join(', ')}</p>
             <div class="images-gallery">${imagesHTML}</div>
             ${buttonsHTML}
@@ -110,7 +129,7 @@
     } catch (err) {
       console.error(err);
       showToast("Failed to load items", false);
-      container.innerHTML = "<p>Failed to load items</p>";
+      container.innerHTML = "<p style='color:white'>Failed to load items</p>";
     }
   }
 
@@ -124,20 +143,18 @@
 
     const modalBg = document.getElementById("modal-bg");
     const modalText = document.getElementById("modal-text");
-    modalText.textContent = action === "purchase" ? "Confirm purchase?" : "Edit your listing?";
+
+    if (action === "purchase") modalText.textContent = "Confirm purchase?";
+    if (action === "edit") modalText.textContent = "Edit your listing?";
+    if (action === "delete") modalText.textContent = "Are you sure to delete this listing?";
+
     modalBg.classList.add("active");
 
     if (action === "edit") {
-      // prompt multiple fields (simple approach)
       const newPrice = prompt("Enter new price (₹):");
       const newLevel = prompt("Enter new level:");
       if (newPrice !== null && newLevel !== null) {
-        const payload = {
-          listing_id: id,
-          price: parseInt(newPrice),
-          level: parseInt(newLevel)
-        };
-        updateListing(payload, session.token);
+        updateListing({ listing_id: id, price: parseInt(newPrice), level: parseInt(newLevel) }, session.token);
       }
     }
   };
@@ -151,6 +168,7 @@
   document.getElementById("confirm-btn")?.addEventListener("click", async () => {
     const session = requireLogin();
     if (!session) return;
+
     const JWT = session.token;
 
     if (!selectedListingId || !selectedAction) return;
@@ -168,6 +186,20 @@
       } catch (err) {
         console.error(err);
         showToast("Purchase failed", false);
+      }
+    } else if (selectedAction === "delete") {
+      try {
+        const res = await fetch(`${API_URL}/listings/delete`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
+          body: JSON.stringify({ listing_id: selectedListingId })
+        });
+        const data = await res.json();
+        showToast(data.message || "Listing deleted");
+        loadListings();
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to delete", false);
       }
     }
 
@@ -193,12 +225,23 @@
     }
   }
 
-  // ===== Search =====
-  const searchInput = document.getElementById("search");
+  // ===== Search / Filter =====
   searchInput?.addEventListener("input", e => {
     currentSearchQuery = e.target.value.toLowerCase();
     loadListings();
   });
+  filterSelect?.addEventListener("change", e => {
+    currentFilter = e.target.value;
+    loadListings();
+  });
+
+  // ===== Image Modal =====
+  window.showImageModal = (src) => {
+    const modal = document.getElementById("imgModal");
+    const img = document.getElementById("imgPreview");
+    img.src = src;
+    modal.style.display = "flex";
+  };
 
   // ===== Initial load & auto-refresh =====
   loadListings();
