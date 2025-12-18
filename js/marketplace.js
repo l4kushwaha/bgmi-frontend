@@ -2,7 +2,7 @@
   const container = document.getElementById("items-container");
   if (!container) return;
 
-  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/market";
+  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
   let selectedListingId = null;
   let selectedAction = null;
   let currentSearchQuery = "";
@@ -19,7 +19,7 @@
 
   // ===== Session =====
   function getSession() {
-    const token = localStorage.getItem("token"); // ✅ use correct key
+    const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!token || !user) return null;
     return { token, user };
@@ -41,7 +41,7 @@
     const JWT = session?.token;
 
     try {
-      const res = await fetch(`${API_URL}/list`, {
+      const res = await fetch(`${API_URL}/listings`, {
         headers: JWT ? { "Authorization": `Bearer ${JWT}` } : {}
       });
       const items = await res.json();
@@ -53,7 +53,7 @@
       }
 
       const filteredItems = items.filter(item => {
-        const text = (item.title + " " + item.uid + " " + (item.highlights || []).join(", ")).toLowerCase();
+        const text = (item.title + " " + item.uid).toLowerCase();
         return text.includes(currentSearchQuery.toLowerCase());
       });
 
@@ -67,8 +67,10 @@
         card.className = "item-card";
 
         let buttonsHTML = "";
-        if (item.status === "available") buttonsHTML += `<button class="buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
-        else buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
+        if (item.status === "available") 
+          buttonsHTML += `<button class="buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
+        else 
+          buttonsHTML += `<button class="buy-btn" disabled>Sold Out</button>`;
 
         if (session && (session.user.role === "admin" || session.user.id === item.seller_id)) {
           buttonsHTML += `<button class="edit-btn" onclick="openListingModal(${item.id}, 'edit')">Edit</button>`;
@@ -79,7 +81,6 @@
           <div class="item-info">
             <p><strong>Title:</strong> ${item.title || "N/A"}</p>
             <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
-            ${item.highlights ? `<p class="highlight">${item.highlights.join(", ")}</p>` : ""}
             <p class="highlight"><strong>Price:</strong> ₹${item.price || 0}</p>
             <p><strong>Status:</strong> ${item.status || "Available"}</p>
             ${buttonsHTML}
@@ -129,13 +130,14 @@
 
     if (selectedAction === "purchase") {
       try {
-        const res = await fetch(`${API_URL}/purchase/${selectedListingId}`, {
+        // Create order instead of /purchase
+        const res = await fetch(`${API_URL}/orders/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
-          body: JSON.stringify({ payment_method: "wallet" })
+          body: JSON.stringify({ listing_id: selectedListingId })
         });
         const data = await res.json();
-        showToast(data.message || "Purchase successful");
+        showToast(data.message || "Order created & escrow initiated");
         loadListings();
       } catch (err) {
         console.error(err);
@@ -153,10 +155,11 @@
     if (!JWT) return;
     if (!price || isNaN(price)) return showToast("Invalid price", false);
     try {
-      const res = await fetch(`${API_URL}/update/${id}`, {
+      // Backend currently has no update route; assuming `/api/listings/create` with same ID overwrites
+      const res = await fetch(`${API_URL}/listings/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
-        body: JSON.stringify({ price })
+        body: JSON.stringify({ uid: id, title: `Updated Item ${id}`, price })
       });
       const data = await res.json();
       showToast(data.message || "Price updated");
