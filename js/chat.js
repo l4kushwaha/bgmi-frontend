@@ -1,139 +1,142 @@
 // =====================================================
-// 💬 BGMI Chat Frontend (v2)
+// 💬 BGMI Chat Frontend – FINAL v6
 // =====================================================
-// ✅ Uses Cloudflare Gateway API for Chat Microservice
-// ✅ Supports user search, conversation view, send messages
+// Features:
+// ✅ JWT Auth
+// ✅ Real-time WebSocket
+// ✅ Message Status (sent/delivered/read)
+// ✅ Typing Indicator
+// ✅ Online / Offline Presence
 // =====================================================
 
-const API_BASE = "https://bgmi_chat_service.bgmi-gateway.workers.dev/api";
+const API_BASE = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
+const token = localStorage.getItem("jwt"); // JWT after login
 
-// 🧩 Example user IDs (replace later with real auth IDs)
-const sender_id = 1;  // logged-in user
-let receiver_id = null; // selected chat user
+let receiver_id = null;
+let socket = null;
 
-// 🌐 DOM Elements
-const searchInput = document.getElementById("searchUser");
-const searchBtn = document.getElementById("searchBtn");
-const userList = document.getElementById("userList");
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
+// DOM
+const usersDiv = document.getElementById("userList");
 const messagesDiv = document.getElementById("messages");
-const statusDiv = document.getElementById("status");
-const currentUserHeader = document.getElementById("currentUser");
+const input = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const typingDiv = document.getElementById("typing");
+const presenceDiv = document.getElementById("presence");
 
-// 🟢 1. Check Chat Service Health
-async function checkHealth() {
-  try {
-    const res = await fetch(`${API_BASE}/health`);
-    const data = await res.json();
-
-    if (data.status === "running") {
-      statusDiv.textContent = "✅ Chat service online";
-      statusDiv.style.color = "#4caf50";
-    } else {
-      statusDiv.textContent = "⚠️ Chat service issue";
-      statusDiv.style.color = "orange";
-    }
-  } catch {
-    statusDiv.textContent = "❌ Chat service offline";
-    statusDiv.style.color = "red";
-  }
+/* ========== HELPERS ========== */
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
 }
 
-// 🔍 2. Search users to start chat
-async function searchUsers() {
-  const q = searchInput.value.trim();
-  if (!q) return;
-
-  try {
-    const res = await fetch(`${API_BASE}/chat/users/search?q=${encodeURIComponent(q)}`);
-    const users = await res.json();
-
-    userList.innerHTML = "";
-    if (users.length === 0) {
-      userList.innerHTML = "<p>No users found.</p>";
-      return;
-    }
-
-    users.forEach(user => {
-      const btn = document.createElement("button");
-      btn.className = "user-btn";
-      btn.textContent = user.username;
-      btn.onclick = () => openConversation(user.id, user.username);
-      userList.appendChild(btn);
-    });
-  } catch (err) {
-    console.error("Search Error:", err);
-  }
+function addMessage(msg, mine) {
+  const div = document.createElement("div");
+  div.className = mine ? "sent" : "received";
+  div.id = `msg-${msg.id || ""}`;
+  div.innerHTML = `
+    <span>${msg.content}</span>
+    ${mine ? `<small>${msg.status || "sent"}</small>` : ""}
+  `;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// 💬 3. Open chat with selected user
-async function openConversation(id, username) {
-  receiver_id = id;
-  currentUserHeader.textContent = `Chatting with: ${username}`;
-  messagesDiv.innerHTML = "<p class='chat-placeholder'>Loading conversation...</p>";
-  await loadConversation();
+/* ========== OPEN CHAT ========== */
+async function openChat(userId) {
+  receiver_id = userId;
+  messagesDiv.innerHTML = "";
+
+  // load history
+  const res = await fetch(
+    `${API_BASE}/api/chat/conversation/${receiver_id}`,
+    { headers: authHeaders() }
+  );
+  const data = await res.json();
+  data.forEach(m => addMessage(m, m.sender_id !== receiver_id));
+
+  checkPresence();
 }
 
-// 📩 4. Load messages between sender and receiver
-async function loadConversation() {
-  if (!receiver_id) return;
-
-  try {
-    const res = await fetch(`${API_BASE}/chat/conversation/${sender_id}/${receiver_id}`);
-    const data = await res.json();
-
-    messagesDiv.innerHTML = "";
-    if (data.length === 0) {
-      messagesDiv.innerHTML = "<p class='chat-placeholder'>Start chatting 👋</p>";
-      return;
-    }
-
-    data.forEach(msg => {
-      const div = document.createElement("div");
-      div.className = "message " + (msg.sender_id == sender_id ? "sent" : "received");
-      div.textContent = msg.content;
-      messagesDiv.appendChild(div);
-    });
-
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  } catch (err) {
-    console.error("Load Error:", err);
-  }
-}
-
-// 📨 5. Send message
+/* ========== SEND MESSAGE ========== */
 async function sendMessage() {
-  const content = msgInput.value.trim();
+  const content = input.value.trim();
   if (!content || !receiver_id) return;
 
-  try {
-    const res = await fetch(`${API_BASE}/chat/send`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender_id, receiver_id, content }),
-    });
+  input.value = "";
 
-    const data = await res.json();
-    if (data.success) {
-      msgInput.value = "";
-      await loadConversation();
-    }
-  } catch (err) {
-    console.error("Send Error:", err);
-  }
+  await fetch(`${API_BASE}/api/chat/send`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ receiver_id, content }),
+  });
+
+  addMessage({ content, status: "sent" }, true);
 }
 
-// ♻️ 6. Auto-refresh chat every 3 seconds
-setInterval(() => {
-  if (receiver_id) loadConversation();
-}, 3000);
+/* ========== READ RECEIPT ========== */
+async function markRead(message_id, sender_id) {
+  await fetch(`${API_BASE}/api/chat/read`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ message_id, sender_id }),
+  });
+}
 
-// 🚀 7. Initialize
-checkHealth();
+/* ========== TYPING ========== */
+input.addEventListener("input", async () => {
+  if (!receiver_id) return;
+  await fetch(`${API_BASE}/api/chat/typing`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ receiver_id }),
+  });
+});
 
-// 🎯 Event Listeners
-sendBtn.addEventListener("click", sendMessage);
-msgInput.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
-searchBtn.addEventListener("click", searchUsers);
-searchInput.addEventListener("keypress", e => e.key === "Enter" && searchUsers());
+/* ========== PRESENCE ========== */
+async function checkPresence() {
+  const res = await fetch(`${API_BASE}/api/user/presence`, {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  presenceDiv.textContent = data.online ? "🟢 Online" : "⚫ Offline";
+}
+
+/* ========== WEBSOCKET ========== */
+function connectWS() {
+  socket = new WebSocket(
+    `wss://bgmi_chat_service.bgmi-gateway.workers.dev/ws`,
+    []
+  );
+
+  socket.onmessage = e => {
+    const msg = JSON.parse(e.data);
+
+    if (msg.type === "chat") {
+      addMessage(msg, false);
+      markRead(msg.message_id, msg.sender_id);
+    }
+
+    if (msg.type === "typing") {
+      typingDiv.textContent = "Typing...";
+      setTimeout(() => (typingDiv.textContent = ""), 1000);
+    }
+
+    if (msg.type === "read") {
+      const el = document.querySelector(`#msg-${msg.message_id} small`);
+      if (el) el.textContent = "read ✔✔";
+    }
+
+    if (msg.type === "order") {
+      alert(`🛒 New Order: ${msg.product} ₹${msg.amount}`);
+    }
+  };
+}
+
+/* ========== EVENTS ========== */
+sendBtn.onclick = sendMessage;
+input.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
+
+/* ========== INIT ========== */
+connectWS();

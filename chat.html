@@ -13,6 +13,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
 
     .chat-container {
@@ -27,16 +28,15 @@
     }
 
     .chat-header {
-      padding: 15px;
+      padding: 12px;
       background: #333;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #444;
+      gap: 6px;
     }
 
     .chat-header input {
-      width: 70%;
+      flex: 1;
       padding: 6px 10px;
       border: none;
       border-radius: 6px;
@@ -57,6 +57,23 @@
       background: #45a049;
     }
 
+    .search-results {
+      background: #111;
+      max-height: 100px;
+      overflow-y: auto;
+      border-top: 1px solid #333;
+    }
+
+    .search-results div {
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .search-results div:hover {
+      background: #333;
+    }
+
     .chat-box {
       flex: 1;
       padding: 15px;
@@ -73,6 +90,7 @@
       border-radius: 12px;
       word-wrap: break-word;
       font-size: 14px;
+      position: relative;
     }
 
     .sent {
@@ -83,6 +101,14 @@
     .received {
       background: #444;
       align-self: flex-start;
+    }
+
+    .message small {
+      display: block;
+      font-size: 10px;
+      margin-top: 4px;
+      text-align: right;
+      opacity: 0.8;
     }
 
     .chat-input {
@@ -112,23 +138,17 @@
       background: #0056b3;
     }
 
-    .search-results {
-      background: #111;
-      max-height: 100px;
-      overflow-y: auto;
-      border-top: 1px solid #333;
+    #typing {
+      font-size: 12px;
+      color: #ccc;
+      padding-left: 10px;
     }
 
-    .search-results div {
-      padding: 8px 10px;
-      cursor: pointer;
-      transition: 0.2s;
+    #presence {
+      font-size: 12px;
+      color: #4caf50;
+      padding-left: 10px;
     }
-
-    .search-results div:hover {
-      background: #333;
-    }
-
   </style>
 </head>
 <body>
@@ -137,12 +157,13 @@
       <input type="text" id="searchInput" placeholder="Search user..." />
       <button id="searchBtn">Search</button>
     </div>
-
     <div class="search-results" id="searchResults"></div>
 
+    <div id="presence">Offline</div>
     <div class="chat-box" id="chatBox">
       <p class="chat-placeholder">Start chatting 👋</p>
     </div>
+    <div id="typing"></div>
 
     <div class="chat-input">
       <input type="text" id="messageInput" placeholder="Type your message..." />
