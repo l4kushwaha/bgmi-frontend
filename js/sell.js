@@ -7,10 +7,9 @@
   const fileElem = document.getElementById('fileElem');
   const preview = document.getElementById('preview');
   const toastEl = document.getElementById('toast');
-  const cardRoot = document.getElementById('cardRoot');
 
   // ===== Session =====
-  function getSession(){
+  function getSession() {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || 'null');
     return token && user ? { token, user } : null;
@@ -27,19 +26,6 @@
     toastEl.className = isError ? 'err' : '';
     toastEl.style.display = 'block';
     setTimeout(()=> toastEl.style.display = 'none', 3200);
-  }
-
-  // ===== Skeleton overlay helpers =====
-  function showSkeleton(){
-    const overlay = document.createElement('div');
-    overlay.className = 'skeleton-overlay';
-    overlay.id = 'skeletonOverlay';
-    overlay.innerHTML = `<div class="skeleton" aria-hidden="true">...</div>`;
-    cardRoot.appendChild(overlay);
-  }
-  function hideSkeleton(){
-    const el = document.getElementById('skeletonOverlay');
-    if(el) el.remove();
   }
 
   // ===== Drag & drop image handling =====
@@ -63,10 +49,6 @@
       const img = document.createElement('img');
       img.src = src;
       img.alt = 'image ' + (idx+1);
-      img.addEventListener('click', ()=> {
-        document.getElementById('modalImg').src = src;
-        document.getElementById('fullModal').style.display = 'flex';
-      });
       const rem = document.createElement('div');
       rem.className = 'remove';
       rem.innerText = '×';
@@ -113,9 +95,16 @@
       title: document.getElementById('title').value.trim(),
       description: document.getElementById('highlights').value.trim(),
       price: parseInt(document.getElementById('estimatedPrice').dataset.value) || 0,
+      level: parseInt(document.getElementById('level').value) || 0,
+      highest_rank: document.getElementById('rank')?.value || "",
+      mythic_items: (document.getElementById('mythic')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
+      legendary_items: (document.getElementById('legendary')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
+      gift_items: (document.getElementById('gift')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
+      upgraded_guns: (document.getElementById('guns')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
+      titles: (document.getElementById('titles')?.value || "").split(',').map(s=>s.trim()).filter(Boolean),
+      images: uploaded
     };
 
-    showSkeleton();
     submitBtn.disabled = true;
     submitBtn.textContent = 'Listing...';
 
@@ -149,7 +138,6 @@
       console.error('Network request failed', err);
       showToast('Network request failed', true);
     } finally {
-      hideSkeleton();
       submitBtn.disabled = false;
       submitBtn.textContent = 'List for Sale';
     }

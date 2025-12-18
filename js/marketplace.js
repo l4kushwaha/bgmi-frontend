@@ -76,6 +76,16 @@
           buttonsHTML += `<button class="edit-btn" onclick="openListingModal(${item.id}, 'edit')">Edit</button>`;
         }
 
+        // parse JSON arrays safely
+        const mythic = item.mythic_items ? JSON.parse(item.mythic_items) : [];
+        const legendary = item.legendary_items ? JSON.parse(item.legendary_items) : [];
+        const gift = item.gift_items ? JSON.parse(item.gift_items) : [];
+        const guns = item.upgraded_guns ? JSON.parse(item.upgraded_guns) : [];
+        const titles = item.titles ? JSON.parse(item.titles) : [];
+        const images = item.images ? JSON.parse(item.images) : [];
+
+        const imagesHTML = images.length > 0 ? images.map(src => `<img src="${src}" class="listing-img">`).join('') : '';
+
         card.innerHTML = `
           ${item.status === "available" ? '<div class="new-badge">NEW</div>' : ''}
           <div class="item-info">
@@ -83,6 +93,14 @@
             <p><strong>UID:</strong> ${item.uid || "N/A"}</p>
             <p class="highlight"><strong>Price:</strong> ₹${item.price || 0}</p>
             <p><strong>Status:</strong> ${item.status || "Available"}</p>
+            <p><strong>Level:</strong> ${item.level || 0}</p>
+            <p><strong>Highest Rank:</strong> ${item.highest_rank || "N/A"}</p>
+            <p><strong>Mythic Items:</strong> ${mythic.join(', ')}</p>
+            <p><strong>Legendary Items:</strong> ${legendary.join(', ')}</p>
+            <p><strong>Gift Items:</strong> ${gift.join(', ')}</p>
+            <p><strong>Upgraded Guns:</strong> ${guns.join(', ')}</p>
+            <p><strong>Titles:</strong> ${titles.join(', ')}</p>
+            <div class="images-gallery">${imagesHTML}</div>
             ${buttonsHTML}
           </div>
         `;
@@ -110,8 +128,17 @@
     modalBg.classList.add("active");
 
     if (action === "edit") {
+      // prompt multiple fields (simple approach)
       const newPrice = prompt("Enter new price (₹):");
-      if (newPrice !== null) updateListingPrice(id, parseInt(newPrice), session.token);
+      const newLevel = prompt("Enter new level:");
+      if (newPrice !== null && newLevel !== null) {
+        const payload = {
+          listing_id: id,
+          price: parseInt(newPrice),
+          level: parseInt(newLevel)
+        };
+        updateListing(payload, session.token);
+      }
     }
   };
 
@@ -130,7 +157,6 @@
 
     if (selectedAction === "purchase") {
       try {
-        // Create order instead of /purchase
         const res = await fetch(`${API_URL}/orders/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
@@ -150,23 +176,20 @@
     document.getElementById("modal-bg")?.classList.remove("active");
   });
 
-  // ===== Update Price =====
-  async function updateListingPrice(id, price, JWT) {
-    if (!JWT) return;
-    if (!price || isNaN(price)) return showToast("Invalid price", false);
+  // ===== Update Listing =====
+  async function updateListing(payload, JWT) {
     try {
-      // Backend currently has no update route; assuming `/api/listings/create` with same ID overwrites
-      const res = await fetch(`${API_URL}/listings/create`, {
+      const res = await fetch(`${API_URL}/listings/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
-        body: JSON.stringify({ uid: id, title: `Updated Item ${id}`, price })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
-      showToast(data.message || "Price updated");
+      showToast(data.message || "Listing updated");
       loadListings();
     } catch (err) {
       console.error(err);
-      showToast("Failed to update price", false);
+      showToast("Failed to update listing", false);
     }
   }
 
