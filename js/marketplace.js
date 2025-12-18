@@ -64,7 +64,7 @@
       });
 
       if (currentFilter === "own" && session) {
-        items = items.filter(item => Number(item.seller_id) === Number(session.user.seller_id));
+        items = items.filter(item => Number(item.seller_id) === Number(user.id));
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
