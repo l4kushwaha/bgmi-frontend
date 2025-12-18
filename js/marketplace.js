@@ -152,7 +152,7 @@
     modalBg.classList.add("active");
 
     if (action === "edit") {
-      fetch(`${API_URL}/listings/search?q=&limit=1000`, { headers: { "Authorization": `Bearer ${session.token}` } })
+      fetch(`${API_URL}/listings?q=&limit=1000`, { headers: { "Authorization": `Bearer ${session.token}` } })
         .then(r => r.json())
         .then(listings => {
           const item = listings.find(l => l.id === id);
@@ -216,7 +216,7 @@
     } else if (selectedAction === "delete") {
       try {
         const res = await fetch(`${API_URL}/listings/delete`, {
-          method: "DELETE",
+          method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
           body: JSON.stringify({ listing_id: selectedListingId })
         });
