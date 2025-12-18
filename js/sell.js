@@ -6,7 +6,7 @@
   const preview = document.getElementById("preview");
   const toast = document.getElementById("toast");
 
-  /* ========== SESSION ========== */
+  // ===== SESSION =====
   function getSession() {
     try {
       const token = localStorage.getItem("token");
@@ -16,7 +16,6 @@
       return null;
     }
   }
-
   const session = getSession();
   if (!session) {
     alert("Login required");
@@ -24,15 +23,15 @@
     return;
   }
 
-  /* ========== TOAST ========== */
+  // ===== TOAST =====
   function showToast(msg, err = false) {
     toast.textContent = msg;
     toast.className = err ? "err" : "";
     toast.style.display = "block";
-    setTimeout(() => (toast.style.display = "none"), 3000);
+    setTimeout(() => (toast.style.display = "none"), 3200);
   }
 
-  /* ========== IMAGE UPLOAD (OPTIONAL) ========== */
+  // ===== IMAGE UPLOAD =====
   let images = [];
   const dropArea = document.getElementById("drop-area");
   const fileElem = document.getElementById("fileElem");
@@ -42,8 +41,8 @@
     images.forEach((src, i) => {
       const d = document.createElement("div");
       d.className = "preview-img";
-      d.innerHTML = `<img src="${src}"><div class="x">×</div>`;
-      d.querySelector(".x").onclick = () => {
+      d.innerHTML = `<img src="${src}"><div class="remove">×</div>`;
+      d.querySelector(".remove").onclick = () => {
         images.splice(i, 1);
         renderPreview();
       };
@@ -54,12 +53,12 @@
   function handleFiles(files) {
     [...files].forEach(f => {
       if (!f.type.startsWith("image/")) return;
-      const r = new FileReader();
-      r.onload = e => {
+      const reader = new FileReader();
+      reader.onload = e => {
         images.push(e.target.result);
         renderPreview();
       };
-      r.readAsDataURL(f);
+      reader.readAsDataURL(f);
     });
   }
 
@@ -71,22 +70,16 @@
   dropArea.ondragover = e => e.preventDefault();
   fileElem.onchange = e => handleFiles(e.target.files);
 
-  /* ========== AI-STYLE PRICE ESTIMATOR ========== */
+  // ===== PRICE ESTIMATOR =====
   function estimatePrice() {
     const level = +document.getElementById("level").value || 0;
-    const mythic = +document.getElementById("mythic_count").value || 0;
-    const legendary = +document.getElementById("legendary_count").value || 0;
-    const xsuit = +document.getElementById("xsuit_count").value || 0;
-    const guns = +document.getElementById("upgradable_guns").value || 0;
-    const titles = +document.getElementById("special_titles").value || 0;
+    const mythic = document.getElementById("mythic_items")?.value.split(",").filter(Boolean).length || 0;
+    const legendary = document.getElementById("legendary_items")?.value.split(",").filter(Boolean).length || 0;
+    const upgradedGuns = document.getElementById("upgraded_guns")?.value.split(",").filter(Boolean).length || 0;
+    const titles = document.getElementById("titles")?.value.split(",").filter(Boolean).length || 0;
+    const giftItems = document.getElementById("gift_items")?.value.split(",").filter(Boolean).length || 0;
 
-    let price =
-      level * 8 +
-      mythic * 550 +
-      legendary * 280 +
-      xsuit * 1800 +
-      guns * 900 +
-      titles * 150;
+    let price = level * 8 + mythic * 550 + legendary * 280 + upgradedGuns * 900 + titles * 150 + giftItems * 100;
 
     price = Math.max(999, Math.round(price / 50) * 50);
 
@@ -98,24 +91,23 @@
 
   estimateBtn.onclick = estimatePrice;
 
-  /* ========== SUBMIT ========== */
+  // ===== SUBMIT =====
   form.onsubmit = async e => {
     e.preventDefault();
-
     const price = estimatePrice();
 
     const payload = {
-      uid: uid.value.trim(),
-      title: title.value.trim(),
-      description: highlights.value.trim(),
+      uid: document.getElementById("uid").value.trim(),
+      title: document.getElementById("title").value.trim(),
+      description: document.getElementById("highlights").value.trim(),
       price,
-      level: +level.value || 0,
-      highest_rank: rank.value || "",
-      mythic_items: Array(+mythic_count.value || 0).fill("Mythic"),
-      legendary_items: Array(+legendary_count.value || 0).fill("Legendary"),
-      gift_items: [],
-      upgraded_guns: Array(+upgradable_guns.value || 0).fill("Gun"),
-      titles: Array(+special_titles.value || 0).fill("Title"),
+      level: +document.getElementById("level").value || 0,
+      highest_rank: document.getElementById("highest_rank")?.value || "",
+      mythic_items: document.getElementById("mythic_items")?.value.split(",").map(s => s.trim()).filter(Boolean),
+      legendary_items: document.getElementById("legendary_items")?.value.split(",").map(s => s.trim()).filter(Boolean),
+      gift_items: document.getElementById("gift_items")?.value.split(",").map(s => s.trim()).filter(Boolean),
+      upgraded_guns: document.getElementById("upgraded_guns")?.value.split(",").map(s => s.trim()).filter(Boolean),
+      titles: document.getElementById("titles")?.value.split(",").map(s => s.trim()).filter(Boolean),
       images
     };
 
@@ -131,11 +123,8 @@
         },
         body: JSON.stringify(payload)
       });
-
       const data = await res.json();
-
       if (!res.ok) throw data;
-
       showToast("🎉 Account listed successfully");
       form.reset();
       images = [];
@@ -143,7 +132,7 @@
       document.getElementById("estimatedPrice").textContent = "";
     } catch (err) {
       console.error(err);
-      showToast(err.error || "Listing failed", true);
+      showToast(err.error || err.message || "Listing failed", true);
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "List for Sale";
