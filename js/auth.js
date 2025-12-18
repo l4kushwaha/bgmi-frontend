@@ -18,6 +18,15 @@
   // ===============================
   async function apiFetch(url, options = {}, retry = true) {
     const token = localStorage.getItem("token");
+    function decodeJWT(token) {
+  try {
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
+
     const headers = {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
@@ -108,34 +117,36 @@
       }
 
       // ✅ Normal user login
-      if (data.role === "user" || data.user) {
+    // ✅ Normal user login
+if (data.role === "user") {
+
+  const jwtPayload = decodeJWT(data.token);
+  console.log("🔓 JWT Payload:", jwtPayload);
+
   const userInfo = {
-    id: Number(data.user?.id),                 // 🔥 force real ID
-    name: data.user?.full_name                 // if future me aaye
-          || data.user?.username               // 🔥 CURRENT BACKEND FIELD
-          || "Player",
-    email: data.user?.email || "",
-    role: data.user?.role || "user",
-    kyc_status: data.user?.kyc_status ?? "pending",
-    is_verified: data.user?.is_verified ?? false,
+    id: Number(jwtPayload?.id),          // 🔥 REAL ID (19)
+    name: jwtPayload?.email?.split("@")[0] || "Player",
+    email: jwtPayload?.email || "",
+    role: jwtPayload?.role || "user",
+    kyc_status: "pending",
+    is_verified: false,
   };
 
-  // 🛡 Safety check
   if (!userInfo.id || userInfo.id <= 0) {
-    console.error("❌ INVALID USER ID FROM AUTH:", data);
-    alert("Login error: Invalid user ID");
+    console.error("❌ INVALID USER ID EVEN AFTER JWT:", jwtPayload);
+    alert("Login failed: Invalid session");
     return;
   }
 
   localStorage.setItem("token", data.token);
   localStorage.setItem("user", JSON.stringify(userInfo));
 
-  console.log("✅ USER SAVED:", userInfo);
-  console.log("🆔 USER ID:", userInfo.id);
+  console.log("✅ USER SAVED FROM JWT:", userInfo);
 
   alert("✅ Login successful!");
   return window.location.href = "index.html";
 }
+
 
 
       alert("❌ Invalid credentials or account not found.");
