@@ -127,6 +127,7 @@
 
         const userInfo = {
           id: Number(jwtPayload?.id) || 0,          // 🔥 REAL ID
+          seller_id: Number(jwtPayload?.id),       // 🔥 Assign seller_id same as user.id
           name: jwtPayload?.email?.split("@")[0] || "Player",
           email: jwtPayload?.email || "",
           role: jwtPayload?.role || "user",

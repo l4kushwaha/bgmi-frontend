@@ -24,6 +24,10 @@
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!token || !user) return null;
+
+    // Ensure seller_id exists for normal users
+    if (user.role === "user" && !("seller_id" in user)) user.seller_id = 0;
+
     return { token, user };
   }
 
@@ -60,7 +64,7 @@
       });
 
       if (currentFilter === "own" && session) {
-        items = items.filter(item => String(item.seller_id) === String(session.user.id));
+        items = items.filter(item => Number(item.seller_id) === Number(session.user.seller_id));
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
@@ -80,7 +84,7 @@
         card.className = "item-card";
 
         const session = getSession();
-        const isOwner = session && String(session.user.id) === String(item.seller_id);
+        const isOwner = session && Number(session.user.seller_id) === Number(item.seller_id);
         const isAdmin = session && session.user.role === "admin";
 
         let buttonsHTML = "";
@@ -151,7 +155,6 @@
     modalBg.classList.add("active");
 
     if (action === "edit") {
-      // Fetch listing data first
       fetch(`${API_URL}/listings/search?q=&limit=1000`, { headers: { "Authorization": `Bearer ${session.token}` } })
         .then(r => r.json())
         .then(listings => {
@@ -171,6 +174,7 @@
           if (newTitle !== null && newPrice !== null && newLevel !== null) {
             updateListing({
               listing_id: id,
+              seller_id: session.user.seller_id,
               title: newTitle,
               price: parseInt(newPrice),
               level: parseInt(newLevel),
