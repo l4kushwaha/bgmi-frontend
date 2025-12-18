@@ -1,12 +1,10 @@
-// ================= BGMI Chat – FINAL v9 =================
+// ================= BGMI Chat – FINAL v8 =================
 const API_BASE = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
-const token = localStorage.getItem("jwt"); // pre-stored JWT
-
+const token = localStorage.getItem("token"); // JWT from auth.js
 let receiver_id = null;
 let socket = null;
-let searchTimeout = null;
 
-// DOM
+// DOM Elements
 const usersDiv = document.getElementById("searchResults");
 const messagesDiv = document.getElementById("chatBox");
 const input = document.getElementById("messageInput");
@@ -16,7 +14,7 @@ const presenceDiv = document.getElementById("presence");
 const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
 
-/* ========== HELPERS ========== */
+// ================= HELPERS =================
 function authHeaders() {
   return {
     "Content-Type": "application/json",
@@ -36,12 +34,11 @@ function addMessage(msg, mine) {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-/* ========== SEARCH USERS (Live Autocomplete) ========== */
-async function searchUsers(q) {
-  if (!q) {
-    usersDiv.innerHTML = "";
-    return;
-  }
+// ================= SEARCH USERS =================
+async function searchUsers() {
+  const q = searchInput.value.trim();
+  if (!q) return;
+  usersDiv.innerHTML = "<p>Searching...</p>";
 
   const res = await fetch(`${API_BASE}/api/chat/users/search?q=${encodeURIComponent(q)}`, {
     headers: authHeaders(),
@@ -49,24 +46,20 @@ async function searchUsers(q) {
   const users = await res.json();
 
   usersDiv.innerHTML = "";
-  if (users.length === 0) {
+  if (!users || users.length === 0) {
     usersDiv.innerHTML = "<p>No users found</p>";
     return;
   }
 
   users.forEach(u => {
     const div = document.createElement("div");
-    div.textContent = `${u.username} (${u.email || "no-email"})`;
-    div.onclick = () => {
-      openChat(u.id);
-      usersDiv.innerHTML = "";
-      searchInput.value = "";
-    };
+    div.textContent = `${u.username} (${u.email})`;
+    div.onclick = () => openChat(u.id);
     usersDiv.appendChild(div);
   });
 }
 
-/* ========== OPEN CHAT ========== */
+// ================= OPEN CHAT =================
 async function openChat(userId) {
   receiver_id = userId;
   messagesDiv.innerHTML = "<p class='chat-placeholder'>Loading...</p>";
@@ -75,13 +68,14 @@ async function openChat(userId) {
     headers: authHeaders(),
   });
   const data = await res.json();
+
   messagesDiv.innerHTML = "";
   data.forEach(m => addMessage(m, m.sender_id != receiver_id));
 
   checkPresence();
 }
 
-/* ========== SEND MESSAGE ========== */
+// ================= SEND MESSAGE =================
 async function sendMessage() {
   const content = input.value.trim();
   if (!content || !receiver_id) return;
@@ -97,7 +91,7 @@ async function sendMessage() {
   addMessage({ content, status: "sent", id: data.message_id }, true);
 }
 
-/* ========== MARK READ ========== */
+// ================= MARK MESSAGE READ =================
 async function markRead(message_id, sender_id) {
   await fetch(`${API_BASE}/api/chat/read`, {
     method: "POST",
@@ -106,7 +100,7 @@ async function markRead(message_id, sender_id) {
   });
 }
 
-/* ========== TYPING ========== */
+// ================= TYPING =================
 input.addEventListener("input", async () => {
   if (!receiver_id) return;
   await fetch(`${API_BASE}/api/chat/typing`, {
@@ -116,7 +110,7 @@ input.addEventListener("input", async () => {
   });
 });
 
-/* ========== PRESENCE ========== */
+// ================= PRESENCE =================
 async function checkPresence() {
   const res = await fetch(`${API_BASE}/api/user/presence`, {
     headers: authHeaders(),
@@ -125,51 +119,55 @@ async function checkPresence() {
   presenceDiv.textContent = data.online ? "🟢 Online" : "⚫ Offline";
 }
 
-/* ========== WEBSOCKET ========== */
+// ================= WEBSOCKET =================
 function connectWS() {
-  socket = new WebSocket(`${API_BASE.replace("https", "wss")}/ws`);
+  if (!token) return console.error("❌ JWT token missing for WebSocket");
 
-  socket.onopen = () => console.log("WebSocket connected");
+  // Use query param for JWT
+  socket = new WebSocket(`${API_BASE.replace("https", "wss")}/ws?token=${token}`);
+
+  socket.onopen = () => console.log("✅ WebSocket connected");
+  socket.onclose = () => {
+    console.warn("⚠️ WebSocket disconnected, reconnecting in 3s");
+    setTimeout(connectWS, 3000);
+  };
+
+  socket.onerror = e => console.error("WebSocket error", e);
 
   socket.onmessage = e => {
     const msg = JSON.parse(e.data);
 
-    if (msg.type === "chat") {
-      addMessage(msg, false);
-      markRead(msg.message_id, msg.sender_id);
-    }
+    switch (msg.type) {
+      case "chat":
+        addMessage(msg, false);
+        markRead(msg.message_id, msg.sender_id);
+        break;
 
-    if (msg.type === "typing") {
-      typingDiv.textContent = "Typing...";
-      setTimeout(() => (typingDiv.textContent = ""), 1000);
-    }
+      case "typing":
+        typingDiv.textContent = "Typing...";
+        setTimeout(() => (typingDiv.textContent = ""), 1000);
+        break;
 
-    if (msg.type === "read") {
-      const el = document.querySelector(`#msg-${msg.message_id} small`);
-      if (el) el.textContent = "read ✔✔";
-    }
+      case "read":
+        const el = document.querySelector(`#msg-${msg.message_id} small`);
+        if (el) el.textContent = "read ✔✔";
+        break;
 
-    if (msg.type === "order") {
-      alert(`🛒 New Order: ${msg.product} ₹${msg.amount}`);
+      case "order":
+        alert(`🛒 New Order: ${msg.product} ₹${msg.amount}`);
+        break;
+
+      default:
+        console.log("Unknown message type:", msg);
     }
   };
-
-  socket.onclose = () => console.log("WebSocket disconnected, reconnecting in 3s") && setTimeout(connectWS, 3000);
-  socket.onerror = err => console.error("WebSocket error", err);
 }
 
-/* ========== EVENTS ========== */
+// ================= EVENTS =================
 sendBtn.onclick = sendMessage;
 input.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
+searchBtn.onclick = searchUsers;
+searchInput.addEventListener("keypress", e => e.key === "Enter" && searchUsers());
 
-// Live search as you type
-searchInput.addEventListener("input", e => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => searchUsers(e.target.value.trim()), 300);
-});
-
-searchBtn.onclick = () => searchUsers(searchInput.value.trim());
-searchInput.addEventListener("keypress", e => e.key === "Enter" && searchUsers(searchInput.value.trim()));
-
-/* ========== INIT ========== */
+// ================= INIT =================
 connectWS();
