@@ -118,9 +118,7 @@
           is_verified: data.user?.is_verified || false,
         };
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        console.log("✅ User saved:", data.user);
-        console.log("🆔 User ID saved:", data.user.id);
+        localStorage.setItem("user", JSON.stringify(userInfo));
         alert("✅ Login successful!");
         return window.location.href = "index.html";
       }
