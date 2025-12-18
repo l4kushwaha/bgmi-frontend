@@ -55,12 +55,12 @@
 
       // ===== FILTER & SEARCH =====
       items = items.filter(item => {
-        const text = (item.title + " " + item.uid + " " + item.highest_rank).toLowerCase();
+        const text = (item.title + " " + item.uid + " " + (item.highest_rank || "")).toLowerCase();
         return text.includes(currentSearchQuery.toLowerCase());
       });
 
       if (currentFilter === "own" && session) {
-        items = items.filter(item => item.seller_id === session.user.id);
+        items = items.filter(item => String(item.seller_id) === String(session.user.id));
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
@@ -79,10 +79,11 @@
         const card = document.createElement("div");
         card.className = "item-card";
 
-        let buttonsHTML = "";
-        const isOwner = session && session.user.id === item.seller_id;
+        const session = getSession();
+        const isOwner = session && String(session.user.id) === String(item.seller_id);
         const isAdmin = session && session.user.role === "admin";
 
+        let buttonsHTML = "";
         if (item.status === "available") {
           buttonsHTML += `<button class="btn buy-btn" onclick="openListingModal(${item.id}, 'purchase')">Buy</button>`;
         } else {
@@ -94,7 +95,6 @@
           buttonsHTML += `<button class="btn delete-btn" onclick="openListingModal(${item.id}, 'delete')">Delete</button>`;
         }
 
-        // Parse JSON arrays safely
         const mythic = item.mythic_items ? JSON.parse(item.mythic_items) : [];
         const legendary = item.legendary_items ? JSON.parse(item.legendary_items) : [];
         const gift = item.gift_items ? JSON.parse(item.gift_items) : [];
@@ -145,17 +145,44 @@
     const modalText = document.getElementById("modal-text");
 
     if (action === "purchase") modalText.textContent = "Confirm purchase?";
-    if (action === "edit") modalText.textContent = "Edit your listing?";
+    if (action === "edit") modalText.textContent = "Edit your listing";
     if (action === "delete") modalText.textContent = "Are you sure to delete this listing?";
 
     modalBg.classList.add("active");
 
     if (action === "edit") {
-      const newPrice = prompt("Enter new price (₹):");
-      const newLevel = prompt("Enter new level:");
-      if (newPrice !== null && newLevel !== null) {
-        updateListing({ listing_id: id, price: parseInt(newPrice), level: parseInt(newLevel) }, session.token);
-      }
+      // Fetch listing data first
+      fetch(`${API_URL}/listings/search?q=&limit=1000`, { headers: { "Authorization": `Bearer ${session.token}` } })
+        .then(r => r.json())
+        .then(listings => {
+          const item = listings.find(l => l.id === id);
+          if (!item) return showToast("Listing not found", false);
+
+          const newTitle = prompt("Title:", item.title || "");
+          const newPrice = prompt("Price (₹):", item.price || 0);
+          const newLevel = prompt("Level:", item.level || 0);
+          const newRank = prompt("Highest Rank:", item.highest_rank || "");
+          const newMythic = prompt("Mythic Items (comma separated):", item.mythic_items ? JSON.parse(item.mythic_items).join(", ") : "");
+          const newLegendary = prompt("Legendary Items (comma separated):", item.legendary_items ? JSON.parse(item.legendary_items).join(", ") : "");
+          const newGift = prompt("Gift Items (comma separated):", item.gift_items ? JSON.parse(item.gift_items).join(", ") : "");
+          const newGuns = prompt("Upgraded Guns (comma separated):", item.upgraded_guns ? JSON.parse(item.upgraded_guns).join(", ") : "");
+          const newTitles = prompt("Titles (comma separated):", item.titles ? JSON.parse(item.titles).join(", ") : "");
+
+          if (newTitle !== null && newPrice !== null && newLevel !== null) {
+            updateListing({
+              listing_id: id,
+              title: newTitle,
+              price: parseInt(newPrice),
+              level: parseInt(newLevel),
+              highest_rank: newRank,
+              mythic_items: newMythic.split(",").map(s => s.trim()).filter(Boolean),
+              legendary_items: newLegendary.split(",").map(s => s.trim()).filter(Boolean),
+              gift_items: newGift.split(",").map(s => s.trim()).filter(Boolean),
+              upgraded_guns: newGuns.split(",").map(s => s.trim()).filter(Boolean),
+              titles: newTitles.split(",").map(s => s.trim()).filter(Boolean)
+            }, session.token);
+          }
+        }).catch(e => showToast("Failed to fetch listing", false));
     }
   };
 
@@ -170,7 +197,6 @@
     if (!session) return;
 
     const JWT = session.token;
-
     if (!selectedListingId || !selectedAction) return;
 
     if (selectedAction === "purchase") {

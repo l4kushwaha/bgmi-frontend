@@ -92,11 +92,11 @@
   let price = 0;
   price += level * 8;
   price += rankValues[rank] || 0;
-  price += mythicArray.length * 500;
-  price += legendaryArray.length * 280;
-  price += giftArray.length * 500;
-  price += titlesArray.length * 400;
-  price += gunsArray.length * 900;
+  price += mythicArray.length * 180;
+  price += legendaryArray.length * 100;
+  price += giftArray.length * 1000;
+  price += titlesArray.length * 100;
+  price += gunsArray.length * 300;
 
   price = Math.max(999, Math.round(price / 50) * 50);
 
