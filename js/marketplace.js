@@ -216,7 +216,7 @@
     } else if (selectedAction === "delete") {
       try {
         const res = await fetch(`${API_URL}/listings/delete`, {
-          method: "DELETE",
+          method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${JWT}` },
           body: JSON.stringify({ listing_id: selectedListingId })
         });
