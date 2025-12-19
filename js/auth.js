@@ -108,7 +108,7 @@
       // ✅ Admin login
       if (data.role === "admin") {
         const adminUser = {
-          id: 0,
+          id: Number(jwtPayload?.id) || 0,
           name: data.admin_info?.name || "Admin",
           email: data.admin_info?.email,
           phone: data.admin_info?.phone,
