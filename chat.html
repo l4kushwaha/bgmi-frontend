@@ -1,164 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BGMI Chat</title>
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(135deg, #0a0a0a, #1f1f1f);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BGMI Chat</title>
+<style>
+  body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #0a0a0a, #1f1f1f);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    background: #222;
+    border-radius: 16px;
+    width: 380px;
+    height: 650px;
+    overflow: hidden;
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+  }
+  .chat-header {
+    padding: 15px;
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #444;
+  }
+  .chat-header input {
+    width: 70%;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    outline: none;
+  }
+  .chat-header button {
+    background: #4caf50;
+    border: none;
+    color: white;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .chat-header button:hover { background: #45a049; }
 
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      background: #222;
-      border-radius: 16px;
-      width: 380px;
-      height: 620px;
-      overflow: hidden;
-      box-shadow: 0 0 25px rgba(0,0,0,0.4);
-    }
+  .search-results {
+    background: #111;
+    max-height: 120px;
+    overflow-y: auto;
+    border-top: 1px solid #333;
+  }
+  .search-results div {
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .search-results div:hover { background: #333; }
 
-    .chat-header {
-      padding: 15px;
-      background: #333;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid #444;
-    }
+  .chat-box {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #1c1c1c;
+  }
+  .message {
+    max-width: 75%;
+    padding: 10px;
+    border-radius: 12px;
+    word-wrap: break-word;
+    font-size: 14px;
+  }
+  .sent { background: #007bff; align-self: flex-end; }
+  .received { background: #444; align-self: flex-start; }
 
-    .chat-header input {
-      flex: 1;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 6px;
-      outline: none;
-    }
+  .chat-input {
+    display: flex;
+    border-top: 1px solid #444;
+  }
+  .chat-input input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    outline: none;
+    background: #2a2a2a;
+    color: white;
+  }
+  .chat-input button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .chat-input button:hover { background: #0056b3; }
 
-    .chat-header button {
-      background: #4caf50;
-      border: none;
-      color: white;
-      padding: 7px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .chat-header button:hover { background: #45a049; }
-
-    .search-results {
-      background: #111;
-      max-height: 100px;
-      overflow-y: auto;
-      border-top: 1px solid #333;
-    }
-
-    .search-results div {
-      padding: 8px 10px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .search-results div:hover { background: #333; }
-
-    .chat-box {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background: #1c1c1c;
-    }
-
-    .message {
-      max-width: 75%;
-      padding: 10px;
-      border-radius: 12px;
-      word-wrap: break-word;
-      font-size: 14px;
-    }
-
-    .sent { background: #007bff; align-self: flex-end; }
-    .received { background: #444; align-self: flex-start; }
-
-    .message small {
-      display: block;
-      font-size: 10px;
-      margin-top: 3px;
-      opacity: 0.7;
-    }
-
-    .chat-input {
-      display: flex;
-      border-top: 1px solid #444;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      outline: none;
-      background: #2a2a2a;
-      color: white;
-    }
-
-    .chat-input button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 15px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .chat-input button:hover { background: #0056b3; }
-
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 15px;
-      font-size: 12px;
-      background: #111;
-      border-top: 1px solid #333;
-    }
-
-  </style>
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 15px;
+    font-size: 13px;
+    color: #aaa;
+    background: #222;
+    border-bottom: 1px solid #333;
+  }
+</style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">
-      <input type="text" id="searchInput" placeholder="Search user or email..." />
-      <button id="searchBtn">Search</button>
-    </div>
 
-    <div class="search-results" id="searchResults"></div>
+<div class="chat-container">
 
-    <div class="chat-box" id="chatBox">
-      <p class="chat-placeholder">Start chatting 👋</p>
-    </div>
-
-    <div class="status-bar">
-      <span id="typing"></span>
-      <span id="presence">Offline</span>
-    </div>
-
-    <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type your message..." />
-      <button id="sendBtn">Send</button>
-    </div>
+  <div class="chat-header">
+    <input type="text" id="searchInput" placeholder="Search user..." />
+    <button id="searchBtn">Search</button>
   </div>
 
-  <script src="js/chat.js"></script>
+  <div class="search-results" id="searchResults"></div>
+
+  <div class="status-bar">
+    <span id="typing"></span>
+    <span id="presence">⚫ Offline</span>
+  </div>
+
+  <div class="chat-box" id="chatBox">
+    <p class="chat-placeholder">Start chatting 👋</p>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+
+</div>
+
+<script src="chat.js"></script>
 </body>
 </html>
