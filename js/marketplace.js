@@ -80,7 +80,6 @@
         const card = document.createElement("div");
         card.className = "item-card";
 
-        const session = getSession();
         const isOwner = session && Number(session.user.id) === Number(item.seller_id);
         const isAdmin = session && session.user.role === "admin";
 
@@ -234,7 +233,6 @@
     document.getElementById("modal-bg")?.classList.remove("active");
   });
 
-  // ===== Update Listing =====
   async function updateListing(payload, JWT) {
     try {
       const res = await fetch(`${API_URL}/listings/update`, {
@@ -251,7 +249,6 @@
     }
   }
 
-  // ===== Search / Filter =====
   searchInput?.addEventListener("input", e => {
     currentSearchQuery = e.target.value.toLowerCase();
     loadListings();
@@ -261,7 +258,6 @@
     loadListings();
   });
 
-  // ===== Image Modal =====
   window.showImageModal = (src) => {
     const modal = document.getElementById("imgModal");
     const img = document.getElementById("imgPreview");
@@ -269,7 +265,6 @@
     modal.style.display = "flex";
   };
 
-  // ===== Initial load & auto-refresh =====
   loadListings();
   setInterval(loadListings, 30000);
 })();

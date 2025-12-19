@@ -98,17 +98,14 @@ button.ghost{
 <form id="sellForm" novalidate>
   <h2>Sell Your BGMI Account</h2>
 
-  <!-- Required -->
   <input id="uid" placeholder="BGMI UID (required)" required>
   <input id="title" placeholder="Account Title (required)" required>
 
-  <!-- Level & Rank -->
   <div class="row">
     <input id="level" type="number" placeholder="Account Level">
     <input id="rank" placeholder="Highest Rank">
   </div>
 
-  <!-- Items (IDs MATCH sell.js) -->
   <div class="grid">
     <input id="mythic" placeholder="Mythic Items">
     <input id="legendary" placeholder="Legendary Items">
@@ -117,17 +114,14 @@ button.ghost{
     <input id="titles" placeholder="Titles">
   </div>
 
-  <!-- Description -->
   <textarea id="highlights" placeholder="Account highlights / description"></textarea>
 
-  <!-- Images -->
   <div id="drop-area">
     <input id="fileElem" type="file" multiple accept="image/*" hidden>
     Drag & drop images here or click to upload (optional)
   </div>
   <div id="preview"></div>
 
-  <!-- Estimate & Submit -->
   <div class="row" style="margin-top:10px">
     <div style="flex:1">
       <button type="button" id="estimateBtn" class="ghost">Estimate Price</button>

@@ -71,42 +71,31 @@
   fileElem.onchange = e => handleFiles(e.target.files);
 
   // ===== PRICE ESTIMATOR =====
-  const rankValues = {
-    gold: 10,
-    platinum: 30,
-    ace: 50,
-    diamond: 40,
-    conquer: 200
-  };
-
+  const rankValues = { gold: 10, platinum: 30, ace: 50, diamond: 40, conquer: 200 };
   function estimatePrice() {
-  const level = +document.getElementById("level").value || 0;
-  const rank = document.getElementById("rank").value.trim().toLowerCase();
+    const level = +document.getElementById("level").value || 0;
+    const rank = document.getElementById("rank").value.trim().toLowerCase();
+    const mythicArray = document.getElementById("mythic")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
+    const legendaryArray = document.getElementById("legendary")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
+    const giftArray = document.getElementById("gift")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
+    const gunsArray = document.getElementById("guns")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
+    const titlesArray = document.getElementById("titles")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
 
-  const mythicArray = document.getElementById("mythic")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-  const legendaryArray = document.getElementById("legendary")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-  const giftArray = document.getElementById("gift")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-  const gunsArray = document.getElementById("guns")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-  const titlesArray = document.getElementById("titles")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
+    let price = 0;
+    price += level * 8;
+    price += rankValues[rank] || 0;
+    price += mythicArray.length * 180;
+    price += legendaryArray.length * 100;
+    price += giftArray.length * 1000;
+    price += titlesArray.length * 100;
+    price += gunsArray.length * 300;
+    price = Math.max(999, Math.round(price / 50) * 50);
 
-  let price = 0;
-  price += level * 8;
-  price += rankValues[rank] || 0;
-  price += mythicArray.length * 180;
-  price += legendaryArray.length * 100;
-  price += giftArray.length * 1000;
-  price += titlesArray.length * 100;
-  price += gunsArray.length * 300;
-
-  price = Math.max(999, Math.round(price / 50) * 50);
-
-  const out = document.getElementById("estimatedPrice");
-  out.textContent = `Estimated price: ₹${price}`;
-  out.dataset.value = price;
-  return price;
-}
-
-
+    const out = document.getElementById("estimatedPrice");
+    out.textContent = `Estimated price: ₹${price}`;
+    out.dataset.value = price;
+    return price;
+  }
   estimateBtn.onclick = estimatePrice;
 
   // ===== SUBMIT =====
@@ -135,10 +124,7 @@
     try {
       const res = await fetch(`${API_BASE}/create`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
