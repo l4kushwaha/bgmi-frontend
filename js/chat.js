@@ -1,141 +1,109 @@
-// ================= BGMI Chat – FINAL v8 =================
 const API_BASE = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
 const token = localStorage.getItem("token"); // pre-stored JWT
 
-let receiver_id = null;
-let socket = null;
+let room_id = null;
+let sse = null;
 
 // DOM
-const usersDiv = document.getElementById("searchResults");
 const messagesDiv = document.getElementById("chatBox");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
-const typingDiv = document.getElementById("typing");
+const attachInput = document.getElementById("attachments"); // <input type="file" multiple>
 const presenceDiv = document.getElementById("presence");
-const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
 
-/* ===== HELPERS ===== */
 function authHeaders() {
   return { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 }
 
-function addMessage(msg, mine) {
+// Add message to chat
+function addMessage(msg, mine = false) {
   const div = document.createElement("div");
   div.className = mine ? "sent message" : "received message";
   div.id = `msg-${msg.id || ""}`;
-  div.innerHTML = `<span>${msg.content}</span>${mine ? `<small>${msg.status || "sent"}</small>` : ""}`;
+
+  let attachHTML = "";
+  if (msg.attachments && msg.attachments.length > 0) {
+    attachHTML = msg.attachments.map(a => `<a href="${a.file_url}" target="_blank">${a.file_url.split("/").pop()}</a>`).join("<br>");
+  }
+
+  div.innerHTML = `
+    <span>${msg.message}</span>
+    ${mine ? `<small>${msg.status || "sent"}</small>` : ""}
+    <div class="attachments">${attachHTML}</div>
+  `;
   messagesDiv.appendChild(div);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-/* ===== SEARCH USERS ===== */
-async function searchUsers() {
-  const q = searchInput.value.trim();
-  if (!q) return;
-  usersDiv.innerHTML = "<p>Searching...</p>";
-
-  const res = await fetch(`${API_BASE}/api/chat/users/search?q=${encodeURIComponent(q)}`, { headers: authHeaders() });
-  const users = await res.json();
-
-  usersDiv.innerHTML = "";
-  users.forEach(u => {
-    const div = document.createElement("div");
-    div.textContent = `${u.username} (${u.email})`;
-    div.onclick = () => openChat(u.id);
-    usersDiv.appendChild(div);
-  });
-}
-
-/* ===== OPEN CHAT ===== */
-async function openChat(userId) {
-  receiver_id = userId;
+// Open chat room
+async function openChat(rid) {
+  room_id = rid;
   messagesDiv.innerHTML = "<p class='chat-placeholder'>Loading...</p>";
 
-  const res = await fetch(`${API_BASE}/api/chat/conversation/${receiver_id}`, { headers: authHeaders() });
+  const res = await fetch(`${API_BASE}/api/chat/messages?room_id=${room_id}`, { headers: authHeaders() });
   const data = await res.json();
   messagesDiv.innerHTML = "";
-  data.forEach(m => addMessage(m, m.sender_id != receiver_id));
+  data.forEach(m => addMessage(m, m.sender_id !== room_id));
 
+  connectSSE();
   checkPresence();
 }
 
-/* ===== SEND MESSAGE ===== */
+// Send message
 async function sendMessage() {
+  if (!room_id) return;
   const content = input.value.trim();
-  if (!content || !receiver_id) return;
+  if (!content && attachInput.files.length === 0) return;
+
+  const attachments = Array.from(attachInput.files).map(f => ({
+    url: URL.createObjectURL(f),
+    mime_type: f.type
+  }));
+
   input.value = "";
+  attachInput.value = "";
+
+  const body = { room_id, message: content, type: "text", attachments };
 
   const res = await fetch(`${API_BASE}/api/chat/send`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ receiver_id, content })
+    body: JSON.stringify(body)
   });
   const data = await res.json();
-
-  addMessage({ content, status: "sent", id: data.message_id }, true);
+  addMessage({ message: content, attachments, status: "sent", id: data.message_id }, true);
 }
 
-/* ===== MARK READ ===== */
-async function markRead(message_id, sender_id) {
-  await fetch(`${API_BASE}/api/chat/read`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({ message_id, sender_id })
-  });
+// SSE / Live updates
+function connectSSE() {
+  if (!room_id) return;
+  if (sse) sse.close();
+
+  sse = new EventSource(`${API_BASE}/api/chat/stream?room_id=${room_id}`, { headers: { Authorization: `Bearer ${token}` } });
+
+  sse.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    addMessage(msg, msg.sender_id !== room_id);
+  };
+
+  sse.onerror = () => {
+    console.warn("SSE error, reconnecting in 3s");
+    sse.close();
+    setTimeout(connectSSE, 3000);
+  };
 }
 
-/* ===== TYPING ===== */
-input.addEventListener("input", async () => {
-  if (!receiver_id) return;
-  await fetch(`${API_BASE}/api/chat/typing`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({ receiver_id })
-  });
-});
-
-/* ===== PRESENCE ===== */
+// Check presence
 async function checkPresence() {
   const res = await fetch(`${API_BASE}/api/user/presence`, { headers: authHeaders() });
   const data = await res.json();
   presenceDiv.textContent = data.online ? "🟢 Online" : "⚫ Offline";
 }
 
-/* ===== WEBSOCKET ===== */
-function connectWS() {
-  const token = localStorage.getItem("token");
-  if (!token) return console.error("No JWT token");
-
-  socket = new WebSocket(
-    `${API_BASE.replace("https", "wss")}/ws?token=${encodeURIComponent(token)}`
-  );
-
-  socket.onopen = () => {
-    console.log("✅ WebSocket connected");
-  };
-
-  socket.onmessage = e => {
-    const msg = JSON.parse(e.data);
-    console.log("📩 WS:", msg);
-  };
-
-  socket.onerror = () => {
-    console.warn("⚠️ WebSocket error");
-  };
-
-  socket.onclose = () => {
-    console.warn("⚠️ WebSocket disconnected, reconnecting in 3s");
-    setTimeout(connectWS, 3000);
-  };
-}
-
-
 /* ===== EVENTS ===== */
 sendBtn.onclick = sendMessage;
 input.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
-searchBtn.onclick = searchUsers;
-searchInput.addEventListener("keypress", e => e.key === "Enter" && searchUsers());
+attachInput.addEventListener("change", () => input.focus());
 
 /* ===== INIT ===== */
-connectWS();
+// call openChat(room_id) when user selects a chat
