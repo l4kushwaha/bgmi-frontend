@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sell BGMI Account</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
+:root {
+  --primary: #00ffff;
+  --secondary: #ff00ff;
+  --bg: #111;
+  --card-bg: rgba(255,255,255,.06);
+  --text-light: #fff;
+  --text-muted: rgba(255,255,255,.7);
+  --success: #27ae60;
+  --error: #c0392b;
+}
+
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Poppins",sans-serif}
 body{
   min-height:100vh;
@@ -16,46 +26,55 @@ body{
   justify-content:center;
   background:url("https://i.ytimg.com/vi/aoV3MROF_OY/hq720.jpg") center/cover no-repeat;
   position:relative;
-  color:#fff;
+  color:var(--text-light);
+  transition: background 0.3s, color 0.3s;
 }
 body::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.5)}
+
 form{
   position:relative;z-index:2;
   width:540px;max-width:96%;
   padding:26px;border-radius:16px;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.15)
+  background:var(--card-bg);
+  border:1px solid rgba(255,255,255,.15);
+  backdrop-filter: blur(6px);
 }
-h2{text-align:center;color:#00ffff;text-shadow:0 0 6px #0ff;margin-bottom:14px}
+h2{text-align:center;color:var(--primary);text-shadow:0 0 8px var(--primary);margin-bottom:14px}
 
 input,textarea,button{
   width:100%;padding:10px;
-  border-radius:10px;border:none;outline:none;margin:7px 0
+  border-radius:10px;border:none;outline:none;margin:7px 0;
+  font-size:14px;
+  transition: all 0.2s;
 }
 input,textarea{
   background:rgba(255,255,255,.08);
-  color:#fff
+  color:var(--text-light)
 }
-input::placeholder,textarea::placeholder{color:rgba(255,255,255,.7)}
+input:focus,textarea:focus{background:rgba(255,255,255,.15)}
+
+input::placeholder,textarea::placeholder{color:var(--text-muted)}
 
 .row{display:flex;gap:8px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 
 button.primary{
-  background:linear-gradient(135deg,#00ffff,#ff00ff);
-  color:#fff;font-weight:700;cursor:pointer
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:var(--text-light);font-weight:700;cursor:pointer;
+  transition: transform 0.2s;
 }
+button.primary:hover{transform:scale(1.05);}
 button.ghost{
-  background:transparent;color:#fff;
+  background:transparent;color:var(--text-light);
   border:1px solid rgba(255,255,255,.2);
-  cursor:pointer
+  cursor:pointer;
 }
 
-/* Drag & drop */
 #drop-area{
   border:2px dashed rgba(0,255,255,.3);
   padding:14px;border-radius:10px;
-  text-align:center;color:#0ff;cursor:pointer
+  text-align:center;color:var(--primary);cursor:pointer;
+  transition: background 0.2s;
 }
 #drop-area.hover{background:rgba(0,255,255,.08)}
 
@@ -63,8 +82,10 @@ button.ghost{
 .preview-img{
   width:70px;height:70px;
   border-radius:8px;overflow:hidden;
-  position:relative;border:1px solid rgba(0,255,255,.2)
+  position:relative;border:1px solid rgba(0,255,255,.2);
+  transition: transform 0.2s;
 }
+.preview-img:hover{transform:scale(1.05);}
 .preview-img img{width:100%;height:100%;object-fit:cover}
 .preview-img .remove{
   position:absolute;top:3px;right:3px;
@@ -74,19 +95,19 @@ button.ghost{
   text-align:center;cursor:pointer
 }
 
-#estimatedPrice{font-size:14px;color:#0ff;margin-top:4px}
+#estimatedPrice{font-size:14px;color:var(--primary);margin-top:4px}
 
-/* Toast */
 #toast{
   position:fixed;bottom:24px;left:50%;
   transform:translateX(-50%);
   padding:10px 18px;border-radius:20px;
-  background:#27ae60;color:#fff;
-  display:none;z-index:9999
+  background:var(--success);color:#fff;
+  display:none;z-index:9999;
+  opacity:0;transition:opacity 0.3s;
 }
-#toast.err{background:#c0392b}
+#toast.show{display:block;opacity:1;}
+#toast.err{background:var(--error)}
 
-/* Mobile */
 @media(max-width:600px){
   .grid{grid-template-columns:repeat(2,1fr)}
 }
@@ -94,7 +115,6 @@ button.ghost{
 </head>
 
 <body>
-
 <form id="sellForm" novalidate>
   <h2>Sell Your BGMI Account</h2>
 
@@ -134,7 +154,6 @@ button.ghost{
 </form>
 
 <div id="toast"></div>
-
 <script src="js/sell.js"></script>
 </body>
 </html>
