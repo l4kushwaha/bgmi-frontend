@@ -104,33 +104,24 @@ async function checkPresence() {
 
 /* ===== WEBSOCKET ===== */
 function connectWS() {
-  if (!token) return console.warn("⚠️ No JWT token found for WebSocket");
+  const token = localStorage.getItem("token");
+  if (!token) return console.error("No JWT token");
 
-  socket = new WebSocket(`${API_BASE.replace("https", "wss")}/ws?token=${token}`);
+  socket = new WebSocket(
+    `${API_BASE.replace("https", "wss")}/ws?token=${encodeURIComponent(token)}`
+  );
 
-  socket.onopen = () => console.log("✅ WebSocket connected");
-  socket.onmessage = e => {
-    const msg = JSON.parse(e.data);
-    if (msg.type === "chat") {
-      addMessage(msg, false);
-      markRead(msg.message_id, msg.sender_id);
-    }
-    if (msg.type === "typing") {
-      typingDiv.textContent = "Typing...";
-      setTimeout(() => (typingDiv.textContent = ""), 1000);
-    }
-    if (msg.type === "read") {
-      const el = document.querySelector(`#msg-${msg.message_id} small`);
-      if (el) el.textContent = "read ✔✔";
-    }
-    if (msg.type === "order") {
-      alert(`🛒 New Order: ${msg.product} ₹${msg.amount}`);
-    }
+  socket.onopen = () => {
+    console.log("✅ WebSocket connected");
   };
 
-  socket.onerror = e => {
-    console.error("WebSocket error", e);
-    setTimeout(connectWS, 3000);
+  socket.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    console.log("📩 WS:", msg);
+  };
+
+  socket.onerror = () => {
+    console.warn("⚠️ WebSocket error");
   };
 
   socket.onclose = () => {
@@ -138,6 +129,7 @@ function connectWS() {
     setTimeout(connectWS, 3000);
   };
 }
+
 
 /* ===== EVENTS ===== */
 sendBtn.onclick = sendMessage;
