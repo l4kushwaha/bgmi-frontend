@@ -122,9 +122,8 @@
 
       for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
-        const session = getSession(); // refresh session inside loop
+        const session = getSession();
 
-        // ✅ FIX: Check using seller_id for owner/admin
         const isOwnerOrAdmin =
           session &&
           (String(session.user.seller_id) === String(item.seller_id) ||
