@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ================= ORIGINAL STYLES ================= */
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
@@ -16,23 +15,16 @@ body{
   overflow-x:hidden;
   transition:.3s;
 }
-body.dark{
-  background:linear-gradient(135deg,#1a1a1a,#2c2c2c);
-}
-
-#particle-canvas{position:fixed;inset:0;z-index:0;}
+body.dark{background:linear-gradient(135deg,#1a1a1a,#2c2c2c)}
+#particle-canvas{position:fixed;inset:0;z-index:0}
 
 header{
-  position:relative;
-  z-index:2;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  position:relative;z-index:2;
+  display:flex;justify-content:space-between;align-items:center;
   padding:15px 20px;
   backdrop-filter:blur(12px);
-  background:rgba(255,255,255,0.05);
-  border-bottom:1px solid rgba(255,255,255,0.1);
-  border-radius:12px;
+  background:rgba(255,255,255,.05);
+  border-bottom:1px solid rgba(255,255,255,.1);
 }
 
 #items-container{
@@ -47,114 +39,51 @@ header{
 }
 
 .item-card{
-  background:rgba(255,255,255,0.05);
+  background:rgba(255,255,255,.05);
   backdrop-filter:blur(12px);
   border-radius:16px;
   padding:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
   transition:.35s;
 }
-.item-card:hover{
-  transform:translateY(-6px) scale(1.02);
-  box-shadow:0 14px 32px rgba(0,0,0,.35);
-}
+.item-card:hover{transform:translateY(-6px) scale(1.02)}
 
-/* ================= IMAGE SLIDER ================= */
-.images-gallery{
-  position:relative;
-  height:180px;
-  overflow:hidden;
-  border-radius:14px;
-  margin-top:8px;
+.btn{
+  width:100%;padding:9px;margin-top:6px;
+  border:none;border-radius:10px;
+  font-weight:600;cursor:pointer;
 }
+.buy-btn{background:#27ae60;color:#fff}
+.edit-btn{background:#3498db;color:#fff}
+.delete-btn{background:#c0392b;color:#fff}
+.outline{background:#fff;color:#3498db;border:2px solid #3498db}
 
-.images-gallery img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:none;
-  filter:blur(14px);
-  transition:filter .6s ease;
-  cursor:pointer;
+/* MODALS */
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  align-items:center;justify-content:center;
+  z-index:999;
 }
-.images-gallery img.active{display:block}
-.images-gallery img.loaded{filter:blur(0)}
+.modal-bg.active{display:flex}
+.modal{
+  background:#fff;color:#333;
+  padding:18px;border-radius:16px;
+  width:400px;max-height:85vh;
+  overflow-y:auto;
+}
+body.dark .modal{background:#2c2c2c;color:#fff}
 
-/* arrows */
-.img-arrow{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  border:none;
-  cursor:pointer;
-  font-size:20px;
-  z-index:3;
-  background:rgba(255,255,255,.85);
-  color:#000;
+/* TOAST */
+#toast{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);
+  background:#27ae60;color:#fff;
+  padding:10px 20px;
+  border-radius:25px;
+  display:none;z-index:1200;
 }
-.img-arrow.left{left:8px}
-.img-arrow.right{right:8px}
-body.dark .img-arrow{background:rgba(0,0,0,.65);color:#fff}
-
-/* dots */
-.img-dots{
-  position:absolute;
-  bottom:8px;
-  width:100%;
-  text-align:center;
-  z-index:3;
-}
-.img-dots span{
-  display:inline-block;
-  width:8px;
-  height:8px;
-  margin:0 4px;
-  background:rgba(255,255,255,.5);
-  border-radius:50%;
-}
-.img-dots span.active{background:#fff}
-
-/* ================= FULLSCREEN VIEWER ================= */
-#img-viewer{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.9);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-#img-viewer.active{display:flex}
-
-#img-viewer img{
-  max-width:92%;
-  max-height:92%;
-  border-radius:16px;
-}
-
-#img-viewer .close{
-  position:absolute;
-  top:20px;
-  right:26px;
-  font-size:32px;
-  color:#fff;
-  cursor:pointer;
-}
-
-#img-viewer .fs-arrow{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:38px;
-  color:#fff;
-  cursor:pointer;
-  padding:10px;
-}
-#img-viewer .fs-left{left:20px}
-#img-viewer .fs-right{right:20px}
+#toast.show{display:block}
 </style>
 </head>
 
@@ -166,21 +95,35 @@ body.dark .img-arrow{background:rgba(0,0,0,.65);color:#fff}
   <button id="dark-toggle">Dark / Light</button>
 </header>
 
+<!-- REQUIRED CONTAINER -->
 <div id="items-container"></div>
 
-<!-- FULLSCREEN IMAGE VIEWER -->
-<div id="img-viewer">
-  <span class="close">&times;</span>
-  <div class="fs-arrow fs-left">‹</div>
-  <img>
-  <div class="fs-arrow fs-right">›</div>
+<!-- SELLER PROFILE MODAL -->
+<div id="seller-modal-bg" class="modal-bg">
+  <div class="modal">
+    <div id="seller-content">Loading...</div>
+    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
+  </div>
 </div>
 
-<!-- ORIGINAL MARKETPLACE JS (UNCHANGED) -->
+<!-- EDIT LISTING MODAL -->
+<div id="edit-modal-bg" class="modal-bg">
+  <div class="modal">
+    <h3>Edit Listing</h3>
+    <div id="edit-form"></div>
+    <button class="btn buy-btn" id="save-edit">Save</button>
+    <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MARKETPLACE JS (UNCHANGED) -->
 <script src="js/marketplace.js"></script>
 
 <script>
-/* dark toggle */
+/* dark mode */
 document.getElementById('dark-toggle')
   .onclick=()=>document.body.classList.toggle('dark');
 
@@ -211,99 +154,6 @@ const dots=[...Array(80)].map(()=>({
   });
   requestAnimationFrame(animate);
 })();
-</script>
-
-<script>
-/* ================= SLIDER + LAZY + FULLSCREEN ================= */
-
-let fsImgs=[],fsIndex=0;
-const viewer=document.getElementById('img-viewer');
-const viewerImg=viewer.querySelector('img');
-
-function initSliders(){
-  document.querySelectorAll('.images-gallery').forEach(gallery=>{
-    if(gallery.dataset.ready) return;
-
-    const imgs=[...gallery.querySelectorAll('img')];
-    if(imgs.length<=1) return;
-
-    gallery.dataset.ready=1;
-    let index=0,auto,startX=0;
-
-    imgs[0].classList.add('active');
-
-    /* lazy + blur */
-    imgs.forEach(img=>{
-      img.loading="lazy";
-      if(img.complete) img.classList.add('loaded');
-      else img.onload=()=>img.classList.add('loaded');
-
-      img.onclick=()=>{
-        fsImgs=imgs;
-        fsIndex=index;
-        viewerImg.src=img.src;
-        viewer.classList.add('active');
-      };
-    });
-
-    /* arrows */
-    const L=document.createElement('button');
-    L.className='img-arrow left';L.innerHTML='‹';
-    const R=document.createElement('button');
-    R.className='img-arrow right';R.innerHTML='›';
-    gallery.append(L,R);
-
-    /* dots */
-    const dots=document.createElement('div');
-    dots.className='img-dots';
-    imgs.forEach((_,i)=>{
-      const d=document.createElement('span');
-      if(i===0)d.classList.add('active');
-      dots.appendChild(d);
-    });
-    gallery.appendChild(dots);
-    const dEls=dots.querySelectorAll('span');
-
-    function show(i){
-      imgs.forEach(im=>im.classList.remove('active'));
-      dEls.forEach(d=>d.classList.remove('active'));
-      imgs[i].classList.add('active');
-      dEls[i].classList.add('active');
-      index=i;
-    }
-
-    L.onclick=()=>show((index-1+imgs.length)%imgs.length);
-    R.onclick=()=>show((index+1)%imgs.length);
-
-    /* auto */
-    auto=setInterval(()=>show((index+1)%imgs.length),3500);
-    gallery.onmouseenter=()=>clearInterval(auto);
-    gallery.onmouseleave=()=>auto=setInterval(()=>show((index+1)%imgs.length),3500);
-
-    /* swipe */
-    gallery.addEventListener('touchstart',e=>startX=e.touches[0].clientX);
-    gallery.addEventListener('touchend',e=>{
-      const endX=e.changedTouches[0].clientX;
-      if(startX-endX>50)R.click();
-      if(endX-startX>50)L.click();
-    });
-  });
-}
-
-/* fullscreen nav */
-function fsShow(i){
-  fsIndex=(i+fsImgs.length)%fsImgs.length;
-  viewerImg.src=fsImgs[fsIndex].src;
-}
-viewer.querySelector('.fs-left').onclick=()=>fsShow(fsIndex-1);
-viewer.querySelector('.fs-right').onclick=()=>fsShow(fsIndex+1);
-viewer.querySelector('.close').onclick=()=>viewer.classList.remove('active');
-viewer.onclick=e=>{if(e.target===viewer)viewer.classList.remove('active')};
-
-/* dynamic cards */
-new MutationObserver(initSliders)
-  .observe(document.getElementById('items-container'),{childList:true,subtree:true});
-initSliders();
 </script>
 
 </body>
