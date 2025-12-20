@@ -68,7 +68,6 @@
       sellerCache[sid] = data;
       return data;
     } catch {
-      // fallback (never break UI)
       const fallback = {
         user_id: sid,
         name: `Seller ${sid}`,
@@ -106,7 +105,8 @@
 
       /* FILTERS */
       if (currentFilter === "own" && session) {
-        items = items.filter(i => String(i.seller_id) === String(session.user.id));
+        // Fix: use seller_id from session
+        items = items.filter(i => String(i.seller_id) === String(session.user.seller_id));
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
@@ -125,10 +125,11 @@
         const seller = await fetchSeller(item.seller_id);
         const session = getSession();
 
+        // Fix: Check using seller_id for owner
         const isOwnerOrAdmin =
-        session &&
-        (String(session.user.seller_id) === String(item.seller_id) ||
-         String(session.user.role).toLowerCase() === "admin");
+          session &&
+          (String(session.user.seller_id) === String(item.seller_id) ||
+           String(session.user.role).toLowerCase() === "admin");
 
         const mythics = safeArray(item.mythic_items).join(", ");
         const legends = safeArray(item.legendary_items).join(", ");
