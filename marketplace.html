@@ -8,43 +8,76 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ===== BASIC RESET ===== */
-*{box-sizing:border-box}
+/* ================= RESET ================= */
+*{box-sizing:border-box;margin:0;padding:0}
 
-/* ===== BODY ===== */
+/* ================= BODY ================= */
 body{
-  margin:0;
   font-family:'Poppins',sans-serif;
   min-height:100vh;
-  background:linear-gradient(135deg,#1abc9c,#3498db);
+  background:linear-gradient(135deg,#141e30,#243b55);
+  color:#fff;
   overflow-x:hidden;
+  transition:background 0.3s,color 0.3s;
 }
 
-/* ===== PARTICLES ===== */
+/* DARK MODE */
+body.dark{
+  background:linear-gradient(135deg,#1a1a1a,#2c2c2c);
+  color:#fff;
+}
+
+/* ================= PARTICLES ================= */
 #particle-canvas{
   position:fixed;
   inset:0;
   z-index:0;
 }
 
-/* ===== HEADER ===== */
-h1{
-  text-align:center;
-  color:#fff;
-  margin:15px;
+/* ================= HEADER ================= */
+header{
   position:relative;
   z-index:2;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 20px 10px;
+}
+header h1{
+  font-size:26px;
+  font-weight:600;
 }
 
-/* ===== TOP BAR ===== */
+/* DARK/LIGHT TOGGLE & WALLET */
+#controls{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+#dark-toggle{
+  padding:6px 10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#3498db;color:#fff;
+}
+#wallet-balance{
+  font-size:14px;
+  font-weight:600;
+  background:rgba(255,255,255,0.1);
+  padding:6px 12px;
+  border-radius:12px;
+}
+
+/* ================= TOP BAR ================= */
 #top-bar{
   display:flex;
   gap:10px;
   justify-content:center;
   flex-wrap:wrap;
-  padding:10px;
-  z-index:2;
+  padding:12px;
   position:relative;
+  z-index:2;
 }
 
 #search,#filter{
@@ -52,101 +85,121 @@ h1{
   border:none;
   border-radius:20px;
   outline:none;
+  font-family:'Poppins';
 }
 
-/* ===== ITEMS ===== */
+/* ================= ITEMS ================= */
 #items-container{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:15px;
-  padding:15px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;
+  padding:16px;
+  max-width:1300px;
+  margin:auto;
   position:relative;
   z-index:2;
 }
 
-/* ===== CARD ===== */
+/* ================= CARD ================= */
 .item-card{
-  background:#fff;
-  width:280px;
-  border-radius:14px;
-  box-shadow:0 6px 18px rgba(0,0,0,.25);
-  overflow:hidden;
+  background:#ffffff;
+  color:#333;
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
   opacity:0;
-  transform:translateY(25px);
-  transition:all .4s ease;
+  transform:translateY(30px);
+  transition:.35s ease;
+  position:relative;
 }
 .item-card.show{opacity:1;transform:none}
-.item-card:hover{transform:scale(1.04)}
+.item-card:hover{transform:translateY(-6px)}
 
+/* DARK MODE CARD */
+body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+
+/* ================= BADGES ================= */
 .rating-badge,.verified-badge{
   position:absolute;
-  top:8px;
+  top:10px;
   font-size:12px;
-  padding:4px 7px;
-  border-radius:6px;
-  font-weight:600;
-}
-.rating-badge{left:8px;background:#f1c40f}
-.verified-badge{right:8px;background:#27ae60;color:#fff}
-
-/* ===== INFO ===== */
-.item-info{padding:10px;font-size:13px}
-.item-info p{margin:4px 0}
-.price{color:#e67e22;font-weight:600}
-
-/* ===== SELLER ===== */
-.seller-link{
-  color:#3498db;
-  font-weight:600;
-  cursor:pointer;
-}
-.seller-link:hover{text-decoration:underline}
-
-/* ===== TAGS ===== */
-.tags{margin-top:5px;font-size:12px}
-.tag{
-  display:inline-block;
-  background:#ecf0f1;
-  padding:2px 6px;
-  border-radius:6px;
-  margin:2px;
-}
-
-/* ===== IMAGES ===== */
-.images-gallery{
-  display:flex;
-  gap:5px;
-  flex-wrap:wrap;
-  margin-top:6px;
-}
-.images-gallery img{
-  width:48px;height:48px;
-  object-fit:cover;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-/* ===== BUTTONS ===== */
-.btn{
-  width:100%;
-  margin-top:6px;
-  padding:8px;
-  border:none;
+  padding:4px 8px;
   border-radius:8px;
   font-weight:600;
+}
+.rating-badge{left:10px;background:#f1c40f}
+.verified-badge{right:10px;background:#27ae60;color:#fff}
+
+/* ================= INFO ================= */
+.item-info{
+  font-size:13px;
+  line-height:1.45;
+}
+.item-info strong{font-size:15px}
+.price{
+  font-size:18px;
+  color:#e67e22;
+  font-weight:600;
+  margin-top:6px;
+}
+
+/* ================= IMAGES ================= */
+.images-gallery{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.images-gallery img{
+  width:52px;
+  height:52px;
+  object-fit:cover;
+  border-radius:8px;
   cursor:pointer;
 }
+
+/* ================= BUTTONS ================= */
+.btn{
+  width:100%;
+  padding:9px;
+  margin-top:7px;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:'Poppins';
+}
 .buy-btn{background:#27ae60;color:#fff}
+.buy-btn:disabled{background:#aaa;cursor:not-allowed}
 .edit-btn{background:#3498db;color:#fff}
 .delete-btn{background:#c0392b;color:#fff}
+.outline{
+  background:#fff;
+  border:2px solid #3498db;
+  color:#3498db;
+}
 
-/* ===== MODALS ===== */
+/* ================= SKELETON LOADER ================= */
+.skeleton{
+  background:#ccc;
+  height:18px;
+  border-radius:8px;
+  margin:5px 0;
+  animation: pulse 1.2s infinite;
+}
+.skeleton.img{height:50px;width:50px;display:inline-block;margin:2px}
+@keyframes pulse{
+  0%{opacity:.5}
+  50%{opacity:1}
+  100%{opacity:.5}
+}
+
+/* ================= MODALS ================= */
 .modal-bg{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.7);
   justify-content:center;
   align-items:center;
   z-index:999;
@@ -155,27 +208,44 @@ h1{
 
 .modal{
   background:#fff;
-  padding:20px;
-  border-radius:12px;
-  width:320px;
-}
-
-/* ===== SELLER MODAL ===== */
-#seller-modal{
-  max-height:80vh;
+  color:#333;
+  padding:18px;
+  border-radius:16px;
+  width:340px;
+  max-height:85vh;
   overflow-y:auto;
-  text-align:left;
 }
-.review{border-top:1px solid #eee;padding:6px 0}
+body.dark .modal{background:#2c2c2c;color:#fff}
 
-/* ===== IMAGE MODAL ===== */
+/* ================= SELLER MODAL ================= */
+#seller-modal h3{margin-bottom:6px}
+.review{
+  border-top:1px solid #eee;
+  padding:8px 0;
+}
+.review .reply{
+  font-size:12px;
+  margin-top:4px;
+  color:#2c3e50;
+  font-style:italic;
+}
+textarea{
+  width:100%;
+  padding:6px;
+  margin-top:4px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-family:'Poppins';
+}
+
+/* ================= IMAGE MODAL ================= */
 #imgModal img{
-  max-width:90%;
-  max-height:90%;
-  border-radius:12px;
+  max-width:92%;
+  max-height:92%;
+  border-radius:14px;
 }
 
-/* ===== TOAST ===== */
+/* ================= TOAST ================= */
 #toast{
   position:fixed;
   bottom:20px;
@@ -190,8 +260,9 @@ h1{
 }
 #toast.show{display:block}
 
+/* ================= MOBILE ================= */
 @media(max-width:600px){
-  .item-card{width:95%}
+  header h1{font-size:22px}
 }
 </style>
 </head>
@@ -200,7 +271,13 @@ h1{
 
 <canvas id="particle-canvas"></canvas>
 
-<h1>BGMI Marketplace</h1>
+<header>
+  <h1>BGMI Marketplace</h1>
+  <div id="controls">
+    <div id="wallet-balance">Wallet: ₹0</div>
+    <button id="dark-toggle">Dark / Light</button>
+  </div>
+</header>
 
 <div id="top-bar">
   <input id="search" placeholder="Search UID / Title / Rank">
@@ -214,19 +291,23 @@ h1{
 </div>
 
 <div id="items-container">
-  <p style="color:white">Loading listings...</p>
-</div>
-
-<!-- CONFIRM -->
-<div id="modal-bg" class="modal-bg">
-  <div class="modal">
-    <p id="modal-text"></p>
-    <button id="confirm-btn" class="btn buy-btn">Confirm</button>
-    <button onclick="closeModal()" class="btn delete-btn">Cancel</button>
+  <!-- Skeleton loader while fetching -->
+  <div class="item-card">
+    <div class="skeleton" style="width:70%"></div>
+    <div class="skeleton" style="width:50%"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
+  </div>
+  <div class="item-card">
+    <div class="skeleton" style="width:65%"></div>
+    <div class="skeleton" style="width:55%"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
   </div>
 </div>
 
-<!-- SELLER -->
+<!-- ================= SELLER PROFILE ================= -->
 <div id="seller-modal-bg" class="modal-bg">
   <div class="modal" id="seller-modal">
     <button class="btn delete-btn" onclick="closeSeller()">Close</button>
@@ -234,7 +315,7 @@ h1{
   </div>
 </div>
 
-<!-- IMAGE -->
+<!-- ================= IMAGE VIEW ================= -->
 <div id="imgModal" class="modal-bg" onclick="this.classList.remove('active')">
   <img id="imgPreview">
 </div>
@@ -242,42 +323,46 @@ h1{
 <div id="toast"></div>
 
 <script>
-/* ===== TOAST ===== */
-function showToast(msg, ok=true){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.style.background=ok?'#27ae60':'#c0392b';
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+/* ===== CLOSE SELLER ===== */
+function closeSeller(){
+  document.getElementById('seller-modal-bg').classList.remove('active');
 }
 
-/* ===== IMAGE ===== */
-document.addEventListener('click',e=>{
-  if(e.target.classList.contains('item-img')){
-    imgPreview.src=e.target.src;
-    imgModal.classList.add('active');
-  }
+/* ===== DARK / LIGHT TOGGLE ===== */
+document.getElementById('dark-toggle').addEventListener('click',()=>{
+  document.body.classList.toggle('dark');
 });
 
 /* ===== PARTICLES ===== */
 const c=document.getElementById('particle-canvas');
-const x=c.getContext('2d');
-function rs(){c.width=innerWidth;c.height=innerHeight}
-rs();addEventListener('resize',rs);
-const p=[...Array(80)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,dx:(Math.random()-.5),dy:(Math.random()-.5)}));
-(function anim(){
-  x.clearRect(0,0,c.width,c.height);
-  p.forEach(o=>{
-    x.beginPath();x.arc(o.x,o.y,o.r,0,7);x.fillStyle='rgba(255,255,255,.6)';x.fill();
-    o.x+=o.dx;o.y+=o.dy;
-    if(o.x<0)o.x=c.width;if(o.y<0)o.y=c.height;
-    if(o.x>c.width)o.x=0;if(o.y>c.height)o.y=0;
+const ctx=c.getContext('2d');
+function resize(){c.width=innerWidth;c.height=innerHeight}
+resize();addEventListener('resize',resize);
+
+const dots=[...Array(90)].map(()=>({
+  x:Math.random()*c.width,
+  y:Math.random()*c.height,
+  r:Math.random()*2+1,
+  dx:(Math.random()-.5)*0.6,
+  dy:(Math.random()-.5)*0.6
+}));
+
+(function animate(){
+  ctx.clearRect(0,0,c.width,c.height);
+  dots.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.6)';
+    ctx.fill();
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0)p.x=c.width;if(p.y<0)p.y=c.height;
+    if(p.x>c.width)p.x=0;if(p.y>c.height)p.y=0;
   });
-  requestAnimationFrame(anim);
+  requestAnimationFrame(animate);
 })();
 </script>
 
-<!-- MAIN LOGIC -->
+<!-- ================= MAIN LOGIC ================= -->
 <script src="js/marketplace.js"></script>
 
 </body>

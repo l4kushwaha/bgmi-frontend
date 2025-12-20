@@ -10,7 +10,7 @@
   let currentSearchQuery = "";
   let currentFilter = "";
 
-  // seller cache (🔥 performance boost)
+  /* ================= SELLER CACHE ================= */
   const sellerCache = {};
 
   /* ================= TOAST ================= */
@@ -36,28 +36,39 @@
   }
 
   function requireLogin() {
-    const session = getSession();
-    if (!session) {
+    const s = getSession();
+    if (!s) {
       alert("Please login first");
       window.location.href = "login.html";
       return null;
     }
-    return session;
+    return s;
   }
 
-  /* ================= FETCH SELLER (SAFE + CACHED) ================= */
+  /* ================= SAFE ARRAY ================= */
+  function safeArray(val) {
+    try {
+      if (Array.isArray(val)) return val;
+      if (typeof val === "string") return JSON.parse(val);
+      return [];
+    } catch {
+      return [];
+    }
+  }
+
+  /* ================= FETCH SELLER (SAFE + CACHE) ================= */
   async function fetchSeller(id) {
     const sid = String(id);
     if (sellerCache[sid]) return sellerCache[sid];
 
     try {
       const res = await fetch(`${API_URL}/seller/${encodeURIComponent(sid)}`);
-      if (!res.ok) throw new Error("Seller not found");
+      if (!res.ok) throw new Error("Seller API missing");
       const data = await res.json();
       sellerCache[sid] = data;
       return data;
     } catch {
-      // fallback (🔥 never break UI)
+      // fallback (never break UI)
       const fallback = {
         user_id: sid,
         name: `Seller ${sid}`,
@@ -81,19 +92,19 @@
       const res = await fetch(`${API_URL}/listings`, {
         headers: JWT ? { Authorization: `Bearer ${JWT}` } : {}
       });
-      if (!res.ok) throw new Error("Failed to fetch listings");
+      if (!res.ok) throw new Error("Listings fetch failed");
 
       let items = await res.json();
       if (!Array.isArray(items)) items = [];
 
-      // SEARCH
+      /* SEARCH */
       items = items.filter(i =>
         ((i.title || "") + (i.uid || "") + (i.highest_rank || ""))
           .toLowerCase()
           .includes(currentSearchQuery)
       );
 
-      // FILTERS
+      /* FILTERS */
       if (currentFilter === "own" && session) {
         items = items.filter(i => String(i.seller_id) === String(session.user.id));
       } else if (currentFilter === "price_high") {
@@ -101,7 +112,7 @@
       } else if (currentFilter === "price_low") {
         items.sort((a, b) => (a.price || 0) - (b.price || 0));
       } else if (currentFilter === "new") {
-        items.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
 
       container.innerHTML = "";
@@ -112,27 +123,36 @@
 
       for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
+        const isOwner =
+          session &&
+          (String(session.user.id) === String(item.seller_id) ||
+            session.user.role === "admin");
+
+        const mythics = safeArray(item.mythic_items).join(", ");
+        const legends = safeArray(item.legendary_items).join(", ");
+        const gifts = safeArray(item.gift_items).join(", ");
+        const guns = safeArray(item.upgraded_guns).join(", ");
+        const titles = safeArray(item.titles).join(", ");
+        const images = safeArray(item.images);
 
         const card = document.createElement("div");
         card.className = "item-card show";
 
-        const arr = v => Array.isArray(v) ? v.join(", ") : "";
-        const images = Array.isArray(item.images) ? item.images : [];
-
         card.innerHTML = `
           <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
           ${seller.seller_verified ? `<div class="verified-badge">✔ Verified</div>` : ""}
+
           <div class="item-info">
-            <p><strong>${item.title || "N/A"}</strong></p>
-            <p>UID: ${item.uid || "N/A"}</p>
+            <p><strong>${item.title}</strong></p>
+            <p>UID: ${item.uid}</p>
             <p>Level: ${item.level || 0}</p>
-            <p>Rank: ${item.highest_rank || "N/A"}</p>
-            <p class="price">₹${item.price || 0}</p>
-            ${arr(item.mythic_items) ? `<p>Mythic: ${arr(item.mythic_items)}</p>` : ""}
-            ${arr(item.legendary_items) ? `<p>Legendary: ${arr(item.legendary_items)}</p>` : ""}
-            ${arr(item.gift_items) ? `<p>Gift: ${arr(item.gift_items)}</p>` : ""}
-            ${arr(item.upgraded_guns) ? `<p>Guns: ${arr(item.upgraded_guns)}</p>` : ""}
-            ${arr(item.titles) ? `<p>Titles: ${arr(item.titles)}</p>` : ""}
+            <p>Rank: ${item.highest_rank || "-"}</p>
+            <p class="price">₹${item.price}</p>
+            ${mythics ? `<p>Mythic: ${mythics}</p>` : ""}
+            ${legends ? `<p>Legendary: ${legends}</p>` : ""}
+            ${gifts ? `<p>Gifts: ${gifts}</p>` : ""}
+            ${guns ? `<p>Guns: ${guns}</p>` : ""}
+            ${titles ? `<p>Titles: ${titles}</p>` : ""}
           </div>
 
           ${images.length ? `
@@ -142,26 +162,21 @@
               ).join("")}
             </div>` : ""}
 
-          <hr>
-          <p>Seller: ${seller.name} ${seller.seller_verified ? "✔" : ""}</p>
-          <p>Total Sales: ${seller.total_sales} | Reviews: ${seller.review_count}</p>
+          <button class="btn buy-btn"
+            ${item.status !== "available" ? "disabled" : ""}
+            onclick="buyItem('${item.id}')">
+            ${item.status === "available" ? "Buy" : "Sold"}
+          </button>
 
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <button class="btn buy-btn"
-              ${item.status !== "available" ? "disabled" : ""}
-              onclick="buyItem('${item.id}','${item.seller_id}')">
-              ${item.status === "available" ? "Buy" : "Sold"}
-            </button>
-            <button class="btn outline"
-              onclick="openSellerProfile('${item.seller_id}')">
-              Seller Profile
-            </button>
+          <button class="btn outline"
+            onclick="openSellerProfile('${item.seller_id}')">
+            Seller Profile
+          </button>
 
-            ${session && (String(session.user.id) === String(item.seller_id) || session.user.role === "admin")
-              ? `<button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
-                 <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>`
-              : ""}
-          </div>
+          ${isOwner ? `
+            <button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
+            <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
+          ` : ""}
         `;
 
         container.appendChild(card);
@@ -174,10 +189,9 @@
   }
 
   /* ================= BUY ITEM ================= */
-  window.buyItem = async (listingId) => {
+  window.buyItem = async listingId => {
     const session = requireLogin();
-    if (!session) return;
-    if (!confirm("Confirm purchase?")) return;
+    if (!session || !confirm("Confirm purchase?")) return;
 
     try {
       const res = await fetch(`${API_URL}/orders/create`, {
@@ -188,6 +202,7 @@
         },
         body: JSON.stringify({ listing_id: listingId })
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Order failed");
 
@@ -199,7 +214,7 @@
   };
 
   /* ================= EDIT / DELETE ================= */
-  window.editListing = id => alert(`Edit coming soon: ${id}`);
+  window.editListing = id => alert(`Edit UI coming soon\nListing ID: ${id}`);
 
   window.deleteListing = async id => {
     const session = requireLogin();
@@ -228,19 +243,60 @@
     const bg = document.getElementById("seller-modal-bg");
     const content = document.getElementById("seller-content");
     bg.classList.add("active");
-    content.innerHTML = "Loading...";
+    content.innerHTML = "Loading seller...";
 
     const s = await fetchSeller(sellerId);
+    const session = getSession();
+    const canReply =
+      session &&
+      (String(session.user.id) === String(sellerId) ||
+        session.user.role === "admin");
+
     content.innerHTML = `
       <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
       <p>⭐ ${(s.avg_rating || 0).toFixed(1)} | Sales: ${s.total_sales} | Reviews: ${s.review_count}</p>
+
+      <button class="btn outline"
+        onclick="window.open('${CHAT_URL}?seller=${sellerId}','_blank')">
+        Chat with Seller
+      </button>
+
       <h4>Reviews</h4>
-      ${(s.reviews || []).map(r => `
-        <div class="review">
-          <p>⭐ ${r.stars}</p>
-          <p>${r.comment || ""}</p>
-        </div>`).join("") || "<p>No reviews yet</p>"}
+      ${(s.reviews || []).length
+        ? s.reviews.map(r => `
+            <div class="review">
+              <p>⭐ ${r.stars}</p>
+              <p>${r.comment || ""}</p>
+              ${r.reply ? `<p class="reply">Seller: ${r.reply}</p>` : ""}
+              ${canReply && !r.reply ? `
+                <textarea id="reply-${r.id}" placeholder="Reply..."></textarea>
+                <button class="btn outline"
+                  onclick="replyReview('${r.id}','${sellerId}')">
+                  Reply
+                </button>` : ""}
+            </div>`).join("")
+        : "<p>No reviews yet</p>"}
     `;
+  };
+
+  window.replyReview = async (reviewId, sellerId) => {
+    const txt = document.getElementById(`reply-${reviewId}`)?.value;
+    if (!txt) return;
+
+    try {
+      await fetch(`${API_URL}/reviews/reply`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getSession().token}`
+        },
+        body: JSON.stringify({ review_id: reviewId, reply: txt })
+      });
+      showToast("Reply submitted");
+      openSellerProfile(sellerId);
+    } catch {
+      showToast("Reply not supported by backend", false);
+    }
   };
 
   /* ================= IMAGE MODAL ================= */
@@ -255,6 +311,7 @@
     currentSearchQuery = e.target.value.toLowerCase();
     loadListings();
   });
+
   filterSelect?.addEventListener("change", e => {
     currentFilter = e.target.value;
     loadListings();
