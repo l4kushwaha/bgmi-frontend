@@ -96,11 +96,12 @@ header h1{font-size:26px;font-weight:600;}
 .item-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(0,0,0,0.35);}
 body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45);}
 
-.rating-badge,.verified-badge{
+.rating-badge,.verified-badge,.seller-badge{
   position:absolute;top:10px;font-size:12px;padding:4px 8px;border-radius:8px;font-weight:600;
 }
 .rating-badge{left:10px;background:#f1c40f;}
 .verified-badge{right:10px;background:#27ae60;color:#fff;}
+.seller-badge{right:80px;background:#9b59b6;color:#fff;}
 
 .item-info{font-size:13px;line-height:1.45;}
 .item-info strong{font-size:15px;}
@@ -131,16 +132,6 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 /* ================= IMAGE MODAL ================= */
 #imgModal img{max-width:92%;max-height:92%;border-radius:14px;transition:transform 0.3s;}
 #imgModal img:hover{transform:scale(1.05);}
-
-/* ================= EDIT MODAL ================= */
-#edit-form{display:flex;flex-direction:column;gap:8px;}
-#edit-images-container{display:flex;gap:6px;overflow-x:auto;padding:6px 0;}
-#edit-add-image{padding:6px 10px;border-radius:8px;border:1px solid #ccc;cursor:pointer;}
-
-/* ================= SELLER MODAL ================= */
-#seller-content{display:flex;flex-direction:column;gap:8px;}
-#seller-content .badge{display:inline-block;background:#27ae60;color:#fff;padding:4px 6px;border-radius:6px;font-size:12px;}
-#seller-content button#seller-chat-btn{background:#3498db;color:#fff;width:100%;margin-top:10px;}
 
 /* ================= TOAST ================= */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 20px;border-radius:25px;display:none;z-index:1200;opacity:0;transition:0.3s;}
@@ -180,33 +171,27 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
   </div>
 </div>
 
+<!-- Seller Modal -->
+<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="seller-modal">
+  <div class="modal" id="seller-modal">
+    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
+    <div id="seller-content">Loading...</div>
+  </div>
+</div>
+
+<!-- Image Modal -->
+<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="imgPreview" onclick="this.classList.remove('active')">
+  <img id="imgPreview" alt="Item Image">
+</div>
+
 <!-- Edit Listing Modal -->
 <div id="edit-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
   <div class="modal" id="edit-modal">
     <h3>Edit Listing</h3>
     <div id="edit-form"></div>
-    <div id="edit-images-container"></div>
-    <input type="file" id="edit-add-image" multiple>
-    <button class="btn buy-btn" id="save-edit" onclick="saveEdit(currentEditId)">Save Changes</button>
+    <button class="btn buy-btn" id="save-edit">Save Changes</button>
     <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
   </div>
-</div>
-
-<!-- Seller Modal -->
-<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
-  <div class="modal" id="seller-modal">
-    <h3 id="seller-name">Seller</h3>
-    <span id="seller-verified" class="badge">✔ Verified</span>
-    <p id="seller-rating">⭐ 0 | Sales: 0</p>
-    <p id="seller-reviews">Reviews: 0</p>
-    <button id="seller-chat-btn">Chat</button>
-    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
-  </div>
-</div>
-
-<!-- Image Modal -->
-<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" onclick="this.classList.remove('active')">
-  <img id="imgPreview" alt="Item Image">
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
