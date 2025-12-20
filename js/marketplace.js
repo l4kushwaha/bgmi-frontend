@@ -13,6 +13,12 @@
   /* ================= SELLER CACHE ================= */
   const sellerCache = {};
 
+  /* ================= NORMALIZE ID (🔥 MAIN FIX) ================= */
+  function normalizeId(val) {
+    if (val === null || val === undefined) return null;
+    return String(parseInt(val, 10));
+  }
+
   /* ================= TOAST ================= */
   function showToast(msg, success = true) {
     const toast = document.getElementById("toast");
@@ -33,11 +39,6 @@
     } catch {
       return null;
     }
-  }
-
-  function getMySellerId(session) {
-    if (!session || !session.user) return null;
-    return String(session.user.seller_id || session.user.id);
   }
 
   function requireLogin() {
@@ -63,11 +64,11 @@
 
   /* ================= FETCH SELLER ================= */
   async function fetchSeller(id) {
-    const sid = String(id);
+    const sid = normalizeId(id);
     if (sellerCache[sid]) return sellerCache[sid];
 
     try {
-      const res = await fetch(`${API_URL}/seller/${sid}`);
+      const res = await fetch(`${API_URL}/seller/${encodeURIComponent(sid)}`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       sellerCache[sid] = data;
@@ -90,14 +91,13 @@
   /* ================= LOAD LISTINGS ================= */
   async function loadListings() {
     const session = getSession();
-    const mySellerId = getMySellerId(session);
+    const JWT = session?.token;
 
     try {
       const res = await fetch(`${API_URL}/listings`, {
-        headers: session?.token
-          ? { Authorization: `Bearer ${session.token}` }
-          : {}
+        headers: JWT ? { Authorization: `Bearer ${JWT}` } : {}
       });
+      if (!res.ok) throw new Error("Listings fetch failed");
 
       let items = await res.json();
       if (!Array.isArray(items)) items = [];
@@ -109,9 +109,11 @@
           .includes(currentSearchQuery)
       );
 
-      /* FILTER */
-      if (currentFilter === "own" && mySellerId) {
-        items = items.filter(i => String(i.seller_id) === mySellerId);
+      /* FILTERS */
+      if (currentFilter === "own" && session) {
+        items = items.filter(i =>
+          normalizeId(i.seller_id) === normalizeId(session.user.seller_id)
+        );
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
@@ -132,13 +134,13 @@
         const isOwnerOrAdmin =
           session &&
           (
-            String(item.seller_id) === mySellerId ||
+            normalizeId(session.user.seller_id) === normalizeId(item.seller_id) ||
             String(session.user.role).toLowerCase() === "admin"
           );
 
         const card = document.createElement("div");
         card.className = "item-card show";
-        card.dataset.sellerId = item.seller_id;
+        card.dataset.sellerId = normalizeId(item.seller_id);
 
         card.innerHTML = `
           <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
@@ -159,7 +161,7 @@
           </button>
 
           <button class="btn outline"
-            onclick="openSellerProfile('${item.seller_id}')">
+            onclick="openSellerProfile('${normalizeId(item.seller_id)}')">
             Seller Profile
           </button>
 
@@ -174,6 +176,7 @@
     } catch (e) {
       console.error(e);
       showToast("Failed to load listings", false);
+      container.innerHTML = `<p style="color:white">Failed to load listings</p>`;
     }
   }
 
@@ -192,20 +195,20 @@
     });
 
     const data = await res.json();
-    if (res.ok) {
-      showToast("Order created");
-      window.open(`${CHAT_URL}?order_id=${data.order.id}`, "_blank");
-    } else {
-      showToast(data.error || "Order failed", false);
-    }
+    if (!res.ok) return showToast(data.error || "Order failed", false);
+
+    showToast("Order created");
+    window.open(`${CHAT_URL}?order_id=${data.order.id}`, "_blank");
   };
 
-  window.editListing = id => alert(`Edit listing ${id}`);
+  /* ================= EDIT / DELETE ================= */
+  window.editListing = id => alert(`Edit UI coming soon\nListing ID: ${id}`);
+
   window.deleteListing = async id => {
     const s = requireLogin();
     if (!s || !confirm("Delete listing?")) return;
 
-    await fetch(`${API_URL}/listings/delete`, {
+    const res = await fetch(`${API_URL}/listings/delete`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -214,8 +217,31 @@
       body: JSON.stringify({ listing_id: id })
     });
 
-    showToast("Listing deleted");
-    loadListings();
+    if (res.ok) {
+      showToast("Listing deleted");
+      loadListings();
+    } else {
+      showToast("Delete failed", false);
+    }
+  };
+
+  /* ================= SELLER PROFILE ================= */
+  window.openSellerProfile = async sellerId => {
+    const bg = document.getElementById("seller-modal-bg");
+    const content = document.getElementById("seller-content");
+    bg.classList.add("active");
+    content.innerHTML = "Loading...";
+
+    const s = await fetchSeller(sellerId);
+    content.innerHTML = `
+      <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
+      <p>⭐ ${(s.avg_rating || 0).toFixed(1)} | Sales: ${s.total_sales}</p>
+
+      <button class="btn outline"
+        onclick="window.open('${CHAT_URL}?seller=${sellerId}','_blank')">
+        Chat with Seller
+      </button>
+    `;
   };
 
   /* ================= SEARCH / FILTER ================= */
@@ -231,4 +257,5 @@
 
   /* ================= INIT ================= */
   loadListings();
+  setInterval(loadListings, 30000);
 })();
