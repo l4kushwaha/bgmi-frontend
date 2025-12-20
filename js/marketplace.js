@@ -11,17 +11,13 @@
   let currentFilter = "";
 
   /* ================= UTILS ================= */
-  const normalizeId = v =>
-    v === null || v === undefined ? null : String(parseInt(v, 10));
-
+  const normalizeId = v => v === null || v === undefined ? null : String(parseInt(v, 10));
   const safeArray = v => {
     try {
       if (Array.isArray(v)) return v;
       if (typeof v === "string") return JSON.parse(v);
       return [];
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   };
 
   const toast = (msg, ok = true) => {
@@ -40,9 +36,7 @@
       const user = JSON.parse(localStorage.getItem("user") || "null");
       if (!token || !user) return null;
       return { token, user };
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   };
 
   const requireLogin = () => {
@@ -60,7 +54,6 @@
   async function fetchSeller(id) {
     const sid = normalizeId(id);
     if (sellerCache[sid]) return sellerCache[sid];
-
     try {
       const r = await fetch(`${API_URL}/seller/${sid}`);
       if (!r.ok) throw 0;
@@ -68,16 +61,7 @@
       sellerCache[sid] = d;
       return d;
     } catch {
-      const f = {
-        name: `Seller ${sid}`,
-        badge: "",
-        verified: false,
-        avg_rating: 0,
-        review_count: 0,
-        total_sales: 0,
-        listings: [],
-        reviews: []
-      };
+      const f = { name: `Seller ${sid}`, badge: "", verified: false, avg_rating: 0, review_count: 0, total_sales: 0, listings: [], reviews: [] };
       sellerCache[sid] = f;
       return f;
     }
@@ -97,18 +81,10 @@
       let items = await res.json();
       if (!Array.isArray(items)) items = [];
 
-      items = items.filter(i =>
-        `${i.title}${i.uid}${i.highest_rank}`
-          .toLowerCase()
-          .includes(currentSearch)
-      );
+      items = items.filter(i => `${i.title}${i.uid}${i.highest_rank}`.toLowerCase().includes(currentSearch));
 
       if (currentFilter === "own" && session) {
-        items = items.filter(
-          i =>
-            normalizeId(i.seller_id) ===
-            normalizeId(session.user.seller_id)
-        );
+        items = items.filter(i => normalizeId(i.seller_id) === normalizeId(session.user.seller_id));
       }
 
       container.innerHTML = "";
@@ -121,11 +97,7 @@
         const seller = await fetchSeller(item.seller_id);
         const images = safeArray(item.images);
 
-        const isOwner =
-          session &&
-          (normalizeId(session.user.seller_id) ===
-            normalizeId(item.seller_id) ||
-            String(session.user.role).toLowerCase() === "admin");
+        const isOwner = session && (normalizeId(session.user.seller_id) === normalizeId(item.seller_id) || String(session.user.role).toLowerCase() === "admin");
 
         const card = document.createElement("div");
         card.className = "item-card show";
@@ -133,41 +105,29 @@
         card.innerHTML = `
           <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
           ${seller.verified ? `<div class="verified-badge">✔ Verified</div>` : ""}
-          ${seller.badge ? `<div class="seller-badge">${seller.badge}</div>` : ""}
+          ${seller.badge ? `<div class="badge-badge">${seller.badge}</div>` : ""}
 
-          ${images.length ? `
-            <div class="images-gallery">
-              ${images.map(img => `
-                <img src="${img}" onclick="openImageModal('${img}')">
-              `).join("")}
-            </div>` : ""}
+          ${images.length ? `<div class="images-gallery">${images.map(img => `<img src="${img}" onclick="openImageModal('${img}')">`).join("")}</div>` : ""}
 
           <div class="item-info">
             <p><strong>${item.title}</strong></p>
             <p>UID: ${item.uid}</p>
-            <p>Level: ${item.level || 0}</p>
+            <p>Level: ${item.level}</p>
             <p>Rank: ${item.highest_rank || "-"}</p>
-            <p>Price: ₹${item.price || 0}</p>
-            ${safeArray(item.upgraded_guns).length ? `<p>Upgraded Guns: ${safeArray(item.upgraded_guns).join(", ")}</p>` : ""}
+            <p>Price: ₹${item.price}</p>
             ${safeArray(item.mythic_items).length ? `<p>Mythic: ${safeArray(item.mythic_items).join(", ")}</p>` : ""}
             ${safeArray(item.legendary_items).length ? `<p>Legendary: ${safeArray(item.legendary_items).join(", ")}</p>` : ""}
             ${safeArray(item.gift_items).length ? `<p>Gifts: ${safeArray(item.gift_items).join(", ")}</p>` : ""}
-            ${item.account_highlights ? `<p>Highlights: ${item.account_highlights}</p>` : ""}
           </div>
 
-          <button class="btn buy-btn" ${item.status !== "available" ? "disabled" : ""}
-            onclick="buyItem('${item.id}')">
+          <button class="btn buy-btn" ${item.status !== "available" ? "disabled" : ""} onclick="buyItem('${item.id}')">
             ${item.status === "available" ? "Buy" : "Sold"}
           </button>
 
-          <button class="btn outline" onclick="openSellerProfile('${item.seller_id}')">
-            Seller Profile
-          </button>
+          <button class="btn outline" onclick="openSellerProfile('${item.seller_id}')">Seller Profile</button>
 
-          ${isOwner ? `
-            <button class="btn edit-btn" onclick="openEditModal('${item.id}')">Edit</button>
-            <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
-          ` : ""}
+          ${isOwner ? `<button class="btn edit-btn" onclick="openEditModal('${item.id}')">Edit</button>
+            <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>` : ""}
         `;
         container.appendChild(card);
       }
@@ -187,155 +147,140 @@
     bg.classList.add("active");
     form.innerHTML = "Loading...";
 
-    try {
-      const res = await fetch(`${API_URL}/listings`);
-      const items = await res.json();
-      const item = items.find(i => String(i.id) === String(id));
-      if (!item) return toast("Listing not found", false);
+    const res = await fetch(`${API_URL}/listings`);
+    const items = await res.json();
+    const item = items.find(i => String(i.id) === String(id));
+    if (!item) return toast("Listing not found", false);
 
-      form.innerHTML = `
-        <label>Title</label>
-        <input id="e-title" value="${item.title || ''}">
-        <label>Price</label>
-        <input id="e-price" type="number" value="${item.price || 0}">
-        <label>Level</label>
-        <input id="e-level" type="number" value="${item.level || 0}">
-        <label>Rank</label>
-        <input id="e-rank" value="${item.highest_rank || ''}">
-        <label>Upgraded Guns</label>
-        <input id="e-guns" value="${safeArray(item.upgraded_guns).join(', ')}">
-        <label>Mythic Items</label>
-        <input id="e-mythic" value="${safeArray(item.mythic_items).join(', ')}">
-        <label>Legendary Items</label>
-        <input id="e-legendary" value="${safeArray(item.legendary_items).join(', ')}">
-        <label>Gift Items</label>
-        <input id="e-gifts" value="${safeArray(item.gift_items).join(', ')}">
-        <label>Account Highlights</label>
-        <textarea id="e-highlights">${item.account_highlights || ''}</textarea>
-        <label>Images (comma separated)</label>
-        <div id="image-list" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-        <button class="btn buy-btn" id="add-image-btn">Add Image</button>
-      `;
+    function arrayToString(arr){return safeArray(arr).join(", ");}
 
-      const imageList = document.getElementById("image-list");
-      const addImageBtn = document.getElementById("add-image-btn");
+    form.innerHTML = `
+      <input id="e-title" placeholder="Title" value="${item.title}">
+      <input id="e-price" type="number" placeholder="Price" value="${item.price}">
+      <input id="e-level" type="number" placeholder="Level" value="${item.level}">
+      <input id="e-rank" placeholder="Rank" value="${item.highest_rank || ""}">
+      <input id="e-upgraded-guns" placeholder="Upgraded Guns" value="${arrayToString(item.upgraded_guns)}">
+      <input id="e-titles" placeholder="Titles" value="${arrayToString(item.titles)}">
+      <textarea id="e-highlights" placeholder="Account Highlights / Description">${item.account_highlights || ""}</textarea>
+      <textarea id="e-mythic" placeholder="Mythic Items">${arrayToString(item.mythic_items)}</textarea>
+      <textarea id="e-legendary" placeholder="Legendary Items">${arrayToString(item.legendary_items)}</textarea>
+      <textarea id="e-gifts" placeholder="Gift Items">${arrayToString(item.gift_items)}</textarea>
+      <div id="e-images-container" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;border:1px dashed #ccc;padding:6px;"></div>
+      <button class="btn outline" id="add-image-btn">Add Image</button>
+      <p style="font-size:12px;color:#aaa;margin-top:4px;">Drag & drop images here or use Add Image button</p>
+    `;
 
-      const renderImages = imgs => {
-        imageList.innerHTML = "";
-        imgs.forEach((img, idx) => {
-          const div = document.createElement("div");
-          div.style.position = "relative";
-          div.style.display = "inline-block";
+    const imagesContainer = document.getElementById("e-images-container");
+    const addImageBtn = document.getElementById("add-image-btn");
 
-          const imgel = document.createElement("img");
-          imgel.src = img;
-          imgel.style.width = "50px";
-          imgel.style.height = "50px";
-          imgel.style.objectFit = "cover";
-          imgel.style.borderRadius = "6px";
-          div.appendChild(imgel);
+    function createImageElement(src){
+      const imgWrapper = document.createElement("div");
+      imgWrapper.style.position="relative";
+      const img = document.createElement("img");
+      img.src = src;
+      img.style.width="60px";
+      img.style.height="60px";
+      img.style.objectFit="cover";
+      img.style.borderRadius="6px";
+      const cross = document.createElement("span");
+      cross.innerHTML="✖";
+      cross.style.position="absolute";
+      cross.style.top="0";
+      cross.style.right="0";
+      cross.style.cursor="pointer";
+      cross.style.background="rgba(0,0,0,0.5)";
+      cross.style.borderRadius="50%";
+      cross.style.fontSize="12px";
+      cross.style.color="#fff";
+      cross.onclick = ()=>imgWrapper.remove();
+      imgWrapper.appendChild(img);
+      imgWrapper.appendChild(cross);
+      imagesContainer.appendChild(imgWrapper);
+    }
 
-          const cross = document.createElement("span");
-          cross.textContent = "✖";
-          cross.style.position = "absolute";
-          cross.style.top = "-6px";
-          cross.style.right = "-6px";
-          cross.style.background = "#c0392b";
-          cross.style.borderRadius = "50%";
-          cross.style.width = "16px";
-          cross.style.height = "16px";
-          cross.style.color = "#fff";
-          cross.style.fontSize = "12px";
-          cross.style.cursor = "pointer";
-          cross.style.display = "flex";
-          cross.style.alignItems = "center";
-          cross.style.justifyContent = "center";
-          cross.onclick = () => {
-            imgs.splice(idx, 1);
-            renderImages(imgs);
-          };
-          div.appendChild(cross);
-          imageList.appendChild(div);
-        });
-      };
+    safeArray(item.images).forEach(createImageElement);
 
-      let currentImages = safeArray(item.images);
-      renderImages(currentImages);
+    addImageBtn.onclick = ()=>{
+      const url = prompt("Enter image URL:");
+      if(url) createImageElement(url);
+    };
 
-      addImageBtn.onclick = () => {
-        const url = prompt("Enter Image URL");
-        if (!url) return;
-        currentImages.push(url);
-        renderImages(currentImages);
-      };
+    // Drag & Drop
+    imagesContainer.addEventListener("dragover", e => { e.preventDefault(); imagesContainer.style.borderColor="#3498db"; });
+    imagesContainer.addEventListener("dragleave", e => { e.preventDefault(); imagesContainer.style.borderColor="#ccc"; });
+    imagesContainer.addEventListener("drop", e => {
+      e.preventDefault(); imagesContainer.style.borderColor="#ccc";
+      const files = e.dataTransfer.files;
+      for(let f of files){
+        const reader = new FileReader();
+        reader.onload = ev => createImageElement(ev.target.result);
+        reader.readAsDataURL(f);
+      }
+    });
 
-      document.getElementById("save-edit").onclick = async () => {
-        const body = {
-          title: document.getElementById("e-title").value,
-          price: Number(document.getElementById("e-price").value) || 0,
-          level: Number(document.getElementById("e-level").value) || 0,
-          highest_rank: document.getElementById("e-rank").value || "",
-          upgraded_guns: document.getElementById("e-guns").value.split(",").map(v => v.trim()).filter(v => v),
-          mythic_items: document.getElementById("e-mythic").value.split(",").map(v => v.trim()).filter(v => v),
-          legendary_items: document.getElementById("e-legendary").value.split(",").map(v => v.trim()).filter(v => v),
-          gift_items: document.getElementById("e-gifts").value.split(",").map(v => v.trim()).filter(v => v),
-          account_highlights: document.getElementById("e-highlights").value,
-          images: currentImages
-        };
+    document.getElementById("save-edit").onclick = ()=>saveEdit(id);
+  };
 
-        const s = requireLogin();
-        try {
-          const res = await fetch(`${API_URL}/listings/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${s.token}` },
-            body: JSON.stringify(body)
-          });
-          if (!res.ok) throw 0;
-          toast("Listing updated");
-          closeEdit();
-          loadListings();
-        } catch {
-          toast("Edit failed", false);
-        }
-      };
-
-    } catch (e) {
-      console.error(e);
-      toast("Failed to load listing for edit", false);
+  window.saveEdit = async id => {
+    const s = requireLogin();
+    if(!s) return;
+    const body = {
+      title: document.getElementById("e-title")?.value || "",
+      price: Number(document.getElementById("e-price")?.value || 0),
+      level: Number(document.getElementById("e-level")?.value || 0),
+      highest_rank: document.getElementById("e-rank")?.value || "",
+      upgraded_guns: document.getElementById("e-upgraded-guns")?.value.split(",").map(v=>v.trim()),
+      titles: document.getElementById("e-titles")?.value.split(",").map(v=>v.trim()),
+      account_highlights: document.getElementById("e-highlights")?.value || "",
+      mythic_items: document.getElementById("e-mythic")?.value.split(",").map(v=>v.trim()),
+      legendary_items: document.getElementById("e-legendary")?.value.split(",").map(v=>v.trim()),
+      gift_items: document.getElementById("e-gifts")?.value.split(",").map(v=>v.trim()),
+      images: [...document.getElementById("e-images-container").querySelectorAll("img")].map(i=>i.src)
+    };
+    try{
+      const res = await fetch(`${API_URL}/listings/${id}`,{
+        method:"PUT",
+        headers:{"Content-Type":"application/json",Authorization:`Bearer ${s.token}`},
+        body:JSON.stringify(body)
+      });
+      if(!res.ok) throw 0;
+      toast("Listing updated");
+      closeEdit();
+      loadListings();
+    }catch{
+      toast("Edit failed",false);
     }
   };
 
-  window.closeEdit = () =>
-    document.getElementById("edit-modal-bg").classList.remove("active");
+  window.closeEdit = ()=>document.getElementById("edit-modal-bg").classList.remove("active");
 
   /* ================= SELLER PROFILE ================= */
   window.openSellerProfile = async sellerId => {
     const bg = document.getElementById("seller-modal-bg");
     const content = document.getElementById("seller-content");
     bg.classList.add("active");
-
     const s = await fetchSeller(sellerId);
     content.innerHTML = `
       <h3>${s.name}</h3>
-      ${s.verified ? `<p>✔ Verified</p>` : ""}
-      ${s.badge ? `<p>Badge: ${s.badge}</p>` : ""}
-      <p>⭐ ${s.avg_rating.toFixed(1)} | Sales: ${s.total_sales}</p>
+      ${s.badge?`<p>Badge: ${s.badge}</p>`:""}
+      ${s.verified?`<p>✔ Verified</p>`:""}
+      <p>⭐ ${s.avg_rating} | Sales: ${s.total_sales}</p>
       <p>Reviews: ${s.review_count}</p>
-      <button class="btn outline" onclick="alert('Chat function coming soon')">Chat with Seller</button>
+      <button class="btn outline" onclick="alert('Chat feature coming soon!')">Chat with Seller</button>
+      <button class="btn delete-btn" onclick="closeSeller()">Close</button>
     `;
   };
 
-  window.closeSeller = () =>
-    document.getElementById("seller-modal-bg").classList.remove("active");
+  window.closeSeller = ()=>document.getElementById("seller-modal-bg").classList.remove("active");
 
   /* ================= BUY / DELETE ================= */
   window.buyItem = async id => {
     const s = requireLogin();
     if (!s || !confirm("Confirm purchase?")) return;
-    await fetch(`${API_URL}/orders/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${s.token}` },
-      body: JSON.stringify({ listing_id: id })
+    await fetch(`${API_URL}/orders/create`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json",Authorization:`Bearer ${s.token}`},
+      body:JSON.stringify({listing_id:id})
     });
     toast("Order created");
   };
@@ -343,24 +288,15 @@
   window.deleteListing = async id => {
     const s = requireLogin();
     if (!s || !confirm("Delete listing?")) return;
-    await fetch(`${API_URL}/listings/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${s.token}` }
-    });
+    await fetch(`${API_URL}/listings/${id}`,{method:"DELETE",headers:{Authorization:`Bearer ${s.token}`}});
     toast("Listing deleted");
     loadListings();
   };
 
-  /* ================= SEARCH ================= */
-  searchInput?.addEventListener("input", e => {
-    currentSearch = e.target.value.toLowerCase();
-    loadListings();
-  });
+  /* ================= SEARCH / FILTER ================= */
+  searchInput?.addEventListener("input",e=>{currentSearch=e.target.value.toLowerCase();loadListings();});
+  filterSelect?.addEventListener("change",e=>{currentFilter=e.target.value;loadListings();});
 
-  filterSelect?.addEventListener("change", e => {
-    currentFilter = e.target.value;
-    loadListings();
-  });
-
+  /* ================= INIT ================= */
   loadListings();
 })();
