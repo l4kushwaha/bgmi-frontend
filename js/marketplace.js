@@ -26,52 +26,59 @@
     setTimeout(() => t.classList.remove("show"), 3000);
   };
 
-  const getSession = () => {
-    try {
-      const token = localStorage.getItem("token");
-      const user = JSON.parse(localStorage.getItem("user") || "null");
-      if (!token || !user) return null;
-      return { token, user };
-    } catch {
-      return null;
-    }
-  };
-
   const stars = r =>
     "★".repeat(Math.round(r || 0)) + "☆".repeat(5 - Math.round(r || 0));
 
-  /* ================= GLOBAL CLOSE ================= */
-  window.closeSeller = () =>
-    document.getElementById("seller-modal-bg")?.classList.remove("active");
+  /* ================= IMAGE COMPRESSION ================= */
+  const compressImage = (file, maxW = 1280, quality = 0.7) =>
+    new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width);
+        const c = document.createElement("canvas");
+        c.width = img.width * scale;
+        c.height = img.height * scale;
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL("image/jpeg", quality));
+      };
+      img.src = URL.createObjectURL(file);
+    });
 
-  window.closeEdit = () =>
-    document.getElementById("edit-modal-bg")?.classList.remove("active");
+  /* ================= FULLSCREEN VIEWER ================= */
+  let fsImgs = [], fsIndex = 0, zoom = 1;
+  const viewer = document.getElementById("img-viewer");
+  const viewerImg = viewer?.querySelector("img");
 
-  /* ================= SELLER PROFILE ================= */
-  window.openSellerProfile = async sellerId => {
-    const bg = document.getElementById("seller-modal-bg");
-    const content = document.getElementById("seller-content");
-    if (!bg || !content) return;
+  function openFS(imgs, index) {
+    fsImgs = imgs;
+    fsIndex = index;
+    zoom = 1;
+    viewerImg.style.transform = "scale(1)";
+    viewerImg.src = fsImgs[fsIndex].src;
+    viewer.classList.add("active");
+  }
 
-    bg.classList.add("active");
-    content.innerHTML = "Loading...";
+  function fsNav(dir) {
+    fsIndex = (fsIndex + dir + fsImgs.length) % fsImgs.length;
+    viewerImg.src = fsImgs[fsIndex].src;
+  }
 
-    try {
-      const res = await fetch(`${API_URL}/seller/${sellerId}`);
-      const s = await res.json();
+  viewer?.querySelector(".fs-left")?.addEventListener("click", () => fsNav(-1));
+  viewer?.querySelector(".fs-right")?.addEventListener("click", () => fsNav(1));
+  viewer?.querySelector(".close")?.addEventListener("click", () =>
+    viewer.classList.remove("active")
+  );
 
-      content.innerHTML = `
-        <h3>${s.name}</h3>
-        <p>Status: ${s.seller_verified == 1 ? "Verified" : "Pending"}</p>
-        <p>Badge: ${s.badge || "-"}</p>
-        <p>Rating: ${stars(s.avg_rating)}</p>
-        <p>Total Sales: ${s.total_sales || 0}</p>
-        <p>Reviews: ${s.review_count || 0}</p>
-      `;
-    } catch {
-      content.innerHTML = "Failed to load seller";
-    }
-  };
+  viewerImg?.addEventListener("wheel", e => {
+    e.preventDefault();
+    zoom += e.deltaY * -0.001;
+    zoom = Math.min(Math.max(1, zoom), 3);
+    viewerImg.style.transform = `scale(${zoom})`;
+  });
+
+  viewer?.addEventListener("click", e => {
+    if (e.target === viewer) viewer.classList.remove("active");
+  });
 
   /* ================= LOAD LISTINGS ================= */
   async function loadListings() {
@@ -83,12 +90,6 @@
 
   /* ================= CARD ================= */
   function renderCard(item) {
-    const session = getSession();
-    const isOwner =
-      session &&
-      (String(session.user.seller_id) === String(item.seller_id) ||
-        session.user.role === "admin");
-
     const images = safeArray(item.images);
 
     const card = document.createElement("div");
@@ -98,7 +99,13 @@
       <div class="rating-badge">${stars(item.avg_rating)}</div>
 
       <div class="images-gallery">
-        ${images.map(i => `<img src="${i}">`).join("")}
+        ${images.map((src, i) =>
+          `<img src="${src}" class="${i === 0 ? "active" : ""}">`
+        ).join("")}
+        ${images.length > 1 ? `
+          <button class="img-arrow left">‹</button>
+          <button class="img-arrow right">›</button>
+        ` : ""}
       </div>
 
       <div class="item-info">
@@ -106,91 +113,73 @@
         UID: ${item.uid}<br>
         Level: ${item.level}<br>
         Rank: ${item.highest_rank || "-"}<br>
+
+        ${safeArray(item.upgraded_guns).length ? `<b>Upgraded:</b> ${safeArray(item.upgraded_guns).join(", ")}<br>` : ""}
+        ${safeArray(item.mythic_items).length ? `<b>Mythic:</b> ${safeArray(item.mythic_items).join(", ")}<br>` : ""}
+        ${safeArray(item.legendary_items).length ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>` : ""}
+        ${safeArray(item.gift_items).length ? `<b>Gifts:</b> ${safeArray(item.gift_items).join(", ")}<br>` : ""}
+        ${safeArray(item.titles).length ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>` : ""}
+        ${item.account_highlights ? `<b>Highlights:</b> ${item.account_highlights}<br>` : ""}
+
         <div class="price">₹${item.price}</div>
       </div>
-
-      <button class="btn outline seller-btn">Seller Profile</button>
-
-      ${
-        isOwner
-          ? `
-            <button class="btn edit-btn">Edit</button>
-            <button class="btn delete-btn">Delete</button>
-          `
-          : `<button class="btn buy-btn">Buy</button>`
-      }
     `;
 
-    card.querySelector(".seller-btn").onclick = () =>
-      openSellerProfile(item.seller_id);
+    /* slider */
+    const imgs = [...card.querySelectorAll(".images-gallery img")];
+    let idx = 0;
+    let auto = setInterval(() => slide(1), 3500);
 
-    if (isOwner) {
-      card.querySelector(".edit-btn").onclick = () => openEdit(item);
-      card.querySelector(".delete-btn").onclick = () =>
-        deleteListing(item.id);
-    } else {
-      card.querySelector(".buy-btn").onclick = () =>
-        toast("Buy feature coming soon");
+    function slide(d) {
+      imgs[idx].classList.remove("active");
+      idx = (idx + d + imgs.length) % imgs.length;
+      imgs[idx].classList.add("active");
     }
+
+    card.querySelector(".img-arrow.left")?.addEventListener("click", () => slide(-1));
+    card.querySelector(".img-arrow.right")?.addEventListener("click", () => slide(1));
+
+    let startX = 0;
+    const g = card.querySelector(".images-gallery");
+    g.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    g.addEventListener("touchend", e => {
+      const endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50) slide(1);
+      if (endX - startX > 50) slide(-1);
+    });
+
+    imgs.forEach((img, i) => img.onclick = () => openFS(imgs, i));
 
     container.appendChild(card);
   }
-
-  /* ================= DELETE ================= */
-  window.deleteListing = async id => {
-    if (!confirm("Delete this listing?")) return;
-    await fetch(`${API_URL}/listings/${id}`, { method: "DELETE" });
-    toast("Listing deleted");
-    loadListings();
-  };
 
   /* ================= EDIT ================= */
   function openEdit(item) {
     editListing = item;
     editImgs = safeArray(item.images);
 
-    const bg = document.getElementById("edit-modal-bg");
+    document.getElementById("edit-modal-bg").classList.add("active");
     const form = document.getElementById("edit-form");
-    if (!bg || !form) return;
-
-    bg.classList.add("active");
-
-    const arr = v => safeArray(v).join(", ");
 
     form.innerHTML = `
-      <input id="e-title" value="${item.title || ""}" placeholder="Title">
-      <input id="e-price" type="number" value="${item.price || 0}" placeholder="Price">
-      <input id="e-level" type="number" value="${item.level || 0}" placeholder="Level">
-      <input id="e-rank" value="${item.highest_rank || ""}" placeholder="Rank">
+      <input id="e-title" value="${item.title}">
+      <input id="e-price" type="number" value="${item.price}">
+      <textarea id="e-upgraded">${safeArray(item.upgraded_guns).join(",")}</textarea>
+      <textarea id="e-mythic">${safeArray(item.mythic_items).join(",")}</textarea>
+      <textarea id="e-legendary">${safeArray(item.legendary_items).join(",")}</textarea>
+      <textarea id="e-gifts">${safeArray(item.gift_items).join(",")}</textarea>
+      <textarea id="e-titles">${safeArray(item.titles).join(",")}</textarea>
+      <textarea id="e-highlights">${item.account_highlights || ""}</textarea>
 
-      <textarea id="e-upgraded" placeholder="Upgraded Guns">${arr(
-        item.upgraded_guns
-      )}</textarea>
-      <textarea id="e-mythic" placeholder="Mythic Items">${arr(
-        item.mythic_items
-      )}</textarea>
-      <textarea id="e-legendary" placeholder="Legendary Items">${arr(
-        item.legendary_items
-      )}</textarea>
-      <textarea id="e-highlights" placeholder="Highlights">${
-        item.account_highlights || ""
-      }</textarea>
-
-      <label><b>Images</b></label>
       <div id="edit-images" class="edit-images-row"></div>
-
       <input type="file" id="add-images" accept="image/*" multiple>
     `;
 
-    document.getElementById("add-images").onchange = e => {
-      [...e.target.files].forEach(file => {
-        const r = new FileReader();
-        r.onload = ev => {
-          editImgs.push(ev.target.result);
-          renderEditImages();
-        };
-        r.readAsDataURL(file);
-      });
+    document.getElementById("add-images").onchange = async e => {
+      for (const file of e.target.files) {
+        editImgs.push(await compressImage(file));
+      }
+      renderEditImages();
     };
 
     renderEditImages();
@@ -198,53 +187,32 @@
 
   function renderEditImages() {
     const box = document.getElementById("edit-images");
-    if (!box) return;
+    box.innerHTML = editImgs.map((src, i) => `
+      <div class="edit-img-wrap" draggable="true" data-i="${i}">
+        <img src="${src}">
+        <span class="remove-img">×</span>
+      </div>
+    `).join("");
 
-    box.innerHTML = editImgs
-      .map(
-        (src, i) => `
-        <div class="edit-img-wrap">
-          <img src="${src}">
-          <span class="remove-img" data-i="${i}">×</span>
-        </div>
-      `
-      )
-      .join("");
-
-    box.querySelectorAll(".remove-img").forEach(btn => {
+    box.querySelectorAll(".remove-img").forEach((btn, i) =>
       btn.onclick = () => {
-        editImgs.splice(btn.dataset.i, 1);
+        editImgs.splice(i, 1);
+        renderEditImages();
+      }
+    );
+
+    let drag;
+    box.querySelectorAll(".edit-img-wrap").forEach(el => {
+      el.ondragstart = () => drag = el;
+      el.ondragover = e => e.preventDefault();
+      el.ondrop = () => {
+        const from = drag.dataset.i;
+        const to = el.dataset.i;
+        editImgs.splice(to, 0, editImgs.splice(from, 1)[0]);
         renderEditImages();
       };
     });
   }
-
-  /* ================= SAVE EDIT ================= */
-  document.getElementById("save-edit")?.addEventListener("click", async () => {
-    if (!editListing) return;
-
-    await fetch(`${API_URL}/listings/${editListing.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: val("e-title"),
-        price: +val("e-price"),
-        level: +val("e-level"),
-        highest_rank: val("e-rank"),
-        upgraded_guns: val("e-upgraded").split(","),
-        mythic_items: val("e-mythic").split(","),
-        legendary_items: val("e-legendary").split(","),
-        account_highlights: val("e-highlights"),
-        images: editImgs
-      })
-    });
-
-    toast("Listing updated");
-    closeEdit();
-    loadListings();
-  });
-
-  const val = id => document.getElementById(id)?.value || "";
 
   loadListings();
 })();
