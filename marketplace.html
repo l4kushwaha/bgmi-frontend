@@ -1,200 +1,247 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>BGMI Marketplace</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+(() => {
 
-<style>
-body {
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background: linear-gradient(135deg,#141e30,#243b55);
-  color:#fff;
-  overflow-x:hidden;
-  transition: background 0.3s,color 0.3s;
-}
-body.dark{background: linear-gradient(135deg,#1a1a1a,#2c2c2c);color:#fff;}
+  /* ================= CONFIG ================= */
+  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 
-#particle-canvas{position:fixed;inset:0;z-index:0;}
+  const container = document.getElementById("items-container");
+  const searchInput = document.getElementById("search");
+  const filterSelect = document.getElementById("filter");
 
-header{
-  position:relative;
-  z-index:2;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 20px;
-  backdrop-filter:blur(12px);
-  background: rgba(255,255,255,0.05);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  border-radius:12px;
-}
-header h1{font-size:26px;font-weight:600;}
-#controls{display:flex;gap:12px;align-items:center;}
-#dark-toggle{
-  padding:6px 10px;border:none;border-radius:10px;cursor:pointer;
-  background:#3498db;color:#fff;transition:0.3s;
-}
-#dark-toggle:hover{background:#2980b9;}
-#wallet-balance{
-  font-size:14px;font-weight:600;
-  background:rgba(255,255,255,0.1);
-  padding:6px 12px;
-  border-radius:12px;
-}
+  let listings = [];
+  let currentListingId = null;
 
-#top-bar{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  padding:12px;
-  position:relative;
-  z-index:2;
-}
-#search,#filter{
-  padding:10px 14px;border:none;border-radius:20px;outline:none;
-  font-family:'Poppins';transition:0.3s;
-}
-#search:focus,#filter:focus{box-shadow:0 0 8px rgba(52,152,219,0.7);}
+  /* ================= UTILS ================= */
+  const safeArray = v => {
+    try {
+      if (Array.isArray(v)) return v;
+      if (typeof v === "string") return JSON.parse(v);
+      return [];
+    } catch {
+      return [];
+    }
+  };
 
-#items-container{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:16px;
-  padding:16px;
-  max-width:1400px;
-  margin:auto;
-  position:relative;
-  z-index:2;
-}
+  const renderStars = rating => {
+    const r = Math.round(Number(rating) || 0);
+    return "★".repeat(r) + "☆".repeat(5 - r);
+  };
 
-.item-card{
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border-radius:16px;
-  padding:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.25);
-  opacity:0;
-  transform:translateY(30px);
-  transition:.35s ease, transform 0.3s;
-  position:relative;
-}
-.item-card.show{opacity:1;transform:none;}
-.item-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(0,0,0,0.35);}
-body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+  const toast = (msg, ok = true) => {
+    const t = document.getElementById("toast");
+    if (!t) return;
+    t.textContent = msg;
+    t.style.background = ok ? "#27ae60" : "#c0392b";
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  };
 
-.badge-badge,.verified-badge,.rating-badge{
-  position:absolute;top:10px;font-size:12px;padding:4px 8px;border-radius:8px;font-weight:600;
-}
-.rating-badge{left:10px;background:#f1c40f;}
-.verified-badge{right:10px;background:#27ae60;color:#fff;}
-.badge-badge{right:80px;background:#e67e22;color:#fff;}
+  const session = () => {
+    try {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      if (!token || !user) return null;
+      return { token, user };
+    } catch {
+      return null;
+    }
+  };
 
-.item-info{font-size:13px;line-height:1.45;}
-.item-info strong{font-size:15px;}
-.price{font-size:18px;color:#e67e22;font-weight:600;margin-top:6px;}
+  /* ================= LOAD LISTINGS ================= */
+  async function loadListings() {
+    container.innerHTML = "";
+    try {
+      const s = session();
+      const res = await fetch(`${API_URL}/listings`, {
+        headers: s ? { Authorization: `Bearer ${s.token}` } : {}
+      });
 
-.images-gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.images-gallery img{width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;transition:0.3s;}
-.images-gallery img:hover{transform:scale(1.2);}
+      listings = await res.json();
+      if (!Array.isArray(listings)) listings = [];
 
-.btn{width:100%;padding:9px;margin-top:7px;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:'Poppins';transition:0.3s;}
-.buy-btn{background:#27ae60;color:#fff;}
-.buy-btn:disabled{background:#aaa;cursor:not-allowed;}
-.edit-btn{background:#3498db;color:#fff;}
-.delete-btn{background:#c0392b;color:#fff;}
-.outline{background:#fff;border:2px solid #3498db;color:#3498db;}
-.btn:hover:not(:disabled){opacity:0.85;}
+      renderListings(listings);
+    } catch {
+      toast("Failed to load listings", false);
+    }
+  }
 
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:999;animation:fadeIn 0.3s;}
-.modal-bg.active{display:flex;}
-.modal{background:#fff;color:#333;padding:18px;border-radius:16px;width:400px;max-height:85vh;overflow-y:auto;position:relative;animation:slideIn 0.3s;display:flex;flex-direction:column;gap:6px;}
-body.dark .modal{background:#2c2c2c;color:#fff;}
-@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-@keyframes slideIn{0%{transform:translateY(-30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+  /* ================= RENDER LISTINGS ================= */
+  function renderListings(items) {
+    container.innerHTML = "";
 
-#imgModal img{max-width:92%;max-height:92%;border-radius:14px;transition:transform 0.3s;}
-#imgModal img:hover{transform:scale(1.05);}
+    const query = searchInput.value.toLowerCase();
+    let filtered = items.filter(i =>
+      `${i.title} ${i.uid} ${i.highest_rank}`.toLowerCase().includes(query)
+    );
 
-#edit-modal form, #seller-modal .modal-content{display:flex;flex-direction:column;gap:6px;}
-#e-images-container{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+    if (filterSelect.value === "own") {
+      const s = session();
+      if (s) filtered = filtered.filter(i => i.seller_id == s.user.seller_id);
+    }
 
-/* Toast */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 20px;border-radius:25px;display:none;z-index:1200;opacity:0;transition:0.3s;}
-#toast.show{display:block;opacity:1;}
-</style>
-</head>
-<body>
-<canvas id="particle-canvas"></canvas>
+    if (!filtered.length) {
+      container.innerHTML = `<p>No listings found</p>`;
+      return;
+    }
 
-<header>
-  <h1>BGMI Marketplace</h1>
-  <div id="controls">
-    <div id="wallet-balance" aria-live="polite">Wallet: ₹0</div>
-    <button id="dark-toggle">Dark / Light</button>
-  </div>
-</header>
+    filtered.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "item-card show";
 
-<div id="top-bar">
-  <input id="search" placeholder="Search UID / Title / Rank" aria-label="Search Listings">
-  <select id="filter" aria-label="Filter Listings">
-    <option value="">Default</option>
-    <option value="price_high">Price High → Low</option>
-    <option value="price_low">Price Low → High</option>
-    <option value="new">Newest</option>
-    <option value="own">My Listings</option>
-  </select>
-</div>
+      const images = safeArray(item.images);
+      const mythic = safeArray(item.mythic_items);
+      const legendary = safeArray(item.legendary_items);
+      const gifts = safeArray(item.gift_items);
+      const guns = safeArray(item.upgraded_guns);
+      const titles = safeArray(item.titles);
 
-<div id="items-container">
-  <div class="item-card">
-    <div class="skeleton" style="width:70%"></div>
-    <div class="skeleton" style="width:50%"></div>
-    <div class="skeleton img"></div>
-    <div class="skeleton img"></div>
-    <div class="skeleton img"></div>
-  </div>
-</div>
+      card.innerHTML = `
+        <div class="rating-badge">${renderStars(item.avg_rating)}</div>
 
-<!-- Seller Modal -->
-<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
-  <div class="modal" id="seller-modal">
-    <div id="seller-content">Loading...</div>
-    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
-  </div>
-</div>
+        <div class="verified-badge">
+          ${item.seller_verified == 1 ? "Verified" : "Pending"}
+        </div>
 
-<!-- Image Modal -->
-<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" onclick="this.classList.remove('active')">
-  <img id="imgPreview" alt="Item Image">
-</div>
+        ${item.badge ? `<div class="badge-badge">${item.badge}</div>` : ""}
 
-<!-- Edit Listing Modal -->
-<div id="edit-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
-  <div class="modal" id="edit-modal">
-    <h3>Edit Listing</h3>
-    <div id="edit-form"></div>
-    <button class="btn buy-btn" id="save-edit">Save Changes</button>
-    <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
-  </div>
-</div>
+        <div class="item-info">
+          <strong>${item.title}</strong><br>
+          UID: ${item.uid}<br>
+          Level: ${item.level}<br>
+          Rank: ${item.highest_rank || "-"}<br>
 
-<div id="toast" role="status" aria-live="polite"></div>
+          ${guns.length ? `Upgraded Guns: ${guns.join(", ")}<br>` : ""}
+          ${mythic.length ? `Mythic: ${mythic.join(", ")}<br>` : ""}
+          ${legendary.length ? `Legendary: ${legendary.join(", ")}<br>` : ""}
+          ${titles.length ? `Titles: ${titles.join(", ")}<br>` : ""}
+          ${gifts.length ? `Gifts: ${gifts.join(", ")}<br>` : ""}
 
-<script src="js/marketplace.js"></script>
+          <div class="price">₹${item.price}</div>
+        </div>
 
-<script>
-document.getElementById('dark-toggle').addEventListener('click',()=>{document.body.classList.toggle('dark');});
+        ${images.length ? `
+          <div class="images-gallery">
+            ${images.map(img => `<img src="${img}" onclick="openImage('${img}')">`).join("")}
+          </div>` : ""}
 
-// Particle background
-const c=document.getElementById('particle-canvas');
-const ctx=c.getContext('2d');
-function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener('resize',resize);
-const dots=[...Array(90)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,dx:(Math.random()-.5)*0.6,dy:(Math.random()-.5)*0.6}));
-(function animate(){ctx.clearRect(0,0,c.width,c.height);dots.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.6)';ctx.fill();p.x+=p.dx;p.y+=p.dy;if(p.x<0)p.x=c.width;if(p.y<0)p.y=c.height;if(p.x>c.width)p.x=0;if(p.y>c.height)p.y=0;});requestAnimationFrame(animate);})();
-</script>
-</body>
-</html>
+        <button class="btn buy-btn" ${item.status !== "available" ? "disabled" : ""}>
+          ${item.status === "available" ? "Buy" : "Sold"}
+        </button>
+
+        <button class="btn outline seller-btn">Seller Profile</button>
+        <button class="btn edit-btn">Edit</button>
+      `;
+
+      /* EVENTS */
+      card.querySelector(".seller-btn").onclick = () =>
+        openSellerProfile(item.seller_id);
+
+      card.querySelector(".edit-btn").onclick = () =>
+        openEdit(item.id);
+
+      container.appendChild(card);
+    });
+  }
+
+  /* ================= IMAGE PREVIEW ================= */
+  window.openImage = src => {
+    const modal = document.getElementById("imgModal");
+    document.getElementById("imgPreview").src = src;
+    modal.classList.add("active");
+  };
+
+  /* ================= EDIT LISTING ================= */
+  function openEdit(id) {
+    currentListingId = id;
+    const item = listings.find(l => l.id == id);
+    if (!item) return toast("Listing not found", false);
+
+    const form = document.getElementById("edit-form");
+    document.getElementById("edit-modal-bg").classList.add("active");
+
+    const arr = v => safeArray(v).join(", ");
+
+    form.innerHTML = `
+      <input id="e-title" value="${item.title}">
+      <input id="e-price" type="number" value="${item.price}">
+      <input id="e-level" type="number" value="${item.level}">
+      <input id="e-rank" value="${item.highest_rank || ""}">
+      <textarea id="e-guns">${arr(item.upgraded_guns)}</textarea>
+      <textarea id="e-mythic">${arr(item.mythic_items)}</textarea>
+      <textarea id="e-legendary">${arr(item.legendary_items)}</textarea>
+      <textarea id="e-gifts">${arr(item.gift_items)}</textarea>
+    `;
+  }
+
+  window.closeEdit = () => {
+    document.getElementById("edit-modal-bg").classList.remove("active");
+  };
+
+  document.getElementById("save-edit").onclick = async () => {
+    if (!currentListingId) return;
+
+    const s = session();
+    if (!s) return toast("Login required", false);
+
+    const body = {
+      title: e("e-title"),
+      price: Number(e("e-price")),
+      level: Number(e("e-level")),
+      highest_rank: e("e-rank"),
+      upgraded_guns: csv("e-guns"),
+      mythic_items: csv("e-mythic"),
+      legendary_items: csv("e-legendary"),
+      gift_items: csv("e-gifts")
+    };
+
+    try {
+      await fetch(`${API_URL}/listings/${currentListingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${s.token}`
+        },
+        body: JSON.stringify(body)
+      });
+
+      toast("Listing updated");
+      closeEdit();
+      loadListings();
+    } catch {
+      toast("Update failed", false);
+    }
+  };
+
+  const e = id => document.getElementById(id).value;
+  const csv = id => e(id).split(",").map(v => v.trim()).filter(Boolean);
+
+  /* ================= SELLER PROFILE (UNCHANGED) ================= */
+  window.openSellerProfile = async sellerId => {
+    const bg = document.getElementById("seller-modal-bg");
+    const content = document.getElementById("seller-content");
+    bg.classList.add("active");
+    content.innerHTML = "Loading...";
+
+    const res = await fetch(`${API_URL}/seller/${sellerId}`);
+    const s = await res.json();
+
+    content.innerHTML = `
+      <h3>${s.name}</h3>
+      <p>${s.seller_verified == 1 ? "Verified" : "Pending"}</p>
+      <p>Badge: ${s.badge || "None"}</p>
+      <p>Rating: ${renderStars(s.avg_rating)}</p>
+      <p>Total Sales: ${s.total_sales}</p>
+      <p>Reviews: ${s.review_count}</p>
+    `;
+  };
+
+  window.closeSeller = () =>
+    document.getElementById("seller-modal-bg").classList.remove("active");
+
+  /* ================= EVENTS ================= */
+  searchInput.addEventListener("input", () => renderListings(listings));
+  filterSelect.addEventListener("change", () => renderListings(listings));
+
+  /* ================= INIT ================= */
+  loadListings();
+
+})();
