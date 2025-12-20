@@ -1,257 +1,597 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8" />
+
 <title>BGMI Marketplace</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
+
+
 <style>
-/* ========== BASE ========== */
+
+/* ===== BASE ===== */
+
 body{
+
   margin:0;
+
   font-family:'Poppins',sans-serif;
+
   background:linear-gradient(135deg,#141e30,#243b55);
+
   color:#fff;
+
 }
-body.dark{background:linear-gradient(135deg,#1a1a1a,#2c2c2c)}
+
+body.dark{background:linear-gradient(135deg,#0d0d0d,#1c1c1c)}
+
 #particle-canvas{position:fixed;inset:0;z-index:0}
 
-/* ========== HEADER ========== */
+
+
+/* ===== HEADER ===== */
+
 header{
-  position:relative;z-index:3;
+
+  position:relative;z-index:5;
+
   display:flex;justify-content:space-between;align-items:center;
+
   padding:15px 20px;
-  backdrop-filter:blur(12px);
+
+  backdrop-filter:blur(14px);
+
   background:rgba(255,255,255,.05);
-  border-bottom:1px solid rgba(255,255,255,.1);
+
+  border-bottom:1px solid rgba(0,255,255,.25);
+
 }
 
-/* ========== SEARCH BAR ========== */
+
+
+/* ===== SEARCH ===== */
+
 #top-bar{
-  position:relative;z-index:3;
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
+
+  position:relative;z-index:5;
+
+  display:flex;gap:12px;flex-wrap:wrap;
+
   justify-content:center;
-  padding:12px 16px;
+
+  padding:14px;
+
 }
+
 #search,#filter{
-  padding:10px 14px;
-  border:none;
-  border-radius:20px;
-  outline:none;
-  font-family:'Poppins';
+
+  padding:10px 16px;
+
+  border:none;border-radius:22px;
+
+  outline:none;font-family:'Poppins';
+
 }
+
 #search{width:260px}
+
 #filter{min-width:220px}
 
-/* ========== GRID ========== */
+
+
+/* ===== GRID ===== */
+
 #items-container{
-  position:relative;
-  z-index:2;
+
+  position:relative;z-index:3;
+
   display:grid;
+
   grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:18px;
-  padding:20px;
-  max-width:1400px;
+
+  gap:22px;
+
+  padding:22px;
+
+  max-width:1450px;
+
   margin:auto;
+
 }
 
-/* ========== CARD ========== */
+
+
+/* ===== CARD ===== */
+
 .item-card{
-  display:flex;
-  flex-direction:column;
+
   background:rgba(255,255,255,.06);
-  backdrop-filter:blur(14px);
-  border-radius:18px;
+
+  backdrop-filter:blur(16px);
+
+  border-radius:20px;
+
   overflow:hidden;
+
   transition:.35s;
+
   box-shadow:
+
     0 0 0 1px rgba(0,255,255,.35),
-    0 0 25px rgba(0,255,255,.25),
-    inset 0 0 25px rgba(0,255,255,.15);
+
+    0 0 28px rgba(0,255,255,.35),
+
+    inset 0 0 30px rgba(0,255,255,.15);
+
 }
+
 .item-card:hover{
+
   box-shadow:
-    0 0 0 1px rgba(0,255,255,.9),
-    0 0 40px rgba(0,255,255,.9),
-    0 0 80px rgba(0,255,255,.45);
+
+    0 0 0 1px rgba(0,255,255,1),
+
+    0 0 55px rgba(0,255,255,.9),
+
+    0 0 120px rgba(255,0,255,.6);
+
 }
 
-/* ========== IMAGES ========== */
+
+
+/* ===== IMAGE SLIDER ===== */
+
 .images-gallery{
+
   position:relative;
+
   height:190px;
+
   overflow:hidden;
-  z-index:1;
+
 }
+
 .images-gallery img{
-  width:100%;
-  height:100%;
+
+  width:100%;height:100%;
+
   object-fit:cover;
+
   display:none;
-}
-.images-gallery img.active{display:block}
 
-/* ========== CONTENT ========== */
-.card-content{
-  padding:14px;
-  font-size:14px;
-  line-height:1.55;
-  flex:1;
-  position:relative;
-  z-index:5;
-}
-.card-content strong{font-size:16px}
-.price{
-  font-size:18px;
-  font-weight:600;
-  color:#f39c12;
-  margin-top:6px;
+  filter:blur(14px);
+
+  transition:.6s;
+
 }
 
-/* ========== BUTTONS ========== */
-.card-actions{
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  position:relative;
-  z-index:6;
+.images-gallery img.active{
+
+  display:block;
+
 }
-.btn{
-  padding:10px;
+
+.images-gallery img.loaded{filter:blur(0)}
+
+
+
+/* arrows */
+
+.img-arrow{
+
+  position:absolute;top:50%;
+
+  transform:translateY(-50%);
+
+  width:34px;height:34px;
+
+  border-radius:50%;
+
   border:none;
-  border-radius:10px;
-  font-weight:600;
+
   cursor:pointer;
+
+  font-size:20px;
+
+  background:rgba(0,255,255,.9);
+
+  color:#000;
+
+  box-shadow:0 0 14px cyan;
+
 }
+
+.img-arrow.left{left:10px}
+
+.img-arrow.right{right:10px}
+
+
+
+/* dots */
+
+.img-dots{
+
+  position:absolute;bottom:8px;width:100%;
+
+  text-align:center;
+
+}
+
+.img-dots span{
+
+  width:8px;height:8px;
+
+  display:inline-block;
+
+  margin:0 4px;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,.4);
+
+}
+
+.img-dots span.active{background:cyan}
+
+
+
+/* ===== CONTENT ===== */
+
+.card-content{
+
+  padding:14px;
+
+  font-size:14px;
+
+  line-height:1.55;
+
+}
+
+.card-content strong{font-size:16px}
+
+.price{
+
+  font-size:18px;
+
+  font-weight:600;
+
+  color:#f39c12;
+
+  margin-top:6px;
+
+}
+
+
+
+/* ===== BUTTONS ===== */
+
+.card-actions{
+
+  padding:14px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+
+}
+
+.btn{
+
+  padding:10px;
+
+  border:none;border-radius:10px;
+
+  font-weight:600;cursor:pointer;
+
+}
+
 .buy-btn{background:#27ae60;color:#fff}
+
 .edit-btn{background:#3498db;color:#fff}
+
 .delete-btn{background:#c0392b;color:#fff}
+
 .outline{background:#fff;color:#3498db;border:2px solid #3498db}
 
-/* ========== MODALS ========== */
+
+
+/* ===== MODALS ===== */
+
 .modal-bg{
+
   display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.75);
-  align-items:center;
-  justify-content:center;
-  z-index:999;
+
+  position:fixed;inset:0;
+
+  background:rgba(0,0,0,.8);
+
+  align-items:center;justify-content:center;
+
+  z-index:9999;
+
 }
+
 .modal-bg.active{display:flex}
+
 .modal{
-  background:#fff;
-  color:#333;
-  padding:20px;
-  border-radius:18px;
-  width:420px;
-  max-height:85vh;
+
+  background:#fff;color:#333;
+
+  padding:22px;border-radius:18px;
+
+  width:440px;max-height:85vh;
+
   overflow-y:auto;
-}
-body.dark .modal{background:#2c2c2c;color:#fff}
 
-/* ========== TOAST ========== */
-#toast{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#27ae60;
-  color:#fff;
-  padding:10px 20px;
-  border-radius:25px;
+}
+
+body.dark .modal{background:#1e1e1e;color:#fff}
+
+
+
+/* ===== FULLSCREEN VIEWER ===== */
+
+#fs-viewer{
+
+  position:fixed;inset:0;
+
+  background:rgba(0,0,0,.95);
+
   display:none;
-  z-index:1200;
-}
-#toast.show{display:block}
 
-/* ========== SKELETON ========== */
-.skeleton{
-  height:14px;
-  border-radius:10px;
-  margin:6px 0;
+  align-items:center;justify-content:center;
+
+  z-index:10000;
+
+}
+
+#fs-viewer.active{display:flex}
+
+#fs-viewer img{
+
+  max-width:90%;max-height:90%;
+
+  border-radius:16px;
+
+  transition:.3s;
+
+  cursor:zoom-in;
+
+}
+
+#fs-viewer img.zoomed{
+
+  transform:scale(1.6);
+
+  cursor:zoom-out;
+
+}
+
+.fs-close{
+
+  position:absolute;top:20px;right:30px;
+
+  font-size:32px;color:#fff;cursor:pointer;
+
+}
+
+.fs-arrow{
+
+  position:absolute;top:50%;
+
+  transform:translateY(-50%);
+
+  font-size:40px;color:#fff;cursor:pointer;
+
+}
+
+.fs-arrow.left{left:30px}
+
+.fs-arrow.right{right:30px}
+
+
+
+/* ===== SKELETON ===== */
+
+.skeleton-card{
+
+  height:360px;
+
+  border-radius:20px;
+
   background:linear-gradient(
+
     90deg,
+
     rgba(255,255,255,.05),
+
     rgba(0,255,255,.35),
+
     rgba(255,255,255,.05)
+
   );
+
   background-size:200% 100%;
-  animation:shimmer 1.2s infinite;
+
+  animation:shimmer 1.3s infinite;
+
 }
+
 @keyframes shimmer{
+
   from{background-position:200% 0}
+
   to{background-position:-200% 0}
+
 }
+
 </style>
+
 </head>
+
+
 
 <body>
 
+
+
 <canvas id="particle-canvas"></canvas>
 
+
+
 <header>
+
   <h1>BGMI Marketplace</h1>
+
   <button id="dark-toggle">Dark / Light</button>
+
 </header>
 
+
+
 <div id="top-bar">
+
   <input id="search" placeholder="Search UID / Title / Rank">
+
   <select id="filter">
+
     <option value="">All Listings</option>
+
     <option value="own">My Listings</option>
+
     <option value="price_low">Price: Low → High</option>
+
     <option value="price_high">Price: High → Low</option>
+
     <option value="new">Newest First</option>
+
   </select>
+
 </div>
 
-<div id="items-container"></div>
+
+
+<div id="items-container">
+
+  <!-- skeletons -->
+
+  <div class="skeleton-card"></div>
+
+  <div class="skeleton-card"></div>
+
+  <div class="skeleton-card"></div>
+
+</div>
+
+
+
+<!-- SELLER -->
 
 <div id="seller-modal-bg" class="modal-bg">
+
   <div class="modal">
+
     <div id="seller-content">Loading...</div>
+
     <button class="btn delete-btn" onclick="closeSeller()">Close</button>
+
   </div>
+
 </div>
 
+
+
+<!-- EDIT -->
+
 <div id="edit-modal-bg" class="modal-bg">
+
   <div class="modal">
+
     <h3>Edit Listing</h3>
+
     <div id="edit-form"></div>
+
     <button class="btn buy-btn" id="save-edit">Save</button>
+
     <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
+
   </div>
+
 </div>
+
+
+
+<!-- FULLSCREEN -->
+
+<div id="fs-viewer">
+
+  <span class="fs-close">×</span>
+
+  <span class="fs-arrow left">‹</span>
+
+  <img id="fs-img">
+
+  <span class="fs-arrow right">›</span>
+
+</div>
+
+
 
 <div id="toast"></div>
 
-<!-- MARKETPLACE JS -->
+
+
 <script src="js/marketplace.js"></script>
 
+
+
 <script>
+
 document.getElementById('dark-toggle')
+
   .onclick=()=>document.body.classList.toggle('dark');
 
-/* 3D TILT */
+
+
+/* 3D tilt */
+
 document.addEventListener('mousemove',e=>{
+
   document.querySelectorAll('.item-card').forEach(card=>{
+
     const r=card.getBoundingClientRect();
+
     if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){
+
       card.style.transform='';
+
       return;
+
     }
+
     const x=(e.clientX-r.left)/r.width-.5;
+
     const y=(e.clientY-r.top)/r.height-.5;
-    card.style.transform=
-      `rotateX(${ -y*8 }deg) rotateY(${ x*8 }deg) translateY(-6px) scale(1.02)`;
+
+    card.style.transform=`rotate(${-y*8}deg) rotate(${x*8}deg) translate(-6px)`;
+
   });
+
 });
+
 </script>
 
+
+
 </body>
+
 </html>
