@@ -29,6 +29,9 @@
   const stars = r =>
     "★".repeat(Math.round(r || 0)) + "☆".repeat(5 - Math.round(r || 0));
 
+  const getUser = () =>
+    JSON.parse(localStorage.getItem("user") || "null");
+
   /* ================= IMAGE COMPRESSION ================= */
   const compressImage = (file, maxW = 1280, quality = 0.7) =>
     new Promise(res => {
@@ -54,7 +57,7 @@
     fsIndex = index;
     zoom = 1;
     viewerImg.style.transform = "scale(1)";
-    viewerImg.src = fsImgs[fsIndex].src;
+    viewerImg.src = imgs[index].src;
     viewer.classList.add("active");
   }
 
@@ -88,8 +91,14 @@
     items.forEach(renderCard);
   }
 
-  /* ================= CARD ================= */
+  /* ================= RENDER CARD ================= */
   function renderCard(item) {
+    const user = getUser();
+    const isOwner =
+      user &&
+      (String(user.seller_id) === String(item.seller_id) ||
+        user.role === "admin");
+
     const images = safeArray(item.images);
 
     const card = document.createElement("div");
@@ -123,9 +132,33 @@
 
         <div class="price">₹${item.price}</div>
       </div>
+
+      <button class="btn outline seller-btn">Seller Profile</button>
+
+      ${
+        isOwner
+          ? `
+            <button class="btn edit-btn">Edit</button>
+            <button class="btn delete-btn">Delete</button>
+          `
+          : `<button class="btn buy-btn">Buy</button>`
+      }
     `;
 
-    /* slider */
+    /* BUTTON EVENTS */
+    card.querySelector(".seller-btn").onclick = () =>
+      openSellerProfile(item.seller_id);
+
+    if (isOwner) {
+      card.querySelector(".edit-btn").onclick = () => openEdit(item);
+      card.querySelector(".delete-btn").onclick = () =>
+        deleteListing(item.id);
+    } else {
+      card.querySelector(".buy-btn").onclick = () =>
+        toast("Buy feature coming soon");
+    }
+
+    /* SLIDER */
     const imgs = [...card.querySelectorAll(".images-gallery img")];
     let idx = 0;
     let auto = setInterval(() => slide(1), 3500);
@@ -136,8 +169,8 @@
       imgs[idx].classList.add("active");
     }
 
-    card.querySelector(".img-arrow.left")?.addEventListener("click", () => slide(-1));
-    card.querySelector(".img-arrow.right")?.addEventListener("click", () => slide(1));
+    card.querySelector(".img-arrow.left")?.onclick = () => slide(-1);
+    card.querySelector(".img-arrow.right")?.onclick = () => slide(1);
 
     let startX = 0;
     const g = card.querySelector(".images-gallery");
