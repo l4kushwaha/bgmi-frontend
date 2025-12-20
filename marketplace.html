@@ -16,10 +16,17 @@ body {
   transition: background 0.3s,color 0.3s;
 }
 body.dark{background: linear-gradient(135deg,#1a1a1a,#2c2c2c);color:#fff;}
+
 #particle-canvas{position:fixed;inset:0;z-index:0;}
+
 header{
-  position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;
-  padding:15px 20px;backdrop-filter:blur(12px);
+  position:relative;
+  z-index:2;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+  backdrop-filter:blur(12px);
   background: rgba(255,255,255,0.05);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   border-radius:12px;
@@ -37,6 +44,7 @@ header h1{font-size:26px;font-weight:600;}
   padding:6px 12px;
   border-radius:12px;
 }
+
 #top-bar{
   display:flex;
   gap:10px;
@@ -51,6 +59,7 @@ header h1{font-size:26px;font-weight:600;}
   font-family:'Poppins';transition:0.3s;
 }
 #search:focus,#filter:focus{box-shadow:0 0 8px rgba(52,152,219,0.7);}
+
 #items-container{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
@@ -61,6 +70,7 @@ header h1{font-size:26px;font-weight:600;}
   position:relative;
   z-index:2;
 }
+
 .item-card{
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px);
@@ -75,18 +85,22 @@ header h1{font-size:26px;font-weight:600;}
 .item-card.show{opacity:1;transform:none;}
 .item-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(0,0,0,0.35);}
 body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45);}
-.rating-badge,.verified-badge,.badge-badge{
+
+.badge-badge,.verified-badge,.rating-badge{
   position:absolute;top:10px;font-size:12px;padding:4px 8px;border-radius:8px;font-weight:600;
 }
 .rating-badge{left:10px;background:#f1c40f;}
 .verified-badge{right:10px;background:#27ae60;color:#fff;}
-.badge-badge{top:35px;left:10px;background:#9b59b6;color:#fff;}
+.badge-badge{right:80px;background:#e67e22;color:#fff;}
+
 .item-info{font-size:13px;line-height:1.45;}
 .item-info strong{font-size:15px;}
 .price{font-size:18px;color:#e67e22;font-weight:600;margin-top:6px;}
+
 .images-gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .images-gallery img{width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;transition:0.3s;}
 .images-gallery img:hover{transform:scale(1.2);}
+
 .btn{width:100%;padding:9px;margin-top:7px;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:'Poppins';transition:0.3s;}
 .buy-btn{background:#27ae60;color:#fff;}
 .buy-btn:disabled{background:#aaa;cursor:not-allowed;}
@@ -94,19 +108,25 @@ body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,
 .delete-btn{background:#c0392b;color:#fff;}
 .outline{background:#fff;border:2px solid #3498db;color:#3498db;}
 .btn:hover:not(:disabled){opacity:0.85;}
+
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:999;animation:fadeIn 0.3s;}
 .modal-bg.active{display:flex;}
-.modal{background:#fff;color:#333;padding:18px;border-radius:16px;width:400px;max-height:85vh;overflow-y:auto;position:relative;animation:slideIn 0.3s;}
+.modal{background:#fff;color:#333;padding:18px;border-radius:16px;width:400px;max-height:85vh;overflow-y:auto;position:relative;animation:slideIn 0.3s;display:flex;flex-direction:column;gap:6px;}
 body.dark .modal{background:#2c2c2c;color:#fff;}
 @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
 @keyframes slideIn{0%{transform:translateY(-30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+
 #imgModal img{max-width:92%;max-height:92%;border-radius:14px;transition:transform 0.3s;}
 #imgModal img:hover{transform:scale(1.05);}
+
+#edit-modal form, #seller-modal .modal-content{display:flex;flex-direction:column;gap:6px;}
+#e-images-container{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+
+/* Toast */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 20px;border-radius:25px;display:none;z-index:1200;opacity:0;transition:0.3s;}
 #toast.show{display:block;opacity:1;}
 </style>
 </head>
-
 <body>
 <canvas id="particle-canvas"></canvas>
 
@@ -140,7 +160,7 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 </div>
 
 <!-- Seller Modal -->
-<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="seller-modal">
+<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
   <div class="modal" id="seller-modal">
     <div id="seller-content">Loading...</div>
     <button class="btn delete-btn" onclick="closeSeller()">Close</button>
@@ -148,7 +168,7 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 </div>
 
 <!-- Image Modal -->
-<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="imgPreview" onclick="this.classList.remove('active')">
+<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" onclick="this.classList.remove('active')">
   <img id="imgPreview" alt="Item Image">
 </div>
 
@@ -167,7 +187,6 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 <script src="js/marketplace.js"></script>
 
 <script>
-// Dark mode toggle
 document.getElementById('dark-toggle').addEventListener('click',()=>{document.body.classList.toggle('dark');});
 
 // Particle background

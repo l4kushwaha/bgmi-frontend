@@ -54,6 +54,7 @@
   async function fetchSeller(id) {
     const sid = normalizeId(id);
     if (sellerCache[sid]) return sellerCache[sid];
+
     try {
       const r = await fetch(`${API_URL}/seller/${sid}`);
       if (!r.ok) throw 0;
@@ -165,23 +166,24 @@
       <textarea id="e-mythic" placeholder="Mythic Items">${arrayToString(item.mythic_items)}</textarea>
       <textarea id="e-legendary" placeholder="Legendary Items">${arrayToString(item.legendary_items)}</textarea>
       <textarea id="e-gifts" placeholder="Gift Items">${arrayToString(item.gift_items)}</textarea>
-      <div id="e-images-container" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;border:1px dashed #ccc;padding:6px;"></div>
+      <div id="e-images-container" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;"></div>
       <button class="btn outline" id="add-image-btn">Add Image</button>
-      <p style="font-size:12px;color:#aaa;margin-top:4px;">Drag & drop images here or use Add Image button</p>
     `;
 
     const imagesContainer = document.getElementById("e-images-container");
     const addImageBtn = document.getElementById("add-image-btn");
 
-    function createImageElement(src){
+    // Load existing images with remove button
+    safeArray(item.images).forEach(src => {
       const imgWrapper = document.createElement("div");
-      imgWrapper.style.position="relative";
+      imgWrapper.style.position = "relative";
       const img = document.createElement("img");
       img.src = src;
       img.style.width="60px";
       img.style.height="60px";
       img.style.objectFit="cover";
       img.style.borderRadius="6px";
+
       const cross = document.createElement("span");
       cross.innerHTML="✖";
       cross.style.position="absolute";
@@ -193,30 +195,54 @@
       cross.style.fontSize="12px";
       cross.style.color="#fff";
       cross.onclick = ()=>imgWrapper.remove();
+
       imgWrapper.appendChild(img);
       imgWrapper.appendChild(cross);
       imagesContainer.appendChild(imgWrapper);
-    }
-
-    safeArray(item.images).forEach(createImageElement);
-
-    addImageBtn.onclick = ()=>{
-      const url = prompt("Enter image URL:");
-      if(url) createImageElement(url);
-    };
-
-    // Drag & Drop
-    imagesContainer.addEventListener("dragover", e => { e.preventDefault(); imagesContainer.style.borderColor="#3498db"; });
-    imagesContainer.addEventListener("dragleave", e => { e.preventDefault(); imagesContainer.style.borderColor="#ccc"; });
-    imagesContainer.addEventListener("drop", e => {
-      e.preventDefault(); imagesContainer.style.borderColor="#ccc";
-      const files = e.dataTransfer.files;
-      for(let f of files){
-        const reader = new FileReader();
-        reader.onload = ev => createImageElement(ev.target.result);
-        reader.readAsDataURL(f);
-      }
     });
+
+    // Add image from local files
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.style.display = "none";
+    fileInput.multiple = true;
+    document.body.appendChild(fileInput);
+
+    addImageBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = e => {
+      Array.from(fileInput.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const imgWrapper = document.createElement("div");
+          imgWrapper.style.position = "relative";
+          const img = document.createElement("img");
+          img.src = reader.result;
+          img.style.width="60px";
+          img.style.height="60px";
+          img.style.objectFit="cover";
+          img.style.borderRadius="6px";
+
+          const cross = document.createElement("span");
+          cross.innerHTML="✖";
+          cross.style.position="absolute";
+          cross.style.top="0";
+          cross.style.right="0";
+          cross.style.cursor="pointer";
+          cross.style.background="rgba(0,0,0,0.5)";
+          cross.style.borderRadius="50%";
+          cross.style.fontSize="12px";
+          cross.style.color="#fff";
+          cross.onclick = ()=>imgWrapper.remove();
+
+          imgWrapper.appendChild(img);
+          imgWrapper.appendChild(cross);
+          imagesContainer.appendChild(imgWrapper);
+        };
+        reader.readAsDataURL(file);
+      });
+    };
 
     document.getElementById("save-edit").onclick = ()=>saveEdit(id);
   };
@@ -260,13 +286,16 @@
     const content = document.getElementById("seller-content");
     bg.classList.add("active");
     const s = await fetchSeller(sellerId);
+
     content.innerHTML = `
       <h3>${s.name}</h3>
-      ${s.badge?`<p>Badge: ${s.badge}</p>`:""}
-      ${s.verified?`<p>✔ Verified</p>`:""}
+      <div style="display:flex;gap:8px;margin:6px 0;">
+        ${s.verified ? `<span class="verified-badge">✔ Verified</span>` : ''}
+        ${s.badge ? `<span class="badge-badge">${s.badge}</span>` : ''}
+      </div>
       <p>⭐ ${s.avg_rating} | Sales: ${s.total_sales}</p>
       <p>Reviews: ${s.review_count}</p>
-      <button class="btn outline" onclick="alert('Chat feature coming soon!')">Chat with Seller</button>
+      <button class="btn outline" onclick="alert('Chat coming soon!')">Chat with Seller</button>
       <button class="btn delete-btn" onclick="closeSeller()">Close</button>
     `;
   };
