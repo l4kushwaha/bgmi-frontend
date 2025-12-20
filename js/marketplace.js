@@ -11,16 +11,14 @@
   let currentFilter = "";
 
   /* ================= UTILS ================= */
-  const normalizeId = v => v === null || v === undefined ? null : String(parseInt(v, 10));
+  const normalizeId = v => v == null ? null : String(parseInt(v, 10));
 
   const safeArray = v => {
     try {
       if (Array.isArray(v)) return v;
       if (typeof v === "string") return JSON.parse(v);
       return [];
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   };
 
   const toast = (msg, ok = true) => {
@@ -39,9 +37,7 @@
       const user = JSON.parse(localStorage.getItem("user") || "null");
       if (!token || !user) return null;
       return { token, user };
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   };
 
   const requireLogin = () => {
@@ -100,8 +96,8 @@
       );
 
       if (currentFilter === "own" && session) {
-        items = items.filter(
-          i => normalizeId(i.seller_id) === normalizeId(session.user.seller_id)
+        items = items.filter(i =>
+          normalizeId(i.seller_id) === normalizeId(session.user.seller_id)
         );
       }
 
@@ -126,25 +122,25 @@
         card.innerHTML = `
           <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
           ${seller.seller_verified ? `<div class="verified-badge">✔ Verified</div>` : ""}
-          ${images.length ? `
-            <div class="images-gallery">
-              ${images.map(img => `<img src="${img}" onclick="openImageModal('${img}')">`).join("")}
-            </div>` : ""}
+          ${images.length ? `<div class="images-gallery">
+            ${images.map(img => `<img src="${img}" onclick="openImageModal('${img}')">`).join("")}
+          </div>` : ""}
           <div class="item-info">
-            <p><strong>${item.title}</strong></p>
-            <p>UID: ${item.uid}</p>
-            <p>Level: ${item.level}</p>
+            <p><strong>${item.title || ""}</strong></p>
+            <p>UID: ${item.uid || "-"}</p>
+            <p>Level: ${item.level || "-"}</p>
             <p>Rank: ${item.highest_rank || "-"}</p>
-            <p>Price: ₹${item.price}</p>
+            <p>Price: ₹${item.price || 0}</p>
             ${safeArray(item.mythic_items).length ? `<p>Mythic: ${safeArray(item.mythic_items).join(", ")}</p>` : ""}
             ${safeArray(item.legendary_items).length ? `<p>Legendary: ${safeArray(item.legendary_items).join(", ")}</p>` : ""}
             ${safeArray(item.gift_items).length ? `<p>Gifts: ${safeArray(item.gift_items).join(", ")}</p>` : ""}
           </div>
-          <button class="btn buy-btn" ${item.status !== "available" ? "disabled" : ""}
-            onclick="buyItem('${item.id}')">
-            ${item.status === "available" ? "Buy" : "Sold"}
+          <button class="btn buy-btn" ${item.status!=="available"?"disabled":""} onclick="buyItem('${item.id}')">
+            ${item.status==="available"?"Buy":"Sold"}
           </button>
-          <button class="btn outline" onclick="openSellerProfile('${item.seller_id}')">Seller Profile</button>
+          <button class="btn outline" onclick="openSellerProfile('${item.seller_id}')">
+            Seller Profile
+          </button>
           ${isOwner ? `
             <button class="btn edit-btn" onclick="openEditModal('${item.id}')">Edit</button>
             <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
@@ -173,13 +169,14 @@
       const item = items.find(i => String(i.id) === String(id));
       if (!item) return toast("Listing not found", false);
 
+      // Build edit form
       form.innerHTML = `
         <label>Title</label>
-        <input id="e-title" value="${item.title}">
+        <input id="e-title" value="${item.title || ""}">
         <label>Price</label>
-        <input id="e-price" type="number" value="${item.price}">
+        <input id="e-price" type="number" value="${item.price || ""}">
         <label>Level</label>
-        <input id="e-level" type="number" value="${item.level}">
+        <input id="e-level" type="number" value="${item.level || ""}">
         <label>Rank</label>
         <input id="e-rank" value="${item.highest_rank || ""}">
         <label>Mythic Items (comma separated)</label>
@@ -188,13 +185,23 @@
         <textarea id="e-legendary">${safeArray(item.legendary_items).join(", ")}</textarea>
         <label>Gift Items (comma separated)</label>
         <textarea id="e-gifts">${safeArray(item.gift_items).join(", ")}</textarea>
-        <label>Images URLs (comma separated)</label>
-        <textarea id="e-images">${safeArray(item.images).join(", ")}</textarea>
-        <div style="display:flex;gap:10px;margin-top:10px;">
-          <button class="btn buy-btn" onclick="saveEdit('${id}')">Save</button>
-          <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
-        </div>
+        <label>Images (drag & drop or paste URLs, comma separated)</label>
+        <textarea id="e-images" placeholder="https://example.com/image1.jpg, ...">${safeArray(item.images).join(", ")}</textarea>
       `;
+
+      // Drag and drop support for images
+      const imagesTextarea = document.getElementById("e-images");
+      imagesTextarea.addEventListener("dragover", e => e.preventDefault());
+      imagesTextarea.addEventListener("drop", e => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files);
+        const urls = files.map(f => URL.createObjectURL(f));
+        imagesTextarea.value = [...imagesTextarea.value.split(",").map(v=>v.trim()), ...urls].join(", ");
+      });
+
+      // Attach save handler
+      document.getElementById("save-edit").onclick = () => saveEdit(id);
+
     } catch {
       toast("Failed to load listing", false);
     }
@@ -204,18 +211,18 @@
     const s = requireLogin();
     if (!s) return;
 
-    try {
-      const body = {
-        title: document.getElementById("e-title").value,
-        price: Number(document.getElementById("e-price").value),
-        level: Number(document.getElementById("e-level").value),
-        highest_rank: document.getElementById("e-rank").value,
-        mythic_items: document.getElementById("e-mythic").value.split(",").map(v => v.trim()).filter(v=>v),
-        legendary_items: document.getElementById("e-legendary").value.split(",").map(v => v.trim()).filter(v=>v),
-        gift_items: document.getElementById("e-gifts").value.split(",").map(v => v.trim()).filter(v=>v),
-        images: document.getElementById("e-images").value.split(",").map(v => v.trim()).filter(v=>v)
-      };
+    const body = {
+      title: document.getElementById("e-title")?.value || "",
+      price: Number(document.getElementById("e-price")?.value) || 0,
+      level: Number(document.getElementById("e-level")?.value) || 0,
+      highest_rank: document.getElementById("e-rank")?.value || "",
+      mythic_items: (document.getElementById("e-mythic")?.value || "").split(",").map(v => v.trim()).filter(v=>v),
+      legendary_items: (document.getElementById("e-legendary")?.value || "").split(",").map(v => v.trim()).filter(v=>v),
+      gift_items: (document.getElementById("e-gifts")?.value || "").split(",").map(v => v.trim()).filter(v=>v),
+      images: (document.getElementById("e-images")?.value || "").split(",").map(v => v.trim()).filter(v=>v)
+    };
 
+    try {
       const res = await fetch(`${API_URL}/listings/${id}`, {
         method: "PUT",
         headers: {
@@ -224,9 +231,8 @@
         },
         body: JSON.stringify(body)
       });
-
-      if (!res.ok) return toast("Edit failed", false);
-      toast("Listing updated");
+      if (!res.ok) throw 1;
+      toast("Listing updated successfully");
       closeEdit();
       loadListings();
     } catch {
@@ -243,14 +249,12 @@
     bg.classList.add("active");
 
     const s = await fetchSeller(sellerId);
+
     content.innerHTML = `
-      <div style="text-align:right;">
-        <button class="btn delete-btn" onclick="closeSeller()">Close</button>
-      </div>
-      <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
+      <h3>${s.name} ${s.seller_verified ? "✔ Verified" : ""}</h3>
       <p>⭐ ${s.avg_rating} | Sales: ${s.total_sales}</p>
       <p>Reviews: ${s.review_count}</p>
-      <p>Listings: ${safeArray(s.listings).length}</p>
+      <button class="btn delete-btn" onclick="closeSeller()">Close</button>
     `;
   };
 
@@ -282,7 +286,7 @@
     loadListings();
   };
 
-  /* ================= SEARCH ================= */
+  /* ================= SEARCH / FILTER ================= */
   searchInput?.addEventListener("input", e => {
     currentSearch = e.target.value.toLowerCase();
     loadListings();
@@ -293,5 +297,6 @@
     loadListings();
   });
 
+  /* ================= INIT ================= */
   loadListings();
 })();

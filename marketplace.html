@@ -134,7 +134,7 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 
 /* ================= TOAST ================= */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 20px;border-radius:25px;display:none;z-index:1200;opacity:0;transition:0.3s;}
-#toast.show{display:block;opacity:1;}
+#toast.show{display:block;opacity:1}
 </style>
 </head>
 
@@ -171,15 +171,14 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 </div>
 
 <!-- Seller Modal -->
-<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
+<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="seller-modal">
   <div class="modal" id="seller-modal">
     <div id="seller-content">Loading...</div>
-    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
   </div>
 </div>
 
 <!-- Image Modal -->
-<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" onclick="this.classList.remove('active')">
+<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="imgPreview" onclick="this.classList.remove('active')">
   <img id="imgPreview" alt="Item Image">
 </div>
 
@@ -187,8 +186,9 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 <div id="edit-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
   <div class="modal" id="edit-modal">
     <h3>Edit Listing</h3>
-    <div id="edit-form">Loading...</div>
-    <!-- Buttons will be generated dynamically by marketplace.js -->
+    <div id="edit-form"></div>
+    <button class="btn buy-btn" id="save-edit">Save Changes</button>
+    <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
   </div>
 </div>
 
