@@ -8,6 +8,7 @@ const filterSelect = document.getElementById("filter");
 let allItems = [];
 let editItem = null;
 let editImages = [];
+let sliderTimers = new WeakMap();
 
 /* ================= HELPERS ================= */
 const safeArray = v => {
@@ -43,6 +44,10 @@ const isOwner = item =>
   session() &&
   (String(session().user.seller_id) === String(item.seller_id) ||
    session().user.role === "admin");
+
+const stars = r =>
+  "★".repeat(Math.round(r || 0)) +
+  "☆".repeat(5 - Math.round(r || 0));
 
 /* ================= LOAD LISTINGS ================= */
 async function loadListings() {
@@ -88,9 +93,15 @@ function renderCard(item) {
 
   card.innerHTML = `
     <div class="images-gallery">
-      ${images.map((img,i)=>
-        `<img src="${img}" class="${i===0?"active":""}">`
-      ).join("")}
+      ${images.map((img,i)=>`
+        <img src="${img}" class="${i===0?"active":""}">
+      `).join("")}
+      ${images.length>1?`
+        <button class="img-arrow left">‹</button>
+        <button class="img-arrow right">›</button>
+        <div class="img-dots">
+          ${images.map((_,i)=>`<span class="${i===0?"active":""}"></span>`).join("")}
+        </div>`:""}
     </div>
 
     <div class="card-content">
@@ -112,19 +123,84 @@ function renderCard(item) {
       ${isOwner(item)
         ? `<button class="btn edit-btn">Edit</button>
            <button class="btn delete-btn">Delete</button>`
-        : `<button class="btn buy-btn">Buy</button>`}
+        : `<button class="btn buy-btn" onclick="alert('Coming soon')">Buy</button>`}
     </div>
   `;
 
+  /* SELLER */
   card.querySelector(".seller-btn").onclick =
     () => openSellerProfile(item.seller_id);
 
+  /* OWNER */
   if (isOwner(item)) {
     card.querySelector(".edit-btn").onclick = () => openEdit(item.id);
     card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
   }
 
+  initSlider(card);
   container.appendChild(card);
+}
+
+/* ================= IMAGE SLIDER ================= */
+function initSlider(card){
+  const gallery = card.querySelector(".images-gallery");
+  if(!gallery) return;
+
+  const imgs=[...gallery.querySelectorAll("img")];
+  if(imgs.length<=1) return;
+
+  const dots=[...gallery.querySelectorAll(".img-dots span")];
+  let index=0;
+
+  const show=i=>{
+    imgs[index].classList.remove("active");
+    dots[index].classList.remove("active");
+    index=(i+imgs.length)%imgs.length;
+    imgs[index].classList.add("active");
+    dots[index].classList.add("active");
+  };
+
+  gallery.querySelector(".left").onclick=()=>show(index-1);
+  gallery.querySelector(".right").onclick=()=>show(index+1);
+  dots.forEach((d,i)=>d.onclick=()=>show(i));
+
+  const timer=setInterval(()=>show(index+1),3500);
+  sliderTimers.set(card,timer);
+
+  imgs.forEach(img=>img.onclick=()=>openFullscreen(imgs,index));
+}
+
+/* ================= FULLSCREEN VIEWER ================= */
+let fsImgs=[],fsIndex=0;
+const viewer=document.createElement("div");
+viewer.style.cssText=`
+  position:fixed;inset:0;background:rgba(0,0,0,.9);
+  display:none;align-items:center;justify-content:center;z-index:9999`;
+viewer.innerHTML=`
+  <span style="position:absolute;top:20px;right:30px;
+    font-size:32px;color:#fff;cursor:pointer">×</span>
+  <span class="fs-left" style="position:absolute;left:20px;
+    font-size:40px;color:#fff;cursor:pointer">‹</span>
+  <img style="max-width:92%;max-height:92%;border-radius:14px">
+  <span class="fs-right" style="position:absolute;right:20px;
+    font-size:40px;color:#fff;cursor:pointer">›</span>
+`;
+document.body.appendChild(viewer);
+
+const fsImg=viewer.querySelector("img");
+viewer.querySelector("span").onclick=()=>viewer.style.display="none";
+viewer.querySelector(".fs-left").onclick=()=>fsShow(fsIndex-1);
+viewer.querySelector(".fs-right").onclick=()=>fsShow(fsIndex+1);
+
+function openFullscreen(imgs,i){
+  fsImgs=imgs;
+  fsIndex=i;
+  fsImg.src=imgs[i].src;
+  viewer.style.display="flex";
+}
+function fsShow(i){
+  fsIndex=(i+fsImgs.length)%fsImgs.length;
+  fsImg.src=fsImgs[fsIndex].src;
 }
 
 /* ================= SELLER PROFILE ================= */
@@ -132,15 +208,17 @@ window.openSellerProfile = async id => {
   const bg = document.getElementById("seller-modal-bg");
   const c = document.getElementById("seller-content");
   bg.classList.add("active");
-  c.innerHTML = "Loading...";
+  c.innerHTML="Loading...";
   const res = await fetch(`${API_URL}/seller/${id}`);
   const s = await res.json();
 
   c.innerHTML = `
     <h3>${s.name}</h3>
     <p>Status: ${s.seller_verified==1?"Verified":"Pending"}</p>
-    <p>Rating: ${"★".repeat(Math.round(s.avg_rating||0))}</p>
-    <p>Sales: ${s.total_sales||0}</p>
+    <p>Badge: ${s.badge || "-"}</p>
+    <p>Rating: ${stars(s.avg_rating)}</p>
+    <p>Reviews: ${s.review_count || 0}</p>
+    <p>Total Sales: ${s.total_sales || 0}</p>
     <button class="btn outline" onclick="alert('Chat coming soon')">Chat</button>
   `;
 };
@@ -149,38 +227,35 @@ window.closeSeller = () =>
   document.getElementById("seller-modal-bg").classList.remove("active");
 
 /* ================= EDIT ================= */
-function openEdit(id) {
-  editItem = allItems.find(i => String(i.id) === String(id));
-  if (!editItem) return;
+function openEdit(id){
+  editItem=allItems.find(i=>String(i.id)===String(id));
+  if(!editItem) return;
+  editImages=safeArray(editItem.images);
 
-  editImages = safeArray(editItem.images);
-  const f = document.getElementById("edit-form");
+  const f=document.getElementById("edit-form");
   document.getElementById("edit-modal-bg").classList.add("active");
 
-  const arr = v => safeArray(v).join(", ");
+  const arr=v=>safeArray(v).join(", ");
 
-  f.innerHTML = `
-    <input id="e-title" value="${editItem.title}" placeholder="Title">
-    <input id="e-price" type="number" value="${editItem.price}" placeholder="Price">
-    <input id="e-level" type="number" value="${editItem.level}" placeholder="Level">
-    <input id="e-rank" value="${editItem.highest_rank||""}" placeholder="Rank">
-
-    <textarea id="e-upgraded" placeholder="Upgraded Guns">${arr(editItem.upgraded_guns)}</textarea>
-    <textarea id="e-mythic" placeholder="Mythic Items">${arr(editItem.mythic_items)}</textarea>
-    <textarea id="e-legendary" placeholder="Legendary Items">${arr(editItem.legendary_items)}</textarea>
-    <textarea id="e-gifts" placeholder="Gift Items">${arr(editItem.gift_items)}</textarea>
-    <textarea id="e-titles" placeholder="Titles">${arr(editItem.titles)}</textarea>
-    <textarea id="e-highlights" placeholder="Highlights">${editItem.account_highlights||""}</textarea>
-
+  f.innerHTML=`
+    <input id="e-title" value="${editItem.title}">
+    <input id="e-price" type="number" value="${editItem.price}">
+    <input id="e-level" type="number" value="${editItem.level}">
+    <input id="e-rank" value="${editItem.highest_rank||""}">
+    <textarea id="e-upgraded">${arr(editItem.upgraded_guns)}</textarea>
+    <textarea id="e-mythic">${arr(editItem.mythic_items)}</textarea>
+    <textarea id="e-legendary">${arr(editItem.legendary_items)}</textarea>
+    <textarea id="e-gifts">${arr(editItem.gift_items)}</textarea>
+    <textarea id="e-titles">${arr(editItem.titles)}</textarea>
+    <textarea id="e-highlights">${editItem.account_highlights||""}</textarea>
     <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     <button class="btn outline" id="add-img">Add Image</button>
   `;
-
   renderEditImages();
 
-  document.getElementById("add-img").onclick = () => {
-    const i = document.createElement("input");
-    i.type="file"; i.accept="image/*";
+  document.getElementById("add-img").onclick=()=>{
+    const i=document.createElement("input");
+    i.type="file";i.accept="image/*";
     i.onchange=e=>{
       const r=new FileReader();
       r.onload=ev=>{
@@ -198,6 +273,7 @@ function renderEditImages(){
   box.innerHTML="";
   editImages.forEach((src,i)=>{
     const d=document.createElement("div");
+    d.draggable=true;
     d.style.position="relative";
     d.innerHTML=`
       <img src="${src}" style="width:70px;height:70px;object-fit:cover;border-radius:8px">
@@ -208,13 +284,19 @@ function renderEditImages(){
       editImages.splice(i,1);
       renderEditImages();
     };
+    d.ondragstart=e=>e.dataTransfer.setData("i",i);
+    d.ondragover=e=>e.preventDefault();
+    d.ondrop=e=>{
+      const from=e.dataTransfer.getData("i");
+      [editImages[from],editImages[i]]=[editImages[i],editImages[from]];
+      renderEditImages();
+    };
     box.appendChild(d);
   });
 }
 
-document.getElementById("save-edit").onclick = async () => {
-  if (!editItem || !session()) return;
-
+document.getElementById("save-edit").onclick=async()=>{
+  if(!editItem||!session())return;
   await fetch(`${API_URL}/listings/${editItem.id}`,{
     method:"PUT",
     headers:{
@@ -235,13 +317,11 @@ document.getElementById("save-edit").onclick = async () => {
       images:editImages
     })
   });
-
   toast("Listing updated");
-  closeEdit();
-  loadListings();
+  closeEdit();loadListings();
 };
 
-window.closeEdit = () =>
+window.closeEdit=()=>
   document.getElementById("edit-modal-bg").classList.remove("active");
 
 const e=id=>document.getElementById(id).value;
