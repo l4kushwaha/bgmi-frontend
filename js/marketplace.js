@@ -6,7 +6,6 @@
 
   let editListing = null;
   let editImgs = [];
-  let editIndex = 0;
 
   /* ================= HELPERS ================= */
   const safeArray = v => {
@@ -97,10 +96,9 @@
 
     card.innerHTML = `
       <div class="rating-badge">${stars(item.avg_rating)}</div>
+
       <div class="images-gallery">
-        ${images.map((i, idx) =>
-          `<img src="${i}" class="${idx === 0 ? "active" : ""}">`
-        ).join("")}
+        ${images.map(i => `<img src="${i}">`).join("")}
       </div>
 
       <div class="item-info">
@@ -150,7 +148,6 @@
   function openEdit(item) {
     editListing = item;
     editImgs = safeArray(item.images);
-    editIndex = 0;
 
     const bg = document.getElementById("edit-modal-bg");
     const form = document.getElementById("edit-form");
@@ -161,59 +158,65 @@
     const arr = v => safeArray(v).join(", ");
 
     form.innerHTML = `
-      <label>Title</label>
-      <input id="e-title" value="${item.title || ""}">
+      <input id="e-title" value="${item.title || ""}" placeholder="Title">
+      <input id="e-price" type="number" value="${item.price || 0}" placeholder="Price">
+      <input id="e-level" type="number" value="${item.level || 0}" placeholder="Level">
+      <input id="e-rank" value="${item.highest_rank || ""}" placeholder="Rank">
 
-      <label>Price</label>
-      <input id="e-price" type="number" value="${item.price || 0}">
+      <textarea id="e-upgraded" placeholder="Upgraded Guns">${arr(
+        item.upgraded_guns
+      )}</textarea>
+      <textarea id="e-mythic" placeholder="Mythic Items">${arr(
+        item.mythic_items
+      )}</textarea>
+      <textarea id="e-legendary" placeholder="Legendary Items">${arr(
+        item.legendary_items
+      )}</textarea>
+      <textarea id="e-highlights" placeholder="Highlights">${
+        item.account_highlights || ""
+      }</textarea>
 
-      <label>Level</label>
-      <input id="e-level" type="number" value="${item.level || 0}">
+      <label><b>Images</b></label>
+      <div id="edit-images" class="edit-images-row"></div>
 
-      <label>Rank</label>
-      <input id="e-rank" value="${item.highest_rank || ""}">
-
-      <label>Upgraded Guns</label>
-      <textarea id="e-upgraded">${arr(item.upgraded_guns)}</textarea>
-
-      <label>Mythic Items</label>
-      <textarea id="e-mythic">${arr(item.mythic_items)}</textarea>
-
-      <label>Legendary Items</label>
-      <textarea id="e-legendary">${arr(item.legendary_items)}</textarea>
-
-      <label>Highlights</label>
-      <textarea id="e-highlights">${item.account_highlights || ""}</textarea>
-
-      <label>Images</label>
-      <div id="edit-images" class="edit-gallery"></div>
+      <input type="file" id="add-images" accept="image/*" multiple>
     `;
+
+    document.getElementById("add-images").onchange = e => {
+      [...e.target.files].forEach(file => {
+        const r = new FileReader();
+        r.onload = ev => {
+          editImgs.push(ev.target.result);
+          renderEditImages();
+        };
+        r.readAsDataURL(file);
+      });
+    };
 
     renderEditImages();
   }
 
   function renderEditImages() {
     const box = document.getElementById("edit-images");
-    if (!box || editImgs.length === 0) return;
+    if (!box) return;
 
-    box.innerHTML = `
-      ${editImgs.map(
-        (src, i) =>
-          `<img src="${src}" class="${i === editIndex ? "active" : ""}">`
-      ).join("")}
-      <button class="edit-arrow left">‹</button>
-      <button class="edit-arrow right">›</button>
-    `;
+    box.innerHTML = editImgs
+      .map(
+        (src, i) => `
+        <div class="edit-img-wrap">
+          <img src="${src}">
+          <span class="remove-img" data-i="${i}">×</span>
+        </div>
+      `
+      )
+      .join("");
 
-    const imgs = box.querySelectorAll("img");
-    box.querySelector(".left").onclick = () => switchImg(-1, imgs);
-    box.querySelector(".right").onclick = () => switchImg(1, imgs);
-  }
-
-  function switchImg(dir, imgs) {
-    imgs[editIndex].classList.remove("active");
-    editIndex = (editIndex + dir + imgs.length) % imgs.length;
-    imgs[editIndex].classList.add("active");
+    box.querySelectorAll(".remove-img").forEach(btn => {
+      btn.onclick = () => {
+        editImgs.splice(btn.dataset.i, 1);
+        renderEditImages();
+      };
+    });
   }
 
   /* ================= SAVE EDIT ================= */
