@@ -18,12 +18,11 @@ const safeArray = v => {
   } catch { return []; }
 };
 
-const toast = (msg, ok = true) => {
+const toast = msg => {
   const t = document.getElementById("toast");
   t.textContent = msg;
-  t.style.background = ok ? "#27ae60" : "#c0392b";
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 3000);
+  setTimeout(() => t.classList.remove("show"), 2500);
 };
 
 const session = () => {
@@ -57,14 +56,14 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
       const canvas = document.createElement("canvas");
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.getContext("2d")
+        .drawImage(img, 0, 0, canvas.width, canvas.height);
       resolve(canvas.toDataURL("image/jpeg", quality));
     };
   });
 }
 
-/* ================= LOAD LISTINGS ================= */
+/* ================= LOAD ================= */
 async function loadListings() {
   const s = session();
   const res = await fetch(`${API_URL}/listings`, {
@@ -80,17 +79,15 @@ function renderList() {
   const q = searchInput?.value?.toLowerCase() || "";
   const f = filterSelect?.value || "";
 
-  if (q) {
+  if (q)
     items = items.filter(i =>
       `${i.uid} ${i.title} ${i.highest_rank}`.toLowerCase().includes(q)
     );
-  }
 
-  if (f === "own" && session()) {
+  if (f === "own" && session())
     items = items.filter(i =>
       String(i.seller_id) === String(session().user.seller_id)
     );
-  }
 
   if (f === "price_low") items.sort((a,b)=>a.price-b.price);
   if (f === "price_high") items.sort((a,b)=>b.price-a.price);
@@ -154,29 +151,44 @@ function renderCard(item) {
   container.appendChild(card);
 }
 
-/* ================= IMAGE SLIDER ================= */
+/* ================= IMAGE SLIDER (FIXED) ================= */
 function initSlider(card){
   const g = card.querySelector(".images-gallery");
   if(!g) return;
-  const imgs=[...g.querySelectorAll("img")];
-  if(imgs.length<=1) return;
 
-  const dots=[...g.querySelectorAll(".img-dots span")];
-  let i=0;
+  const imgs = [...g.querySelectorAll("img")];
+  if(imgs.length <= 1) return;
 
-  const show=n=>{
-    imgs[i].classList.remove("active");
-    dots[i].classList.remove("active");
-    i=(n+imgs.length)%imgs.length;
-    imgs[i].classList.add("active");
-    dots[i].classList.add("active");
+  const dots = [...g.querySelectorAll(".img-dots span")];
+  const left = g.querySelector(".left");
+  const right = g.querySelector(".right");
+
+  let index = 0;
+  let timer = null;
+
+  const show = n => {
+    imgs[index].classList.remove("active");
+    dots[index].classList.remove("active");
+
+    index = (n + imgs.length) % imgs.length;
+
+    imgs[index].classList.add("active");
+    dots[index].classList.add("active");
   };
 
-  g.querySelector(".left").onclick=()=>show(i-1);
-  g.querySelector(".right").onclick=()=>show(i+1);
-  dots.forEach((d,n)=>d.onclick=()=>show(n));
+  left.onclick = () => show(index - 1);
+  right.onclick = () => show(index + 1);
+  dots.forEach((d,i)=>d.onclick=()=>show(i));
 
-  setInterval(()=>show(i+1),3500);
+  const startAuto = () =>
+    timer = setInterval(() => show(index + 1), 3500);
+
+  const stopAuto = () => timer && clearInterval(timer);
+
+  g.addEventListener("mouseenter", stopAuto);
+  g.addEventListener("mouseleave", startAuto);
+
+  startAuto();
 }
 
 /* ================= EDIT ================= */
@@ -187,29 +199,20 @@ function openEdit(id){
   const f = document.getElementById("edit-form");
   document.getElementById("edit-modal-bg").classList.add("active");
 
-  const field = (label,id,val)=>`
-    <label><b>${label}</b></label>
-    <input id="${id}" value="${val||""}">
-  `;
-
-  const area = (label,id,val)=>`
-    <label><b>${label}</b></label>
-    <textarea id="${id}">${val||""}</textarea>
-  `;
+  const field = (l,i,v)=>`<label><b>${l}</b></label><input id="${i}" value="${v||""}">`;
+  const area = (l,i,v)=>`<label><b>${l}</b></label><textarea id="${i}">${v||""}</textarea>`;
 
   f.innerHTML = `
-    ${field("Listing Title","e-title",editItem.title)}
+    ${field("Title","e-title",editItem.title)}
     ${field("Price","e-price",editItem.price)}
     ${field("Level","e-level",editItem.level)}
-    ${field("Highest Rank","e-rank",editItem.highest_rank)}
-
+    ${field("Rank","e-rank",editItem.highest_rank)}
     ${area("Upgraded Guns","e-upgraded",safeArray(editItem.upgraded_guns).join(","))}
     ${area("Mythic Items","e-mythic",safeArray(editItem.mythic_items).join(","))}
     ${area("Legendary Items","e-legendary",safeArray(editItem.legendary_items).join(","))}
     ${area("Gift Items","e-gifts",safeArray(editItem.gift_items).join(","))}
     ${area("Titles","e-titles",safeArray(editItem.titles).join(","))}
     ${area("Highlights","e-highlights",editItem.account_highlights)}
-
     <label><b>Images</b></label>
     <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     <button class="btn outline" id="add-img">Add Image</button>
@@ -235,9 +238,8 @@ function renderEditImages(){
   editImages.forEach((src,i)=>{
     const d=document.createElement("div");
     d.style.position="relative";
-    d.draggable=true;
     d.innerHTML=`
-      <img src="${src}" style="width:70px;height:70px;object-fit:cover;border-radius:8px">
+      <img src="${src}" style="width:70px;height:70px;border-radius:8px;object-fit:cover">
       <span style="position:absolute;top:-6px;right:-6px;
         background:red;color:#fff;border-radius:50%;
         padding:2px 6px;cursor:pointer">✖</span>`;
