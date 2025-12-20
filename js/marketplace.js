@@ -8,7 +8,6 @@ const filterSelect = document.getElementById("filter");
 let allItems = [];
 let editItem = null;
 let editImages = [];
-let sliderTimers = new WeakMap();
 
 /* ================= HELPERS ================= */
 const safeArray = v => {
@@ -16,9 +15,7 @@ const safeArray = v => {
     if (Array.isArray(v)) return v;
     if (typeof v === "string") return JSON.parse(v);
     return [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 };
 
 const toast = (msg, ok = true) => {
@@ -35,9 +32,7 @@ const session = () => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!token || !user) return null;
     return { token, user };
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 };
 
 const isOwner = item =>
@@ -48,6 +43,26 @@ const isOwner = item =>
 const stars = r =>
   "★".repeat(Math.round(r || 0)) +
   "☆".repeat(5 - Math.round(r || 0));
+
+/* ================= IMAGE COMPRESSION ================= */
+function compressImage(file, maxW = 1200, quality = 0.75) {
+  return new Promise(resolve => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = e => img.src = e.target.result;
+    reader.readAsDataURL(file);
+
+    img.onload = () => {
+      const scale = Math.min(maxW / img.width, 1);
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+  });
+}
 
 /* ================= LOAD LISTINGS ================= */
 async function loadListings() {
@@ -123,15 +138,13 @@ function renderCard(item) {
       ${isOwner(item)
         ? `<button class="btn edit-btn">Edit</button>
            <button class="btn delete-btn">Delete</button>`
-        : `<button class="btn buy-btn" onclick="alert('Coming soon')">Buy</button>`}
+        : `<button class="btn buy-btn" onclick="alert('Buy coming soon')">Buy</button>`}
     </div>
   `;
 
-  /* SELLER */
   card.querySelector(".seller-btn").onclick =
     () => openSellerProfile(item.seller_id);
 
-  /* OWNER */
   if (isOwner(item)) {
     card.querySelector(".edit-btn").onclick = () => openEdit(item.id);
     card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
@@ -143,126 +156,74 @@ function renderCard(item) {
 
 /* ================= IMAGE SLIDER ================= */
 function initSlider(card){
-  const gallery = card.querySelector(".images-gallery");
-  if(!gallery) return;
-
-  const imgs=[...gallery.querySelectorAll("img")];
+  const g = card.querySelector(".images-gallery");
+  if(!g) return;
+  const imgs=[...g.querySelectorAll("img")];
   if(imgs.length<=1) return;
 
-  const dots=[...gallery.querySelectorAll(".img-dots span")];
-  let index=0;
+  const dots=[...g.querySelectorAll(".img-dots span")];
+  let i=0;
 
-  const show=i=>{
-    imgs[index].classList.remove("active");
-    dots[index].classList.remove("active");
-    index=(i+imgs.length)%imgs.length;
-    imgs[index].classList.add("active");
-    dots[index].classList.add("active");
+  const show=n=>{
+    imgs[i].classList.remove("active");
+    dots[i].classList.remove("active");
+    i=(n+imgs.length)%imgs.length;
+    imgs[i].classList.add("active");
+    dots[i].classList.add("active");
   };
 
-  gallery.querySelector(".left").onclick=()=>show(index-1);
-  gallery.querySelector(".right").onclick=()=>show(index+1);
-  dots.forEach((d,i)=>d.onclick=()=>show(i));
+  g.querySelector(".left").onclick=()=>show(i-1);
+  g.querySelector(".right").onclick=()=>show(i+1);
+  dots.forEach((d,n)=>d.onclick=()=>show(n));
 
-  const timer=setInterval(()=>show(index+1),3500);
-  sliderTimers.set(card,timer);
-
-  imgs.forEach(img=>img.onclick=()=>openFullscreen(imgs,index));
+  setInterval(()=>show(i+1),3500);
 }
-
-/* ================= FULLSCREEN VIEWER ================= */
-let fsImgs=[],fsIndex=0;
-const viewer=document.createElement("div");
-viewer.style.cssText=`
-  position:fixed;inset:0;background:rgba(0,0,0,.9);
-  display:none;align-items:center;justify-content:center;z-index:9999`;
-viewer.innerHTML=`
-  <span style="position:absolute;top:20px;right:30px;
-    font-size:32px;color:#fff;cursor:pointer">×</span>
-  <span class="fs-left" style="position:absolute;left:20px;
-    font-size:40px;color:#fff;cursor:pointer">‹</span>
-  <img style="max-width:92%;max-height:92%;border-radius:14px">
-  <span class="fs-right" style="position:absolute;right:20px;
-    font-size:40px;color:#fff;cursor:pointer">›</span>
-`;
-document.body.appendChild(viewer);
-
-const fsImg=viewer.querySelector("img");
-viewer.querySelector("span").onclick=()=>viewer.style.display="none";
-viewer.querySelector(".fs-left").onclick=()=>fsShow(fsIndex-1);
-viewer.querySelector(".fs-right").onclick=()=>fsShow(fsIndex+1);
-
-function openFullscreen(imgs,i){
-  fsImgs=imgs;
-  fsIndex=i;
-  fsImg.src=imgs[i].src;
-  viewer.style.display="flex";
-}
-function fsShow(i){
-  fsIndex=(i+fsImgs.length)%fsImgs.length;
-  fsImg.src=fsImgs[fsIndex].src;
-}
-
-/* ================= SELLER PROFILE ================= */
-window.openSellerProfile = async id => {
-  const bg = document.getElementById("seller-modal-bg");
-  const c = document.getElementById("seller-content");
-  bg.classList.add("active");
-  c.innerHTML="Loading...";
-  const res = await fetch(`${API_URL}/seller/${id}`);
-  const s = await res.json();
-
-  c.innerHTML = `
-    <h3>${s.name}</h3>
-    <p>Status: ${s.seller_verified==1?"Verified":"Pending"}</p>
-    <p>Badge: ${s.badge || "-"}</p>
-    <p>Rating: ${stars(s.avg_rating)}</p>
-    <p>Reviews: ${s.review_count || 0}</p>
-    <p>Total Sales: ${s.total_sales || 0}</p>
-    <button class="btn outline" onclick="alert('Chat coming soon')">Chat</button>
-  `;
-};
-
-window.closeSeller = () =>
-  document.getElementById("seller-modal-bg").classList.remove("active");
 
 /* ================= EDIT ================= */
 function openEdit(id){
-  editItem=allItems.find(i=>String(i.id)===String(id));
-  if(!editItem) return;
-  editImages=safeArray(editItem.images);
+  editItem = allItems.find(i=>String(i.id)===String(id));
+  editImages = safeArray(editItem.images);
 
-  const f=document.getElementById("edit-form");
+  const f = document.getElementById("edit-form");
   document.getElementById("edit-modal-bg").classList.add("active");
 
-  const arr=v=>safeArray(v).join(", ");
+  const field = (label,id,val)=>`
+    <label><b>${label}</b></label>
+    <input id="${id}" value="${val||""}">
+  `;
 
-  f.innerHTML=`
-    <input id="e-title" value="${editItem.title}">
-    <input id="e-price" type="number" value="${editItem.price}">
-    <input id="e-level" type="number" value="${editItem.level}">
-    <input id="e-rank" value="${editItem.highest_rank||""}">
-    <textarea id="e-upgraded">${arr(editItem.upgraded_guns)}</textarea>
-    <textarea id="e-mythic">${arr(editItem.mythic_items)}</textarea>
-    <textarea id="e-legendary">${arr(editItem.legendary_items)}</textarea>
-    <textarea id="e-gifts">${arr(editItem.gift_items)}</textarea>
-    <textarea id="e-titles">${arr(editItem.titles)}</textarea>
-    <textarea id="e-highlights">${editItem.account_highlights||""}</textarea>
+  const area = (label,id,val)=>`
+    <label><b>${label}</b></label>
+    <textarea id="${id}">${val||""}</textarea>
+  `;
+
+  f.innerHTML = `
+    ${field("Listing Title","e-title",editItem.title)}
+    ${field("Price","e-price",editItem.price)}
+    ${field("Level","e-level",editItem.level)}
+    ${field("Highest Rank","e-rank",editItem.highest_rank)}
+
+    ${area("Upgraded Guns","e-upgraded",safeArray(editItem.upgraded_guns).join(","))}
+    ${area("Mythic Items","e-mythic",safeArray(editItem.mythic_items).join(","))}
+    ${area("Legendary Items","e-legendary",safeArray(editItem.legendary_items).join(","))}
+    ${area("Gift Items","e-gifts",safeArray(editItem.gift_items).join(","))}
+    ${area("Titles","e-titles",safeArray(editItem.titles).join(","))}
+    ${area("Highlights","e-highlights",editItem.account_highlights)}
+
+    <label><b>Images</b></label>
     <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     <button class="btn outline" id="add-img">Add Image</button>
   `;
+
   renderEditImages();
 
-  document.getElementById("add-img").onclick=()=>{
-    const i=document.createElement("input");
-    i.type="file";i.accept="image/*";
-    i.onchange=e=>{
-      const r=new FileReader();
-      r.onload=ev=>{
-        editImages.push(ev.target.result);
-        renderEditImages();
-      };
-      r.readAsDataURL(e.target.files[0]);
+  document.getElementById("add-img").onclick = () => {
+    const i = document.createElement("input");
+    i.type="file"; i.accept="image/*";
+    i.onchange=async e=>{
+      const compressed = await compressImage(e.target.files[0]);
+      editImages.push(compressed);
+      renderEditImages();
     };
     i.click();
   };
@@ -273,8 +234,8 @@ function renderEditImages(){
   box.innerHTML="";
   editImages.forEach((src,i)=>{
     const d=document.createElement("div");
-    d.draggable=true;
     d.style.position="relative";
+    d.draggable=true;
     d.innerHTML=`
       <img src="${src}" style="width:70px;height:70px;object-fit:cover;border-radius:8px">
       <span style="position:absolute;top:-6px;right:-6px;
@@ -284,19 +245,12 @@ function renderEditImages(){
       editImages.splice(i,1);
       renderEditImages();
     };
-    d.ondragstart=e=>e.dataTransfer.setData("i",i);
-    d.ondragover=e=>e.preventDefault();
-    d.ondrop=e=>{
-      const from=e.dataTransfer.getData("i");
-      [editImages[from],editImages[i]]=[editImages[i],editImages[from]];
-      renderEditImages();
-    };
     box.appendChild(d);
   });
 }
 
-document.getElementById("save-edit").onclick=async()=>{
-  if(!editItem||!session())return;
+/* ================= SAVE ================= */
+document.getElementById("save-edit").onclick = async () => {
   await fetch(`${API_URL}/listings/${editItem.id}`,{
     method:"PUT",
     headers:{
@@ -318,17 +272,18 @@ document.getElementById("save-edit").onclick=async()=>{
     })
   });
   toast("Listing updated");
-  closeEdit();loadListings();
+  closeEdit();
+  loadListings();
 };
 
-window.closeEdit=()=>
+window.closeEdit = () =>
   document.getElementById("edit-modal-bg").classList.remove("active");
 
-const e=id=>document.getElementById(id).value;
+const e = id => document.getElementById(id).value;
 
 /* ================= DELETE ================= */
 async function deleteListing(id){
-  if(!session()||!confirm("Delete this listing?"))return;
+  if(!confirm("Delete listing?"))return;
   await fetch(`${API_URL}/listings/${id}`,{
     method:"DELETE",
     headers:{Authorization:`Bearer ${session().token}`}
@@ -340,6 +295,5 @@ async function deleteListing(id){
 /* ================= EVENTS ================= */
 searchInput?.addEventListener("input",renderList);
 filterSelect?.addEventListener("change",renderList);
-
 loadListings();
 })();
