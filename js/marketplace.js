@@ -1,8 +1,9 @@
 (() => {
-  /*************** CONFIG ***************/
+  /* ================= CONFIG ================= */
   const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
   const container = document.getElementById("items-container");
   const toastBox = document.getElementById("toast");
+
   const searchInput = document.getElementById("search");
   const filterSelect = document.getElementById("filter");
 
@@ -10,7 +11,7 @@
   let currentFilter = "";
   let editListing = null;
 
-  /*************** HELPERS ***************/
+  /* ================= HELPERS ================= */
   const safeArray = v => {
     try {
       if (Array.isArray(v)) return v;
@@ -38,6 +39,16 @@
     }
   };
 
+  const requireLogin = () => {
+    const s = session();
+    if (!s) {
+      alert("Please login first");
+      location.href = "login.html";
+      return null;
+    }
+    return s;
+  };
+
   const isOwner = sellerId => {
     const s = session();
     return s && String(s.user.seller_id) === String(sellerId);
@@ -48,9 +59,9 @@
     return "★".repeat(n) + "☆".repeat(5 - n);
   };
 
-  /*************** LOAD LISTINGS ***************/
+  /* ================= LOAD LISTINGS ================= */
   async function loadListings() {
-    container.innerHTML = ""; // 🔥 prevents duplicate cards
+    container.innerHTML = "";
 
     const res = await fetch(`${API_URL}/listings`);
     let items = await res.json();
@@ -76,7 +87,7 @@
     items.forEach(renderCard);
   }
 
-  /*************** CARD ***************/
+  /* ================= CARD ================= */
   function renderCard(item) {
     const card = document.createElement("div");
     card.className = "item-card";
@@ -85,8 +96,9 @@
 
     card.innerHTML = `
       <div class="images-gallery">
-        ${images.map((i, idx) =>
-          `<img src="${i}" class="${idx === 0 ? "active" : ""}">`
+        ${images.map(
+          (i, idx) =>
+            `<img src="${i}" class="${idx === 0 ? "active" : ""}">`
         ).join("")}
       </div>
 
@@ -96,11 +108,11 @@
         UID: ${item.uid}<br>
         Level: ${item.level}<br>
         Rank: ${item.highest_rank || "-"}<br>
-        Upgraded: ${safeArray(item.upgraded_guns).length}<br>
-        Mythic: ${safeArray(item.mythic_items).length},
-        Legendary: ${safeArray(item.legendary_items).length}<br>
-        Gifts: ${safeArray(item.gift_items).length},
-        Titles: ${safeArray(item.titles).length}
+        Upgraded: ${safeArray(item.upgraded_guns).join(", ") || "-"}<br>
+        Mythic: ${safeArray(item.mythic_items).join(", ") || "-"}<br>
+        Legendary: ${safeArray(item.legendary_items).join(", ") || "-"}<br>
+        Gifts: ${safeArray(item.gift_items).join(", ") || "-"}<br>
+        Titles: ${safeArray(item.titles).join(", ") || "-"}
         <div class="price">₹${item.price}</div>
       </div>
 
@@ -123,14 +135,20 @@
 
     if (isOwner(item.seller_id)) {
       card.querySelector(".edit-btn").onclick = () => openEdit(item);
-      card.querySelector(".delete-btn").onclick = () =>
-        deleteListing(item.id);
+      card.querySelector(".delete-btn").onclick =
+        () => deleteListing(item.id);
+    } else {
+      card.querySelector(".buy-btn").onclick = () => {
+        const s = requireLogin();
+        if (!s) return;
+        toast("Buy feature coming soon");
+      };
     }
 
     container.appendChild(card);
   }
 
-  /*************** SELLER PROFILE ***************/
+  /* ================= SELLER PROFILE ================= */
   window.openSellerProfile = async sellerId => {
     const bg = document.getElementById("seller-modal-bg");
     const content = document.getElementById("seller-content");
@@ -156,13 +174,13 @@
   window.closeSeller = () =>
     document.getElementById("seller-modal-bg").classList.remove("active");
 
-  /*************** EDIT LISTING ***************/
+  /* ================= EDIT LISTING ================= */
   function openEdit(item) {
     editListing = item;
     document.getElementById("edit-modal-bg").classList.add("active");
 
     const form = document.getElementById("edit-form");
-    const images = safeArray(item.images);
+    const arr = v => safeArray(v).join(", ");
 
     form.innerHTML = `
       <label>Title</label>
@@ -171,18 +189,32 @@
       <label>Price</label>
       <input id="e-price" value="${item.price}">
 
+      <label>Upgraded Guns</label>
+      <textarea id="e-upgraded">${arr(item.upgraded_guns)}</textarea>
+
+      <label>Mythic Items</label>
+      <textarea id="e-mythic">${arr(item.mythic_items)}</textarea>
+
+      <label>Legendary Items</label>
+      <textarea id="e-legendary">${arr(item.legendary_items)}</textarea>
+
+      <label>Gift Items</label>
+      <textarea id="e-gifts">${arr(item.gift_items)}</textarea>
+
+      <label>Titles</label>
+      <textarea id="e-titles">${arr(item.titles)}</textarea>
+
       <label>Highlights</label>
       <textarea id="e-highlights">${item.account_highlights || ""}</textarea>
 
       <label>Images</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap" id="e-images"></div>
-
+      <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       <input type="file" id="imgAdd" multiple>
     `;
 
     const imgBox = document.getElementById("e-images");
 
-    images.forEach(src => addImg(src));
+    safeArray(item.images).forEach(src => addImg(src));
 
     document.getElementById("imgAdd").onchange = e => {
       [...e.target.files].forEach(f => {
@@ -200,8 +232,10 @@
         <span style="
           position:absolute;top:-6px;right:-6px;
           background:red;color:#fff;
-          border-radius:50%;cursor:pointer;
-          padding:2px 6px;font-size:12px">×</span>
+          border-radius:50%;
+          cursor:pointer;
+          padding:2px 6px;
+          font-size:12px">×</span>
       `;
       wrap.querySelector("span").onclick = () => wrap.remove();
       imgBox.appendChild(wrap);
@@ -213,6 +247,8 @@
 
   document.getElementById("save-edit").onclick = async () => {
     if (!editListing) return;
+    const s = requireLogin();
+    if (!s) return;
 
     const imgs = [...document.querySelectorAll("#e-images img")].map(i => i.src);
 
@@ -220,11 +256,16 @@
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session().token}`
+        Authorization: `Bearer ${s.token}`
       },
       body: JSON.stringify({
         title: e("e-title"),
         price: e("e-price"),
+        upgraded_guns: e("e-upgraded").split(","),
+        mythic_items: e("e-mythic").split(","),
+        legendary_items: e("e-legendary").split(","),
+        gift_items: e("e-gifts").split(","),
+        titles: e("e-titles").split(","),
         account_highlights: e("e-highlights"),
         images: imgs
       })
@@ -237,20 +278,22 @@
 
   const e = id => document.getElementById(id).value;
 
-  /*************** DELETE ***************/
+  /* ================= DELETE ================= */
   async function deleteListing(id) {
     if (!confirm("Delete this listing?")) return;
+    const s = requireLogin();
+    if (!s) return;
 
     await fetch(`${API_URL}/listings/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${session().token}` }
+      headers: { Authorization: `Bearer ${s.token}` }
     });
 
     toast("Listing deleted");
     loadListings();
   }
 
-  /*************** SEARCH & FILTER ***************/
+  /* ================= SEARCH + FILTER ================= */
   searchInput?.addEventListener("input", e => {
     currentSearch = e.target.value.toLowerCase();
     loadListings();
