@@ -126,9 +126,9 @@
         const session = getSession();
 
         const isOwnerOrAdmin =
-          session &&
-          (String(session.user.id) === String(item.seller_id) ||
-            String(session.user.role).toLowerCase() === "admin");
+        session &&
+        (String(session.user.seller_id) === String(item.seller_id) ||
+         String(session.user.role).toLowerCase() === "admin");
 
         const mythics = safeArray(item.mythic_items).join(", ");
         const legends = safeArray(item.legendary_items).join(", ");
