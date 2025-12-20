@@ -9,6 +9,9 @@ let allItems = [];
 let editItem = null;
 let editImages = [];
 
+/* ================= SLIDER STATE ================= */
+const sliderTimers = new WeakMap();
+
 /* ================= HELPERS ================= */
 const safeArray = v => {
   try {
@@ -39,29 +42,35 @@ const isOwner = item =>
   (String(session().user.seller_id) === String(item.seller_id) ||
    session().user.role === "admin");
 
-const stars = r =>
-  "★".repeat(Math.round(r || 0)) +
-  "☆".repeat(5 - Math.round(r || 0));
+/* ================= SELLER PROFILE (FIXED) ================= */
+window.openSellerProfile = async sellerId => {
+  const bg = document.getElementById("seller-modal-bg");
+  const content = document.getElementById("seller-content");
+  bg.classList.add("active");
+  content.innerHTML = "Loading...";
 
-/* ================= IMAGE COMPRESSION ================= */
-function compressImage(file, maxW = 1200, quality = 0.75) {
-  return new Promise(resolve => {
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = e => img.src = e.target.result;
-    reader.readAsDataURL(file);
+  try {
+    const res = await fetch(`${API_URL}/seller/${sellerId}`);
+    const s = await res.json();
 
-    img.onload = () => {
-      const scale = Math.min(maxW / img.width, 1);
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      canvas.getContext("2d")
-        .drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", quality));
-    };
-  });
-}
+    content.innerHTML = `
+      <h3>${s.name}</h3>
+      <p><b>Status:</b> ${s.seller_verified ? "Verified" : "Pending"}</p>
+      <p><b>Badge:</b> ${s.badge || "-"}</p>
+      <p><b>Rating:</b> ${"★".repeat(Math.round(s.avg_rating || 0))}</p>
+      <p><b>Total Sales:</b> ${s.total_sales || 0}</p>
+      <p><b>Reviews:</b> ${s.review_count || 0}</p>
+      <button class="btn outline" onclick="alert('Chat coming soon')">
+        Chat with Seller
+      </button>
+    `;
+  } catch {
+    content.innerHTML = "Failed to load seller profile";
+  }
+};
+
+window.closeSeller = () =>
+  document.getElementById("seller-modal-bg").classList.remove("active");
 
 /* ================= LOAD ================= */
 async function loadListings() {
@@ -121,12 +130,6 @@ function renderCard(item) {
       UID: ${item.uid}<br>
       Level: ${item.level}<br>
       Rank: ${item.highest_rank || "-"}<br>
-      ${safeArray(item.upgraded_guns).length ? `<b>Upgraded:</b> ${safeArray(item.upgraded_guns).join(", ")}<br>` : ""}
-      ${safeArray(item.mythic_items).length ? `<b>Mythic:</b> ${safeArray(item.mythic_items).join(", ")}<br>` : ""}
-      ${safeArray(item.legendary_items).length ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>` : ""}
-      ${safeArray(item.gift_items).length ? `<b>Gifts:</b> ${safeArray(item.gift_items).join(", ")}<br>` : ""}
-      ${safeArray(item.titles).length ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>` : ""}
-      ${item.account_highlights ? `<b>Highlights:</b> ${item.account_highlights}` : ""}
       <div class="price">₹${item.price}</div>
     </div>
 
@@ -142,16 +145,11 @@ function renderCard(item) {
   card.querySelector(".seller-btn").onclick =
     () => openSellerProfile(item.seller_id);
 
-  if (isOwner(item)) {
-    card.querySelector(".edit-btn").onclick = () => openEdit(item.id);
-    card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
-  }
-
   initSlider(card);
   container.appendChild(card);
 }
 
-/* ================= IMAGE SLIDER (FIXED) ================= */
+/* ================= IMAGE SLIDER (FINAL FIX) ================= */
 function initSlider(card){
   const g = card.querySelector(".images-gallery");
   if(!g) return;
@@ -164,14 +162,11 @@ function initSlider(card){
   const right = g.querySelector(".right");
 
   let index = 0;
-  let timer = null;
 
   const show = n => {
     imgs[index].classList.remove("active");
     dots[index].classList.remove("active");
-
     index = (n + imgs.length) % imgs.length;
-
     imgs[index].classList.add("active");
     dots[index].classList.add("active");
   };
@@ -180,118 +175,18 @@ function initSlider(card){
   right.onclick = () => show(index + 1);
   dots.forEach((d,i)=>d.onclick=()=>show(i));
 
-  const startAuto = () =>
-    timer = setInterval(() => show(index + 1), 3500);
+  if (sliderTimers.has(g)) {
+    clearInterval(sliderTimers.get(g));
+  }
 
-  const stopAuto = () => timer && clearInterval(timer);
+  const timer = setInterval(() => show(index + 1), 3500);
+  sliderTimers.set(g, timer);
 
-  g.addEventListener("mouseenter", stopAuto);
-  g.addEventListener("mouseleave", startAuto);
-
-  startAuto();
-}
-
-/* ================= EDIT ================= */
-function openEdit(id){
-  editItem = allItems.find(i=>String(i.id)===String(id));
-  editImages = safeArray(editItem.images);
-
-  const f = document.getElementById("edit-form");
-  document.getElementById("edit-modal-bg").classList.add("active");
-
-  const field = (l,i,v)=>`<label><b>${l}</b></label><input id="${i}" value="${v||""}">`;
-  const area = (l,i,v)=>`<label><b>${l}</b></label><textarea id="${i}">${v||""}</textarea>`;
-
-  f.innerHTML = `
-    ${field("Title","e-title",editItem.title)}
-    ${field("Price","e-price",editItem.price)}
-    ${field("Level","e-level",editItem.level)}
-    ${field("Rank","e-rank",editItem.highest_rank)}
-    ${area("Upgraded Guns","e-upgraded",safeArray(editItem.upgraded_guns).join(","))}
-    ${area("Mythic Items","e-mythic",safeArray(editItem.mythic_items).join(","))}
-    ${area("Legendary Items","e-legendary",safeArray(editItem.legendary_items).join(","))}
-    ${area("Gift Items","e-gifts",safeArray(editItem.gift_items).join(","))}
-    ${area("Titles","e-titles",safeArray(editItem.titles).join(","))}
-    ${area("Highlights","e-highlights",editItem.account_highlights)}
-    <label><b>Images</b></label>
-    <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>
-    <button class="btn outline" id="add-img">Add Image</button>
-  `;
-
-  renderEditImages();
-
-  document.getElementById("add-img").onclick = () => {
-    const i = document.createElement("input");
-    i.type="file"; i.accept="image/*";
-    i.onchange=async e=>{
-      const compressed = await compressImage(e.target.files[0]);
-      editImages.push(compressed);
-      renderEditImages();
-    };
-    i.click();
-  };
-}
-
-function renderEditImages(){
-  const box=document.getElementById("e-images");
-  box.innerHTML="";
-  editImages.forEach((src,i)=>{
-    const d=document.createElement("div");
-    d.style.position="relative";
-    d.innerHTML=`
-      <img src="${src}" style="width:70px;height:70px;border-radius:8px;object-fit:cover">
-      <span style="position:absolute;top:-6px;right:-6px;
-        background:red;color:#fff;border-radius:50%;
-        padding:2px 6px;cursor:pointer">✖</span>`;
-    d.querySelector("span").onclick=()=>{
-      editImages.splice(i,1);
-      renderEditImages();
-    };
-    box.appendChild(d);
+  g.addEventListener("mouseenter", () => clearInterval(timer));
+  g.addEventListener("mouseleave", () => {
+    clearInterval(sliderTimers.get(g));
+    sliderTimers.set(g, setInterval(() => show(index + 1), 3500));
   });
-}
-
-/* ================= SAVE ================= */
-document.getElementById("save-edit").onclick = async () => {
-  await fetch(`${API_URL}/listings/${editItem.id}`,{
-    method:"PUT",
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:`Bearer ${session().token}`
-    },
-    body:JSON.stringify({
-      title:e("e-title"),
-      price:+e("e-price"),
-      level:+e("e-level"),
-      highest_rank:e("e-rank"),
-      upgraded_guns:e("e-upgraded").split(","),
-      mythic_items:e("e-mythic").split(","),
-      legendary_items:e("e-legendary").split(","),
-      gift_items:e("e-gifts").split(","),
-      titles:e("e-titles").split(","),
-      account_highlights:e("e-highlights"),
-      images:editImages
-    })
-  });
-  toast("Listing updated");
-  closeEdit();
-  loadListings();
-};
-
-window.closeEdit = () =>
-  document.getElementById("edit-modal-bg").classList.remove("active");
-
-const e = id => document.getElementById(id).value;
-
-/* ================= DELETE ================= */
-async function deleteListing(id){
-  if(!confirm("Delete listing?"))return;
-  await fetch(`${API_URL}/listings/${id}`,{
-    method:"DELETE",
-    headers:{Authorization:`Bearer ${session().token}`}
-  });
-  toast("Listing deleted");
-  loadListings();
 }
 
 /* ================= EVENTS ================= */
