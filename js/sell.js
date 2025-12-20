@@ -24,9 +24,9 @@
   }
 
   // ===== TOAST =====
-  function showToast(msg, err = false) {
+  function showToast(msg, error = false) {
     toast.textContent = msg;
-    toast.className = err ? "err" : "";
+    toast.style.background = error ? "#c0392b" : "#27ae60";
     toast.style.display = "block";
     setTimeout(() => (toast.style.display = "none"), 3200);
   }
@@ -41,7 +41,7 @@
     images.forEach((src, i) => {
       const d = document.createElement("div");
       d.className = "preview-img";
-      d.innerHTML = `<img src="${src}"><div class="remove">×</div>`;
+      d.innerHTML = `<img src="${src}" class="item-img"><div class="remove">×</div>`;
       d.querySelector(".remove").onclick = () => {
         images.splice(i, 1);
         renderPreview();
@@ -75,11 +75,11 @@
   function estimatePrice() {
     const level = +document.getElementById("level").value || 0;
     const rank = document.getElementById("rank").value.trim().toLowerCase();
-    const mythicArray = document.getElementById("mythic")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-    const legendaryArray = document.getElementById("legendary")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-    const giftArray = document.getElementById("gift")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-    const gunsArray = document.getElementById("guns")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
-    const titlesArray = document.getElementById("titles")?.value.split(",").map(s => s.trim()).filter(Boolean) || [];
+    const mythicArray = (document.getElementById("mythic")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const legendaryArray = (document.getElementById("legendary")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const giftArray = (document.getElementById("gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const gunsArray = (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const titlesArray = (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
 
     let price = 0;
     price += level * 8;
@@ -98,7 +98,7 @@
   }
   estimateBtn.onclick = estimatePrice;
 
-  // ===== SUBMIT =====
+  // ===== SUBMIT LISTING =====
   form.onsubmit = async e => {
     e.preventDefault();
     const price = estimatePrice();
@@ -106,15 +106,15 @@
     const payload = {
       uid: document.getElementById("uid").value.trim(),
       title: document.getElementById("title").value.trim(),
-      description: document.getElementById("highlights").value.trim(),
+      description: document.getElementById("highlights")?.value.trim() || "",
       price,
       level: +document.getElementById("level").value || 0,
       highest_rank: document.getElementById("rank")?.value || "",
-      mythic_items: document.getElementById("mythic")?.value.split(",").map(s => s.trim()).filter(Boolean),
-      legendary_items: document.getElementById("legendary")?.value.split(",").map(s => s.trim()).filter(Boolean),
-      gift_items: document.getElementById("gift")?.value.split(",").map(s => s.trim()).filter(Boolean),
-      upgraded_guns: document.getElementById("guns")?.value.split(",").map(s => s.trim()).filter(Boolean),
-      titles: document.getElementById("titles")?.value.split(",").map(s => s.trim()).filter(Boolean),
+      mythic_items: (document.getElementById("mythic")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      legendary_items: (document.getElementById("legendary")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      gift_items: (document.getElementById("gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      upgraded_guns: (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      titles: (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       images
     };
 
@@ -124,12 +124,17 @@
     try {
       const res = await fetch(`${API_BASE}/create`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`
+        },
         body: JSON.stringify(payload)
       });
+
       const data = await res.json();
       if (!res.ok) throw data;
-      showToast("🎉 Account listed successfully");
+
+      showToast("🎉 Listing created successfully");
       form.reset();
       images = [];
       renderPreview();

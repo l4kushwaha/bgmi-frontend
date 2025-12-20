@@ -29,7 +29,9 @@ h1{text-align:center;color:#fff;margin:15px}
   border:none;
   outline:none;
   font-size:14px;
+  transition: all 0.2s;
 }
+#search:focus, #filter:focus{box-shadow:0 0 8px rgba(255,255,255,0.8);}
 #search{width:220px}
 #filter{width:180px}
 
@@ -48,30 +50,37 @@ h1{text-align:center;color:#fff;margin:15px}
   box-shadow:0 4px 10px rgba(0,0,0,.2);
   position:relative;
   overflow:hidden;
-  transition:.2s;
+  transition:transform 0.3s, box-shadow 0.3s;
 }
-.item-card:hover{transform:scale(1.03)}
+.item-card:hover{
+  transform:scale(1.03);
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+}
 
-.new-badge{
+.rating-badge{
   position:absolute;
   top:8px;
   left:8px;
-  background:#e74c3c;
-  color:#fff;
-  font-size:11px;
+  background:#f1c40f;
+  color:#000;
+  font-size:12px;
+  font-weight:600;
   padding:3px 6px;
-  border-radius:4px;
+  border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
 }
 
-.owner-badge{
+.verified-badge{
   position:absolute;
   top:8px;
   right:8px;
-  background:#2980b9;
+  background:#27ae60;
   color:#fff;
-  font-size:11px;
+  font-size:12px;
+  font-weight:600;
   padding:3px 6px;
-  border-radius:4px;
+  border-radius:6px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
 }
 
 .item-info{
@@ -93,23 +102,29 @@ h1{text-align:center;color:#fff;margin:15px}
   border-radius:6px;
   object-fit:cover;
   cursor:pointer;
+  transition:transform 0.2s;
 }
+.images-gallery img:hover{transform:scale(1.1);}
 
+/* Buttons */
 .btn{
   width:100%;
-  padding:7px;
+  padding:8px;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   margin-top:6px;
   cursor:pointer;
+  font-weight:600;
+  transition:all 0.2s;
 }
 .buy-btn{background:#27ae60;color:#fff}
+.buy-btn:hover:not(:disabled){background:#2ecc71}
 .edit-btn{background:#3498db;color:#fff}
 .delete-btn{background:#c0392b;color:#fff}
-.buy-btn:disabled{background:#95a5a6}
+.buy-btn:disabled{background:#95a5a6;cursor:not-allowed}
 
 /* Modal */
-#modal-bg{
+#modal-bg, #seller-modal-bg, #imgModal{
   display:none;
   position:fixed;
   inset:0;
@@ -117,51 +132,79 @@ h1{text-align:center;color:#fff;margin:15px}
   justify-content:center;
   align-items:center;
   z-index:1000;
+  opacity:0;
+  transition:opacity 0.3s;
 }
-#modal-bg.active{display:flex}
-.modal{
+#modal-bg.active, #seller-modal-bg.active, #imgModal.active{display:flex; opacity:1;}
+
+.modal, #seller-modal{
   background:#fff;
   padding:20px;
-  border-radius:10px;
+  border-radius:12px;
   text-align:center;
-  width:300px;
+  width:320px;
+  transform:scale(0.8);
+  transition:transform 0.3s;
 }
-.modal button{margin:8px}
+#modal-bg.active .modal, #seller-modal-bg.active #seller-modal{transform:scale(1);}
+.modal button, #seller-modal button{margin:8px}
 
 /* Toast */
 #toast{
   position:fixed;
   bottom:20px;
   left:50%;
-  transform:translateX(-50%);
-  padding:10px 20px;
+  transform:translateX(-50%) translateY(30px);
+  padding:12px 25px;
   background:#27ae60;
   color:#fff;
-  border-radius:20px;
+  border-radius:25px;
   display:none;
   z-index:1100;
+  opacity:0;
+  transition:opacity 0.3s, transform 0.3s;
 }
-#toast.show{display:block}
+#toast.show{
+  display:block;
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
 
 /* Image preview */
-#imgModal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.9);
-  justify-content:center;
-  align-items:center;
-  z-index:1200;
-}
 #imgModal img{
   max-width:90%;
   max-height:90%;
   border-radius:10px;
 }
 
+/* Seller Profile */
+#seller-modal{
+  max-height:80vh;
+  overflow-y:auto;
+  text-align:left;
+}
+#seller-modal h3{margin:0 0 5px 0;}
+.review{
+  border-top:1px solid #eee;
+  padding:6px 0;
+}
+.review p{margin:2px 0;}
+.review .reply{color:#2980b9; font-weight:600; font-size:13px; margin-left:8px;}
+#seller-modal .close-btn{
+  background:#c0392b;
+  color:#fff;
+  padding:6px 12px;
+  margin-top:10px;
+  width:auto;
+  cursor:pointer;
+  border-radius:6px;
+  float:right;
+}
+
 /* Mobile */
 @media(max-width:600px){
   .item-card{width:95%}
+  #seller-modal{width:95%;}
 }
 </style>
 </head>
@@ -194,12 +237,73 @@ h1{text-align:center;color:#fff;margin:15px}
   </div>
 </div>
 
+<!-- Seller Profile Modal -->
+<div id="seller-modal-bg">
+  <div id="seller-modal">
+    <button class="close-btn" onclick="document.getElementById('seller-modal-bg').classList.remove('active')">Close</button>
+    <div id="seller-content">Loading seller profile...</div>
+  </div>
+</div>
+
 <!-- Image Modal -->
-<div id="imgModal" onclick="this.style.display='none'">
+<div id="imgModal" onclick="this.classList.remove('active')">
   <img id="imgPreview">
 </div>
 
 <div id="toast"></div>
+
+<script>
+// ================= TOAST FUNCTION =================
+function showToast(msg, success = true){
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.style.background = success ? "#27ae60" : "#c0392b";
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),3000);
+}
+
+// ================= IMAGE PREVIEW =================
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('item-img')){
+    const imgModal = document.getElementById('imgModal');
+    const imgPreview = document.getElementById('imgPreview');
+    imgPreview.src = e.target.src;
+    imgModal.classList.add('active');
+  }
+});
+
+// ================= OPEN SELLER PROFILE =================
+window.openSellerProfile = async function(sellerId){
+  const modalBg = document.getElementById('seller-modal-bg');
+  const content = document.getElementById('seller-content');
+  modalBg.classList.add('active');
+  content.innerHTML = "Loading...";
+
+  try{
+    const res = await fetch(`${API_URL}/seller/${sellerId}`);
+    const seller = await res.json();
+
+    const ratingsRes = await fetch(`${API_URL}/seller/${sellerId}/ratings`);
+    const ratings = await ratingsRes.json();
+
+    content.innerHTML = `
+      <h3>${seller.name || "Seller"} ${seller.is_verified ? "✔" : ""}</h3>
+      <p>⭐ Avg Rating: ${seller.avg_rating.toFixed(1)} (${ratings.length} reviews)</p>
+      <h4>Reviews:</h4>
+      ${ratings.map(r => `
+        <div class="review">
+          <p>⭐ ${r.rating}</p>
+          <p>${r.review || ""}</p>
+          ${r.reply ? `<p class="reply">Seller: ${r.reply}</p>` : ""}
+        </div>
+      `).join("")}
+    `;
+  }catch(e){
+    content.innerHTML = "<p style='color:red'>Failed to load seller profile.</p>";
+  }
+};
+
+</script>
 
 <script src="js/marketplace.js"></script>
 

@@ -52,7 +52,6 @@ input,textarea{
   color:var(--text-light)
 }
 input:focus,textarea:focus{background:rgba(255,255,255,.15)}
-
 input::placeholder,textarea::placeholder{color:var(--text-muted)}
 
 .row{display:flex;gap:8px}
@@ -155,5 +154,13 @@ button.ghost{
 
 <div id="toast"></div>
 <script src="js/sell.js"></script>
+<script>
+  // Drag hover effect
+  const dropArea = document.getElementById("drop-area");
+  dropArea.addEventListener("dragenter", e => { e.preventDefault(); dropArea.classList.add("hover"); });
+  dropArea.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
+  dropArea.addEventListener("dragover", e => e.preventDefault());
+  dropArea.addEventListener("drop", e => dropArea.classList.remove("hover"));
+</script>
 </body>
 </html>
