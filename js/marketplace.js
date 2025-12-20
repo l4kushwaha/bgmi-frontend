@@ -11,7 +11,7 @@
   let currentFilter = "";
 
   /* ================= SELLER CACHE ================= */
-  const sellerCache = {};  
+  const sellerCache = {};
 
   /* ================= TOAST ================= */
   function showToast(msg, success = true) {
@@ -122,7 +122,6 @@
 
       for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
-        const session = getSession();
 
         const isOwnerOrAdmin =
           session &&
@@ -138,6 +137,7 @@
 
         const card = document.createElement("div");
         card.className = "item-card show";
+        card.dataset.sellerId = item.seller_id; // ✅ Added for owner/admin check
 
         card.innerHTML = `
           <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
