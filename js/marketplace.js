@@ -1,15 +1,12 @@
 (() => {
-  /* ================= CONFIG ================= */
   const container = document.getElementById("items-container");
-  const searchInput = document.getElementById("search");
-  const filterSelect = document.getElementById("filter");
-
   const API_URL =
     "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 
-  let currentSearch = "";
-  let currentFilter = "";
   let editListing = null;
+  let editImgs = [];
+  let editIndex = 0;
+  let dragIndex = null;
 
   /* ================= HELPERS ================= */
   const safeArray = v => {
@@ -22,11 +19,10 @@
     }
   };
 
-  const toast = (msg, ok = true) => {
+  const toast = msg => {
     const t = document.getElementById("toast");
     if (!t) return;
     t.textContent = msg;
-    t.style.background = ok ? "#27ae60" : "#c0392b";
     t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 3000);
   };
@@ -42,82 +38,34 @@
     }
   };
 
-  const requireLogin = () => {
-    const s = getSession();
-    if (!s) {
-      alert("Please login first");
-      location.href = "login.html";
-      return null;
-    }
-    return s;
-  };
-
   const stars = r =>
     "★".repeat(Math.round(r || 0)) + "☆".repeat(5 - Math.round(r || 0));
 
-  /* ================= GLOBAL CLOSE FUNCTIONS ================= */
-  window.closeSeller = () => {
-    document.getElementById("seller-modal-bg")?.classList.remove("active");
-  };
-
-  window.closeEdit = () => {
-    document.getElementById("edit-modal-bg")?.classList.remove("active");
-  };
-
-  /* ================= SELLER PROFILE ================= */
-  window.openSellerProfile = async sellerId => {
+  /* ================= SELLER ================= */
+  window.openSellerProfile = async id => {
     const bg = document.getElementById("seller-modal-bg");
-    const content = document.getElementById("seller-content");
-    if (!bg || !content) return;
-
+    const c = document.getElementById("seller-content");
     bg.classList.add("active");
-    content.innerHTML = "Loading...";
+    c.innerHTML = "Loading...";
 
-    try {
-      const res = await fetch(`${API_URL}/seller/${sellerId}`);
-      const s = await res.json();
+    const res = await fetch(`${API_URL}/seller/${id}`);
+    const s = await res.json();
 
-      content.innerHTML = `
-        <h3>${s.name}</h3>
-        <p><b>Status:</b> ${s.seller_verified == 1 ? "Verified" : "Pending"}</p>
-        <p><b>Badge:</b> ${s.badge || "-"}</p>
-        <p><b>Rating:</b> ${stars(s.avg_rating)}</p>
-        <p><b>Total Sales:</b> ${s.total_sales || 0}</p>
-        <p><b>Reviews:</b> ${s.review_count || 0}</p>
-        <button class="btn outline" onclick="alert('Chat coming soon')">
-          Chat with Seller
-        </button>
-      `;
-    } catch {
-      content.innerHTML = "Failed to load seller";
-    }
+    c.innerHTML = `
+      <h3>${s.name}</h3>
+      <p>Status: ${s.seller_verified ? "Verified" : "Pending"}</p>
+      <p>Rating: ${stars(s.avg_rating)}</p>
+      <p>Total Sales: ${s.total_sales || 0}</p>
+    `;
   };
 
-  /* ================= LOAD LISTINGS ================= */
+  window.closeSeller = () =>
+    document.getElementById("seller-modal-bg").classList.remove("active");
+
+  /* ================= LOAD ================= */
   async function loadListings() {
-    const session = getSession();
-    const res = await fetch(`${API_URL}/listings`, {
-      headers: session ? { Authorization: `Bearer ${session.token}` } : {}
-    });
-
-    let items = await res.json();
-    if (!Array.isArray(items)) items = [];
-
-    if (currentSearch) {
-      items = items.filter(i =>
-        `${i.uid} ${i.title} ${i.highest_rank || ""}`
-          .toLowerCase()
-          .includes(currentSearch)
-      );
-    }
-
-    if (currentFilter === "own" && session) {
-      items = items.filter(
-        i => String(i.seller_id) === String(session.user.seller_id)
-      );
-    }
-
-    if (!container) return;
+    const res = await fetch(`${API_URL}/listings`);
+    const items = await res.json();
     container.innerHTML = "";
     items.forEach(renderCard);
   }
@@ -127,22 +75,19 @@
     const session = getSession();
     const isOwner =
       session &&
-      (String(session.user.seller_id) === String(item.seller_id) ||
+      (session.user.seller_id == item.seller_id ||
         session.user.role === "admin");
 
     const images = safeArray(item.images);
+
     const card = document.createElement("div");
     card.className = "item-card show";
 
     card.innerHTML = `
-      <div class="rating-badge">${stars(item.avg_rating)}</div>
-      <div class="verified-badge">
-        ${item.seller_verified == 1 ? "Verified" : "Pending"}
-      </div>
-      ${item.badge ? `<div class="badge-badge">${item.badge}</div>` : ""}
-
       <div class="images-gallery">
-        ${images.map(img => `<img src="${img}">`).join("")}
+        ${images.map((i, x) =>
+          `<img src="${i}" class="${x === 0 ? "active" : ""}">`
+        ).join("")}
       </div>
 
       <div class="item-info">
@@ -161,27 +106,20 @@
             <button class="btn edit-btn">Edit</button>
             <button class="btn delete-btn">Delete</button>
           `
-          : `
-            <button class="btn buy-btn">Buy</button>
-          `
+          : `<button class="btn buy-btn">Buy</button>`
       }
     `;
 
-    const sellerBtn = card.querySelector(".seller-btn");
-    if (sellerBtn)
-      sellerBtn.onclick = () => openSellerProfile(item.seller_id);
+    card.querySelector(".seller-btn").onclick = () =>
+      openSellerProfile(item.seller_id);
 
     if (isOwner) {
-      card.querySelector(".edit-btn")?.addEventListener("click", () =>
-        openEdit(item)
-      );
-      card.querySelector(".delete-btn")?.addEventListener("click", () =>
-        deleteListing(item.id)
-      );
+      card.querySelector(".edit-btn").onclick = () => openEdit(item);
+      card.querySelector(".delete-btn").onclick = () =>
+        deleteListing(item.id);
     } else {
-      card.querySelector(".buy-btn")?.addEventListener("click", () =>
-        toast("Buy feature coming soon")
-      );
+      card.querySelector(".buy-btn").onclick = () =>
+        toast("Buy coming soon");
     }
 
     container.appendChild(card);
@@ -189,73 +127,103 @@
 
   /* ================= DELETE ================= */
   window.deleteListing = async id => {
-    const s = requireLogin();
-    if (!s || !confirm("Delete this listing?")) return;
-
-    await fetch(`${API_URL}/listings/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${s.token}` }
-    });
-
-    toast("Listing deleted");
+    if (!confirm("Delete listing?")) return;
+    await fetch(`${API_URL}/listings/${id}`, { method: "DELETE" });
+    toast("Deleted");
     loadListings();
   };
 
   /* ================= EDIT ================= */
   function openEdit(item) {
     editListing = item;
-    const bg = document.getElementById("edit-modal-bg");
-    const form = document.getElementById("edit-form");
-    if (!bg || !form) return;
+    editImgs = safeArray(item.images);
+    editIndex = 0;
 
-    bg.classList.add("active");
+    document.getElementById("edit-modal-bg").classList.add("active");
+    const form = document.getElementById("edit-form");
 
     form.innerHTML = `
       <input id="e-title" value="${item.title}">
       <input id="e-price" type="number" value="${item.price}">
       <input id="e-level" type="number" value="${item.level}">
       <input id="e-rank" value="${item.highest_rank || ""}">
+
+      <div id="edit-gallery" class="images-gallery"></div>
     `;
+
+    renderEditGallery();
   }
 
-  const saveBtn = document.getElementById("save-edit");
-  if (saveBtn) {
-    saveBtn.onclick = async () => {
-      if (!editListing) return;
-      const s = requireLogin();
-      if (!s) return;
+  function renderEditGallery() {
+    const g = document.getElementById("edit-gallery");
+    g.innerHTML = `
+      ${editImgs.map(
+        (src, i) => `
+        <div class="edit-img-wrap"
+             draggable="true"
+             data-i="${i}">
+          <img src="${src}" class="${i === editIndex ? "active" : ""}">
+          <span class="remove">×</span>
+        </div>
+      `
+      ).join("")}
+      <button class="img-arrow left">‹</button>
+      <button class="img-arrow right">›</button>
+    `;
 
-      await fetch(`${API_URL}/listings/${editListing.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${s.token}`
-        },
-        body: JSON.stringify({
-          title: e("e-title"),
-          price: +e("e-price"),
-          level: +e("e-level"),
-          highest_rank: e("e-rank")
-        })
-      });
+    const imgs = g.querySelectorAll(".edit-img-wrap");
 
-      toast("Listing updated");
-      closeEdit();
-      loadListings();
-    };
+    imgs.forEach(wrap => {
+      const i = +wrap.dataset.i;
+
+      wrap.querySelector(".remove").onclick = () => {
+        editImgs.splice(i, 1);
+        editIndex = 0;
+        renderEditGallery();
+      };
+
+      wrap.ondragstart = () => (dragIndex = i);
+      wrap.ondragover = e => e.preventDefault();
+      wrap.ondrop = () => {
+        const temp = editImgs[dragIndex];
+        editImgs[dragIndex] = editImgs[i];
+        editImgs[i] = temp;
+        renderEditGallery();
+      };
+    });
+
+    g.querySelector(".left").onclick = () =>
+      switchEdit(-1, imgs);
+    g.querySelector(".right").onclick = () =>
+      switchEdit(1, imgs);
   }
 
-  const e = id => document.getElementById(id)?.value || "";
+  function switchEdit(d, imgs) {
+    imgs[editIndex]?.querySelector("img").classList.remove("active");
+    editIndex = (editIndex + d + imgs.length) % imgs.length;
+    imgs[editIndex]?.querySelector("img").classList.add("active");
+  }
 
-  searchInput?.addEventListener("input", ev => {
-    currentSearch = ev.target.value.toLowerCase();
+  /* ================= SAVE ================= */
+  document.getElementById("save-edit")?.addEventListener("click", async () => {
+    await fetch(`${API_URL}/listings/${editListing.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: val("e-title"),
+        price: +val("e-price"),
+        level: +val("e-level"),
+        highest_rank: val("e-rank"),
+        images: editImgs
+      })
+    });
+
+    toast("Updated");
+    document.getElementById("edit-modal-bg").classList.remove("active");
     loadListings();
   });
 
-  filterSelect?.addEventListener("change", ev => {
-    currentFilter = ev.target.value;
-    loadListings();
-  });
+  const val = id => document.getElementById(id)?.value || "";
 
   loadListings();
 })();
