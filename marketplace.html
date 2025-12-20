@@ -7,36 +7,98 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ========== BODY & BACKGROUND ========== */
-body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#141e30,#243b55);color:#fff;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
-body.dark{background:linear-gradient(135deg,#1a1a1a,#2c2c2c);color:#fff;}
+/* ================= BODY & FONTS ================= */
+body {
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background: linear-gradient(135deg,#141e30,#243b55);
+  color:#fff;
+  overflow-x:hidden;
+  transition: background 0.3s,color 0.3s;
+}
+body.dark{background: linear-gradient(135deg,#1a1a1a,#2c2c2c);color:#fff;}
 
-/* ========== PARTICLE CANVAS ========== */
-#particle-canvas{position:fixed;inset:0;z-index:0;}
+/* ================= PARTICLE CANVAS ================= */
+#particle-canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
 
-/* ========== HEADER ========== */
-header{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:15px 20px;backdrop-filter:blur(12px);background:rgba(255,255,255,0.05);border-radius:12px;margin:10px;}
+/* ================= HEADER ================= */
+header{
+  position:relative;
+  z-index:2;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+  backdrop-filter:blur(12px);
+  background: rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+}
 header h1{font-size:26px;font-weight:600;}
 #controls{display:flex;gap:12px;align-items:center;}
-#dark-toggle{padding:6px 10px;border:none;border-radius:10px;cursor:pointer;background:#3498db;color:#fff;transition:0.3s;}
+#dark-toggle{
+  padding:6px 10px;border:none;border-radius:10px;cursor:pointer;
+  background:#3498db;color:#fff;transition:0.3s;
+}
 #dark-toggle:hover{background:#2980b9;}
-#wallet-balance{font-size:14px;font-weight:600;background:rgba(255,255,255,0.1);padding:6px 12px;border-radius:12px;}
+#wallet-balance{
+  font-size:14px;font-weight:600;
+  background:rgba(255,255,255,0.1);
+  padding:6px 12px;
+  border-radius:12px;
+}
 
-/* ========== TOP BAR ========== */
-#top-bar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:12px;position:relative;z-index:2;}
-#search,#filter{padding:10px 14px;border:none;border-radius:20px;outline:none;font-family:'Poppins';transition:0.3s;}
+/* ================= TOP BAR ================= */
+#top-bar{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding:12px;
+  position:relative;
+  z-index:2;
+}
+#search,#filter{
+  padding:10px 14px;border:none;border-radius:20px;outline:none;
+  font-family:'Poppins';transition:0.3s;
+}
 #search:focus,#filter:focus{box-shadow:0 0 8px rgba(52,152,219,0.7);}
 
-/* ========== ITEMS CONTAINER ========== */
-#items-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:16px;max-width:1400px;margin:auto;position:relative;z-index:2;}
+/* ================= ITEMS CONTAINER ================= */
+#items-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
+  padding:16px;
+  max-width:1400px;
+  margin:auto;
+  position:relative;
+  z-index:2;
+}
 
-/* ========== ITEM CARD ========== */
-.item-card{background: rgba(255,255,255,0.05);backdrop-filter: blur(12px);border-radius:16px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,0.25);opacity:0;transform:translateY(30px);transition:.35s ease, transform 0.3s;position:relative;}
+/* ================= ITEM CARD ================= */
+.item-card{
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  opacity:0;
+  transform:translateY(30px);
+  transition:.35s ease, transform 0.3s;
+  position:relative;
+}
 .item-card.show{opacity:1;transform:none;}
 .item-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(0,0,0,0.35);}
 body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45);}
 
-.rating-badge,.verified-badge{position:absolute;top:10px;font-size:12px;padding:4px 8px;border-radius:8px;font-weight:600;}
+.rating-badge,.verified-badge{
+  position:absolute;top:10px;font-size:12px;padding:4px 8px;border-radius:8px;font-weight:600;
+}
 .rating-badge{left:10px;background:#f1c40f;}
 .verified-badge{right:10px;background:#27ae60;color:#fff;}
 
@@ -44,12 +106,12 @@ body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,
 .item-info strong{font-size:15px;}
 .price{font-size:18px;color:#e67e22;font-weight:600;margin-top:6px;}
 
-/* ========== IMAGE GALLERY ========== */
+/* ================= IMAGE GALLERY ================= */
 .images-gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 .images-gallery img{width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;transition:0.3s;}
 .images-gallery img:hover{transform:scale(1.2);}
 
-/* ========== BUTTONS ========== */
+/* ================= BUTTONS ================= */
 .btn{width:100%;padding:9px;margin-top:7px;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:'Poppins';transition:0.3s;}
 .buy-btn{background:#27ae60;color:#fff;}
 .buy-btn:disabled{background:#aaa;cursor:not-allowed;}
@@ -58,7 +120,7 @@ body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,
 .outline{background:#fff;border:2px solid #3498db;color:#3498db;}
 .btn:hover:not(:disabled){opacity:0.85;}
 
-/* ========== MODALS ========== */
+/* ================= MODALS ================= */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:999;animation:fadeIn 0.3s;}
 .modal-bg.active{display:flex;}
 .modal{background:#fff;color:#333;padding:18px;border-radius:16px;width:400px;max-height:85vh;overflow-y:auto;position:relative;animation:slideIn 0.3s;}
@@ -66,11 +128,11 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 @keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
 @keyframes slideIn{0%{transform:translateY(-30px);opacity:0}100%{transform:translateY(0);opacity:1}}
 
-/* ========== IMAGE MODAL ========== */
+/* ================= IMAGE MODAL ================= */
 #imgModal img{max-width:92%;max-height:92%;border-radius:14px;transition:transform 0.3s;}
 #imgModal img:hover{transform:scale(1.05);}
 
-/* ========== TOAST ========== */
+/* ================= TOAST ================= */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 20px;border-radius:25px;display:none;z-index:1200;opacity:0;transition:0.3s;}
 #toast.show{display:block;opacity:1;}
 </style>
@@ -98,10 +160,18 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
   </select>
 </div>
 
-<div id="items-container"></div>
+<div id="items-container">
+  <div class="item-card">
+    <div class="skeleton" style="width:70%"></div>
+    <div class="skeleton" style="width:50%"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
+  </div>
+</div>
 
 <!-- Seller Modal -->
-<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
+<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="seller-modal">
   <div class="modal" id="seller-modal">
     <button class="btn delete-btn" onclick="closeSeller()">Close</button>
     <div id="seller-content">Loading...</div>
@@ -109,11 +179,11 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 </div>
 
 <!-- Image Modal -->
-<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" onclick="this.classList.remove('active')">
+<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="imgPreview" onclick="this.classList.remove('active')">
   <img id="imgPreview" alt="Item Image">
 </div>
 
-<!-- Edit Modal -->
+<!-- Edit Listing Modal -->
 <div id="edit-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
   <div class="modal" id="edit-modal">
     <h3>Edit Listing</h3>
@@ -128,70 +198,15 @@ body.dark .modal{background:#2c2c2c;color:#fff;}
 <script src="js/marketplace.js"></script>
 
 <script>
-// Dark toggle
+// Dark mode toggle
 document.getElementById('dark-toggle').addEventListener('click',()=>{document.body.classList.toggle('dark');});
 
 // Particle background
-const c=document.getElementById('particle-canvas');const ctx=c.getContext('2d');
+const c=document.getElementById('particle-canvas');
+const ctx=c.getContext('2d');
 function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener('resize',resize);
 const dots=[...Array(90)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,dx:(Math.random()-.5)*0.6,dy:(Math.random()-.5)*0.6}));
 (function animate(){ctx.clearRect(0,0,c.width,c.height);dots.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.6)';ctx.fill();p.x+=p.dx;p.y+=p.dy;if(p.x<0)p.x=c.width;if(p.y<0)p.y=c.height;if(p.x>c.width)p.x=0;if(p.y>c.height)p.y=0;});requestAnimationFrame(animate);})();
-
-// ================= ENHANCEMENTS =================
-(function(){
-  const analytics = JSON.parse(localStorage.getItem("img_analytics")||"{}");
-
-  function track(id,type){analytics[id] ??= {views:0};analytics[id][type]=(analytics[id][type]||0)+1;localStorage.setItem("img_analytics",JSON.stringify(analytics));}
-
-  function watermark(img){
-    return new Promise(resolve=>{
-      const c=document.createElement("canvas");
-      const ctx=c.getContext("2d");
-      c.width=img.naturalWidth;c.height=img.naturalHeight;
-      ctx.drawImage(img,0,0);
-      ctx.fillStyle="rgba(255,255,255,0.35)";
-      ctx.font="24px Arial";
-      ctx.fillText("BGMI MARKET",c.width-180,c.height-20);
-      resolve(c.toDataURL());
-    });
-  }
-
-  function enhanceGallery(container){
-    container.querySelectorAll(".images-gallery").forEach(gallery=>{
-      if(gallery.dataset.done)return;gallery.dataset.done=1;
-      const imgs=[...gallery.querySelectorAll("img")];
-      if(!imgs.length)return;
-      const trackDiv=document.createElement("div");trackDiv.className="carousel-track";
-      imgs.forEach(i=>{i.loading="lazy";trackDiv.appendChild(i);});
-      const carousel=document.createElement("div");carousel.className="carousel";carousel.appendChild(trackDiv);
-
-      let index=0;
-      const dots=document.createElement("div");dots.className="dots";
-      imgs.forEach((_,i)=>{const d=document.createElement("div");d.className="dot"+(i===0?" active":"");dots.appendChild(d);});
-      carousel.after(dots);
-
-      const update=()=>{trackDiv.style.transform=`translateX(-${index*100}%)`;dots.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("active",i===index));};
-
-      const prev=document.createElement("button");prev.className="carousel-btn prev";prev.innerHTML="‹";prev.onclick=()=>{index=(index-1+imgs.length)%imgs.length;update();};
-      const next=document.createElement("button");next.className="carousel-btn next";next.innerHTML="›";next.onclick=()=>{index=(index+1)%imgs.length;update();};
-      carousel.append(prev,next);gallery.replaceWith(carousel);
-
-      let startX=0;
-      carousel.addEventListener("touchstart",e=>{startX=e.touches[0].clientX;});
-      carousel.addEventListener("touchend",e=>{const diff=startX-e.changedTouches[0].clientX;if(diff>30){index=(index+1)%imgs.length;}else if(diff<-30){index=(index-1+imgs.length)%imgs.length;}update();});
-      setInterval(()=>{index=(index+1)%imgs.length;update();},4000);
-    });
-  }
-
-  new MutationObserver(m=>{enhanceGallery(document.body);}).observe(document.body,{childList:true,subtree:true});
-
-  document.addEventListener("load",async e=>{
-    if(e.target.tagName==="IMG"){
-      track(e.target.src,"views");
-      e.target.src=await watermark(e.target);
-    }
-  },true);
-})();
 </script>
 
 </body>
