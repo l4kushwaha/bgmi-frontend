@@ -122,6 +122,7 @@
 
       for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
+        const session = getSession();
 
         const isOwnerOrAdmin =
           session &&
