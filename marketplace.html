@@ -8,53 +8,53 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ======= BODY & PARTICLES ======= */
+/* ===== BASIC RESET ===== */
+*{box-sizing:border-box}
+
+/* ===== BODY ===== */
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
   min-height:100vh;
   background:linear-gradient(135deg,#1abc9c,#3498db);
   overflow-x:hidden;
-  transition: background 0.3s;
-  position:relative;
 }
 
-/* Particle canvas */
+/* ===== PARTICLES ===== */
 #particle-canvas{
   position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  inset:0;
   z-index:0;
 }
 
-/* ======= HEADER ======= */
-h1{text-align:center;color:#fff;margin:15px;position:relative;z-index:1;}
+/* ===== HEADER ===== */
+h1{
+  text-align:center;
+  color:#fff;
+  margin:15px;
+  position:relative;
+  z-index:2;
+}
 
-/* ======= TOP BAR ======= */
+/* ===== TOP BAR ===== */
 #top-bar{
   display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
   gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
   padding:10px;
+  z-index:2;
   position:relative;
-  z-index:1;
 }
-#search, #filter{
-  padding:10px;
-  border-radius:20px;
-  border:none;
-  outline:none;
-  font-size:14px;
-  transition: all 0.3s;
-}
-#search:focus, #filter:focus{box-shadow:0 0 12px rgba(255,255,255,0.9);}
-#search{width:220px}
-#filter{width:180px}
 
-/* ======= ITEMS CONTAINER ======= */
+#search,#filter{
+  padding:10px 14px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+}
+
+/* ===== ITEMS ===== */
 #items-container{
   display:flex;
   flex-wrap:wrap;
@@ -62,212 +62,136 @@ h1{text-align:center;color:#fff;margin:15px;position:relative;z-index:1;}
   gap:15px;
   padding:15px;
   position:relative;
-  z-index:1;
+  z-index:2;
 }
 
-/* ======= ITEM CARD ======= */
+/* ===== CARD ===== */
 .item-card{
   background:#fff;
   width:280px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.2);
-  position:relative;
+  border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
   overflow:hidden;
-  cursor:pointer;
   opacity:0;
-  transform:translateY(20px);
-  transition:transform 0.4s ease, box-shadow 0.3s, opacity 0.5s;
-  z-index:1;
+  transform:translateY(25px);
+  transition:all .4s ease;
 }
-.item-card.show{
-  opacity:1;
-  transform:translateY(0);
-}
-.item-card:hover{
-  transform:scale(1.05);
-  box-shadow:0 10px 30px rgba(0,0,0,0.35);
-}
+.item-card.show{opacity:1;transform:none}
+.item-card:hover{transform:scale(1.04)}
 
-/* ======= BADGES ======= */
-.rating-badge{
+.rating-badge,.verified-badge{
   position:absolute;
   top:8px;
-  left:8px;
-  background:#f1c40f;
-  color:#000;
   font-size:12px;
-  font-weight:600;
-  padding:3px 6px;
+  padding:4px 7px;
   border-radius:6px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
-  transition:transform 0.2s, box-shadow 0.3s;
-}
-.rating-badge:hover{
-  transform:scale(1.2);
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
-}
-
-/* Verified badge with sparkle animation */
-@keyframes sparkle {
-  0%, 100% {transform:scale(1) rotate(0deg); opacity:1;}
-  50% {transform:scale(1.2) rotate(20deg); opacity:0.7;}
-}
-
-.verified-badge{
-  position:absolute;
-  top:8px;
-  right:8px;
-  background:#27ae60;
-  color:#fff;
-  font-size:12px;
   font-weight:600;
-  padding:3px 6px;
-  border-radius:6px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
-  transition:transform 0.2s, box-shadow 0.3s;
-  animation: sparkle 1.5s infinite;
 }
-.verified-badge:hover{
-  transform:scale(1.2);
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
-}
+.rating-badge{left:8px;background:#f1c40f}
+.verified-badge{right:8px;background:#27ae60;color:#fff}
 
-/* ======= ITEM INFO ======= */
-.item-info{
-  padding:10px;
-  font-size:13px;
-}
+/* ===== INFO ===== */
+.item-info{padding:10px;font-size:13px}
 .item-info p{margin:4px 0}
 .price{color:#e67e22;font-weight:600}
 
-/* ======= IMAGE GALLERY ======= */
+/* ===== SELLER ===== */
+.seller-link{
+  color:#3498db;
+  font-weight:600;
+  cursor:pointer;
+}
+.seller-link:hover{text-decoration:underline}
+
+/* ===== TAGS ===== */
+.tags{margin-top:5px;font-size:12px}
+.tag{
+  display:inline-block;
+  background:#ecf0f1;
+  padding:2px 6px;
+  border-radius:6px;
+  margin:2px;
+}
+
+/* ===== IMAGES ===== */
 .images-gallery{
   display:flex;
   gap:5px;
-  margin-top:6px;
   flex-wrap:wrap;
+  margin-top:6px;
 }
 .images-gallery img{
-  width:48px;
-  height:48px;
-  border-radius:6px;
+  width:48px;height:48px;
   object-fit:cover;
+  border-radius:6px;
   cursor:pointer;
-  transition:transform 0.3s, box-shadow 0.3s;
-}
-.images-gallery img:hover{
-  transform:scale(1.3);
-  box-shadow:0 6px 15px rgba(0,0,0,0.35);
 }
 
-/* ======= BUTTONS ======= */
+/* ===== BUTTONS ===== */
 .btn{
   width:100%;
+  margin-top:6px;
   padding:8px;
   border:none;
   border-radius:8px;
-  margin-top:6px;
-  cursor:pointer;
   font-weight:600;
-  transition:all 0.3s, box-shadow 0.3s;
+  cursor:pointer;
 }
 .buy-btn{background:#27ae60;color:#fff}
-.buy-btn:hover:not(:disabled){
-  background:#2ecc71;
-  box-shadow:0 4px 12px rgba(46,204,113,0.5);
-}
 .edit-btn{background:#3498db;color:#fff}
-.edit-btn:hover{box-shadow:0 4px 12px rgba(52,152,219,0.5);}
 .delete-btn{background:#c0392b;color:#fff}
-.delete-btn:hover{box-shadow:0 4px 12px rgba(192,57,43,0.5);}
-.buy-btn:disabled{background:#95a5a6;cursor:not-allowed}
-.btn.outline{background:transparent;border:1px solid #3498db;color:#3498db}
-.btn.outline:hover{background:#3498db;color:#fff;box-shadow:0 4px 12px rgba(52,152,219,0.4)}
 
-/* ======= MODALS ======= */
-#modal-bg, #seller-modal-bg, #imgModal{
+/* ===== MODALS ===== */
+.modal-bg{
   display:none;
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
   justify-content:center;
   align-items:center;
-  z-index:1000;
-  opacity:0;
-  transition:opacity 0.3s;
+  z-index:999;
 }
-#modal-bg.active, #seller-modal-bg.active, #imgModal.active{display:flex; opacity:1;}
+.modal-bg.active{display:flex}
 
-.modal, #seller-modal{
+.modal{
   background:#fff;
   padding:20px;
   border-radius:12px;
-  text-align:center;
   width:320px;
-  transform:scale(0.8);
-  transition:transform 0.3s;
-}
-#modal-bg.active .modal, #seller-modal-bg.active #seller-modal{transform:scale(1);}
-.modal button, #seller-modal button{margin:8px}
-
-/* ======= TOAST ======= */
-#toast{
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%) translateY(30px);
-  padding:12px 25px;
-  background:#27ae60;
-  color:#fff;
-  border-radius:25px;
-  display:none;
-  z-index:1100;
-  opacity:0;
-  transition:opacity 0.3s, transform 0.3s;
-}
-#toast.show{
-  display:block;
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
 }
 
-/* ======= IMAGE MODAL ======= */
-#imgModal img{
-  max-width:90%;
-  max-height:90%;
-  border-radius:10px;
-  transition:transform 0.3s;
-}
-#imgModal.active img{transform:scale(1.05);}
-
-/* ======= SELLER PROFILE ======= */
+/* ===== SELLER MODAL ===== */
 #seller-modal{
   max-height:80vh;
   overflow-y:auto;
   text-align:left;
 }
-#seller-modal h3{margin:0 0 5px 0;}
-.review{
-  border-top:1px solid #eee;
-  padding:6px 0;
-}
-.review p{margin:2px 0;}
-.review .reply{color:#2980b9; font-weight:600; font-size:13px; margin-left:8px;}
-#seller-modal .close-btn{
-  background:#c0392b;
-  color:#fff;
-  padding:6px 12px;
-  margin-top:10px;
-  width:auto;
-  cursor:pointer;
-  border-radius:6px;
-  float:right;
+.review{border-top:1px solid #eee;padding:6px 0}
+
+/* ===== IMAGE MODAL ===== */
+#imgModal img{
+  max-width:90%;
+  max-height:90%;
+  border-radius:12px;
 }
 
-/* ======= MOBILE ======= */
+/* ===== TOAST ===== */
+#toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#27ae60;
+  color:#fff;
+  padding:10px 20px;
+  border-radius:25px;
+  display:none;
+  z-index:1200;
+}
+#toast.show{display:block}
+
 @media(max-width:600px){
   .item-card{width:95%}
-  #seller-modal{width:95%; max-height:70vh;}
 }
 </style>
 </head>
@@ -279,12 +203,12 @@ h1{text-align:center;color:#fff;margin:15px;position:relative;z-index:1;}
 <h1>BGMI Marketplace</h1>
 
 <div id="top-bar">
-  <input type="text" id="search" placeholder="Search UID / title / rank">
+  <input id="search" placeholder="Search UID / Title / Rank">
   <select id="filter">
     <option value="">Default</option>
-    <option value="price_high">Price: High → Low</option>
-    <option value="price_low">Price: Low → High</option>
-    <option value="new">Newest First</option>
+    <option value="price_high">Price High → Low</option>
+    <option value="price_low">Price Low → High</option>
+    <option value="new">Newest</option>
     <option value="own">My Listings</option>
   </select>
 </div>
@@ -293,94 +217,68 @@ h1{text-align:center;color:#fff;margin:15px;position:relative;z-index:1;}
   <p style="color:white">Loading listings...</p>
 </div>
 
-<!-- Confirm Modal -->
-<div id="modal-bg">
+<!-- CONFIRM -->
+<div id="modal-bg" class="modal-bg">
   <div class="modal">
-    <p id="modal-text">Confirm?</p>
+    <p id="modal-text"></p>
     <button id="confirm-btn" class="btn buy-btn">Confirm</button>
-    <button id="cancel-btn" class="btn delete-btn">Cancel</button>
+    <button onclick="closeModal()" class="btn delete-btn">Cancel</button>
   </div>
 </div>
 
-<!-- Seller Profile Modal -->
-<div id="seller-modal-bg">
-  <div id="seller-modal">
-    <button class="close-btn" onclick="document.getElementById('seller-modal-bg').classList.remove('active')">Close</button>
-    <div id="seller-content">Loading seller profile...</div>
+<!-- SELLER -->
+<div id="seller-modal-bg" class="modal-bg">
+  <div class="modal" id="seller-modal">
+    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
+    <div id="seller-content">Loading...</div>
   </div>
 </div>
 
-<!-- Image Modal -->
-<div id="imgModal" onclick="this.classList.remove('active')">
+<!-- IMAGE -->
+<div id="imgModal" class="modal-bg" onclick="this.classList.remove('active')">
   <img id="imgPreview">
 </div>
 
 <div id="toast"></div>
 
 <script>
-// TOAST
-function showToast(msg, success = true){
-  const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.style.background = success ? "#27ae60" : "#c0392b";
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),3000);
+/* ===== TOAST ===== */
+function showToast(msg, ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=ok?'#27ae60':'#c0392b';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// IMAGE MODAL
-document.addEventListener('click', function(e){
+/* ===== IMAGE ===== */
+document.addEventListener('click',e=>{
   if(e.target.classList.contains('item-img')){
-    const imgModal = document.getElementById('imgModal');
-    const imgPreview = document.getElementById('imgPreview');
-    imgPreview.src = e.target.src;
+    imgPreview.src=e.target.src;
     imgModal.classList.add('active');
   }
 });
 
-// SEQUENTIAL ANIMATION FOR ITEM CARDS
-function animateCards(){
-  const cards = document.querySelectorAll('.item-card');
-  cards.forEach((card,i)=>{
-    setTimeout(()=>card.classList.add('show'), i*100); // 100ms delay between each
+/* ===== PARTICLES ===== */
+const c=document.getElementById('particle-canvas');
+const x=c.getContext('2d');
+function rs(){c.width=innerWidth;c.height=innerHeight}
+rs();addEventListener('resize',rs);
+const p=[...Array(80)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,dx:(Math.random()-.5),dy:(Math.random()-.5)}));
+(function anim(){
+  x.clearRect(0,0,c.width,c.height);
+  p.forEach(o=>{
+    x.beginPath();x.arc(o.x,o.y,o.r,0,7);x.fillStyle='rgba(255,255,255,.6)';x.fill();
+    o.x+=o.dx;o.y+=o.dy;
+    if(o.x<0)o.x=c.width;if(o.y<0)o.y=c.height;
+    if(o.x>c.width)o.x=0;if(o.y>c.height)o.y=0;
   });
-}
-
-// PARTICLE BACKGROUND
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
-let W, H;
-function resizeCanvas(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-const particles = [];
-const particleCount = 80;
-for(let i=0;i<particleCount;i++){
-  particles.push({
-    x:Math.random()*W,
-    y:Math.random()*H,
-    r:Math.random()*2+1,
-    dx:(Math.random()-0.5)*0.5,
-    dy:(Math.random()-0.5)*0.5
-  });
-}
-
-function drawParticles(){
-  ctx.clearRect(0,0,W,H);
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
-    ctx.fillStyle='rgba(255,255,255,0.6)';
-    ctx.fill();
-    p.x+=p.dx; p.y+=p.dy;
-    if(p.x<0)p.x=W;if(p.x>W)p.x=0;
-    if(p.y<0)p.y=H;if(p.y>H)p.y=0;
-  });
-  requestAnimationFrame(drawParticles);
-}
-drawParticles();
+  requestAnimationFrame(anim);
+})();
 </script>
 
+<!-- MAIN LOGIC -->
 <script src="js/marketplace.js"></script>
+
 </body>
 </html>
