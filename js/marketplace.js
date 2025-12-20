@@ -55,6 +55,15 @@
   const stars = r =>
     "★".repeat(Math.round(r || 0)) + "☆".repeat(5 - Math.round(r || 0));
 
+  /* ================= GLOBAL CLOSE FUNCTIONS ================= */
+  window.closeSeller = () => {
+    document.getElementById("seller-modal-bg")?.classList.remove("active");
+  };
+
+  window.closeEdit = () => {
+    document.getElementById("edit-modal-bg")?.classList.remove("active");
+  };
+
   /* ================= SELLER PROFILE ================= */
   window.openSellerProfile = async sellerId => {
     const bg = document.getElementById("seller-modal-bg");
@@ -71,7 +80,7 @@
       content.innerHTML = `
         <h3>${s.name}</h3>
         <p><b>Status:</b> ${s.seller_verified == 1 ? "Verified" : "Pending"}</p>
-        <p><b>Badge:</b> ${s.badge || "None"}</p>
+        <p><b>Badge:</b> ${s.badge || "-"}</p>
         <p><b>Rating:</b> ${stars(s.avg_rating)}</p>
         <p><b>Total Sales:</b> ${s.total_sales || 0}</p>
         <p><b>Reviews:</b> ${s.review_count || 0}</p>
@@ -82,11 +91,6 @@
     } catch {
       content.innerHTML = "Failed to load seller";
     }
-  };
-
-  window.closeSeller = () => {
-    const bg = document.getElementById("seller-modal-bg");
-    if (bg) bg.classList.remove("active");
   };
 
   /* ================= LOAD LISTINGS ================= */
@@ -113,10 +117,9 @@
       );
     }
 
-    if (container) {
-      container.innerHTML = "";
-      items.forEach(renderCard);
-    }
+    if (!container) return;
+    container.innerHTML = "";
+    items.forEach(renderCard);
   }
 
   /* ================= CARD ================= */
@@ -147,23 +150,6 @@
         UID: ${item.uid}<br>
         Level: ${item.level}<br>
         Rank: ${item.highest_rank || "-"}<br>
-
-        ${
-          safeArray(item.upgraded_guns).length
-            ? `<b>Upgraded:</b> ${safeArray(item.upgraded_guns).join(", ")}<br>`
-            : ""
-        }
-        ${
-          safeArray(item.mythic_items).length
-            ? `<b>Mythic:</b> ${safeArray(item.mythic_items).join(", ")}<br>`
-            : ""
-        }
-        ${
-          safeArray(item.legendary_items).length
-            ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>`
-            : ""
-        }
-
         <div class="price">₹${item.price}</div>
       </div>
 
@@ -182,18 +168,23 @@
     `;
 
     const sellerBtn = card.querySelector(".seller-btn");
-    if (sellerBtn) {
+    if (sellerBtn)
       sellerBtn.onclick = () => openSellerProfile(item.seller_id);
-    }
 
     if (isOwner) {
-      const editBtn = card.querySelector(".edit-btn");
-      const delBtn = card.querySelector(".delete-btn");
-      if (editBtn) editBtn.onclick = () => openEdit(item);
-      if (delBtn) delBtn.onclick = () => deleteListing(item.id);
+      card.querySelector(".edit-btn")?.addEventListener("click", () =>
+        openEdit(item)
+      );
+      card.querySelector(".delete-btn")?.addEventListener("click", () =>
+        deleteListing(item.id)
+      );
+    } else {
+      card.querySelector(".buy-btn")?.addEventListener("click", () =>
+        toast("Buy feature coming soon")
+      );
     }
 
-    if (container) container.appendChild(card);
+    container.appendChild(card);
   }
 
   /* ================= DELETE ================= */
@@ -218,17 +209,12 @@
     if (!bg || !form) return;
 
     bg.classList.add("active");
-    const arr = v => safeArray(v).join(", ");
 
     form.innerHTML = `
       <input id="e-title" value="${item.title}">
       <input id="e-price" type="number" value="${item.price}">
       <input id="e-level" type="number" value="${item.level}">
       <input id="e-rank" value="${item.highest_rank || ""}">
-      <textarea id="e-upgraded">${arr(item.upgraded_guns)}</textarea>
-      <textarea id="e-mythic">${arr(item.mythic_items)}</textarea>
-      <textarea id="e-legendary">${arr(item.legendary_items)}</textarea>
-      <textarea id="e-highlights">${item.account_highlights || ""}</textarea>
     `;
   }
 
@@ -249,16 +235,12 @@
           title: e("e-title"),
           price: +e("e-price"),
           level: +e("e-level"),
-          highest_rank: e("e-rank"),
-          upgraded_guns: e("e-upgraded").split(","),
-          mythic_items: e("e-mythic").split(","),
-          legendary_items: e("e-legendary").split(","),
-          account_highlights: e("e-highlights")
+          highest_rank: e("e-rank")
         })
       });
 
       toast("Listing updated");
-      document.getElementById("edit-modal-bg")?.classList.remove("active");
+      closeEdit();
       loadListings();
     };
   }
