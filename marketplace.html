@@ -7,15 +7,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-body {
+/* ================= ORIGINAL STYLES ================= */
+body{
   margin:0;
   font-family:'Poppins',sans-serif;
-  background: linear-gradient(135deg,#141e30,#243b55);
+  background:linear-gradient(135deg,#141e30,#243b55);
   color:#fff;
   overflow-x:hidden;
-  transition: background 0.3s,color 0.3s;
+  transition:.3s;
 }
-body.dark{background: linear-gradient(135deg,#1a1a1a,#2c2c2c);color:#fff;}
+body.dark{
+  background:linear-gradient(135deg,#1a1a1a,#2c2c2c);
+}
 
 #particle-canvas{position:fixed;inset:0;z-index:0;}
 
@@ -27,38 +30,10 @@ header{
   align-items:center;
   padding:15px 20px;
   backdrop-filter:blur(12px);
-  background: rgba(255,255,255,0.05);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.05);
+  border-bottom:1px solid rgba(255,255,255,0.1);
   border-radius:12px;
 }
-header h1{font-size:26px;font-weight:600;}
-#controls{display:flex;gap:12px;align-items:center;}
-#dark-toggle{
-  padding:6px 10px;border:none;border-radius:10px;cursor:pointer;
-  background:#3498db;color:#fff;transition:0.3s;
-}
-#dark-toggle:hover{background:#2980b9;}
-#wallet-balance{
-  font-size:14px;font-weight:600;
-  background:rgba(255,255,255,0.1);
-  padding:6px 12px;
-  border-radius:12px;
-}
-
-#top-bar{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  padding:12px;
-  position:relative;
-  z-index:2;
-}
-#search,#filter{
-  padding:10px 14px;border:none;border-radius:20px;outline:none;
-  font-family:'Poppins';transition:0.3s;
-}
-#search:focus,#filter:focus{box-shadow:0 0 8px rgba(52,152,219,0.7);}
 
 #items-container{
   display:grid;
@@ -72,129 +47,264 @@ header h1{font-size:26px;font-weight:600;}
 }
 
 .item-card{
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(12px);
   border-radius:16px;
   padding:12px;
   box-shadow:0 8px 24px rgba(0,0,0,0.25);
-  opacity:0;
-  transform:translateY(30px);
-  transition:.35s ease, transform 0.3s;
+  transition:.35s;
+}
+.item-card:hover{
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 14px 32px rgba(0,0,0,.35);
+}
+
+/* ================= IMAGE SLIDER ================= */
+.images-gallery{
   position:relative;
+  height:180px;
+  overflow:hidden;
+  border-radius:14px;
+  margin-top:8px;
 }
-.item-card.show{opacity:1;transform:none;}
-.item-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(0,0,0,0.35);}
-body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45);}
 
-.badge-badge,.verified-badge,.rating-badge{
-  position:absolute;top:10px;font-size:12px;padding:4px 8px;border-radius:8px;font-weight:600;
+.images-gallery img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:none;
+  filter:blur(14px);
+  transition:filter .6s ease;
+  cursor:pointer;
 }
-.rating-badge{left:10px;background:#f1c40f;}
-.verified-badge{right:10px;background:#27ae60;color:#fff;}
-.badge-badge{right:80px;background:#e67e22;color:#fff;}
+.images-gallery img.active{display:block}
+.images-gallery img.loaded{filter:blur(0)}
 
-.item-info{font-size:13px;line-height:1.45;}
-.item-info strong{font-size:15px;}
-.price{font-size:18px;color:#e67e22;font-weight:600;margin-top:6px;}
+/* arrows */
+.img-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  font-size:20px;
+  z-index:3;
+  background:rgba(255,255,255,.85);
+  color:#000;
+}
+.img-arrow.left{left:8px}
+.img-arrow.right{right:8px}
+body.dark .img-arrow{background:rgba(0,0,0,.65);color:#fff}
 
-.images-gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.images-gallery img{width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;transition:0.3s;}
-.images-gallery img:hover{transform:scale(1.2);}
+/* dots */
+.img-dots{
+  position:absolute;
+  bottom:8px;
+  width:100%;
+  text-align:center;
+  z-index:3;
+}
+.img-dots span{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  margin:0 4px;
+  background:rgba(255,255,255,.5);
+  border-radius:50%;
+}
+.img-dots span.active{background:#fff}
 
-.btn{width:100%;padding:9px;margin-top:7px;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:'Poppins';transition:0.3s;}
-.buy-btn{background:#27ae60;color:#fff;}
-.buy-btn:disabled{background:#aaa;cursor:not-allowed;}
-.edit-btn{background:#3498db;color:#fff;}
-.delete-btn{background:#c0392b;color:#fff;}
-.outline{background:#fff;border:2px solid #3498db;color:#3498db;}
-.btn:hover:not(:disabled){opacity:0.85;}
+/* ================= FULLSCREEN VIEWER ================= */
+#img-viewer{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+#img-viewer.active{display:flex}
 
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:999;animation:fadeIn 0.3s;}
-.modal-bg.active{display:flex;}
-.modal{background:#fff;color:#333;padding:18px;border-radius:16px;width:400px;max-height:85vh;overflow-y:auto;position:relative;animation:slideIn 0.3s;display:flex;flex-direction:column;gap:6px;}
-body.dark .modal{background:#2c2c2c;color:#fff;}
-@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-@keyframes slideIn{0%{transform:translateY(-30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+#img-viewer img{
+  max-width:92%;
+  max-height:92%;
+  border-radius:16px;
+}
 
-#imgModal img{max-width:92%;max-height:92%;border-radius:14px;transition:transform 0.3s;}
-#imgModal img:hover{transform:scale(1.05);}
+#img-viewer .close{
+  position:absolute;
+  top:20px;
+  right:26px;
+  font-size:32px;
+  color:#fff;
+  cursor:pointer;
+}
 
-#edit-modal form, #seller-modal .modal-content{display:flex;flex-direction:column;gap:6px;}
-#e-images-container{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
-
-/* Toast */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 20px;border-radius:25px;display:none;z-index:1200;opacity:0;transition:0.3s;}
-#toast.show{display:block;opacity:1;}
+#img-viewer .fs-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:38px;
+  color:#fff;
+  cursor:pointer;
+  padding:10px;
+}
+#img-viewer .fs-left{left:20px}
+#img-viewer .fs-right{right:20px}
 </style>
 </head>
+
 <body>
 <canvas id="particle-canvas"></canvas>
 
 <header>
   <h1>BGMI Marketplace</h1>
-  <div id="controls">
-    <div id="wallet-balance" aria-live="polite">Wallet: ₹0</div>
-    <button id="dark-toggle">Dark / Light</button>
-  </div>
+  <button id="dark-toggle">Dark / Light</button>
 </header>
 
-<div id="top-bar">
-  <input id="search" placeholder="Search UID / Title / Rank" aria-label="Search Listings">
-  <select id="filter" aria-label="Filter Listings">
-    <option value="">Default</option>
-    <option value="price_high">Price High → Low</option>
-    <option value="price_low">Price Low → High</option>
-    <option value="new">Newest</option>
-    <option value="own">My Listings</option>
-  </select>
+<div id="items-container"></div>
+
+<!-- FULLSCREEN IMAGE VIEWER -->
+<div id="img-viewer">
+  <span class="close">&times;</span>
+  <div class="fs-arrow fs-left">‹</div>
+  <img>
+  <div class="fs-arrow fs-right">›</div>
 </div>
 
-<div id="items-container">
-  <div class="item-card">
-    <div class="skeleton" style="width:70%"></div>
-    <div class="skeleton" style="width:50%"></div>
-    <div class="skeleton img"></div>
-    <div class="skeleton img"></div>
-    <div class="skeleton img"></div>
-  </div>
-</div>
-
-<!-- Seller Modal -->
-<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
-  <div class="modal" id="seller-modal">
-    <div id="seller-content">Loading...</div>
-    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
-  </div>
-</div>
-
-<!-- Image Modal -->
-<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" onclick="this.classList.remove('active')">
-  <img id="imgPreview" alt="Item Image">
-</div>
-
-<!-- Edit Listing Modal -->
-<div id="edit-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
-  <div class="modal" id="edit-modal">
-    <h3>Edit Listing</h3>
-    <div id="edit-form"></div>
-    <button class="btn buy-btn" id="save-edit">Save Changes</button>
-    <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
-  </div>
-</div>
-
-<div id="toast" role="status" aria-live="polite"></div>
-
+<!-- ORIGINAL MARKETPLACE JS (UNCHANGED) -->
 <script src="js/marketplace.js"></script>
 
 <script>
-document.getElementById('dark-toggle').addEventListener('click',()=>{document.body.classList.toggle('dark');});
+/* dark toggle */
+document.getElementById('dark-toggle')
+  .onclick=()=>document.body.classList.toggle('dark');
 
-// Particle background
+/* particles */
 const c=document.getElementById('particle-canvas');
 const ctx=c.getContext('2d');
-function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener('resize',resize);
-const dots=[...Array(90)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,dx:(Math.random()-.5)*0.6,dy:(Math.random()-.5)*0.6}));
-(function animate(){ctx.clearRect(0,0,c.width,c.height);dots.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.6)';ctx.fill();p.x+=p.dx;p.y+=p.dy;if(p.x<0)p.x=c.width;if(p.y<0)p.y=c.height;if(p.x>c.width)p.x=0;if(p.y>c.height)p.y=0;});requestAnimationFrame(animate);})();
+function resize(){c.width=innerWidth;c.height=innerHeight}
+resize();addEventListener('resize',resize);
+const dots=[...Array(80)].map(()=>({
+  x:Math.random()*c.width,
+  y:Math.random()*c.height,
+  r:Math.random()*2+1,
+  dx:(Math.random()-.5)*.6,
+  dy:(Math.random()-.5)*.6
+}));
+(function animate(){
+  ctx.clearRect(0,0,c.width,c.height);
+  dots.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.6)';
+    ctx.fill();
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0)p.x=c.width;
+    if(p.y<0)p.y=c.height;
+    if(p.x>c.width)p.x=0;
+    if(p.y>c.height)p.y=0;
+  });
+  requestAnimationFrame(animate);
+})();
 </script>
+
+<script>
+/* ================= SLIDER + LAZY + FULLSCREEN ================= */
+
+let fsImgs=[],fsIndex=0;
+const viewer=document.getElementById('img-viewer');
+const viewerImg=viewer.querySelector('img');
+
+function initSliders(){
+  document.querySelectorAll('.images-gallery').forEach(gallery=>{
+    if(gallery.dataset.ready) return;
+
+    const imgs=[...gallery.querySelectorAll('img')];
+    if(imgs.length<=1) return;
+
+    gallery.dataset.ready=1;
+    let index=0,auto,startX=0;
+
+    imgs[0].classList.add('active');
+
+    /* lazy + blur */
+    imgs.forEach(img=>{
+      img.loading="lazy";
+      if(img.complete) img.classList.add('loaded');
+      else img.onload=()=>img.classList.add('loaded');
+
+      img.onclick=()=>{
+        fsImgs=imgs;
+        fsIndex=index;
+        viewerImg.src=img.src;
+        viewer.classList.add('active');
+      };
+    });
+
+    /* arrows */
+    const L=document.createElement('button');
+    L.className='img-arrow left';L.innerHTML='‹';
+    const R=document.createElement('button');
+    R.className='img-arrow right';R.innerHTML='›';
+    gallery.append(L,R);
+
+    /* dots */
+    const dots=document.createElement('div');
+    dots.className='img-dots';
+    imgs.forEach((_,i)=>{
+      const d=document.createElement('span');
+      if(i===0)d.classList.add('active');
+      dots.appendChild(d);
+    });
+    gallery.appendChild(dots);
+    const dEls=dots.querySelectorAll('span');
+
+    function show(i){
+      imgs.forEach(im=>im.classList.remove('active'));
+      dEls.forEach(d=>d.classList.remove('active'));
+      imgs[i].classList.add('active');
+      dEls[i].classList.add('active');
+      index=i;
+    }
+
+    L.onclick=()=>show((index-1+imgs.length)%imgs.length);
+    R.onclick=()=>show((index+1)%imgs.length);
+
+    /* auto */
+    auto=setInterval(()=>show((index+1)%imgs.length),3500);
+    gallery.onmouseenter=()=>clearInterval(auto);
+    gallery.onmouseleave=()=>auto=setInterval(()=>show((index+1)%imgs.length),3500);
+
+    /* swipe */
+    gallery.addEventListener('touchstart',e=>startX=e.touches[0].clientX);
+    gallery.addEventListener('touchend',e=>{
+      const endX=e.changedTouches[0].clientX;
+      if(startX-endX>50)R.click();
+      if(endX-startX>50)L.click();
+    });
+  });
+}
+
+/* fullscreen nav */
+function fsShow(i){
+  fsIndex=(i+fsImgs.length)%fsImgs.length;
+  viewerImg.src=fsImgs[fsIndex].src;
+}
+viewer.querySelector('.fs-left').onclick=()=>fsShow(fsIndex-1);
+viewer.querySelector('.fs-right').onclick=()=>fsShow(fsIndex+1);
+viewer.querySelector('.close').onclick=()=>viewer.classList.remove('active');
+viewer.onclick=e=>{if(e.target===viewer)viewer.classList.remove('active')};
+
+/* dynamic cards */
+new MutationObserver(initSliders)
+  .observe(document.getElementById('items-container'),{childList:true,subtree:true});
+initSliders();
+</script>
+
 </body>
 </html>
