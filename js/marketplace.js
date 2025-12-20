@@ -1,4 +1,5 @@
 (() => {
+  /* ================= BASIC SETUP ================= */
   const container = document.getElementById("items-container");
   const searchInput = document.getElementById("search");
   const filterSelect = document.getElementById("filter");
@@ -9,8 +10,10 @@
   let currentSearchQuery = "";
   let currentFilter = "";
 
+  /* ================= SELLER CACHE ================= */
   const sellerCache = {};
 
+  /* ================= TOAST ================= */
   function showToast(msg, success = true) {
     const toast = document.getElementById("toast");
     if (!toast) return;
@@ -20,6 +23,7 @@
     setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
+  /* ================= SESSION ================= */
   function getSession() {
     try {
       const token = localStorage.getItem("token");
@@ -29,6 +33,11 @@
     } catch {
       return null;
     }
+  }
+
+  function getMySellerId(session) {
+    if (!session || !session.user) return null;
+    return String(session.user.seller_id || session.user.id);
   }
 
   function requireLogin() {
@@ -41,6 +50,7 @@
     return s;
   }
 
+  /* ================= SAFE ARRAY ================= */
   function safeArray(val) {
     try {
       if (Array.isArray(val)) return val;
@@ -51,12 +61,14 @@
     }
   }
 
+  /* ================= FETCH SELLER ================= */
   async function fetchSeller(id) {
     const sid = String(id);
     if (sellerCache[sid]) return sellerCache[sid];
+
     try {
-      const res = await fetch(`${API_URL}/seller/${encodeURIComponent(sid)}`);
-      if (!res.ok) throw new Error("Seller API missing");
+      const res = await fetch(`${API_URL}/seller/${sid}`);
+      if (!res.ok) throw new Error();
       const data = await res.json();
       sellerCache[sid] = data;
       return data;
@@ -75,28 +87,31 @@
     }
   }
 
+  /* ================= LOAD LISTINGS ================= */
   async function loadListings() {
     const session = getSession();
-    const JWT = session?.token;
-    const sessionSellerId = String(session?.user?.seller_id);
+    const mySellerId = getMySellerId(session);
 
     try {
       const res = await fetch(`${API_URL}/listings`, {
-        headers: JWT ? { Authorization: `Bearer ${JWT}` } : {}
+        headers: session?.token
+          ? { Authorization: `Bearer ${session.token}` }
+          : {}
       });
-      if (!res.ok) throw new Error("Listings fetch failed");
 
       let items = await res.json();
       if (!Array.isArray(items)) items = [];
 
+      /* SEARCH */
       items = items.filter(i =>
         ((i.title || "") + (i.uid || "") + (i.highest_rank || ""))
           .toLowerCase()
           .includes(currentSearchQuery)
       );
 
-      if (currentFilter === "own" && session) {
-        items = items.filter(i => String(i.seller_id) === sessionSellerId);
+      /* FILTER */
+      if (currentFilter === "own" && mySellerId) {
+        items = items.filter(i => String(i.seller_id) === mySellerId);
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
@@ -113,42 +128,41 @@
 
       for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
+
         const isOwnerOrAdmin =
           session &&
-          (sessionSellerId === String(item.seller_id) ||
-           String(session.user.role).toLowerCase() === "admin");
-
-        const mythics = safeArray(item.mythic_items).join(", ");
-        const legends = safeArray(item.legendary_items).join(", ");
-        const gifts = safeArray(item.gift_items).join(", ");
-        const guns = safeArray(item.upgraded_guns).join(", ");
-        const titles = safeArray(item.titles).join(", ");
-        const images = safeArray(item.images);
+          (
+            String(item.seller_id) === mySellerId ||
+            String(session.user.role).toLowerCase() === "admin"
+          );
 
         const card = document.createElement("div");
         card.className = "item-card show";
-        card.dataset.sellerId = String(item.seller_id);
+        card.dataset.sellerId = item.seller_id;
 
         card.innerHTML = `
           <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
           ${seller.seller_verified ? `<div class="verified-badge">✔ Verified</div>` : ""}
+
           <div class="item-info">
             <p><strong>${item.title}</strong></p>
             <p>UID: ${item.uid}</p>
             <p>Level: ${item.level || 0}</p>
             <p>Rank: ${item.highest_rank || "-"}</p>
             <p class="price">₹${item.price}</p>
-            ${mythics ? `<p>Mythic: ${mythics}</p>` : ""}
-            ${legends ? `<p>Legendary: ${legends}</p>` : ""}
-            ${gifts ? `<p>Gifts: ${gifts}</p>` : ""}
-            ${guns ? `<p>Guns: ${guns}</p>` : ""}
-            ${titles ? `<p>Titles: ${titles}</p>` : ""}
           </div>
-          ${images.length ? `<div class="images-gallery">${images.map(img => `<img src="${img}" class="item-img" onclick="openImageModal('${img}')">`).join("")}</div>` : ""}
-          <button class="btn buy-btn" ${item.status !== "available" ? "disabled" : ""} onclick="buyItem('${item.id}')">
+
+          <button class="btn buy-btn"
+            ${item.status !== "available" ? "disabled" : ""}
+            onclick="buyItem('${item.id}')">
             ${item.status === "available" ? "Buy" : "Sold"}
           </button>
-          <button class="btn outline" onclick="openSellerProfile('${item.seller_id}')">Seller Profile</button>
+
+          <button class="btn outline"
+            onclick="openSellerProfile('${item.seller_id}')">
+            Seller Profile
+          </button>
+
           ${isOwnerOrAdmin ? `
             <button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
             <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
@@ -160,114 +174,61 @@
     } catch (e) {
       console.error(e);
       showToast("Failed to load listings", false);
-      container.innerHTML = `<p style="color:white">Failed to load listings</p>`;
     }
   }
 
-  window.buyItem = async listingId => {
-    const session = requireLogin();
-    if (!session || !confirm("Confirm purchase?")) return;
+  /* ================= BUY ================= */
+  window.buyItem = async id => {
+    const s = requireLogin();
+    if (!s || !confirm("Confirm purchase?")) return;
 
-    try {
-      const res = await fetch(`${API_URL}/orders/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`
-        },
-        body: JSON.stringify({ listing_id: listingId })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Order failed");
-      showToast("Order created, opening chat...");
-      window.open(`${CHAT_URL}?order_id=${data.order.id}`, "_blank");
-    } catch (e) {
-      showToast(e.message, false);
-    }
-  };
-
-  window.editListing = id => alert(`Edit UI coming soon\nListing ID: ${id}`);
-  window.deleteListing = async id => {
-    const session = requireLogin();
-    if (!session || !confirm("Delete this listing?")) return;
-    const res = await fetch(`${API_URL}/listings/delete`, {
+    const res = await fetch(`${API_URL}/orders/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.token}`
+        Authorization: `Bearer ${s.token}`
       },
       body: JSON.stringify({ listing_id: id })
     });
+
     const data = await res.json();
     if (res.ok) {
-      showToast("Listing deleted");
-      loadListings();
+      showToast("Order created");
+      window.open(`${CHAT_URL}?order_id=${data.order.id}`, "_blank");
     } else {
-      showToast(data.error || "Delete failed", false);
+      showToast(data.error || "Order failed", false);
     }
   };
 
-  window.openSellerProfile = async sellerId => {
-    const bg = document.getElementById("seller-modal-bg");
-    const content = document.getElementById("seller-content");
-    bg.classList.add("active");
-    content.innerHTML = "Loading seller...";
-    const s = await fetchSeller(sellerId);
-    const session = getSession();
-    const canReply = session && (String(session.user.id) === String(sellerId) || String(session.user.role).toLowerCase() === "admin");
-    content.innerHTML = `
-      <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
-      <p>⭐ ${(s.avg_rating || 0).toFixed(1)} | Sales: ${s.total_sales} | Reviews: ${s.review_count}</p>
-      <button class="btn outline" onclick="window.open('${CHAT_URL}?seller=${sellerId}','_blank')">Chat with Seller</button>
-      <h4>Reviews</h4>
-      ${(s.reviews || []).length
-        ? s.reviews.map(r => `
-            <div class="review">
-              <p>⭐ ${r.stars}</p>
-              <p>${r.comment || ""}</p>
-              ${r.reply ? `<p class="reply">Seller: ${r.reply}</p>` : ""}
-              ${canReply && !r.reply ? `
-                <textarea id="reply-${r.id}" placeholder="Reply..."></textarea>
-                <button class="btn outline" onclick="replyReview('${r.id}','${sellerId}')">Reply</button>` : ""}
-            </div>`).join("")
-        : "<p>No reviews yet</p>"}
-    `;
+  window.editListing = id => alert(`Edit listing ${id}`);
+  window.deleteListing = async id => {
+    const s = requireLogin();
+    if (!s || !confirm("Delete listing?")) return;
+
+    await fetch(`${API_URL}/listings/delete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${s.token}`
+      },
+      body: JSON.stringify({ listing_id: id })
+    });
+
+    showToast("Listing deleted");
+    loadListings();
   };
 
-  window.replyReview = async (reviewId, sellerId) => {
-    const txt = document.getElementById(`reply-${reviewId}`)?.value;
-    if (!txt) return;
-    try {
-      await fetch(`${API_URL}/reviews/reply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getSession().token}`
-        },
-        body: JSON.stringify({ review_id: reviewId, reply: txt })
-      });
-      showToast("Reply submitted");
-      openSellerProfile(sellerId);
-    } catch {
-      showToast("Reply not supported by backend", false);
-    }
-  };
-
-  window.openImageModal = src => {
-    const m = document.getElementById("imgModal");
-    document.getElementById("imgPreview").src = src;
-    m.classList.add("active");
-  };
-
+  /* ================= SEARCH / FILTER ================= */
   searchInput?.addEventListener("input", e => {
     currentSearchQuery = e.target.value.toLowerCase();
     loadListings();
   });
+
   filterSelect?.addEventListener("change", e => {
     currentFilter = e.target.value;
     loadListings();
   });
 
+  /* ================= INIT ================= */
   loadListings();
-  setInterval(loadListings, 30000);
 })();
