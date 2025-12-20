@@ -6,10 +6,11 @@
 
   const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 
-  let listingsCache = [];
-  let currentListing = null;
+  let currentSearch = "";
+  let currentFilter = "";
+  let editListingId = null;
 
-  /* ================= UTILS ================= */
+  /* ================= HELPERS ================= */
   const safeArray = v => {
     try {
       if (Array.isArray(v)) return v;
@@ -50,205 +51,273 @@
     return s;
   };
 
-  const stars = r => {
-    const full = Math.round(r || 0);
-    return "★".repeat(full) + "☆".repeat(5 - full);
+  const renderStars = rating => {
+    const r = Math.round(Number(rating || 0));
+    return "★".repeat(r) + "☆".repeat(5 - r);
   };
 
   /* ================= LOAD LISTINGS ================= */
   async function loadListings() {
     try {
-      const res = await fetch(`${API_URL}/listings`);
+      const session = getSession();
+      const res = await fetch(`${API_URL}/listings`, {
+        headers: session ? { Authorization: `Bearer ${session.token}` } : {}
+      });
+
+      if (!res.ok) throw new Error("Failed to load listings");
       let items = await res.json();
       if (!Array.isArray(items)) items = [];
-      listingsCache = items;
-      renderListings(items);
-    } catch {
+
+      /* SEARCH */
+      if (currentSearch) {
+        items = items.filter(i =>
+          `${i.uid} ${i.title} ${i.highest_rank}`
+            .toLowerCase()
+            .includes(currentSearch)
+        );
+      }
+
+      /* FILTER */
+      if (currentFilter === "own" && session) {
+        items = items.filter(
+          i => String(i.seller_id) === String(session.user.seller_id)
+        );
+      }
+
+      container.innerHTML = "";
+
+      if (!items.length) {
+        container.innerHTML = `<p>No listings found</p>`;
+        return;
+      }
+
+      items.forEach(item => renderCard(item));
+    } catch (e) {
+      console.error(e);
       toast("Failed to load listings", false);
     }
   }
 
-  /* ================= RENDER LISTINGS ================= */
-  function renderListings(items) {
-    const q = searchInput.value.toLowerCase();
-    container.innerHTML = "";
+  /* ================= RENDER CARD ================= */
+  function renderCard(item) {
+    const session = getSession();
+    const isOwner =
+      session &&
+      (String(session.user.seller_id) === String(item.seller_id) ||
+        session.user.role === "admin");
 
-    items
-      .filter(i =>
-        `${i.uid}${i.title}${i.highest_rank}`.toLowerCase().includes(q)
-      )
-      .forEach(item => {
-        const card = document.createElement("div");
-        card.className = "item-card show";
+    const card = document.createElement("div");
+    card.className = "item-card show";
 
-        const mythic = safeArray(item.mythic_items);
-        const legendary = safeArray(item.legendary_items);
-        const gifts = safeArray(item.gift_items);
-        const guns = safeArray(item.upgraded_guns);
-        const titles = safeArray(item.titles);
-        const images = safeArray(item.images);
+    const images = safeArray(item.images);
 
-        card.innerHTML = `
-          <div class="rating-badge">${stars(item.avg_rating)}</div>
+    card.innerHTML = `
+      <div class="rating-badge">${renderStars(item.avg_rating)}</div>
 
-          <div class="verified-badge">
-            ${item.seller_verified == 1 ? "Verified" : "Pending"}
-          </div>
+      ${
+        item.seller_verified == 1
+          ? `<div class="verified-badge">Verified</div>`
+          : `<div class="verified-badge" style="background:#f39c12">Pending</div>`
+      }
 
-          ${item.badge ? `<div class="badge-badge">${item.badge}</div>` : ""}
+      ${item.badge ? `<div class="badge-badge">${item.badge}</div>` : ""}
 
-          <div class="item-info">
-            <strong>${item.title}</strong><br>
-            BGMI UID: ${item.uid}<br>
-            Account Level: ${item.level}<br>
-            Highest Rank: ${item.highest_rank || "-"}<br>
+      ${
+        images.length
+          ? `<div class="images-gallery">
+              ${images
+                .map(
+                  img =>
+                    `<img src="${img}" onclick="openImageModal('${img}')">`
+                )
+                .join("")}
+            </div>`
+          : ""
+      }
 
-            ${guns.length ? `Upgraded Guns: ${guns.join(", ")}<br>` : ""}
-            ${mythic.length ? `Mythic Items: ${mythic.join(", ")}<br>` : ""}
-            ${legendary.length ? `Legendary Items: ${legendary.join(", ")}<br>` : ""}
-            ${gifts.length ? `Gift Items: ${gifts.join(", ")}<br>` : ""}
-            ${titles.length ? `Titles: ${titles.join(", ")}<br>` : ""}
+      <div class="item-info">
+        <strong>${item.title}</strong><br>
+        <b>BGMI UID:</b> ${item.uid}<br>
+        <b>Account Level:</b> ${item.level}<br>
+        <b>Highest Rank:</b> ${item.highest_rank || "-"}<br>
 
-            ${item.account_highlights
-              ? `<br><em>${item.account_highlights}</em>`
-              : ""}
-            
-            <div class="price">₹${item.price}</div>
-          </div>
+        ${
+          safeArray(item.upgraded_guns).length
+            ? `<b>Upgraded Guns:</b> ${safeArray(
+                item.upgraded_guns
+              ).join(", ")}<br>`
+            : ""
+        }
 
-          ${
-            images.length
-              ? `<div class="images-gallery">
-                  ${images
-                    .map(
-                      img =>
-                        `<img src="${img}" onclick="openImage('${img}')">`
-                    )
-                    .join("")}
-                </div>`
-              : ""
-          }
+        ${
+          safeArray(item.mythic_items).length
+            ? `<b>Mythic Items:</b> ${safeArray(
+                item.mythic_items
+              ).join(", ")}<br>`
+            : ""
+        }
 
-          <button class="btn buy-btn" ${
-            item.status !== "available" ? "disabled" : ""
-          }>
-            ${item.status === "available" ? "Buy" : "Sold"}
-          </button>
+        ${
+          safeArray(item.legendary_items).length
+            ? `<b>Legendary Items:</b> ${safeArray(
+                item.legendary_items
+              ).join(", ")}<br>`
+            : ""
+        }
 
-          <button class="btn outline seller-btn">Seller Profile</button>
+        ${
+          safeArray(item.gift_items).length
+            ? `<b>Gift Items:</b> ${safeArray(item.gift_items).join(", ")}<br>`
+            : ""
+        }
+
+        ${
+          safeArray(item.titles).length
+            ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>`
+            : ""
+        }
+
+        ${
+          item.account_highlights
+            ? `<b>Highlights:</b> ${item.account_highlights}`
+            : ""
+        }
+
+        <div class="price">₹${item.price}</div>
+      </div>
+
+      <button class="btn buy-btn" ${
+        item.status !== "available" ? "disabled" : ""
+      } onclick="buyItem('${item.id}')">
+        ${item.status === "available" ? "Buy Now" : "Sold"}
+      </button>
+
+      <button class="btn outline" onclick="openSellerProfile('${
+        item.seller_id
+      }')">
+        Seller Profile
+      </button>
+
+      ${
+        isOwner
+          ? `
           <button class="btn edit-btn">Edit</button>
-        `;
+          <button class="btn delete-btn">Delete</button>
+        `
+          : ""
+      }
+    `;
 
-        card.querySelector(".seller-btn").onclick = () =>
-          openSellerProfile(item.seller_id);
+    if (isOwner) {
+      card.querySelector(".edit-btn").onclick = () => openEdit(item);
+      card.querySelector(".delete-btn").onclick = () =>
+        deleteListing(item.id);
+    }
 
-        card.querySelector(".edit-btn").onclick = () =>
-          openEditModal(item);
-
-        container.appendChild(card);
-      });
+    container.appendChild(card);
   }
 
-  /* ================= IMAGE PREVIEW ================= */
-  window.openImage = src => {
-    const m = document.getElementById("imgModal");
-    document.getElementById("imgPreview").src = src;
-    m.classList.add("active");
-  };
-
-  /* ================= EDIT MODAL ================= */
-  function openEditModal(item) {
-    requireLogin();
-    currentListing = item;
+  /* ================= EDIT LISTING ================= */
+  function openEdit(item) {
+    editListingId = item.id;
     document.getElementById("edit-modal-bg").classList.add("active");
 
-    const f = document.getElementById("edit-form");
-    f.innerHTML = `
-      <input id="e-title" value="${item.title}">
+    const form = document.getElementById("edit-form");
+    const arr = v => safeArray(v).join(", ");
+
+    form.innerHTML = `
+      <input id="e-title" value="${item.title}" placeholder="Title">
       <input id="e-price" type="number" value="${item.price}">
       <input id="e-level" type="number" value="${item.level}">
       <input id="e-rank" value="${item.highest_rank || ""}">
+      <textarea id="e-upgraded">${arr(item.upgraded_guns)}</textarea>
+      <textarea id="e-mythic">${arr(item.mythic_items)}</textarea>
+      <textarea id="e-legendary">${arr(item.legendary_items)}</textarea>
+      <textarea id="e-gifts">${arr(item.gift_items)}</textarea>
+      <textarea id="e-titles">${arr(item.titles)}</textarea>
       <textarea id="e-highlights">${item.account_highlights || ""}</textarea>
-      <textarea id="e-guns">${safeArray(item.upgraded_guns).join(", ")}</textarea>
-      <textarea id="e-mythic">${safeArray(item.mythic_items).join(", ")}</textarea>
-      <textarea id="e-legendary">${safeArray(item.legendary_items).join(", ")}</textarea>
-      <textarea id="e-gifts">${safeArray(item.gift_items).join(", ")}</textarea>
-      <textarea id="e-titles">${safeArray(item.titles).join(", ")}</textarea>
     `;
   }
 
+  window.closeEdit = () => {
+    editListingId = null;
+    document.getElementById("edit-modal-bg").classList.remove("active");
+  };
+
   document.getElementById("save-edit").onclick = async () => {
+    if (!editListingId) return;
+
     const s = requireLogin();
-    if (!currentListing) return;
+    if (!s) return;
 
     const body = {
-      title: e("e-title"),
-      price: Number(e("e-price")),
-      level: Number(e("e-level")),
-      highest_rank: e("e-rank"),
-      account_highlights: e("e-highlights"),
-      upgraded_guns: e("e-guns").split(",").map(v => v.trim()),
-      mythic_items: e("e-mythic").split(",").map(v => v.trim()),
-      legendary_items: e("e-legendary").split(",").map(v => v.trim()),
-      gift_items: e("e-gifts").split(",").map(v => v.trim()),
-      titles: e("e-titles").split(",").map(v => v.trim())
+      title: document.getElementById("e-title").value,
+      price: Number(document.getElementById("e-price").value),
+      level: Number(document.getElementById("e-level").value),
+      highest_rank: document.getElementById("e-rank").value,
+      upgraded_guns: document.getElementById("e-upgraded").value.split(","),
+      mythic_items: document.getElementById("e-mythic").value.split(","),
+      legendary_items: document.getElementById("e-legendary").value.split(","),
+      gift_items: document.getElementById("e-gifts").value.split(","),
+      titles: document.getElementById("e-titles").value.split(","),
+      account_highlights: document.getElementById("e-highlights").value
     };
 
     try {
-      const res = await fetch(
-        `${API_URL}/listings/${currentListing.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${s.token}`
-          },
-          body: JSON.stringify(body)
-        }
-      );
+      const res = await fetch(`${API_URL}/listings/${editListingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${s.token}`
+        },
+        body: JSON.stringify(body)
+      });
 
-      if (!res.ok) throw 0;
+      if (!res.ok) throw new Error();
       toast("Listing updated");
       closeEdit();
       loadListings();
     } catch {
-      toast("Edit failed", false);
+      toast("Update failed", false);
     }
   };
 
-  function e(id) {
-    return document.getElementById(id).value || "";
-  }
-
-  window.closeEdit = () =>
-    document.getElementById("edit-modal-bg").classList.remove("active");
-
-  /* ================= SELLER PROFILE (UNCHANGED) ================= */
-  window.openSellerProfile = async sellerId => {
-    const bg = document.getElementById("seller-modal-bg");
-    const content = document.getElementById("seller-content");
-    bg.classList.add("active");
-
-    const r = await fetch(`${API_URL}/seller/${sellerId}`);
-    const s = await r.json();
-
-    content.innerHTML = `
-      <h3>${s.name}</h3>
-      <p>${s.seller_verified ? "Verified" : "Pending"}</p>
-      <p>Badge: ${s.badge || "None"}</p>
-      <p>Rating: ${stars(s.avg_rating)}</p>
-      <p>Total Sales: ${s.total_sales}</p>
-      <p>Reviews: ${s.review_count}</p>
-    `;
+  /* ================= BUY / DELETE ================= */
+  window.buyItem = async id => {
+    const s = requireLogin();
+    if (!s || !confirm("Confirm purchase?")) return;
+    await fetch(`${API_URL}/orders/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${s.token}`
+      },
+      body: JSON.stringify({ listing_id: id })
+    });
+    toast("Order created");
   };
 
-  window.closeSeller = () =>
-    document.getElementById("seller-modal-bg").classList.remove("active");
+  window.deleteListing = async id => {
+    const s = requireLogin();
+    if (!s || !confirm("Delete listing?")) return;
+    await fetch(`${API_URL}/listings/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${s.token}` }
+    });
+    toast("Listing deleted");
+    loadListings();
+  };
 
-  /* ================= SEARCH ================= */
-  searchInput.addEventListener("input", () =>
-    renderListings(listingsCache)
-  );
+  /* ================= SEARCH / FILTER ================= */
+  searchInput?.addEventListener("input", e => {
+    currentSearch = e.target.value.toLowerCase();
+    loadListings();
+  });
+
+  filterSelect?.addEventListener("change", e => {
+    currentFilter = e.target.value;
+    loadListings();
+  });
 
   /* ================= INIT ================= */
   loadListings();
