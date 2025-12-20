@@ -62,12 +62,15 @@
       const res = await fetch(`${API_URL}/listings`, {
         headers: JWT ? { Authorization: `Bearer ${JWT}` } : {}
       });
+
+      if (!res.ok) throw new Error("Failed to fetch listings");
+
       let items = await res.json();
-      if (!Array.isArray(items)) return;
+      if (!Array.isArray(items)) items = [];
 
       // SEARCH FILTER
       items = items.filter(i =>
-        (i.title + i.uid + (i.highest_rank || ""))
+        ((i.title || "") + (i.uid || "") + (i.highest_rank || ""))
           .toLowerCase()
           .includes(currentSearchQuery)
       );
@@ -76,17 +79,20 @@
       if (currentFilter === "own" && session) {
         items = items.filter(i => i.seller_id === session.user.id);
       } else if (currentFilter === "price_high") {
-        items.sort((a, b) => b.price - a.price);
+        items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
-        items.sort((a, b) => a.price - b.price);
+        items.sort((a, b) => (a.price || 0) - (b.price || 0));
       } else if (currentFilter === "new") {
-        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        items.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
       }
 
       container.innerHTML = "";
+      if (items.length === 0) {
+        container.innerHTML = `<p style="color:white">No listings found</p>`;
+        return;
+      }
 
-      for (let idx = 0; idx < items.length; idx++) {
-        const item = items[idx];
+      for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
         const rating = seller?.avg_rating || 0;
         const verified = seller?.seller_verified || false;
@@ -95,33 +101,43 @@
 
         const card = document.createElement("div");
         card.className = "item-card";
-        card.style.opacity = 0;
-        card.style.transform = "translateY(20px)";
 
-        // Image gallery HTML
-        let imagesHTML = "";
-        if (item.images?.length) {
-          imagesHTML = `<div class="images-gallery">`;
-          for (const img of item.images) {
-            imagesHTML += `<img src="${img}" class="item-img" alt="${item.title}"/>`;
-          }
-          imagesHTML += `</div>`;
-        }
+        // Safe array handling
+        const mythics = Array.isArray(item.mythic_items) ? item.mythic_items.join(", ") : "";
+        const legendaries = Array.isArray(item.legendary_items) ? item.legendary_items.join(", ") : "";
+        const gifts = Array.isArray(item.gift_items) ? item.gift_items.join(", ") : "";
+        const guns = Array.isArray(item.upgraded_guns) ? item.upgraded_guns.join(", ") : "";
+        const titles = Array.isArray(item.titles) ? item.titles.join(", ") : "";
+        const images = Array.isArray(item.images) ? item.images : [];
 
         let itemDetails = `
           <div class="rating-badge">⭐ ${rating.toFixed(1)}</div>
           ${verified ? `<div class="verified-badge">✔ Verified Seller</div>` : ""}
-          <p><strong>${item.title}</strong></p>
-          <p>UID: ${item.uid}</p>
-          <p>Level: ${item.level || 0}</p>
-          <p>Rank: ${item.highest_rank || "N/A"}</p>
-          <p class="price">₹${item.price}</p>
-          ${item.mythic_items?.length ? `<p>Mythic: ${item.mythic_items.join(", ")}</p>` : ""}
-          ${item.legendary_items?.length ? `<p>Legendary: ${item.legendary_items.join(", ")}</p>` : ""}
-          ${item.gift_items?.length ? `<p>Gift: ${item.gift_items.join(", ")}</p>` : ""}
-          ${item.upgraded_guns?.length ? `<p>Guns: ${item.upgraded_guns.join(", ")}</p>` : ""}
-          ${item.titles?.length ? `<p>Titles: ${item.titles.join(", ")}</p>` : ""}
-          ${imagesHTML}
+          <div class="item-info">
+            <p><strong>${item.title || "N/A"}</strong></p>
+            <p>UID: ${item.uid || "N/A"}</p>
+            <p>Level: ${item.level || 0}</p>
+            <p>Rank: ${item.highest_rank || "N/A"}</p>
+            <p class="price">₹${item.price || 0}</p>
+            ${mythics ? `<p>Mythic: ${mythics}</p>` : ""}
+            ${legendaries ? `<p>Legendary: ${legendaries}</p>` : ""}
+            ${gifts ? `<p>Gift: ${gifts}</p>` : ""}
+            ${guns ? `<p>Guns: ${guns}</p>` : ""}
+            ${titles ? `<p>Titles: ${titles}</p>` : ""}
+          </div>
+        `;
+
+        // Images gallery
+        if (images.length) {
+          itemDetails += `<div class="images-gallery">`;
+          for (const img of images) {
+            itemDetails += `<img src="${img}" class="item-img" alt="item">`;
+          }
+          itemDetails += `</div>`;
+        }
+
+        // Seller info & buttons
+        itemDetails += `
           <hr>
           <p>Seller: ${seller?.name || "N/A"} ${verified ? "✔" : ""}</p>
           <p>Total Sells: ${totalSells} | Reviews: ${reviewCount}</p>
@@ -137,28 +153,22 @@
             </button>
         `;
 
-        // OWNER / ADMIN BUTTONS
+        // Owner / Admin buttons
         if (session && (Number(session.user.id) === Number(item.seller_id) || session.user.role === "admin")) {
           itemDetails += `
             <button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
             <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
           `;
         }
-
         itemDetails += `</div>`;
+
         card.innerHTML = itemDetails;
-
         container.appendChild(card);
-
-        // ===== STAGGERED FADE-IN + SLIDE-UP =====
-        setTimeout(() => {
-          card.style.opacity = 1;
-          card.style.transform = "translateY(0)";
-        }, idx * 100);
       }
     } catch (e) {
       console.error(e);
       showToast("Failed to load listings", false);
+      container.innerHTML = `<p style="color:white">Failed to load listings</p>`;
     }
   }
 
@@ -192,6 +202,7 @@
   /* ================= EDIT / DELETE ================= */
   window.editListing = (listingId) => {
     alert(`Edit listing coming soon! Listing ID: ${listingId}`);
+    // Optional: redirect to sell/edit page with pre-filled data
   };
 
   window.deleteListing = async (listingId) => {
@@ -229,20 +240,22 @@
       return;
     }
 
-    const ratingsRes = await fetch(`${API_URL}/seller/${sellerId}/ratings`);
-    const ratings = (await ratingsRes.json()) || [];
+    let ratings = [];
+    try {
+      const ratingsRes = await fetch(`${API_URL}/seller/${sellerId}/ratings`);
+      ratings = await ratingsRes.json();
+    } catch {}
 
     content.innerHTML = `
-      <h3>${seller.name} ${seller.seller_verified ? "✔" : ""}</h3>
-      <p>⭐ ${seller.avg_rating.toFixed(1)} | Total Sells: ${seller.total_sells || 0} | Reviews: ${seller.review_count || 0}</p>
-      <h4>Reviews</h4>
+      <h3>${seller.name || "Seller"} ${seller.seller_verified ? "✔" : ""}</h3>
+      <p>⭐ ${seller.avg_rating?.toFixed(1) || 0} | Total Sells: ${seller.total_sells || 0} | Reviews: ${seller.review_count || 0}</p>
+      <h4>Reviews:</h4>
       ${ratings.map(r => `
         <div class="review">
-          <p>⭐ ${r.stars}</p>
-          <p>${r.comment || ""}</p>
-          ${seller.user_id === getSession()?.user.id
-            ? `<button onclick="replyReview(${r.id})">Reply</button>` : ""}
+          <p>⭐ ${r.stars || r.rating || 0}</p>
+          <p>${r.comment || r.review || ""}</p>
           ${r.reply ? `<p class="reply">Seller: ${r.reply}</p>` : ""}
+          ${seller.user_id === getSession()?.user.id ? `<button onclick="replyReview(${r.id})">Reply</button>` : ""}
         </div>
       `).join("")}
     `;
@@ -281,16 +294,6 @@
   filterSelect?.addEventListener("change", e => {
     currentFilter = e.target.value;
     loadListings();
-  });
-
-  /* ================= IMAGE LIGHTBOX ================= */
-  document.addEventListener("click", function(e){
-    if(e.target.classList.contains('item-img')){
-      const imgModal = document.getElementById('imgModal');
-      const imgPreview = document.getElementById('imgPreview');
-      imgPreview.src = e.target.src;
-      imgModal.classList.add('active');
-    }
   });
 
   /* ================= INIT ================= */
