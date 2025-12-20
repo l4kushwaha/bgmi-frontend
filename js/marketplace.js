@@ -22,7 +22,7 @@ const toast = msg => {
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 3000);
+  setTimeout(() => t.classList.remove("show"), 2500);
 };
 
 const session = () => {
@@ -39,20 +39,26 @@ const isOwner = item =>
   (String(session().user.seller_id) === String(item.seller_id) ||
    session().user.role === "admin");
 
+const stars = r =>
+  "★".repeat(Math.round(r || 0)) +
+  "☆".repeat(5 - Math.round(r || 0));
+
 /* ================= IMAGE COMPRESSION ================= */
 function compressImage(file, maxW = 1200, quality = 0.75) {
   return new Promise(resolve => {
     const img = new Image();
-    const r = new FileReader();
-    r.onload = e => img.src = e.target.result;
-    r.readAsDataURL(file);
+    const reader = new FileReader();
+    reader.onload = e => img.src = e.target.result;
+    reader.readAsDataURL(file);
+
     img.onload = () => {
       const scale = Math.min(maxW / img.width, 1);
-      const c = document.createElement("canvas");
-      c.width = img.width * scale;
-      c.height = img.height * scale;
-      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      resolve(c.toDataURL("image/jpeg", quality));
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext("2d")
+        .drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
     };
   });
 }
@@ -68,23 +74,20 @@ async function loadListings() {
   renderList();
 }
 
-/* ================= FILTER ================= */
 function renderList() {
   let items = [...allItems];
   const q = searchInput?.value?.toLowerCase() || "";
   const f = filterSelect?.value || "";
 
-  if (q) {
+  if (q)
     items = items.filter(i =>
       `${i.uid} ${i.title} ${i.highest_rank}`.toLowerCase().includes(q)
     );
-  }
 
-  if (f === "own" && session()) {
+  if (f === "own" && session())
     items = items.filter(i =>
       String(i.seller_id) === String(session().user.seller_id)
     );
-  }
 
   if (f === "price_low") items.sort((a,b)=>a.price-b.price);
   if (f === "price_high") items.sort((a,b)=>b.price-a.price);
@@ -105,14 +108,12 @@ function renderCard(item) {
       ${images.map((img,i)=>`
         <img src="${img}" class="${i===0?"active":""}">
       `).join("")}
-
-      ${images.length > 1 ? `
+      ${images.length>1?`
         <button class="img-arrow left">‹</button>
         <button class="img-arrow right">›</button>
         <div class="img-dots">
           ${images.map((_,i)=>`<span class="${i===0?"active":""}"></span>`).join("")}
-        </div>
-      ` : ""}
+        </div>`:""}
     </div>
 
     <div class="card-content">
@@ -120,18 +121,21 @@ function renderCard(item) {
       UID: ${item.uid}<br>
       Level: ${item.level}<br>
       Rank: ${item.highest_rank || "-"}<br>
-      ${item.account_highlights || ""}
+      ${safeArray(item.upgraded_guns).length ? `<b>Upgraded:</b> ${safeArray(item.upgraded_guns).join(", ")}<br>` : ""}
+      ${safeArray(item.mythic_items).length ? `<b>Mythic:</b> ${safeArray(item.mythic_items).join(", ")}<br>` : ""}
+      ${safeArray(item.legendary_items).length ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>` : ""}
+      ${safeArray(item.gift_items).length ? `<b>Gifts:</b> ${safeArray(item.gift_items).join(", ")}<br>` : ""}
+      ${safeArray(item.titles).length ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>` : ""}
+      ${item.account_highlights ? `<b>Highlights:</b> ${item.account_highlights}` : ""}
       <div class="price">₹${item.price}</div>
     </div>
 
     <div class="card-actions">
       <button class="btn outline seller-btn">Seller Profile</button>
-      ${
-        isOwner(item)
-          ? `<button class="btn edit-btn">Edit</button>
-             <button class="btn delete-btn">Delete</button>`
-          : `<button class="btn buy-btn" onclick="alert('Buy coming soon')">Buy</button>`
-      }
+      ${isOwner(item)
+        ? `<button class="btn edit-btn">Edit</button>
+           <button class="btn delete-btn">Delete</button>`
+        : `<button class="btn buy-btn" onclick="alert('Buy coming soon')">Buy</button>`}
     </div>
   `;
 
@@ -147,42 +151,44 @@ function renderCard(item) {
   container.appendChild(card);
 }
 
-/* ================= IMAGE SLIDER (FINAL FIX) ================= */
+/* ================= IMAGE SLIDER (FIXED) ================= */
 function initSlider(card){
-  const gallery = card.querySelector(".images-gallery");
-  if (!gallery) return;
+  const g = card.querySelector(".images-gallery");
+  if(!g) return;
 
-  const imgs = [...gallery.querySelectorAll("img")];
-  if (imgs.length <= 1) return;
+  const imgs = [...g.querySelectorAll("img")];
+  if(imgs.length <= 1) return;
 
-  const left = gallery.querySelector(".left");
-  const right = gallery.querySelector(".right");
-  const dots = [...gallery.querySelectorAll(".img-dots span")];
+  const dots = [...g.querySelectorAll(".img-dots span")];
+  const left = g.querySelector(".left");
+  const right = g.querySelector(".right");
 
   let index = 0;
   let timer = null;
 
-  const show = i => {
+  const show = n => {
     imgs[index].classList.remove("active");
     dots[index].classList.remove("active");
-    index = (i + imgs.length) % imgs.length;
+
+    index = (n + imgs.length) % imgs.length;
+
     imgs[index].classList.add("active");
     dots[index].classList.add("active");
   };
 
   left.onclick = () => show(index - 1);
   right.onclick = () => show(index + 1);
-  dots.forEach((d,i)=> d.onclick = ()=>show(i));
+  dots.forEach((d,i)=>d.onclick=()=>show(i));
 
-  const start = () =>
+  const startAuto = () =>
     timer = setInterval(() => show(index + 1), 3500);
 
-  const stop = () => clearInterval(timer);
+  const stopAuto = () => timer && clearInterval(timer);
 
-  gallery.addEventListener("mouseenter", stop);
-  gallery.addEventListener("mouseleave", start);
+  g.addEventListener("mouseenter", stopAuto);
+  g.addEventListener("mouseleave", startAuto);
 
-  start(); // 🔥 AUTO SLIDE START
+  startAuto();
 }
 
 /* ================= EDIT ================= */
@@ -190,13 +196,24 @@ function openEdit(id){
   editItem = allItems.find(i=>String(i.id)===String(id));
   editImages = safeArray(editItem.images);
 
-  document.getElementById("edit-modal-bg").classList.add("active");
   const f = document.getElementById("edit-form");
+  document.getElementById("edit-modal-bg").classList.add("active");
+
+  const field = (l,i,v)=>`<label><b>${l}</b></label><input id="${i}" value="${v||""}">`;
+  const area = (l,i,v)=>`<label><b>${l}</b></label><textarea id="${i}">${v||""}</textarea>`;
 
   f.innerHTML = `
-    <label>Title</label><input id="e-title" value="${editItem.title}">
-    <label>Price</label><input id="e-price" value="${editItem.price}">
-    <label>Images</label>
+    ${field("Title","e-title",editItem.title)}
+    ${field("Price","e-price",editItem.price)}
+    ${field("Level","e-level",editItem.level)}
+    ${field("Rank","e-rank",editItem.highest_rank)}
+    ${area("Upgraded Guns","e-upgraded",safeArray(editItem.upgraded_guns).join(","))}
+    ${area("Mythic Items","e-mythic",safeArray(editItem.mythic_items).join(","))}
+    ${area("Legendary Items","e-legendary",safeArray(editItem.legendary_items).join(","))}
+    ${area("Gift Items","e-gifts",safeArray(editItem.gift_items).join(","))}
+    ${area("Titles","e-titles",safeArray(editItem.titles).join(","))}
+    ${area("Highlights","e-highlights",editItem.account_highlights)}
+    <label><b>Images</b></label>
     <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     <button class="btn outline" id="add-img">Add Image</button>
   `;
@@ -206,7 +223,7 @@ function openEdit(id){
   document.getElementById("add-img").onclick = () => {
     const i = document.createElement("input");
     i.type="file"; i.accept="image/*";
-    i.onchange = async e => {
+    i.onchange=async e=>{
       const compressed = await compressImage(e.target.files[0]);
       editImages.push(compressed);
       renderEditImages();
@@ -222,7 +239,7 @@ function renderEditImages(){
     const d=document.createElement("div");
     d.style.position="relative";
     d.innerHTML=`
-      <img src="${src}" style="width:70px;height:70px;border-radius:8px">
+      <img src="${src}" style="width:70px;height:70px;border-radius:8px;object-fit:cover">
       <span style="position:absolute;top:-6px;right:-6px;
         background:red;color:#fff;border-radius:50%;
         padding:2px 6px;cursor:pointer">✖</span>`;
@@ -243,8 +260,16 @@ document.getElementById("save-edit").onclick = async () => {
       Authorization:`Bearer ${session().token}`
     },
     body:JSON.stringify({
-      title:document.getElementById("e-title").value,
-      price:+document.getElementById("e-price").value,
+      title:e("e-title"),
+      price:+e("e-price"),
+      level:+e("e-level"),
+      highest_rank:e("e-rank"),
+      upgraded_guns:e("e-upgraded").split(","),
+      mythic_items:e("e-mythic").split(","),
+      legendary_items:e("e-legendary").split(","),
+      gift_items:e("e-gifts").split(","),
+      titles:e("e-titles").split(","),
+      account_highlights:e("e-highlights"),
       images:editImages
     })
   });
@@ -255,6 +280,8 @@ document.getElementById("save-edit").onclick = async () => {
 
 window.closeEdit = () =>
   document.getElementById("edit-modal-bg").classList.remove("active");
+
+const e = id => document.getElementById(id).value;
 
 /* ================= DELETE ================= */
 async function deleteListing(id){
@@ -268,7 +295,7 @@ async function deleteListing(id){
 }
 
 /* ================= EVENTS ================= */
-if (searchInput) searchInput.addEventListener("input", renderList);
-if (filterSelect) filterSelect.addEventListener("change", renderList);
+searchInput?.addEventListener("input",renderList);
+filterSelect?.addEventListener("change",renderList);
 loadListings();
 })();
