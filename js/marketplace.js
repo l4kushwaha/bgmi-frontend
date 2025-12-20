@@ -11,7 +11,7 @@
   let currentFilter = "";
 
   /* ================= SELLER CACHE ================= */
-  const sellerCache = {};
+  const sellerCache = {};  
 
   /* ================= TOAST ================= */
   function showToast(msg, success = true) {
@@ -123,10 +123,12 @@
 
       for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
-        const isOwner =
+        const session = getSession();
+
+        const isOwnerOrAdmin =
           session &&
           (String(session.user.id) === String(item.seller_id) ||
-            session.user.role === "admin");
+            String(session.user.role).toLowerCase() === "admin");
 
         const mythics = safeArray(item.mythic_items).join(", ");
         const legends = safeArray(item.legendary_items).join(", ");
@@ -173,7 +175,7 @@
             Seller Profile
           </button>
 
-          ${isOwner ? `
+          ${isOwnerOrAdmin ? `
             <button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
             <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
           ` : ""}
@@ -250,7 +252,7 @@
     const canReply =
       session &&
       (String(session.user.id) === String(sellerId) ||
-        session.user.role === "admin");
+        String(session.user.role).toLowerCase() === "admin");
 
     content.innerHTML = `
       <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
