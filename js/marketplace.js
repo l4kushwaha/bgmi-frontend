@@ -105,7 +105,6 @@
 
       /* FILTERS */
       if (currentFilter === "own" && session) {
-        // Fix: use seller_id from session
         items = items.filter(i => String(i.seller_id) === String(session.user.seller_id));
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
@@ -123,9 +122,9 @@
 
       for (const item of items) {
         const seller = await fetchSeller(item.seller_id);
-        const session = getSession();
+        const session = getSession(); // refresh session inside loop
 
-        // Fix: Check using seller_id for owner
+        // ✅ FIX: Check using seller_id for owner/admin
         const isOwnerOrAdmin =
           session &&
           (String(session.user.seller_id) === String(item.seller_id) ||

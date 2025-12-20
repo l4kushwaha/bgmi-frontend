@@ -1,325 +1,369 @@
-(() => {
-  /* ================= BASIC SETUP ================= */
-  const container = document.getElementById("items-container");
-  const searchInput = document.getElementById("search");
-  const filterSelect = document.getElementById("filter");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGMI Marketplace</title>
 
-  const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
-  const CHAT_URL = "https://chat.bgmi-gateway.workers.dev";
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  let currentSearchQuery = "";
-  let currentFilter = "";
+<style>
+/* ================= RESET ================= */
+*{box-sizing:border-box;margin:0;padding:0}
 
-  /* ================= SELLER CACHE ================= */
-  const sellerCache = {};  
+/* ================= BODY ================= */
+body{
+  font-family:'Poppins',sans-serif;
+  min-height:100vh;
+  background:linear-gradient(135deg,#141e30,#243b55);
+  color:#fff;
+  overflow-x:hidden;
+  transition:background 0.3s,color 0.3s;
+}
 
-  /* ================= TOAST ================= */
-  function showToast(msg, success = true) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.style.background = success ? "#27ae60" : "#c0392b";
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 3000);
-  }
+/* DARK MODE */
+body.dark{
+  background:linear-gradient(135deg,#1a1a1a,#2c2c2c);
+  color:#fff;
+}
 
-  /* ================= SESSION ================= */
-  function getSession() {
-    try {
-      const token = localStorage.getItem("token");
-      const user = JSON.parse(localStorage.getItem("user") || "null");
-      if (!token || !user) return null;
-      return { token, user };
-    } catch {
-      return null;
-    }
-  }
+/* ================= PARTICLES ================= */
+#particle-canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
 
-  function requireLogin() {
-    const s = getSession();
-    if (!s) {
-      alert("Please login first");
-      window.location.href = "login.html";
-      return null;
-    }
-    return s;
-  }
+/* ================= HEADER ================= */
+header{
+  position:relative;
+  z-index:2;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 20px 10px;
+}
+header h1{
+  font-size:26px;
+  font-weight:600;
+}
 
-  /* ================= SAFE ARRAY ================= */
-  function safeArray(val) {
-    try {
-      if (Array.isArray(val)) return val;
-      if (typeof val === "string") return JSON.parse(val);
-      return [];
-    } catch {
-      return [];
-    }
-  }
+/* DARK/LIGHT TOGGLE & WALLET */
+#controls{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+#dark-toggle{
+  padding:6px 10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#3498db;color:#fff;
+}
+#wallet-balance{
+  font-size:14px;
+  font-weight:600;
+  background:rgba(255,255,255,0.1);
+  padding:6px 12px;
+  border-radius:12px;
+}
 
-  /* ================= FETCH SELLER (SAFE + CACHE) ================= */
-  async function fetchSeller(id) {
-    const sid = String(id);
-    if (sellerCache[sid]) return sellerCache[sid];
+/* ================= TOP BAR ================= */
+#top-bar{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding:12px;
+  position:relative;
+  z-index:2;
+}
 
-    try {
-      const res = await fetch(`${API_URL}/seller/${encodeURIComponent(sid)}`);
-      if (!res.ok) throw new Error("Seller API missing");
-      const data = await res.json();
-      sellerCache[sid] = data;
-      return data;
-    } catch {
-      const fallback = {
-        user_id: sid,
-        name: `Seller ${sid}`,
-        avg_rating: 0,
-        review_count: 0,
-        total_sales: 0,
-        seller_verified: false,
-        reviews: []
-      };
-      sellerCache[sid] = fallback;
-      return fallback;
-    }
-  }
+#search,#filter{
+  padding:10px 14px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+  font-family:'Poppins';
+}
 
-  /* ================= LOAD LISTINGS ================= */
-  async function loadListings() {
-    const session = getSession();
-    const JWT = session?.token;
+/* ================= ITEMS ================= */
+#items-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:16px;
+  padding:16px;
+  max-width:1300px;
+  margin:auto;
+  position:relative;
+  z-index:2;
+}
 
-    try {
-      const res = await fetch(`${API_URL}/listings`, {
-        headers: JWT ? { Authorization: `Bearer ${JWT}` } : {}
-      });
-      if (!res.ok) throw new Error("Listings fetch failed");
+/* ================= CARD ================= */
+.item-card{
+  background:#ffffff;
+  color:#333;
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  opacity:0;
+  transform:translateY(30px);
+  transition:.35s ease;
+  position:relative;
+}
+.item-card.show{opacity:1;transform:none}
+.item-card:hover{transform:translateY(-6px)}
 
-      let items = await res.json();
-      if (!Array.isArray(items)) items = [];
+/* DARK MODE CARD */
+body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45)}
 
-      /* SEARCH */
-      items = items.filter(i =>
-        ((i.title || "") + (i.uid || "") + (i.highest_rank || ""))
-          .toLowerCase()
-          .includes(currentSearchQuery)
-      );
+/* ================= BADGES ================= */
+.rating-badge,.verified-badge{
+  position:absolute;
+  top:10px;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:8px;
+  font-weight:600;
+}
+.rating-badge{left:10px;background:#f1c40f}
+.verified-badge{right:10px;background:#27ae60;color:#fff}
 
-      /* FILTERS */
-      if (currentFilter === "own" && session) {
-        items = items.filter(i => String(i.seller_id) === String(session.user.seller_id));
-      } else if (currentFilter === "price_high") {
-        items.sort((a, b) => (b.price || 0) - (a.price || 0));
-      } else if (currentFilter === "price_low") {
-        items.sort((a, b) => (a.price || 0) - (b.price || 0));
-      } else if (currentFilter === "new") {
-        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      }
+/* ================= INFO ================= */
+.item-info{
+  font-size:13px;
+  line-height:1.45;
+}
+.item-info strong{font-size:15px}
+.price{
+  font-size:18px;
+  color:#e67e22;
+  font-weight:600;
+  margin-top:6px;
+}
 
-      container.innerHTML = "";
-      if (!items.length) {
-        container.innerHTML = `<p style="color:white">No listings found</p>`;
-        return;
-      }
+/* ================= IMAGES ================= */
+.images-gallery{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.images-gallery img{
+  width:52px;
+  height:52px;
+  object-fit:cover;
+  border-radius:8px;
+  cursor:pointer;
+}
 
-      for (const item of items) {
-        const seller = await fetchSeller(item.seller_id);
-        const session = getSession(); // refresh session inside loop
+/* ================= BUTTONS ================= */
+.btn{
+  width:100%;
+  padding:9px;
+  margin-top:7px;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:'Poppins';
+}
+.buy-btn{background:#27ae60;color:#fff}
+.buy-btn:disabled{background:#aaa;cursor:not-allowed}
+.edit-btn{background:#3498db;color:#fff}
+.delete-btn{background:#c0392b;color:#fff}
+.outline{
+  background:#fff;
+  border:2px solid #3498db;
+  color:#3498db;
+}
 
-        // ✅ FIX: Check using seller_id for owner/admin
-        const isOwnerOrAdmin =
-          session &&
-          (String(session.user.seller_id) === String(item.seller_id) ||
-           String(session.user.role).toLowerCase() === "admin");
+/* ================= SKELETON LOADER ================= */
+.skeleton{
+  background:#ccc;
+  height:18px;
+  border-radius:8px;
+  margin:5px 0;
+  animation: pulse 1.2s infinite;
+}
+.skeleton.img{height:50px;width:50px;display:inline-block;margin:2px}
+@keyframes pulse{
+  0%{opacity:.5}
+  50%{opacity:1}
+  100%{opacity:.5}
+}
 
-        const mythics = safeArray(item.mythic_items).join(", ");
-        const legends = safeArray(item.legendary_items).join(", ");
-        const gifts = safeArray(item.gift_items).join(", ");
-        const guns = safeArray(item.upgraded_guns).join(", ");
-        const titles = safeArray(item.titles).join(", ");
-        const images = safeArray(item.images);
+/* ================= MODALS ================= */
+.modal-bg{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+.modal-bg.active{display:flex}
 
-        const card = document.createElement("div");
-        card.className = "item-card show";
+.modal{
+  background:#fff;
+  color:#333;
+  padding:18px;
+  border-radius:16px;
+  width:340px;
+  max-height:85vh;
+  overflow-y:auto;
+}
+body.dark .modal{background:#2c2c2c;color:#fff}
 
-        card.innerHTML = `
-          <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
-          ${seller.seller_verified ? `<div class="verified-badge">✔ Verified</div>` : ""}
+/* ================= SELLER MODAL ================= */
+#seller-modal h3{margin-bottom:6px}
+.review{
+  border-top:1px solid #eee;
+  padding:8px 0;
+}
+.review .reply{
+  font-size:12px;
+  margin-top:4px;
+  color:#2c3e50;
+  font-style:italic;
+}
+textarea{
+  width:100%;
+  padding:6px;
+  margin-top:4px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-family:'Poppins';
+}
 
-          <div class="item-info">
-            <p><strong>${item.title}</strong></p>
-            <p>UID: ${item.uid}</p>
-            <p>Level: ${item.level || 0}</p>
-            <p>Rank: ${item.highest_rank || "-"}</p>
-            <p class="price">₹${item.price}</p>
-            ${mythics ? `<p>Mythic: ${mythics}</p>` : ""}
-            ${legends ? `<p>Legendary: ${legends}</p>` : ""}
-            ${gifts ? `<p>Gifts: ${gifts}</p>` : ""}
-            ${guns ? `<p>Guns: ${guns}</p>` : ""}
-            ${titles ? `<p>Titles: ${titles}</p>` : ""}
-          </div>
+/* ================= IMAGE MODAL ================= */
+#imgModal img{
+  max-width:92%;
+  max-height:92%;
+  border-radius:14px;
+}
 
-          ${images.length ? `
-            <div class="images-gallery">
-              ${images.map(img =>
-                `<img src="${img}" class="item-img" onclick="openImageModal('${img}')">`
-              ).join("")}
-            </div>` : ""}
+/* ================= TOAST ================= */
+#toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#27ae60;
+  color:#fff;
+  padding:10px 20px;
+  border-radius:25px;
+  display:none;
+  z-index:1200;
+}
+#toast.show{display:block}
 
-          <button class="btn buy-btn"
-            ${item.status !== "available" ? "disabled" : ""}
-            onclick="buyItem('${item.id}')">
-            ${item.status === "available" ? "Buy" : "Sold"}
-          </button>
+/* ================= MOBILE ================= */
+@media(max-width:600px){
+  header h1{font-size:22px}
+}
+</style>
+</head>
 
-          <button class="btn outline"
-            onclick="openSellerProfile('${item.seller_id}')">
-            Seller Profile
-          </button>
+<body>
 
-          ${isOwnerOrAdmin ? `
-            <button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
-            <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
-          ` : ""}
-        `;
+<canvas id="particle-canvas"></canvas>
 
-        container.appendChild(card);
-      }
-    } catch (e) {
-      console.error(e);
-      showToast("Failed to load listings", false);
-      container.innerHTML = `<p style="color:white">Failed to load listings</p>`;
-    }
-  }
+<header>
+  <h1>BGMI Marketplace</h1>
+  <div id="controls">
+    <div id="wallet-balance">Wallet: ₹0</div>
+    <button id="dark-toggle">Dark / Light</button>
+  </div>
+</header>
 
-  /* ================= BUY ITEM ================= */
-  window.buyItem = async listingId => {
-    const session = requireLogin();
-    if (!session || !confirm("Confirm purchase?")) return;
+<div id="top-bar">
+  <input id="search" placeholder="Search UID / Title / Rank">
+  <select id="filter">
+    <option value="">Default</option>
+    <option value="price_high">Price High → Low</option>
+    <option value="price_low">Price Low → High</option>
+    <option value="new">Newest</option>
+    <option value="own">My Listings</option>
+  </select>
+</div>
 
-    try {
-      const res = await fetch(`${API_URL}/orders/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`
-        },
-        body: JSON.stringify({ listing_id: listingId })
-      });
+<div id="items-container">
+  <!-- Skeleton loader while fetching -->
+  <div class="item-card">
+    <div class="skeleton" style="width:70%"></div>
+    <div class="skeleton" style="width:50%"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
+  </div>
+  <div class="item-card">
+    <div class="skeleton" style="width:65%"></div>
+    <div class="skeleton" style="width:55%"></div>
+    <div class="skeleton img"></div>
+    <div class="skeleton img"></div>
+  </div>
+</div>
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Order failed");
+<!-- ================= SELLER PROFILE ================= -->
+<div id="seller-modal-bg" class="modal-bg">
+  <div class="modal" id="seller-modal">
+    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
+    <div id="seller-content">Loading...</div>
+  </div>
+</div>
 
-      showToast("Order created, opening chat...");
-      window.open(`${CHAT_URL}?order_id=${data.order.id}`, "_blank");
-    } catch (e) {
-      showToast(e.message, false);
-    }
-  };
+<!-- ================= IMAGE VIEW ================= -->
+<div id="imgModal" class="modal-bg" onclick="this.classList.remove('active')">
+  <img id="imgPreview">
+</div>
 
-  /* ================= EDIT / DELETE ================= */
-  window.editListing = id => alert(`Edit UI coming soon\nListing ID: ${id}`);
+<div id="toast"></div>
 
-  window.deleteListing = async id => {
-    const session = requireLogin();
-    if (!session || !confirm("Delete this listing?")) return;
+<script>
+/* ===== CLOSE SELLER ===== */
+function closeSeller(){
+  document.getElementById('seller-modal-bg').classList.remove('active');
+}
 
-    const res = await fetch(`${API_URL}/listings/delete`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.token}`
-      },
-      body: JSON.stringify({ listing_id: id })
-    });
+/* ===== DARK / LIGHT TOGGLE ===== */
+document.getElementById('dark-toggle').addEventListener('click',()=>{
+  document.body.classList.toggle('dark');
+});
 
-    const data = await res.json();
-    if (res.ok) {
-      showToast("Listing deleted");
-      loadListings();
-    } else {
-      showToast(data.error || "Delete failed", false);
-    }
-  };
+/* ===== PARTICLES ===== */
+const c=document.getElementById('particle-canvas');
+const ctx=c.getContext('2d');
+function resize(){c.width=innerWidth;c.height=innerHeight}
+resize();addEventListener('resize',resize);
 
-  /* ================= SELLER PROFILE ================= */
-  window.openSellerProfile = async sellerId => {
-    const bg = document.getElementById("seller-modal-bg");
-    const content = document.getElementById("seller-content");
-    bg.classList.add("active");
-    content.innerHTML = "Loading seller...";
+const dots=[...Array(90)].map(()=>({
+  x:Math.random()*c.width,
+  y:Math.random()*c.height,
+  r:Math.random()*2+1,
+  dx:(Math.random()-.5)*0.6,
+  dy:(Math.random()-.5)*0.6
+}));
 
-    const s = await fetchSeller(sellerId);
-    const session = getSession();
-    const canReply =
-      session &&
-      (String(session.user.id) === String(sellerId) ||
-        String(session.user.role).toLowerCase() === "admin");
-
-    content.innerHTML = `
-      <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
-      <p>⭐ ${(s.avg_rating || 0).toFixed(1)} | Sales: ${s.total_sales} | Reviews: ${s.review_count}</p>
-
-      <button class="btn outline"
-        onclick="window.open('${CHAT_URL}?seller=${sellerId}','_blank')">
-        Chat with Seller
-      </button>
-
-      <h4>Reviews</h4>
-      ${(s.reviews || []).length
-        ? s.reviews.map(r => `
-            <div class="review">
-              <p>⭐ ${r.stars}</p>
-              <p>${r.comment || ""}</p>
-              ${r.reply ? `<p class="reply">Seller: ${r.reply}</p>` : ""}
-              ${canReply && !r.reply ? `
-                <textarea id="reply-${r.id}" placeholder="Reply..."></textarea>
-                <button class="btn outline"
-                  onclick="replyReview('${r.id}','${sellerId}')">
-                  Reply
-                </button>` : ""}
-            </div>`).join("")
-        : "<p>No reviews yet</p>"}
-    `;
-  };
-
-  window.replyReview = async (reviewId, sellerId) => {
-    const txt = document.getElementById(`reply-${reviewId}`)?.value;
-    if (!txt) return;
-
-    try {
-      await fetch(`${API_URL}/reviews/reply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getSession().token}`
-        },
-        body: JSON.stringify({ review_id: reviewId, reply: txt })
-      });
-      showToast("Reply submitted");
-      openSellerProfile(sellerId);
-    } catch {
-      showToast("Reply not supported by backend", false);
-    }
-  };
-
-  /* ================= IMAGE MODAL ================= */
-  window.openImageModal = src => {
-    const m = document.getElementById("imgModal");
-    document.getElementById("imgPreview").src = src;
-    m.classList.add("active");
-  };
-
-  /* ================= SEARCH / FILTER ================= */
-  searchInput?.addEventListener("input", e => {
-    currentSearchQuery = e.target.value.toLowerCase();
-    loadListings();
+(function animate(){
+  ctx.clearRect(0,0,c.width,c.height);
+  dots.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.6)';
+    ctx.fill();
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0)p.x=c.width;if(p.y<0)p.y=c.height;
+    if(p.x>c.width)p.x=0;if(p.y>c.height)p.y=0;
   });
-
-  filterSelect?.addEventListener("change", e => {
-    currentFilter = e.target.value;
-    loadListings();
-  });
-
-  /* ================= INIT ================= */
-  loadListings();
-  setInterval(loadListings, 30000);
+  requestAnimationFrame(animate);
 })();
+</script>
+
+<!-- ================= MAIN LOGIC ================= -->
+<script src="js/marketplace.js"></script>
+
+</body>
+</html>
