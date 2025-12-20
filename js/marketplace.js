@@ -77,7 +77,7 @@
 
       // APPLY FILTERS
       if (currentFilter === "own" && session) {
-        items = items.filter(i => i.seller_id === session.user.id);
+        items = items.filter(i => String(i.seller_id) === String(session.user.id));
       } else if (currentFilter === "price_high") {
         items.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (currentFilter === "price_low") {
@@ -96,7 +96,7 @@
         const seller = await fetchSeller(item.seller_id);
         const rating = seller?.avg_rating || 0;
         const verified = seller?.seller_verified || false;
-        const totalSells = seller?.total_sells || 0;
+        const totalSells = seller?.total_sales || 0;
         const reviewCount = seller?.review_count || 0;
 
         const card = document.createElement("div");
@@ -131,7 +131,7 @@
         if (images.length) {
           itemDetails += `<div class="images-gallery">`;
           for (const img of images) {
-            itemDetails += `<img src="${img}" class="item-img" alt="item">`;
+            itemDetails += `<img src="${img}" class="item-img" alt="item" onclick="openImageModal('${img}')">`;
           }
           itemDetails += `</div>`;
         }
@@ -154,7 +154,7 @@
         `;
 
         // Owner / Admin buttons
-        if (session && (Number(session.user.id) === Number(item.seller_id) || session.user.role === "admin")) {
+        if (session && (String(session.user.id) === String(item.seller_id) || session.user.role === "admin")) {
           itemDetails += `
             <button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
             <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
@@ -176,7 +176,6 @@
   window.buyItem = async (listingId, sellerId) => {
     const session = requireLogin();
     if (!session) return;
-
     if (!confirm("Confirm purchase?")) return;
 
     try {
@@ -200,15 +199,10 @@
   };
 
   /* ================= EDIT / DELETE ================= */
-  window.editListing = (listingId) => {
-    alert(`Edit listing coming soon! Listing ID: ${listingId}`);
-    // Optional: redirect to sell/edit page with pre-filled data
-  };
-
+  window.editListing = (listingId) => alert(`Edit listing coming soon! ID: ${listingId}`);
   window.deleteListing = async (listingId) => {
     const session = requireLogin();
     if (!session) return;
-
     if (!confirm("Delete this listing?")) return;
 
     try {
@@ -240,57 +234,36 @@
       return;
     }
 
-    let ratings = [];
-    try {
-      const ratingsRes = await fetch(`${API_URL}/seller/${sellerId}/ratings`);
-      ratings = await ratingsRes.json();
-    } catch {}
-
     content.innerHTML = `
       <h3>${seller.name || "Seller"} ${seller.seller_verified ? "✔" : ""}</h3>
-      <p>⭐ ${seller.avg_rating?.toFixed(1) || 0} | Total Sells: ${seller.total_sells || 0} | Reviews: ${seller.review_count || 0}</p>
+      <p>⭐ ${seller.avg_rating?.toFixed(1) || 0} | Total Sells: ${seller.total_sales || 0} | Reviews: ${seller.review_count || 0}</p>
       <h4>Reviews:</h4>
-      ${ratings.map(r => `
+      <div>${(seller.reviews || []).map(r => `
         <div class="review">
-          <p>⭐ ${r.stars || r.rating || 0}</p>
-          <p>${r.comment || r.review || ""}</p>
+          <p>⭐ ${r.stars || 0}</p>
+          <p>${r.comment || ""}</p>
           ${r.reply ? `<p class="reply">Seller: ${r.reply}</p>` : ""}
-          ${seller.user_id === getSession()?.user.id ? `<button onclick="replyReview(${r.id})">Reply</button>` : ""}
         </div>
-      `).join("")}
+      `).join("")}</div>
     `;
   };
 
-  /* ================= REVIEW REPLY ================= */
-  window.replyReview = async (reviewId) => {
-    const reply = prompt("Reply to review");
-    if (!reply) return;
-
-    const session = getSession();
-    if (!session) return;
-
-    try {
-      await fetch(`${API_URL}/reviews/reply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`
-        },
-        body: JSON.stringify({ review_id: reviewId, reply })
-      });
-      showToast("Reply posted");
-      loadListings();
-    } catch {
-      showToast("Failed to post reply", false);
-    }
+  /* ================= IMAGE LIGHTBOX ================= */
+  window.openImageModal = (src) => {
+    const imgModal = document.getElementById("imgModal");
+    const imgPreview = document.getElementById("imgPreview");
+    imgPreview.src = src;
+    imgModal.classList.add("active");
   };
+  document.getElementById("imgModal")?.addEventListener("click", () => {
+    document.getElementById("imgModal").classList.remove("active");
+  });
 
   /* ================= SEARCH / FILTER ================= */
   searchInput?.addEventListener("input", e => {
     currentSearchQuery = e.target.value.toLowerCase();
     loadListings();
   });
-
   filterSelect?.addEventListener("change", e => {
     currentFilter = e.target.value;
     loadListings();
