@@ -13,7 +13,7 @@
   /* ================= SELLER CACHE ================= */
   const sellerCache = {};
 
-  /* ================= NORMALIZE ID (🔥 MAIN FIX) ================= */
+  /* ================= NORMALIZE ID ================= */
   function normalizeId(val) {
     if (val === null || val === undefined) return null;
     return String(parseInt(val, 10));
@@ -81,6 +81,7 @@
         review_count: 0,
         total_sales: 0,
         seller_verified: false,
+        listings: [],
         reviews: []
       };
       sellerCache[sid] = fallback;
@@ -138,6 +139,13 @@
             String(session.user.role).toLowerCase() === "admin"
           );
 
+        const mythics = safeArray(item.mythic_items).join(", ");
+        const legends = safeArray(item.legendary_items).join(", ");
+        const gifts = safeArray(item.gift_items).join(", ");
+        const guns = safeArray(item.upgraded_guns).join(", ");
+        const titles = safeArray(item.titles).join(", ");
+        const images = safeArray(item.images);
+
         const card = document.createElement("div");
         card.className = "item-card show";
         card.dataset.sellerId = normalizeId(item.seller_id);
@@ -152,7 +160,17 @@
             <p>Level: ${item.level || 0}</p>
             <p>Rank: ${item.highest_rank || "-"}</p>
             <p class="price">₹${item.price}</p>
+            ${mythics ? `<p>Mythic: ${mythics}</p>` : ""}
+            ${legends ? `<p>Legendary: ${legends}</p>` : ""}
+            ${gifts ? `<p>Gifts: ${gifts}</p>` : ""}
+            ${guns ? `<p>Guns: ${guns}</p>` : ""}
+            ${titles ? `<p>Titles: ${titles}</p>` : ""}
           </div>
+
+          ${images.length ? `
+            <div class="images-gallery">
+              ${images.map(img => `<img src="${img}" class="item-img" onclick="openImageModal('${img}')">`).join("")}
+            </div>` : ""}
 
           <button class="btn buy-btn"
             ${item.status !== "available" ? "disabled" : ""}
@@ -185,42 +203,68 @@
     const s = requireLogin();
     if (!s || !confirm("Confirm purchase?")) return;
 
-    const res = await fetch(`${API_URL}/orders/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${s.token}`
-      },
-      body: JSON.stringify({ listing_id: id })
-    });
+    try {
+      const res = await fetch(`${API_URL}/orders/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${s.token}`
+        },
+        body: JSON.stringify({ listing_id: id })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || "Order failed", false);
 
-    const data = await res.json();
-    if (!res.ok) return showToast(data.error || "Order failed", false);
-
-    showToast("Order created");
-    window.open(`${CHAT_URL}?order_id=${data.order.id}`, "_blank");
+      showToast("Order created");
+      window.open(`${CHAT_URL}?order_id=${data.order.id}`, "_blank");
+    } catch {
+      showToast("Order failed", false);
+    }
   };
 
   /* ================= EDIT / DELETE ================= */
-  window.editListing = id => alert(`Edit UI coming soon\nListing ID: ${id}`);
+  window.editListing = async id => {
+    const s = requireLogin();
+    if (!s) return;
+    const title = prompt("Enter new title");
+    if (!title) return;
+
+    try {
+      const res = await fetch(`${API_URL}/listings/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${s.token}`
+        },
+        body: JSON.stringify({ title })
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || "Edit failed", false);
+
+      showToast("Listing updated");
+      loadListings();
+    } catch {
+      showToast("Edit failed", false);
+    }
+  };
 
   window.deleteListing = async id => {
     const s = requireLogin();
     if (!s || !confirm("Delete listing?")) return;
 
-    const res = await fetch(`${API_URL}/listings/delete`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${s.token}`
-      },
-      body: JSON.stringify({ listing_id: id })
-    });
+    try {
+      const res = await fetch(`${API_URL}/listings/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${s.token}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || "Delete failed", false);
 
-    if (res.ok) {
       showToast("Listing deleted");
       loadListings();
-    } else {
+    } catch {
       showToast("Delete failed", false);
     }
   };
@@ -230,18 +274,32 @@
     const bg = document.getElementById("seller-modal-bg");
     const content = document.getElementById("seller-content");
     bg.classList.add("active");
-    content.innerHTML = "Loading...";
+    content.innerHTML = "Loading seller...";
 
     const s = await fetchSeller(sellerId);
+
     content.innerHTML = `
       <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
-      <p>⭐ ${(s.avg_rating || 0).toFixed(1)} | Sales: ${s.total_sales}</p>
-
+      <p>⭐ ${(s.avg_rating || 0).toFixed(1)} | Sales: ${s.total_sales} | Reviews: ${s.review_count}</p>
+      ${s.listings?.length ? `<p>Listings: ${s.listings.map(l => l.title).join(", ")}</p>` : ""}
+      ${(s.reviews || []).map(r => `
+        <div class="review">
+          <p>⭐ ${r.stars}</p>
+          <p>${r.comment}</p>
+          ${r.reply ? `<p class="reply">Seller: ${r.reply}</p>` : ""}
+        </div>`).join("")}
       <button class="btn outline"
         onclick="window.open('${CHAT_URL}?seller=${sellerId}','_blank')">
         Chat with Seller
       </button>
     `;
+  };
+
+  /* ================= IMAGE MODAL ================= */
+  window.openImageModal = src => {
+    const m = document.getElementById("imgModal");
+    document.getElementById("imgPreview").src = src;
+    m.classList.add("active");
   };
 
   /* ================= SEARCH / FILTER ================= */
