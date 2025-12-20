@@ -1,252 +1,227 @@
-/***********************
- * GLOBALS
- ***********************/
-const API_URL = "/api"; // change if needed
+/******************** CONFIG ********************/
+const API_URL = "http://localhost:5000/api";
 const itemsContainer = document.getElementById("items-container");
-const editModalBg = document.getElementById("edit-modal-bg");
-const editForm = document.getElementById("edit-form");
-const saveEditBtn = document.getElementById("save-edit");
-const sellerModalBg = document.getElementById("seller-modal-bg");
-const sellerContent = document.getElementById("seller-content");
 const toastBox = document.getElementById("toast");
 
-let listings = [];
-let currentEditItem = null;
+/******************** HELPERS ********************/
+const session = () => JSON.parse(localStorage.getItem("session"));
+const isOwner = sellerId => session()?.user?.id === sellerId;
 
-/***********************
- * AUTH HELPERS
- ***********************/
-function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
-
-function requireLogin() {
-  const s = getSession();
-  if (!s) {
-    toast("Please login first", true);
-    return null;
-  }
-  return s;
-}
-
-/***********************
- * TOAST
- ***********************/
-function toast(msg, err = false) {
+const toast = msg => {
   toastBox.textContent = msg;
-  toastBox.style.background = err ? "#c0392b" : "#27ae60";
   toastBox.classList.add("show");
   setTimeout(() => toastBox.classList.remove("show"), 2500);
-}
+};
 
-/***********************
- * LOAD LISTINGS
- ***********************/
+const stars = r =>
+  "★".repeat(Math.round(r || 0)) +
+  "☆".repeat(5 - Math.round(r || 0));
+
+/******************** LOAD LISTINGS ********************/
 async function loadListings() {
   itemsContainer.innerHTML = "";
-  try {
-    const res = await fetch(`${API_URL}/listings`);
-    listings = await res.json();
-    listings.forEach(renderCard);
-  } catch {
-    toast("Failed to load listings", true);
-  }
+  const res = await fetch(`${API_URL}/listings`);
+  const data = await res.json();
+  data.forEach(renderCard);
 }
+loadListings();
 
-/***********************
- * RENDER CARD
- ***********************/
+/******************** RENDER CARD ********************/
 function renderCard(item) {
-  const session = getSession();
-  const isOwner = session && session.userId === item.sellerId;
-
   const card = document.createElement("div");
   card.className = "item-card show";
 
+  const verified =
+    item.seller?.verified === 1
+      ? `<div class="verified-badge">Verified</div>`
+      : "";
+
+  const badge = item.seller?.badge
+    ? `<div class="badge-badge">${item.seller.badge}</div>`
+    : "";
+
   card.innerHTML = `
-    ${item.rating ? `<div class="rating-badge">⭐ ${item.rating}</div>` : ""}
-    ${item.verified === 1 ? `<div class="verified-badge">Verified</div>` : ""}
-    ${item.badge ? `<div class="badge-badge">${item.badge}</div>` : ""}
+    <div class="rating-badge">${stars(item.rating || 0)}</div>
+    ${verified}
+    ${badge}
 
     <div class="item-info">
-      <strong>${item.account_title || "BGMI Account"}</strong><br>
-      UID: ${item.bgmi_uid || "-"}<br>
-      Level: ${item.account_level || "-"}<br>
-      Highest Rank: ${item.highest_rank || "-"}<br>
-      Gilt Items: ${item.gilt_items || 0}<br>
-      Upgraded Guns: ${item.upgraded_guns || 0}<br>
-      Mythic Items: ${item.mythic_items || 0}<br>
-      Legendary Items: ${item.legendary_items || 0}<br>
-      Titles: ${item.titles || "-"}<br>
-      <em>${item.account_highlights || ""}</em>
+      <strong>${item.title}</strong><br>
+      BGMI UID: ${item.uid}<br>
+      Level: ${item.level}<br>
+      Rank: ${item.highest_rank}<br>
+      Guns: ${item.upgraded_guns || "-"}<br>
+      Mythic: ${item.mythic_items || 0},
+      Legendary: ${item.legendary_items || 0}<br>
+      Highlights: ${item.highlights || "-"}
     </div>
 
     <div class="price">₹${item.price}</div>
 
     <div class="images-gallery">
-      ${(item.images || []).map(
-        img => `<img src="${img}" onclick="openImg('${img}')">`
-      ).join("")}
+      ${(item.images || [])
+        .map(
+          i => `<img src="${i}" onclick="previewImg('${i}')">`
+        )
+        .join("")}
     </div>
 
     <button class="btn outline seller-btn">Seller Profile</button>
 
-    ${isOwner ? `
+    ${
+      isOwner(item.seller_id)
+        ? `
       <button class="btn edit-btn">Edit</button>
       <button class="btn delete-btn">Delete</button>
-    ` : `
-      <button class="btn buy-btn">Buy</button>
-    `}
+    `
+        : `<button class="btn buy-btn">Buy</button>`
+    }
   `;
 
-  // seller profile
+  // EVENTS
   card.querySelector(".seller-btn").onclick = () =>
-    openSeller(item.sellerId);
+    openSeller(item.seller);
 
-  if (isOwner) {
+  if (isOwner(item.seller_id)) {
     card.querySelector(".edit-btn").onclick = () => openEdit(item);
-    card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
+    card.querySelector(".delete-btn").onclick = () =>
+      deleteListing(item.id);
   }
 
   itemsContainer.appendChild(card);
 }
 
-/***********************
- * IMAGE MODAL
- ***********************/
-window.openImg = src => {
-  const m = document.getElementById("imgModal");
+/******************** IMAGE PREVIEW ********************/
+window.previewImg = src => {
   document.getElementById("imgPreview").src = src;
-  m.classList.add("active");
+  document.getElementById("imgModal").classList.add("active");
 };
 
-/***********************
- * SELLER PROFILE
- ***********************/
-async function openSeller(id) {
-  sellerModalBg.classList.add("active");
-  sellerContent.innerHTML = "Loading...";
+/******************** SELLER PROFILE ********************/
+window.openSeller = seller => {
+  document.getElementById("seller-modal-bg").classList.add("active");
 
-  try {
-    const res = await fetch(`${API_URL}/sellers/${id}`);
-    const s = await res.json();
-
-    sellerContent.innerHTML = `
-      <h3>${s.name}</h3>
-      ${s.verified === 1 ? `<span class="verified-badge">Verified</span>` : ""}
-      ${s.badge ? `<span class="badge-badge">${s.badge}</span>` : ""}
-      <p>Total Sales: ${s.total_sales}</p>
-      <p>Reviews: ${s.review_count}</p>
-      <button class="btn outline">Chat (Coming Soon)</button>
-    `;
-  } catch {
-    sellerContent.innerHTML = "Failed to load seller";
-  }
-}
+  document.getElementById("seller-content").innerHTML = `
+    <h3>${seller.name}</h3>
+    <p>Status: ${
+      seller.verified === 1 ? "Verified" : "Pending"
+    }</p>
+    <p>Badge: ${seller.badge || "-"}</p>
+    <p>Total Sales: ${seller.total_sales || 0}</p>
+    <p>Reviews: ${seller.review_count || 0}</p>
+    <button class="btn outline">Chat (coming soon)</button>
+  `;
+};
 
 window.closeSeller = () =>
-  sellerModalBg.classList.remove("active");
+  document
+    .getElementById("seller-modal-bg")
+    .classList.remove("active");
 
-/***********************
- * EDIT LISTING
- ***********************/
-function openEdit(item) {
-  currentEditItem = item;
-  editModalBg.classList.add("active");
+/******************** EDIT LISTING ********************/
+let editImages = [];
+let editId = null;
 
-  editForm.innerHTML = `
-    <input value="${item.account_title || ""}" id="e-title" placeholder="Account Title">
-    <input value="${item.price}" id="e-price" type="number" placeholder="Price">
-    <textarea id="e-highlights" placeholder="Account Highlights">${item.account_highlights || ""}</textarea>
+window.openEdit = item => {
+  editId = item.id;
+  editImages = [...(item.images || [])];
 
+  document.getElementById("edit-modal-bg").classList.add("active");
+
+  document.getElementById("edit-form").innerHTML = `
+    <input id="e-title" value="${item.title}">
+    <input id="e-uid" value="${item.uid}">
+    <input id="e-level" value="${item.level}">
+    <input id="e-rank" value="${item.highest_rank}">
+    <input id="e-guns" value="${item.upgraded_guns || ""}">
+    <input id="e-mythic" value="${item.mythic_items || 0}">
+    <input id="e-legend" value="${item.legendary_items || 0}">
+    <textarea id="e-highlights">${
+      item.highlights || ""
+    }</textarea>
+    <input id="e-price" value="${item.price}">
+
+    <input type="file" id="imgAdd" multiple>
     <div id="e-images-container"></div>
-    <button class="btn outline" id="add-image">Add Image</button>
   `;
 
-  const imgBox = document.getElementById("e-images-container");
-  (item.images || []).forEach(addEditImage);
-
-  document.getElementById("add-image").onclick = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = () => {
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = () => addEditImage(reader.result);
-      reader.readAsDataURL(file);
-    };
-    input.click();
+  document.getElementById("imgAdd").onchange = e => {
+    [...e.target.files].forEach(f => {
+      const r = new FileReader();
+      r.onload = ev => {
+        editImages.push(ev.target.result);
+        renderEditImages();
+      };
+      r.readAsDataURL(f);
+    });
   };
+
+  renderEditImages();
+};
+
+function renderEditImages() {
+  document.getElementById("e-images-container").innerHTML =
+    editImages
+      .map(
+        (i, idx) => `
+      <div style="position:relative">
+        <img src="${i}" width="60">
+        <span onclick="removeEditImg(${idx})"
+         style="position:absolute;top:-6px;right:-6px;
+         cursor:pointer;background:red;color:#fff;
+         border-radius:50%;padding:2px 6px">×</span>
+      </div>`
+      )
+      .join("");
 }
 
-function addEditImage(src) {
-  const imgBox = document.getElementById("e-images-container");
-  const wrap = document.createElement("div");
-  wrap.style.position = "relative";
-  wrap.innerHTML = `
-    <img src="${src}" style="width:60px;height:60px;border-radius:8px">
-    <span style="position:absolute;top:-6px;right:-6px;
-      background:red;color:#fff;border-radius:50%;
-      padding:2px 6px;cursor:pointer">×</span>
-  `;
-  wrap.querySelector("span").onclick = () => wrap.remove();
-  imgBox.appendChild(wrap);
-}
+window.removeEditImg = i => {
+  editImages.splice(i, 1);
+  renderEditImages();
+};
 
-window.closeEdit = () =>
-  editModalBg.classList.remove("active");
-
-/***********************
- * SAVE EDIT
- ***********************/
-saveEditBtn.onclick = async () => {
-  const s = requireLogin();
-  if (!s) return;
-
-  const imgs = [...document.querySelectorAll("#e-images-container img")]
-    .map(i => i.src);
-
-  await fetch(`${API_URL}/listings/${currentEditItem.id}`, {
+document.getElementById("save-edit").onclick = async () => {
+  await fetch(`${API_URL}/listings/${editId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${s.token}`
+      Authorization: `Bearer ${session().token}`,
     },
     body: JSON.stringify({
-      account_title: document.getElementById("e-title").value,
-      price: document.getElementById("e-price").value,
-      account_highlights: document.getElementById("e-highlights").value,
-      images: imgs
-    })
+      title: e("e-title"),
+      uid: e("e-uid"),
+      level: e("e-level"),
+      highest_rank: e("e-rank"),
+      upgraded_guns: e("e-guns"),
+      mythic_items: e("e-mythic"),
+      legendary_items: e("e-legend"),
+      highlights: e("e-highlights"),
+      price: e("e-price"),
+      images: editImages,
+    }),
   });
 
-  toast("Listing updated");
   closeEdit();
   loadListings();
+  toast("Listing updated");
 };
 
-/***********************
- * DELETE LISTING ✅ FIXED
- ***********************/
-async function deleteListing(id) {
-  const s = requireLogin();
-  if (!s || !confirm("Delete this listing?")) return;
+const e = id => document.getElementById(id).value;
 
+window.closeEdit = () =>
+  document
+    .getElementById("edit-modal-bg")
+    .classList.remove("active");
+
+/******************** DELETE ********************/
+window.deleteListing = async id => {
+  if (!confirm("Delete this listing?")) return;
   await fetch(`${API_URL}/listings/${id}`, {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${s.token}` }
+    headers: {
+      Authorization: `Bearer ${session().token}`,
+    },
   });
-
   toast("Listing deleted");
   loadListings();
-}
-
-/***********************
- * INIT
- ***********************/
-loadListings();
+};
