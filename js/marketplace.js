@@ -24,6 +24,7 @@
 
   const toast = (msg, ok = true) => {
     const t = document.getElementById("toast");
+    if (!t) return;
     t.textContent = msg;
     t.style.background = ok ? "#27ae60" : "#c0392b";
     t.classList.add("show");
@@ -58,6 +59,8 @@
   window.openSellerProfile = async sellerId => {
     const bg = document.getElementById("seller-modal-bg");
     const content = document.getElementById("seller-content");
+    if (!bg || !content) return;
+
     bg.classList.add("active");
     content.innerHTML = "Loading...";
 
@@ -81,8 +84,10 @@
     }
   };
 
-  window.closeSeller = () =>
-    document.getElementById("seller-modal-bg").classList.remove("active");
+  window.closeSeller = () => {
+    const bg = document.getElementById("seller-modal-bg");
+    if (bg) bg.classList.remove("active");
+  };
 
   /* ================= LOAD LISTINGS ================= */
   async function loadListings() {
@@ -108,8 +113,10 @@
       );
     }
 
-    container.innerHTML = "";
-    items.forEach(renderCard);
+    if (container) {
+      container.innerHTML = "";
+      items.forEach(renderCard);
+    }
   }
 
   /* ================= CARD ================= */
@@ -121,7 +128,6 @@
         session.user.role === "admin");
 
     const images = safeArray(item.images);
-
     const card = document.createElement("div");
     card.className = "item-card show";
 
@@ -157,21 +163,6 @@
             ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>`
             : ""
         }
-        ${
-          safeArray(item.gift_items).length
-            ? `<b>Gifts:</b> ${safeArray(item.gift_items).join(", ")}<br>`
-            : ""
-        }
-        ${
-          safeArray(item.titles).length
-            ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>`
-            : ""
-        }
-        ${
-          item.account_highlights
-            ? `<b>Highlights:</b> ${item.account_highlights}`
-            : ""
-        }
 
         <div class="price">₹${item.price}</div>
       </div>
@@ -202,7 +193,7 @@
       if (delBtn) delBtn.onclick = () => deleteListing(item.id);
     }
 
-    container.appendChild(card);
+    if (container) container.appendChild(card);
   }
 
   /* ================= DELETE ================= */
@@ -222,9 +213,11 @@
   /* ================= EDIT ================= */
   function openEdit(item) {
     editListing = item;
-    document.getElementById("edit-modal-bg").classList.add("active");
-
+    const bg = document.getElementById("edit-modal-bg");
     const form = document.getElementById("edit-form");
+    if (!bg || !form) return;
+
+    bg.classList.add("active");
     const arr = v => safeArray(v).join(", ");
 
     form.innerHTML = `
@@ -235,51 +228,50 @@
       <textarea id="e-upgraded">${arr(item.upgraded_guns)}</textarea>
       <textarea id="e-mythic">${arr(item.mythic_items)}</textarea>
       <textarea id="e-legendary">${arr(item.legendary_items)}</textarea>
-      <textarea id="e-gifts">${arr(item.gift_items)}</textarea>
-      <textarea id="e-titles">${arr(item.titles)}</textarea>
       <textarea id="e-highlights">${item.account_highlights || ""}</textarea>
     `;
   }
 
-  document.getElementById("save-edit").onclick = async () => {
-    if (!editListing) return;
-    const s = requireLogin();
-    if (!s) return;
+  const saveBtn = document.getElementById("save-edit");
+  if (saveBtn) {
+    saveBtn.onclick = async () => {
+      if (!editListing) return;
+      const s = requireLogin();
+      if (!s) return;
 
-    await fetch(`${API_URL}/listings/${editListing.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${s.token}`
-      },
-      body: JSON.stringify({
-        title: e("e-title"),
-        price: +e("e-price"),
-        level: +e("e-level"),
-        highest_rank: e("e-rank"),
-        upgraded_guns: e("e-upgraded").split(","),
-        mythic_items: e("e-mythic").split(","),
-        legendary_items: e("e-legendary").split(","),
-        gift_items: e("e-gifts").split(","),
-        titles: e("e-titles").split(","),
-        account_highlights: e("e-highlights")
-      })
-    });
+      await fetch(`${API_URL}/listings/${editListing.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${s.token}`
+        },
+        body: JSON.stringify({
+          title: e("e-title"),
+          price: +e("e-price"),
+          level: +e("e-level"),
+          highest_rank: e("e-rank"),
+          upgraded_guns: e("e-upgraded").split(","),
+          mythic_items: e("e-mythic").split(","),
+          legendary_items: e("e-legendary").split(","),
+          account_highlights: e("e-highlights")
+        })
+      });
 
-    toast("Listing updated");
-    document.getElementById("edit-modal-bg").classList.remove("active");
-    loadListings();
-  };
+      toast("Listing updated");
+      document.getElementById("edit-modal-bg")?.classList.remove("active");
+      loadListings();
+    };
+  }
 
-  const e = id => document.getElementById(id).value;
+  const e = id => document.getElementById(id)?.value || "";
 
-  searchInput?.addEventListener("input", e => {
-    currentSearch = e.target.value.toLowerCase();
+  searchInput?.addEventListener("input", ev => {
+    currentSearch = ev.target.value.toLowerCase();
     loadListings();
   });
 
-  filterSelect?.addEventListener("change", e => {
-    currentFilter = e.target.value;
+  filterSelect?.addEventListener("change", ev => {
+    currentFilter = ev.target.value;
     loadListings();
   });
 
