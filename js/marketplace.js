@@ -164,7 +164,7 @@
         <div class="price">₹${item.price}</div>
       </div>
 
-      <button class="btn buy-btn">Buy</button>
+      
       <button class="btn outline seller-btn">Seller Profile</button>
 
       ${
@@ -173,7 +173,11 @@
             <button class="btn edit-btn">Edit</button>
             <button class="btn delete-btn">Delete</button>
           `
-          : ""
+          : 
+           `
+             <button class ="btn buy-btn">Buy</button>
+          `
+          
       }
     `;
 
