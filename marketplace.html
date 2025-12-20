@@ -7,17 +7,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
+/* ========== BASE ========== */
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
   background:linear-gradient(135deg,#141e30,#243b55);
   color:#fff;
-  overflow-x:hidden;
-  transition:.3s;
 }
 body.dark{background:linear-gradient(135deg,#1a1a1a,#2c2c2c)}
 #particle-canvas{position:fixed;inset:0;z-index:0}
 
+/* ========== HEADER ========== */
 header{
   position:relative;z-index:2;
   display:flex;justify-content:space-between;align-items:center;
@@ -27,67 +27,121 @@ header{
   border-bottom:1px solid rgba(255,255,255,.1);
 }
 
+/* ========== GRID ========== */
 #items-container{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-  gap:16px;
-  padding:16px;
-  max-width:1400px;
-  margin:auto;
   position:relative;
   z-index:2;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:18px;
+  padding:20px;
+  max-width:1400px;
+  margin:auto;
 }
 
+/* ========== CARD ========== */
 .item-card{
-  background:rgba(255,255,255,.05);
-  backdrop-filter:blur(12px);
-  border-radius:16px;
-  padding:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  display:flex;
+  flex-direction:column;
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(14px);
+  border-radius:18px;
+  box-shadow:0 10px 26px rgba(0,0,0,.35);
+  overflow:hidden;
   transition:.35s;
 }
 .item-card:hover{transform:translateY(-6px) scale(1.02)}
 
+/* IMAGE SLIDER ZONE */
+.images-gallery{
+  position:relative;
+  height:190px;
+  overflow:hidden;
+}
+.images-gallery img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:none;
+}
+.images-gallery img.active{display:block}
+
+/* INFO */
+.card-content{
+  padding:14px;
+  font-size:14px;
+  line-height:1.5;
+}
+.card-content strong{font-size:16px}
+.price{
+  font-size:18px;
+  font-weight:600;
+  color:#f39c12;
+  margin-top:6px;
+}
+
+/* BUTTONS */
+.card-actions{
+  margin-top:auto;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
 .btn{
-  width:100%;padding:9px;margin-top:6px;
-  border:none;border-radius:10px;
-  font-weight:600;cursor:pointer;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
 }
 .buy-btn{background:#27ae60;color:#fff}
 .edit-btn{background:#3498db;color:#fff}
 .delete-btn{background:#c0392b;color:#fff}
 .outline{background:#fff;color:#3498db;border:2px solid #3498db}
 
-/* MODALS */
+/* ========== MODALS ========== */
 .modal-bg{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.7);
-  align-items:center;justify-content:center;
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  align-items:center;
+  justify-content:center;
   z-index:999;
 }
 .modal-bg.active{display:flex}
+
 .modal{
-  background:#fff;color:#333;
-  padding:18px;border-radius:16px;
-  width:400px;max-height:85vh;
+  background:#fff;
+  color:#333;
+  padding:20px;
+  border-radius:18px;
+  width:420px;
+  max-height:85vh;
   overflow-y:auto;
 }
 body.dark .modal{background:#2c2c2c;color:#fff}
 
-/* TOAST */
+/* ========== TOAST ========== */
 #toast{
-  position:fixed;bottom:20px;left:50%;
+  position:fixed;
+  bottom:20px;
+  left:50%;
   transform:translateX(-50%);
-  background:#27ae60;color:#fff;
+  background:#27ae60;
+  color:#fff;
   padding:10px 20px;
   border-radius:25px;
-  display:none;z-index:1200;
+  display:none;
+  z-index:1200;
 }
 #toast.show{display:block}
 </style>
 </head>
 
 <body>
+
 <canvas id="particle-canvas"></canvas>
 
 <header>
@@ -95,10 +149,10 @@ body.dark .modal{background:#2c2c2c;color:#fff}
   <button id="dark-toggle">Dark / Light</button>
 </header>
 
-<!-- REQUIRED CONTAINER -->
+<!-- REQUIRED FOR JS -->
 <div id="items-container"></div>
 
-<!-- SELLER PROFILE MODAL -->
+<!-- SELLER PROFILE -->
 <div id="seller-modal-bg" class="modal-bg">
   <div class="modal">
     <div id="seller-content">Loading...</div>
@@ -106,7 +160,7 @@ body.dark .modal{background:#2c2c2c;color:#fff}
   </div>
 </div>
 
-<!-- EDIT LISTING MODAL -->
+<!-- EDIT MODAL -->
 <div id="edit-modal-bg" class="modal-bg">
   <div class="modal">
     <h3>Edit Listing</h3>
@@ -116,10 +170,9 @@ body.dark .modal{background:#2c2c2c;color:#fff}
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- MARKETPLACE JS (UNCHANGED) -->
+<!-- ORIGINAL JS (UNCHANGED) -->
 <script src="js/marketplace.js"></script>
 
 <script>
