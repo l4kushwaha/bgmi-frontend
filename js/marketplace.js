@@ -79,36 +79,82 @@
         items.sort((a, b) => b.price - a.price);
       } else if (currentFilter === "price_low") {
         items.sort((a, b) => a.price - b.price);
+      } else if (currentFilter === "new") {
+        items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
 
       container.innerHTML = "";
 
-      for (const item of items) {
+      for (let idx = 0; idx < items.length; idx++) {
+        const item = items[idx];
         const seller = await fetchSeller(item.seller_id);
         const rating = seller?.avg_rating || 0;
-        const verified = seller?.seller_verified;
+        const verified = seller?.seller_verified || false;
+        const totalSells = seller?.total_sells || 0;
+        const reviewCount = seller?.review_count || 0;
 
         const card = document.createElement("div");
         card.className = "item-card";
+        card.style.opacity = 0;
+        card.style.transform = "translateY(20px)";
 
-        card.innerHTML = `
+        // Image gallery HTML
+        let imagesHTML = "";
+        if (item.images?.length) {
+          imagesHTML = `<div class="images-gallery">`;
+          for (const img of item.images) {
+            imagesHTML += `<img src="${img}" class="item-img" alt="${item.title}"/>`;
+          }
+          imagesHTML += `</div>`;
+        }
+
+        let itemDetails = `
           <div class="rating-badge">⭐ ${rating.toFixed(1)}</div>
           ${verified ? `<div class="verified-badge">✔ Verified Seller</div>` : ""}
           <p><strong>${item.title}</strong></p>
           <p>UID: ${item.uid}</p>
+          <p>Level: ${item.level || 0}</p>
+          <p>Rank: ${item.highest_rank || "N/A"}</p>
           <p class="price">₹${item.price}</p>
-          <button class="btn buy-btn"
-            ${item.status !== "available" ? "disabled" : ""}
-            onclick="buyItem('${item.id}', '${item.seller_id}')">
-            ${item.status === "available" ? "Buy" : "Sold"}
-          </button>
-          <button class="btn outline"
-            onclick="openSellerProfile('${item.seller_id}')">
-            Seller Profile
-          </button>
+          ${item.mythic_items?.length ? `<p>Mythic: ${item.mythic_items.join(", ")}</p>` : ""}
+          ${item.legendary_items?.length ? `<p>Legendary: ${item.legendary_items.join(", ")}</p>` : ""}
+          ${item.gift_items?.length ? `<p>Gift: ${item.gift_items.join(", ")}</p>` : ""}
+          ${item.upgraded_guns?.length ? `<p>Guns: ${item.upgraded_guns.join(", ")}</p>` : ""}
+          ${item.titles?.length ? `<p>Titles: ${item.titles.join(", ")}</p>` : ""}
+          ${imagesHTML}
+          <hr>
+          <p>Seller: ${seller?.name || "N/A"} ${verified ? "✔" : ""}</p>
+          <p>Total Sells: ${totalSells} | Reviews: ${reviewCount}</p>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="btn buy-btn"
+              ${item.status !== "available" ? "disabled" : ""}
+              onclick="buyItem('${item.id}', '${item.seller_id}')">
+              ${item.status === "available" ? "Buy" : "Sold"}
+            </button>
+            <button class="btn outline"
+              onclick="openSellerProfile('${item.seller_id}')">
+              Seller Profile
+            </button>
         `;
 
+        // OWNER / ADMIN BUTTONS
+        if (session && (Number(session.user.id) === Number(item.seller_id) || session.user.role === "admin")) {
+          itemDetails += `
+            <button class="btn edit-btn" onclick="editListing('${item.id}')">Edit</button>
+            <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
+          `;
+        }
+
+        itemDetails += `</div>`;
+        card.innerHTML = itemDetails;
+
         container.appendChild(card);
+
+        // ===== STAGGERED FADE-IN + SLIDE-UP =====
+        setTimeout(() => {
+          card.style.opacity = 1;
+          card.style.transform = "translateY(0)";
+        }, idx * 100);
       }
     } catch (e) {
       console.error(e);
@@ -143,11 +189,37 @@
     }
   };
 
+  /* ================= EDIT / DELETE ================= */
+  window.editListing = (listingId) => {
+    alert(`Edit listing coming soon! Listing ID: ${listingId}`);
+  };
+
+  window.deleteListing = async (listingId) => {
+    const session = requireLogin();
+    if (!session) return;
+
+    if (!confirm("Delete this listing?")) return;
+
+    try {
+      const res = await fetch(`${API_URL}/listings/delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+        body: JSON.stringify({ listing_id: listingId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delete failed");
+
+      showToast("Listing deleted");
+      loadListings();
+    } catch (e) {
+      showToast(e.message, false);
+    }
+  };
+
   /* ================= SELLER PROFILE ================= */
   window.openSellerProfile = async (sellerId) => {
     const modal = document.getElementById("seller-modal");
     const content = document.getElementById("seller-content");
-
     modal.classList.add("active");
     content.innerHTML = "Loading...";
 
@@ -162,7 +234,7 @@
 
     content.innerHTML = `
       <h3>${seller.name} ${seller.seller_verified ? "✔" : ""}</h3>
-      <p>⭐ ${seller.avg_rating.toFixed(1)} (${seller.review_count} reviews)</p>
+      <p>⭐ ${seller.avg_rating.toFixed(1)} | Total Sells: ${seller.total_sells || 0} | Reviews: ${seller.review_count || 0}</p>
       <h4>Reviews</h4>
       ${ratings.map(r => `
         <div class="review">
@@ -200,30 +272,6 @@
     }
   };
 
-  /* ================= RATE SELLER ================= */
-  window.rateSeller = async (orderId) => {
-    const rating = prompt("Rate seller (1–5)");
-    if (!rating) return;
-
-    const session = getSession();
-    if (!session) return;
-
-    try {
-      await fetch(`${API_URL}/reviews/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.token}`
-        },
-        body: JSON.stringify({ order_id: orderId, stars: Number(rating), comment: "" })
-      });
-      showToast("Rating submitted");
-      loadListings();
-    } catch {
-      showToast("Failed to submit rating", false);
-    }
-  };
-
   /* ================= SEARCH / FILTER ================= */
   searchInput?.addEventListener("input", e => {
     currentSearchQuery = e.target.value.toLowerCase();
@@ -233,6 +281,16 @@
   filterSelect?.addEventListener("change", e => {
     currentFilter = e.target.value;
     loadListings();
+  });
+
+  /* ================= IMAGE LIGHTBOX ================= */
+  document.addEventListener("click", function(e){
+    if(e.target.classList.contains('item-img')){
+      const imgModal = document.getElementById('imgModal');
+      const imgPreview = document.getElementById('imgPreview');
+      imgPreview.src = e.target.src;
+      imgModal.classList.add('active');
+    }
   });
 
   /* ================= INIT ================= */
