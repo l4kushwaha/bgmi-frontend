@@ -7,136 +7,118 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ================= BASE ================= */
+/* ========== BASE ========== */
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
   background:linear-gradient(135deg,#141e30,#243b55);
   color:#fff;
 }
-body.dark{background:linear-gradient(135deg,#0f0f0f,#1c1c1c)}
+body.dark{background:linear-gradient(135deg,#1a1a1a,#2c2c2c)}
 #particle-canvas{position:fixed;inset:0;z-index:0}
 
-/* ================= HEADER ================= */
+/* ========== HEADER ========== */
 header{
-  position:relative;z-index:2;
+  position:relative;z-index:3;
   display:flex;justify-content:space-between;align-items:center;
   padding:15px 20px;
-  backdrop-filter:blur(14px);
-  background:rgba(255,255,255,.06);
-  border-bottom:1px solid rgba(255,255,255,.15);
+  backdrop-filter:blur(12px);
+  background:rgba(255,255,255,.05);
+  border-bottom:1px solid rgba(255,255,255,.1);
 }
 
-/* ================= SEARCH ================= */
+/* ========== SEARCH BAR ========== */
 #top-bar{
-  position:relative;z-index:2;
-  display:flex;gap:12px;flex-wrap:wrap;
-  justify-content:center;padding:14px;
+  position:relative;z-index:3;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+  padding:12px 16px;
 }
 #search,#filter{
-  padding:10px 14px;border:none;border-radius:20px;
-  outline:none;font-family:'Poppins';
+  padding:10px 14px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+  font-family:'Poppins';
 }
+#search{width:260px}
+#filter{min-width:220px}
 
-/* ================= GRID ================= */
+/* ========== GRID ========== */
 #items-container{
-  position:relative;z-index:2;
+  position:relative;
+  z-index:2;
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-  gap:22px;
-  padding:22px;
+  gap:18px;
+  padding:20px;
   max-width:1400px;
   margin:auto;
 }
 
-/* ================= CARD ================= */
+/* ========== CARD ========== */
 .item-card{
-  position:relative;
-  display:flex;flex-direction:column;
-  background:rgba(255,255,255,.08);
-  backdrop-filter:blur(18px);
+  display:flex;
+  flex-direction:column;
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(14px);
   border-radius:18px;
   overflow:hidden;
-  box-shadow:
-    0 0 0 1px rgba(0,255,255,.25),
-    0 0 25px rgba(0,255,255,.15);
-  animation:fadeUp .6s ease both;
   transition:.35s;
+  box-shadow:
+    0 0 0 1px rgba(0,255,255,.35),
+    0 0 25px rgba(0,255,255,.25),
+    inset 0 0 25px rgba(0,255,255,.15);
 }
 .item-card:hover{
-  transform:translateY(-8px) scale(1.03);
   box-shadow:
-    0 0 0 1px rgba(0,255,255,.7),
-    0 0 35px rgba(0,255,255,.65),
-    0 0 65px rgba(0,255,255,.35);
+    0 0 0 1px rgba(0,255,255,.9),
+    0 0 40px rgba(0,255,255,.9),
+    0 0 80px rgba(0,255,255,.45);
 }
 
-/* ================= IMAGE SLIDER ================= */
+/* ========== IMAGES ========== */
 .images-gallery{
   position:relative;
-  height:200px;
+  height:190px;
   overflow:hidden;
+  z-index:1;
 }
 .images-gallery img{
-  width:100%;height:100%;
+  width:100%;
+  height:100%;
   object-fit:cover;
   display:none;
 }
 .images-gallery img.active{display:block}
 
-/* arrows */
-.img-arrow{
-  position:absolute;
-  top:50%;transform:translateY(-50%);
-  width:34px;height:34px;
-  border-radius:50%;
-  border:none;
-  cursor:pointer;
-  font-size:20px;
-  z-index:3;
-  background:rgba(0,255,255,.8);
-  color:#000;
-}
-.img-arrow.left{left:10px}
-.img-arrow.right{right:10px}
-
-/* dots */
-.img-dots{
-  position:absolute;
-  bottom:8px;
-  width:100%;
-  text-align:center;
-}
-.img-dots span{
-  display:inline-block;
-  width:8px;height:8px;
-  margin:0 4px;
-  border-radius:50%;
-  background:rgba(255,255,255,.4);
-}
-.img-dots span.active{background:#0ff}
-
-/* ================= INFO ================= */
+/* ========== CONTENT ========== */
 .card-content{
   padding:14px;
   font-size:14px;
   line-height:1.55;
+  flex:1;
+  position:relative;
+  z-index:5;
 }
 .card-content strong{font-size:16px}
 .price{
   font-size:18px;
   font-weight:600;
-  color:#f1c40f;
+  color:#f39c12;
   margin-top:6px;
 }
 
-/* ================= BUTTONS ================= */
+/* ========== BUTTONS ========== */
 .card-actions{
-  margin-top:auto;
-  padding:14px;
+  padding:12px;
   display:flex;
   flex-direction:column;
   gap:8px;
+  position:relative;
+  z-index:6;
 }
 .btn{
   padding:10px;
@@ -150,29 +132,36 @@ header{
 .delete-btn{background:#c0392b;color:#fff}
 .outline{background:#fff;color:#3498db;border:2px solid #3498db}
 
-/* ================= MODALS ================= */
+/* ========== MODALS ========== */
 .modal-bg{
   display:none;
-  position:fixed;inset:0;
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,.75);
-  align-items:center;justify-content:center;
+  align-items:center;
+  justify-content:center;
   z-index:999;
 }
 .modal-bg.active{display:flex}
 .modal{
-  background:#fff;color:#333;
-  padding:20px;border-radius:18px;
-  width:420px;max-height:85vh;
+  background:#fff;
+  color:#333;
+  padding:20px;
+  border-radius:18px;
+  width:420px;
+  max-height:85vh;
   overflow-y:auto;
 }
-body.dark .modal{background:#1e1e1e;color:#fff}
+body.dark .modal{background:#2c2c2c;color:#fff}
 
-/* ================= TOAST ================= */
+/* ========== TOAST ========== */
 #toast{
   position:fixed;
-  bottom:20px;left:50%;
+  bottom:20px;
+  left:50%;
   transform:translateX(-50%);
-  background:#27ae60;color:#fff;
+  background:#27ae60;
+  color:#fff;
   padding:10px 20px;
   border-radius:25px;
   display:none;
@@ -180,10 +169,23 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 }
 #toast.show{display:block}
 
-/* ================= ANIMATION ================= */
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(40px)}
-  to{opacity:1;transform:none}
+/* ========== SKELETON ========== */
+.skeleton{
+  height:14px;
+  border-radius:10px;
+  margin:6px 0;
+  background:linear-gradient(
+    90deg,
+    rgba(255,255,255,.05),
+    rgba(0,255,255,.35),
+    rgba(255,255,255,.05)
+  );
+  background-size:200% 100%;
+  animation:shimmer 1.2s infinite;
+}
+@keyframes shimmer{
+  from{background-position:200% 0}
+  to{background-position:-200% 0}
 }
 </style>
 </head>
@@ -210,7 +212,6 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 
 <div id="items-container"></div>
 
-<!-- SELLER -->
 <div id="seller-modal-bg" class="modal-bg">
   <div class="modal">
     <div id="seller-content">Loading...</div>
@@ -218,7 +219,6 @@ body.dark .modal{background:#1e1e1e;color:#fff}
   </div>
 </div>
 
-<!-- EDIT -->
 <div id="edit-modal-bg" class="modal-bg">
   <div class="modal">
     <h3>Edit Listing</h3>
@@ -230,89 +230,27 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 
 <div id="toast"></div>
 
-<!-- MARKETPLACE LOGIC -->
+<!-- MARKETPLACE JS -->
 <script src="js/marketplace.js"></script>
 
 <script>
 document.getElementById('dark-toggle')
   .onclick=()=>document.body.classList.toggle('dark');
 
-/* ===== SLIDER INIT (NO JS FILE TOUCHED) ===== */
-function initNeonSliders(){
-  document.querySelectorAll('.images-gallery').forEach(g=>{
-    if(g.dataset.ready) return;
-    const imgs=[...g.querySelectorAll('img')];
-    if(imgs.length<=1) return;
-
-    g.dataset.ready=1;
-    let i=0,auto;
-
-    imgs[0].classList.add('active');
-
-    const L=document.createElement('button');
-    L.className='img-arrow left';L.innerHTML='‹';
-    const R=document.createElement('button');
-    R.className='img-arrow right';R.innerHTML='›';
-    g.append(L,R);
-
-    const dots=document.createElement('div');
-    dots.className='img-dots';
-    imgs.forEach((_,n)=>{
-      const d=document.createElement('span');
-      if(n===0)d.classList.add('active');
-      dots.appendChild(d);
-    });
-    g.appendChild(dots);
-    const dEls=[...dots.children];
-
-    function show(n){
-      imgs.forEach(im=>im.classList.remove('active'));
-      dEls.forEach(d=>d.classList.remove('active'));
-      imgs[n].classList.add('active');
-      dEls[n].classList.add('active');
-      i=n;
+/* 3D TILT */
+document.addEventListener('mousemove',e=>{
+  document.querySelectorAll('.item-card').forEach(card=>{
+    const r=card.getBoundingClientRect();
+    if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){
+      card.style.transform='';
+      return;
     }
-
-    L.onclick=()=>show((i-1+imgs.length)%imgs.length);
-    R.onclick=()=>show((i+1)%imgs.length);
-
-    auto=setInterval(()=>show((i+1)%imgs.length),3500);
-    g.onmouseenter=()=>clearInterval(auto);
-    g.onmouseleave=()=>auto=setInterval(()=>show((i+1)%imgs.length),3500);
+    const x=(e.clientX-r.left)/r.width-.5;
+    const y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=
+      `rotateX(${ -y*8 }deg) rotateY(${ x*8 }deg) translateY(-6px) scale(1.02)`;
   });
-}
-
-new MutationObserver(initNeonSliders)
-  .observe(document.getElementById('items-container'),{childList:true,subtree:true});
-initNeonSliders();
-
-/* ===== PARTICLES ===== */
-const c=document.getElementById('particle-canvas');
-const ctx=c.getContext('2d');
-function resize(){c.width=innerWidth;c.height=innerHeight}
-resize();addEventListener('resize',resize);
-const dots=[...Array(90)].map(()=>({
-  x:Math.random()*c.width,
-  y:Math.random()*c.height,
-  r:Math.random()*2+1,
-  dx:(Math.random()-.5)*.6,
-  dy:(Math.random()-.5)*.6
-}));
-(function animate(){
-  ctx.clearRect(0,0,c.width,c.height);
-  dots.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle='rgba(0,255,255,.45)';
-    ctx.fill();
-    p.x+=p.dx;p.y+=p.dy;
-    if(p.x<0)p.x=c.width;
-    if(p.y<0)p.y=c.height;
-    if(p.x>c.width)p.x=0;
-    if(p.y>c.height)p.y=0;
-  });
-  requestAnimationFrame(animate);
-})();
+});
 </script>
 
 </body>
