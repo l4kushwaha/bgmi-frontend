@@ -1,215 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BGMI Marketplace</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Poppins',sans-serif;min-height:100vh;background:linear-gradient(135deg,#141e30,#243b55);color:#fff;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
-body.dark{background:linear-gradient(135deg,#1a1a1a,#2c2c2c);color:#fff;}
-#particle-canvas{position:fixed;inset:0;z-index:0;}
-header{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:18px 20px 10px;}
-header h1{font-size:26px;font-weight:600;}
-#controls{display:flex;gap:12px;align-items:center;}
-#dark-toggle{padding:6px 10px;border:none;border-radius:10px;cursor:pointer;background:#3498db;color:#fff;transition:0.3s;}
-#dark-toggle:hover{background:#2980b9;}
-#wallet-balance{font-size:14px;font-weight:600;background:rgba(255,255,255,0.1);padding:6px 12px;border-radius:12px;}
-#top-bar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:12px;position:relative;z-index:2;}
-#search,#filter{padding:10px 14px;border:none;border-radius:20px;outline:none;font-family:'Poppins';transition:0.3s;}
-#search:focus,#filter:focus{box-shadow:0 0 8px rgba(52,152,219,0.7);}
-#items-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:16px;max-width:1300px;margin:auto;position:relative;z-index:2;}
-.item-card{background:#ffffff;color:#333;border-radius:16px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transform:translateY(30px);transition:.35s ease, transform 0.3s;position:relative;}
-.item-card.show{opacity:1;transform:none;}
-.item-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(0,0,0,0.35);}
-body.dark .item-card{background:#2c2c2c;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.45);}
-.rating-badge,.verified-badge{position:absolute;top:10px;font-size:12px;padding:4px 8px;border-radius:8px;font-weight:600;}
-.rating-badge{left:10px;background:#f1c40f;}
-.verified-badge{right:10px;background:#27ae60;color:#fff;}
-.item-info{font-size:13px;line-height:1.45;}
-.item-info strong{font-size:15px;}
-.price{font-size:18px;color:#e67e22;font-weight:600;margin-top:6px;}
-.images-gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.images-gallery img{width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;transition:0.3s;}
-.images-gallery img:hover{transform:scale(1.2);}
-.btn{width:100%;padding:9px;margin-top:7px;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:'Poppins';transition:0.3s;}
-.buy-btn{background:#27ae60;color:#fff;}
-.buy-btn:disabled{background:#aaa;cursor:not-allowed;}
-.edit-btn{background:#3498db;color:#fff;}
-.delete-btn{background:#c0392b;color:#fff;}
-.outline{background:#fff;border:2px solid #3498db;color:#3498db;}
-.btn:hover:not(:disabled){opacity:0.85;}
-.skeleton{background:#ccc;height:18px;border-radius:8px;margin:5px 0;animation: pulse 1.2s infinite;}
-.skeleton.img{height:50px;width:50px;display:inline-block;margin:2px;}
-@keyframes pulse{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:999;animation:fadeIn 0.3s;}
-.modal-bg.active{display:flex;}
-.modal{background:#fff;color:#333;padding:18px;border-radius:16px;width:400px;max-height:85vh;overflow-y:auto;position:relative;animation:slideIn 0.3s;}
-body.dark .modal{background:#2c2c2c;color:#fff;}
-@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-@keyframes slideIn{0%{transform:translateY(-30px);opacity:0}100%{transform:translateY(0);opacity:1}}
-#seller-modal h3{margin-bottom:6px;}
-.review{border-top:1px solid #eee;padding:8px 0;}
-.review .reply{font-size:12px;margin-top:4px;color:#2c3e50;font-style:italic;}
-textarea{width:100%;padding:6px;margin-top:4px;border-radius:8px;border:1px solid #ccc;font-family:'Poppins';}
-#imgModal img{max-width:92%;max-height:92%;border-radius:14px;transition:transform 0.3s;}
-#imgModal img:hover{transform:scale(1.05);}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 20px;border-radius:25px;display:none;z-index:1200;opacity:0;transition:0.3s;}
-#toast.show{display:block;opacity:1;}
-@media(max-width:600px){header h1{font-size:22px}}
-/* ============== EDIT LISTING MODAL ============== */
-.edit-field{margin-bottom:8px;}
-.edit-field label{font-size:12px;margin-bottom:2px;display:block;color:#333;}
-body.dark .edit-field label{color:#fff;}
-.edit-field input, .edit-field textarea{width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;font-family:'Poppins';font-size:13px;}
-</style>
+  <meta charset="UTF-8" />
+  <title>BGMI Marketplace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ================= BASIC STYLES ================= -->
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+    }
+
+    header {
+      padding: 15px;
+      display: flex;
+      gap: 10px;
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header input, header select {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      flex: 1;
+    }
+
+    #items-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      padding: 15px;
+    }
+
+    .item-card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rating-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #16a34a;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .verified-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #2563eb;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .item-info p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .price {
+      font-size: 18px;
+      color: #22c55e;
+      font-weight: bold;
+    }
+
+    /* ================= IMAGE CAROUSEL ================= */
+    .carousel {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.4s ease;
+    }
+
+    .carousel img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      font-size: 22px;
+      padding: 6px 10px;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .carousel-btn.prev { left: 5px; }
+    .carousel-btn.next { right: 5px; }
+
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #475569;
+      border-radius: 50%;
+    }
+
+    .dot.active {
+      background: #22c55e;
+    }
+
+    /* ================= BUTTONS ================= */
+    .btn {
+      width: 100%;
+      margin-top: 6px;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .buy-btn {
+      background: #22c55e;
+      color: black;
+    }
+
+    .outline {
+      background: transparent;
+      border: 1px solid #475569;
+      color: white;
+    }
+
+    .edit-btn { background: #facc15; }
+    .delete-btn { background: #ef4444; }
+
+    /* ================= MODALS ================= */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+
+    .modal-bg.active { display: flex; }
+
+    .modal {
+      background: #020617;
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      border-radius: 12px;
+    }
+
+    #imgModal img {
+      max-width: 100%;
+      max-height: 90vh;
+    }
+
+    /* ================= TOAST ================= */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background: #16a34a;
+      border-radius: 20px;
+      display: none;
+      z-index: 100;
+    }
+
+    #toast.show { display: block; }
+  </style>
 </head>
 
 <body>
-<canvas id="particle-canvas"></canvas>
 
+<!-- ================= HEADER ================= -->
 <header>
-  <h1>BGMI Marketplace</h1>
-  <div id="controls">
-    <div id="wallet-balance" aria-live="polite">Wallet: ₹0</div>
-    <button id="dark-toggle">Dark / Light</button>
-  </div>
+  <input type="text" id="search" placeholder="Search UID / title" />
+  <select id="filter">
+    <option value="">All</option>
+    <option value="own">My Listings</option>
+    <option value="price_low">Price Low → High</option>
+    <option value="price_high">Price High → Low</option>
+    <option value="new">Newest</option>
+  </select>
 </header>
 
-<div id="top-bar">
-  <input id="search" placeholder="Search UID / Title / Rank" aria-label="Search Listings">
-  <select id="filter" aria-label="Filter Listings">
-    <option value="">Default</option>
-    <option value="price_high">Price High → Low</option>
-    <option value="price_low">Price Low → High</option>
-    <option value="new">Newest</option>
-    <option value="own">My Listings</option>
-  </select>
+<!-- ================= LISTINGS ================= -->
+<div id="items-container"></div>
+
+<!-- ================= IMAGE MODAL ================= -->
+<div class="modal-bg" id="imgModal" onclick="this.classList.remove('active')">
+  <img id="imgPreview" />
 </div>
 
-<div id="items-container">
-  <div class="item-card">
-    <div class="skeleton" style="width:70%"></div>
-    <div class="skeleton" style="width:50%"></div>
-    <div class="skeleton img"></div>
-    <div class="skeleton img"></div>
-    <div class="skeleton img"></div>
-  </div>
-  <div class="item-card">
-    <div class="skeleton" style="width:65%"></div>
-    <div class="skeleton" style="width:55%"></div>
-    <div class="skeleton img"></div>
-    <div class="skeleton img"></div>
-  </div>
+<!-- ================= SELLER MODAL ================= -->
+<div class="modal-bg" id="seller-modal-bg">
+  <div class="modal" id="seller-content"></div>
 </div>
 
-<!-- Seller Modal -->
-<div id="seller-modal-bg" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="seller-modal">
-  <div class="modal" id="seller-modal">
-    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
-    <div id="seller-content">Loading...</div>
-  </div>
-</div>
+<!-- ================= TOAST ================= -->
+<div id="toast"></div>
 
-<!-- Image Modal -->
-<div id="imgModal" class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="imgPreview" onclick="this.classList.remove('active')">
-  <img id="imgPreview" alt="Item Image">
-</div>
+<!-- ================= YOUR EXISTING JS ================= -->
+<script src="marketplace.js"></script>
 
-<!-- Edit Listing Modal -->
-<div id="edit-modal-bg" class="modal-bg" role="dialog" aria-modal="true">
-  <div class="modal" id="edit-modal">
-    <h3>Edit Listing</h3>
-    <div id="edit-form">
-      <!-- Fields will be injected by JS -->
-    </div>
-    <button class="btn buy-btn" id="save-edit">Save Changes</button>
-    <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
-  </div>
-</div>
-
-<div id="toast" role="status" aria-live="polite"></div>
-
+<!-- ================= ENHANCEMENTS (NO MARKETPLACE.JS TOUCH) ================= -->
 <script>
-function closeSeller(){document.getElementById('seller-modal-bg').classList.remove('active');}
-document.getElementById('dark-toggle').addEventListener('click',()=>{document.body.classList.toggle('dark');});
+/* ======================================================
+   🔄 AUTO IMAGE CAROUSEL + SWIPE + AUTOPLAY
+====================================================== */
+function enhanceGalleries(){
+  document.querySelectorAll(".images-gallery").forEach(gallery=>{
+    if(gallery.dataset.done) return;
+    gallery.dataset.done = "1";
 
-// Particle background
-const c=document.getElementById('particle-canvas');
-const ctx=c.getContext('2d');
-function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener('resize',resize);
-const dots=[...Array(90)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,dx:(Math.random()-.5)*0.6,dy:(Math.random()-.5)*0.6}));
-(function animate(){ctx.clearRect(0,0,c.width,c.height);dots.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.6)';ctx.fill();p.x+=p.dx;p.y+=p.dy;if(p.x<0)p.x=c.width;if(p.y<0)p.y=c.height;if(p.x>c.width)p.x=0;if(p.y>c.height)p.y=0;});requestAnimationFrame(animate);})();
+    const imgs = [...gallery.querySelectorAll("img")];
+    if(imgs.length <= 1) return;
 
-// ========== Edit Listing JS ==========
-const editModalBg = document.getElementById('edit-modal-bg');
-const editForm = document.getElementById('edit-form');
-let currentEditId = null;
+    const carousel = document.createElement("div");
+    carousel.className = "carousel";
 
-window.editListing = async id => {
-  const session = JSON.parse(localStorage.getItem('user')||"null");
-  const token = localStorage.getItem('token');
-  if(!session||!token){alert("Login first");return;}
-  currentEditId = id;
-  editForm.innerHTML = `<p>Loading...</p>`;
-  try{
-    const res = await fetch(`https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings`,{
-      headers: {Authorization:`Bearer ${token}`}
+    const track = document.createElement("div");
+    track.className = "carousel-track";
+
+    imgs.forEach(i => track.appendChild(i));
+    carousel.appendChild(track);
+
+    let index = 0;
+    const dots = document.createElement("div");
+    dots.className = "dots";
+
+    imgs.forEach((_,i)=>{
+      const d = document.createElement("div");
+      d.className = "dot" + (i===0?" active":"");
+      dots.appendChild(d);
     });
-    const items = await res.json();
-    const item = items.find(i=>i.id==id);
-    if(!item){alert("Listing not found");return;}
-    editForm.innerHTML = `
-      <div class="edit-field"><label>Title</label><input id="edit-title" value="${item.title||''}"></div>
-      <div class="edit-field"><label>UID</label><input id="edit-uid" value="${item.uid||''}"></div>
-      <div class="edit-field"><label>Price</label><input id="edit-price" type="number" value="${item.price||0}"></div>
-      <div class="edit-field"><label>Level</label><input id="edit-level" type="number" value="${item.level||0}"></div>
-      <div class="edit-field"><label>Rank</label><input id="edit-rank" value="${item.highest_rank||''}"></div>
-      <div class="edit-field"><label>Mythic Items (comma separated)</label><input id="edit-mythic" value="${(item.mythic_items||[]).join(', ')}"></div>
-      <div class="edit-field"><label>Legendary Items (comma separated)</label><input id="edit-legendary" value="${(item.legendary_items||[]).join(', ')}"></div>
-      <div class="edit-field"><label>Gift Items (comma separated)</label><input id="edit-gift" value="${(item.gift_items||[]).join(', ')}"></div>
-      <div class="edit-field"><label>Upgraded Guns (comma separated)</label><input id="edit-guns" value="${(item.upgraded_guns||[]).join(', ')}"></div>
-      <div class="edit-field"><label>Titles (comma separated)</label><input id="edit-titles" value="${(item.titles||[]).join(', ')}"></div>
-      <div class="edit-field"><label>Images (comma separated URLs)</label><input id="edit-images" value="${(item.images||[]).join(', ')}"></div>
-    `;
-    editModalBg.classList.add('active');
-  }catch(e){console.error(e);alert("Failed to load item");}
-};
 
-document.getElementById('save-edit').addEventListener('click',async()=>{
-  const token = localStorage.getItem('token');
-  if(!currentEditId||!token)return;
-  const payload = {
-    title: document.getElementById('edit-title').value,
-    uid: document.getElementById('edit-uid').value,
-    price: parseFloat(document.getElementById('edit-price').value)||0,
-    level: parseInt(document.getElementById('edit-level').value)||0,
-    highest_rank: document.getElementById('edit-rank').value,
-    mythic_items: document.getElementById('edit-mythic').value.split(',').map(i=>i.trim()),
-    legendary_items: document.getElementById('edit-legendary').value.split(',').map(i=>i.trim()),
-    gift_items: document.getElementById('edit-gift').value.split(',').map(i=>i.trim()),
-    upgraded_guns: document.getElementById('edit-guns').value.split(',').map(i=>i.trim()),
-    titles: document.getElementById('edit-titles').value.split(',').map(i=>i.trim()),
-    images: document.getElementById('edit-images').value.split(',').map(i=>i.trim())
-  };
-  try{
-    const res = await fetch(`https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings/${currentEditId}`,{
-      method:"PUT",
-      headers:{Authorization:`Bearer ${token}`, "Content-Type":"application/json"},
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if(!res.ok){alert(data.error||"Edit failed");return;}
-    editModalBg.classList.remove('active');
-    alert("Listing updated!");
-    window.loadListings(); // refresh listings
-  }catch(e){console.error(e);alert("Failed to save changes");}
-});
+    const update = ()=>{
+      track.style.transform = `translateX(-${index*100}%)`;
+      dots.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("active",i===index));
+    };
 
-function closeEdit(){editModalBg.classList.remove('active');}
+    const prev = document.createElement("button");
+    prev.className="carousel-btn prev";
+    prev.innerHTML="‹";
+    prev.onclick=()=>{ index=(index-1+imgs.length)%imgs.length; update(); };
+
+    const next = document.createElement("button");
+    next.className="carousel-btn next";
+    next.innerHTML="›";
+    next.onclick=()=>{ index=(index+1)%imgs.length; update(); };
+
+    carousel.append(prev,next);
+    gallery.replaceWith(carousel);
+    carousel.after(dots);
+
+    setInterval(()=>{ index=(index+1)%imgs.length; update(); },4000);
+  });
+}
+
+new MutationObserver(enhanceGalleries)
+  .observe(document.body,{childList:true,subtree:true});
+
+/* ======================================================
+   🔐 WATERMARK + ⚡ WEBP + 📊 ANALYTICS
+====================================================== */
+const supportsWebP = (()=> {
+  try {
+    return document.createElement("canvas")
+      .toDataURL("image/webp").includes("webp");
+  } catch { return false; }
+})();
+
+const analytics = JSON.parse(localStorage.getItem("img_analytics")||"{}");
+
+function track(id,type){
+  analytics[id] ??= {views:0};
+  analytics[id][type]=(analytics[id][type]||0)+1;
+  localStorage.setItem("img_analytics",JSON.stringify(analytics));
+}
+
+async function watermark(img){
+  const c=document.createElement("canvas");
+  const ctx=c.getContext("2d");
+  c.width=img.naturalWidth;
+  c.height=img.naturalHeight;
+  ctx.drawImage(img,0,0);
+  ctx.fillStyle="rgba(255,255,255,0.35)";
+  ctx.font="24px Arial";
+  ctx.fillText("BGMI MARKET",c.width-180,c.height-20);
+  return c.toDataURL();
+}
+
+document.addEventListener("load",async e=>{
+  if(e.target.tagName==="IMG"){
+    track(e.target.src,"views");
+    e.target.src = await watermark(e.target);
+  }
+},true);
 </script>
 
-<script src="js/marketplace.js"></script>
 </body>
 </html>
