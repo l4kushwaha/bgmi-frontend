@@ -11,8 +11,7 @@
   let currentFilter = "";
 
   /* ================= UTILS ================= */
-  const normalizeId = v =>
-    v === null || v === undefined ? null : String(parseInt(v, 10));
+  const normalizeId = v => v === null || v === undefined ? null : String(parseInt(v, 10));
 
   const safeArray = v => {
     try {
@@ -97,16 +96,12 @@
       if (!Array.isArray(items)) items = [];
 
       items = items.filter(i =>
-        `${i.title}${i.uid}${i.highest_rank}`
-          .toLowerCase()
-          .includes(currentSearch)
+        `${i.title}${i.uid}${i.highest_rank}`.toLowerCase().includes(currentSearch)
       );
 
       if (currentFilter === "own" && session) {
         items = items.filter(
-          i =>
-            normalizeId(i.seller_id) ===
-            normalizeId(session.user.seller_id)
+          i => normalizeId(i.seller_id) === normalizeId(session.user.seller_id)
         );
       }
 
@@ -122,8 +117,7 @@
 
         const isOwner =
           session &&
-          (normalizeId(session.user.seller_id) ===
-            normalizeId(item.seller_id) ||
+          (normalizeId(session.user.seller_id) === normalizeId(item.seller_id) ||
             String(session.user.role).toLowerCase() === "admin");
 
         const card = document.createElement("div");
@@ -132,14 +126,10 @@
         card.innerHTML = `
           <div class="rating-badge">⭐ ${(seller.avg_rating || 0).toFixed(1)}</div>
           ${seller.seller_verified ? `<div class="verified-badge">✔ Verified</div>` : ""}
-
           ${images.length ? `
             <div class="images-gallery">
-              ${images.map(img => `
-                <img src="${img}" onclick="openImageModal('${img}')">
-              `).join("")}
+              ${images.map(img => `<img src="${img}" onclick="openImageModal('${img}')">`).join("")}
             </div>` : ""}
-
           <div class="item-info">
             <p><strong>${item.title}</strong></p>
             <p>UID: ${item.uid}</p>
@@ -150,16 +140,11 @@
             ${safeArray(item.legendary_items).length ? `<p>Legendary: ${safeArray(item.legendary_items).join(", ")}</p>` : ""}
             ${safeArray(item.gift_items).length ? `<p>Gifts: ${safeArray(item.gift_items).join(", ")}</p>` : ""}
           </div>
-
           <button class="btn buy-btn" ${item.status !== "available" ? "disabled" : ""}
             onclick="buyItem('${item.id}')">
             ${item.status === "available" ? "Buy" : "Sold"}
           </button>
-
-          <button class="btn outline" onclick="openSellerProfile('${item.seller_id}')">
-            Seller Profile
-          </button>
-
+          <button class="btn outline" onclick="openSellerProfile('${item.seller_id}')">Seller Profile</button>
           ${isOwner ? `
             <button class="btn edit-btn" onclick="openEditModal('${item.id}')">Edit</button>
             <button class="btn delete-btn" onclick="deleteListing('${item.id}')">Delete</button>
@@ -182,57 +167,74 @@
     bg.classList.add("active");
     form.innerHTML = "Loading...";
 
-    const res = await fetch(`${API_URL}/listings`);
-    const items = await res.json();
-    const item = items.find(i => String(i.id) === String(id));
-    if (!item) return toast("Listing not found", false);
+    try {
+      const res = await fetch(`${API_URL}/listings`);
+      const items = await res.json();
+      const item = items.find(i => String(i.id) === String(id));
+      if (!item) return toast("Listing not found", false);
 
-    form.innerHTML = `
-      <input id="e-title" value="${item.title}">
-      <input id="e-price" type="number" value="${item.price}">
-      <input id="e-level" type="number" value="${item.level}">
-      <input id="e-rank" value="${item.highest_rank || ""}">
-      <textarea id="e-mythic">${safeArray(item.mythic_items).join(", ")}</textarea>
-      <textarea id="e-legendary">${safeArray(item.legendary_items).join(", ")}</textarea>
-      <textarea id="e-gifts">${safeArray(item.gift_items).join(", ")}</textarea>
-      <textarea id="e-images">${safeArray(item.images).join(", ")}</textarea>
-      <button class="btn buy-btn" onclick="saveEdit('${id}')">Save</button>
-      <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
-    `;
+      form.innerHTML = `
+        <label>Title</label>
+        <input id="e-title" value="${item.title}">
+        <label>Price</label>
+        <input id="e-price" type="number" value="${item.price}">
+        <label>Level</label>
+        <input id="e-level" type="number" value="${item.level}">
+        <label>Rank</label>
+        <input id="e-rank" value="${item.highest_rank || ""}">
+        <label>Mythic Items (comma separated)</label>
+        <textarea id="e-mythic">${safeArray(item.mythic_items).join(", ")}</textarea>
+        <label>Legendary Items (comma separated)</label>
+        <textarea id="e-legendary">${safeArray(item.legendary_items).join(", ")}</textarea>
+        <label>Gift Items (comma separated)</label>
+        <textarea id="e-gifts">${safeArray(item.gift_items).join(", ")}</textarea>
+        <label>Images URLs (comma separated)</label>
+        <textarea id="e-images">${safeArray(item.images).join(", ")}</textarea>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn buy-btn" onclick="saveEdit('${id}')">Save</button>
+          <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
+        </div>
+      `;
+    } catch {
+      toast("Failed to load listing", false);
+    }
   };
 
   window.saveEdit = async id => {
     const s = requireLogin();
     if (!s) return;
 
-    const body = {
-      title: document.getElementById("e-title").value,
-      price: Number(document.getElementById("e-price").value),
-      level: Number(document.getElementById("e-level").value),
-      highest_rank: document.getElementById("e-rank").value,
-      mythic_items: document.getElementById("e-mythic").value.split(",").map(v => v.trim()),
-      legendary_items: document.getElementById("e-legendary").value.split(",").map(v => v.trim()),
-      gift_items: document.getElementById("e-gifts").value.split(",").map(v => v.trim()),
-      images: document.getElementById("e-images").value.split(",").map(v => v.trim())
-    };
+    try {
+      const body = {
+        title: document.getElementById("e-title").value,
+        price: Number(document.getElementById("e-price").value),
+        level: Number(document.getElementById("e-level").value),
+        highest_rank: document.getElementById("e-rank").value,
+        mythic_items: document.getElementById("e-mythic").value.split(",").map(v => v.trim()).filter(v=>v),
+        legendary_items: document.getElementById("e-legendary").value.split(",").map(v => v.trim()).filter(v=>v),
+        gift_items: document.getElementById("e-gifts").value.split(",").map(v => v.trim()).filter(v=>v),
+        images: document.getElementById("e-images").value.split(",").map(v => v.trim()).filter(v=>v)
+      };
 
-    const res = await fetch(`${API_URL}/listings/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${s.token}`
-      },
-      body: JSON.stringify(body)
-    });
+      const res = await fetch(`${API_URL}/listings/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${s.token}`
+        },
+        body: JSON.stringify(body)
+      });
 
-    if (!res.ok) return toast("Edit failed", false);
-    toast("Listing updated");
-    closeEdit();
-    loadListings();
+      if (!res.ok) return toast("Edit failed", false);
+      toast("Listing updated");
+      closeEdit();
+      loadListings();
+    } catch {
+      toast("Edit failed", false);
+    }
   };
 
-  window.closeEdit = () =>
-    document.getElementById("edit-modal-bg").classList.remove("active");
+  window.closeEdit = () => document.getElementById("edit-modal-bg").classList.remove("active");
 
   /* ================= SELLER PROFILE ================= */
   window.openSellerProfile = async sellerId => {
@@ -242,15 +244,17 @@
 
     const s = await fetchSeller(sellerId);
     content.innerHTML = `
-      <button class="btn delete-btn" onclick="closeSeller()">Close</button>
+      <div style="text-align:right;">
+        <button class="btn delete-btn" onclick="closeSeller()">Close</button>
+      </div>
       <h3>${s.name} ${s.seller_verified ? "✔" : ""}</h3>
       <p>⭐ ${s.avg_rating} | Sales: ${s.total_sales}</p>
       <p>Reviews: ${s.review_count}</p>
+      <p>Listings: ${safeArray(s.listings).length}</p>
     `;
   };
 
-  window.closeSeller = () =>
-    document.getElementById("seller-modal-bg").classList.remove("active");
+  window.closeSeller = () => document.getElementById("seller-modal-bg").classList.remove("active");
 
   /* ================= BUY / DELETE ================= */
   window.buyItem = async id => {
