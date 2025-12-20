@@ -1,4 +1,5 @@
 (() => {
+  /* ================= CONFIG ================= */
   const container = document.getElementById("items-container");
   const API_URL =
     "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
@@ -6,7 +7,6 @@
   let editListing = null;
   let editImgs = [];
   let editIndex = 0;
-  let dragIndex = null;
 
   /* ================= HELPERS ================= */
   const safeArray = v => {
@@ -41,28 +41,40 @@
   const stars = r =>
     "★".repeat(Math.round(r || 0)) + "☆".repeat(5 - Math.round(r || 0));
 
-  /* ================= SELLER ================= */
-  window.openSellerProfile = async id => {
+  /* ================= GLOBAL CLOSE ================= */
+  window.closeSeller = () =>
+    document.getElementById("seller-modal-bg")?.classList.remove("active");
+
+  window.closeEdit = () =>
+    document.getElementById("edit-modal-bg")?.classList.remove("active");
+
+  /* ================= SELLER PROFILE ================= */
+  window.openSellerProfile = async sellerId => {
     const bg = document.getElementById("seller-modal-bg");
-    const c = document.getElementById("seller-content");
+    const content = document.getElementById("seller-content");
+    if (!bg || !content) return;
+
     bg.classList.add("active");
-    c.innerHTML = "Loading...";
+    content.innerHTML = "Loading...";
 
-    const res = await fetch(`${API_URL}/seller/${id}`);
-    const s = await res.json();
+    try {
+      const res = await fetch(`${API_URL}/seller/${sellerId}`);
+      const s = await res.json();
 
-    c.innerHTML = `
-      <h3>${s.name}</h3>
-      <p>Status: ${s.seller_verified ? "Verified" : "Pending"}</p>
-      <p>Rating: ${stars(s.avg_rating)}</p>
-      <p>Total Sales: ${s.total_sales || 0}</p>
-    `;
+      content.innerHTML = `
+        <h3>${s.name}</h3>
+        <p>Status: ${s.seller_verified == 1 ? "Verified" : "Pending"}</p>
+        <p>Badge: ${s.badge || "-"}</p>
+        <p>Rating: ${stars(s.avg_rating)}</p>
+        <p>Total Sales: ${s.total_sales || 0}</p>
+        <p>Reviews: ${s.review_count || 0}</p>
+      `;
+    } catch {
+      content.innerHTML = "Failed to load seller";
+    }
   };
 
-  window.closeSeller = () =>
-    document.getElementById("seller-modal-bg").classList.remove("active");
-
-  /* ================= LOAD ================= */
+  /* ================= LOAD LISTINGS ================= */
   async function loadListings() {
     const res = await fetch(`${API_URL}/listings`);
     const items = await res.json();
@@ -75,18 +87,19 @@
     const session = getSession();
     const isOwner =
       session &&
-      (session.user.seller_id == item.seller_id ||
+      (String(session.user.seller_id) === String(item.seller_id) ||
         session.user.role === "admin");
 
     const images = safeArray(item.images);
 
     const card = document.createElement("div");
-    card.className = "item-card show";
+    card.className = "item-card";
 
     card.innerHTML = `
+      <div class="rating-badge">${stars(item.avg_rating)}</div>
       <div class="images-gallery">
-        ${images.map((i, x) =>
-          `<img src="${i}" class="${x === 0 ? "active" : ""}">`
+        ${images.map((i, idx) =>
+          `<img src="${i}" class="${idx === 0 ? "active" : ""}">`
         ).join("")}
       </div>
 
@@ -119,7 +132,7 @@
         deleteListing(item.id);
     } else {
       card.querySelector(".buy-btn").onclick = () =>
-        toast("Buy coming soon");
+        toast("Buy feature coming soon");
     }
 
     container.appendChild(card);
@@ -127,9 +140,9 @@
 
   /* ================= DELETE ================= */
   window.deleteListing = async id => {
-    if (!confirm("Delete listing?")) return;
+    if (!confirm("Delete this listing?")) return;
     await fetch(`${API_URL}/listings/${id}`, { method: "DELETE" });
-    toast("Deleted");
+    toast("Listing deleted");
     loadListings();
   };
 
@@ -139,73 +152,74 @@
     editImgs = safeArray(item.images);
     editIndex = 0;
 
-    document.getElementById("edit-modal-bg").classList.add("active");
+    const bg = document.getElementById("edit-modal-bg");
     const form = document.getElementById("edit-form");
+    if (!bg || !form) return;
+
+    bg.classList.add("active");
+
+    const arr = v => safeArray(v).join(", ");
 
     form.innerHTML = `
-      <input id="e-title" value="${item.title}">
-      <input id="e-price" type="number" value="${item.price}">
-      <input id="e-level" type="number" value="${item.level}">
+      <label>Title</label>
+      <input id="e-title" value="${item.title || ""}">
+
+      <label>Price</label>
+      <input id="e-price" type="number" value="${item.price || 0}">
+
+      <label>Level</label>
+      <input id="e-level" type="number" value="${item.level || 0}">
+
+      <label>Rank</label>
       <input id="e-rank" value="${item.highest_rank || ""}">
 
-      <div id="edit-gallery" class="images-gallery"></div>
+      <label>Upgraded Guns</label>
+      <textarea id="e-upgraded">${arr(item.upgraded_guns)}</textarea>
+
+      <label>Mythic Items</label>
+      <textarea id="e-mythic">${arr(item.mythic_items)}</textarea>
+
+      <label>Legendary Items</label>
+      <textarea id="e-legendary">${arr(item.legendary_items)}</textarea>
+
+      <label>Highlights</label>
+      <textarea id="e-highlights">${item.account_highlights || ""}</textarea>
+
+      <label>Images</label>
+      <div id="edit-images" class="edit-gallery"></div>
     `;
 
-    renderEditGallery();
+    renderEditImages();
   }
 
-  function renderEditGallery() {
-    const g = document.getElementById("edit-gallery");
-    g.innerHTML = `
+  function renderEditImages() {
+    const box = document.getElementById("edit-images");
+    if (!box || editImgs.length === 0) return;
+
+    box.innerHTML = `
       ${editImgs.map(
-        (src, i) => `
-        <div class="edit-img-wrap"
-             draggable="true"
-             data-i="${i}">
-          <img src="${src}" class="${i === editIndex ? "active" : ""}">
-          <span class="remove">×</span>
-        </div>
-      `
+        (src, i) =>
+          `<img src="${src}" class="${i === editIndex ? "active" : ""}">`
       ).join("")}
-      <button class="img-arrow left">‹</button>
-      <button class="img-arrow right">›</button>
+      <button class="edit-arrow left">‹</button>
+      <button class="edit-arrow right">›</button>
     `;
 
-    const imgs = g.querySelectorAll(".edit-img-wrap");
-
-    imgs.forEach(wrap => {
-      const i = +wrap.dataset.i;
-
-      wrap.querySelector(".remove").onclick = () => {
-        editImgs.splice(i, 1);
-        editIndex = 0;
-        renderEditGallery();
-      };
-
-      wrap.ondragstart = () => (dragIndex = i);
-      wrap.ondragover = e => e.preventDefault();
-      wrap.ondrop = () => {
-        const temp = editImgs[dragIndex];
-        editImgs[dragIndex] = editImgs[i];
-        editImgs[i] = temp;
-        renderEditGallery();
-      };
-    });
-
-    g.querySelector(".left").onclick = () =>
-      switchEdit(-1, imgs);
-    g.querySelector(".right").onclick = () =>
-      switchEdit(1, imgs);
+    const imgs = box.querySelectorAll("img");
+    box.querySelector(".left").onclick = () => switchImg(-1, imgs);
+    box.querySelector(".right").onclick = () => switchImg(1, imgs);
   }
 
-  function switchEdit(d, imgs) {
-    imgs[editIndex]?.querySelector("img").classList.remove("active");
-    editIndex = (editIndex + d + imgs.length) % imgs.length;
-    imgs[editIndex]?.querySelector("img").classList.add("active");
+  function switchImg(dir, imgs) {
+    imgs[editIndex].classList.remove("active");
+    editIndex = (editIndex + dir + imgs.length) % imgs.length;
+    imgs[editIndex].classList.add("active");
   }
 
-  /* ================= SAVE ================= */
+  /* ================= SAVE EDIT ================= */
   document.getElementById("save-edit")?.addEventListener("click", async () => {
+    if (!editListing) return;
+
     await fetch(`${API_URL}/listings/${editListing.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -214,12 +228,16 @@
         price: +val("e-price"),
         level: +val("e-level"),
         highest_rank: val("e-rank"),
+        upgraded_guns: val("e-upgraded").split(","),
+        mythic_items: val("e-mythic").split(","),
+        legendary_items: val("e-legendary").split(","),
+        account_highlights: val("e-highlights"),
         images: editImgs
       })
     });
 
-    toast("Updated");
-    document.getElementById("edit-modal-bg").classList.remove("active");
+    toast("Listing updated");
+    closeEdit();
     loadListings();
   });
 
