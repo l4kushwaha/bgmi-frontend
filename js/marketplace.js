@@ -64,6 +64,10 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 }
 
 /* ================= LOAD ================= */
+const CHAT_API = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
+
+
+
 async function startChatFromMarketplace(item, type = "chat") {
 
   const s = session();
@@ -82,43 +86,37 @@ async function startChatFromMarketplace(item, type = "chat") {
 
 
 
-  const res = await fetch(
+  const res = await fetch(`${CHAT_API}/internal/create-room`, {
 
-    "https://bgmi_chat_service.bgmi-gateway.workers.dev/internal/create-room",
+    method: "POST",
 
-    {
+    headers: {
 
-      method: "POST",
+      "Content-Type": "application/json",
 
-      headers: {
+      Authorization: `Bearer ${s.token}`
 
-        "Content-Type": "application/json",
+    },
 
-        Authorization: `Bearer ${s.token}`
+    body: JSON.stringify({
 
-      },
+      order_id,
 
-      body: JSON.stringify({
+      buyer_id: s.user.id,
 
-        order_id,
+      seller_id: item.seller_id,
 
-        buyer_id: s.user.id,
+      type // chat | buy
 
-        seller_id: item.seller_id,
+    })
 
-        type // "chat" | "buy"
-
-      })
-
-    }
-
-  );
+  });
 
 
 
   if (!res.ok) {
 
-    alert("Unable to create chat");
+    toast("Unable to start chat");
 
     return;
 
@@ -126,9 +124,13 @@ async function startChatFromMarketplace(item, type = "chat") {
 
 
 
-  // redirect to chat page
+  const data = await res.json();
 
-  window.location.href = `chat.html?room_id=${order_id}`;
+
+
+  // 🔥 VERY IMPORTANT
+
+  window.location.href = `chat.html?room_id=${data.room_id}`;
 
 }
 
