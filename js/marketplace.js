@@ -160,38 +160,54 @@ function renderCard(item) {
 
 /* ================= CARD SLIDER ================= */
 function initSlider(card) {
-  const g = card.querySelector(".images-gallery");
-  const imgs = [...g.querySelectorAll("img")];
+  const gallery = card.querySelector(".images-gallery");
+  if (!gallery) return;
+
+  const imgs = [...gallery.querySelectorAll("img")];
   if (imgs.length <= 1) return;
 
-  const dots = [...g.querySelectorAll(".img-dots span")];
-  const left = g.querySelector(".img-arrow.left");
-  const right = g.querySelector(".img-arrow.right");
+  const dots = [...gallery.querySelectorAll(".img-dots span")];
+  const left = gallery.querySelector(".img-arrow.left");
+  const right = gallery.querySelector(".img-arrow.right");
 
   let index = 0;
   let timer;
 
-  const show = n => {
+  const show = i => {
     imgs[index].classList.remove("active");
-    dots[index].classList.remove("active");
-    index = (n + imgs.length) % imgs.length;
+    dots[index]?.classList.remove("active");
+
+    index = (i + imgs.length) % imgs.length;
+
     imgs[index].classList.add("active");
-    dots[index].classList.add("active");
+    dots[index]?.classList.add("active");
   };
 
-  left.onclick = e => { e.stopPropagation(); show(index-1); };
-  right.onclick = e => { e.stopPropagation(); show(index+1); };
-  dots.forEach((d,i)=> d.onclick = e => { e.stopPropagation(); show(i); });
-
-  const start = () => {
-    stop();
-    timer = setInterval(() => show(index+1), 3000);
+  const startAuto = () => {
+    stopAuto();
+    timer = setInterval(() => show(index + 1), 3000);
   };
-  const stop = () => timer && clearInterval(timer);
 
-  g.addEventListener("mouseenter", stop);
-  g.addEventListener("mouseleave", start);
-  start();
+  const stopAuto = () => {
+    if (timer) clearInterval(timer);
+  };
+
+  left.onclick = e => {
+    e.stopPropagation();
+    show(index - 1);
+  };
+
+  right.onclick = e => {
+    e.stopPropagation();
+    show(index + 1);
+  };
+
+  dots.forEach((d, i) => d.onclick = () => show(i));
+
+  gallery.addEventListener("mouseenter", stopAuto);
+  gallery.addEventListener("mouseleave", startAuto);
+
+  startAuto(); // ✅ AUTO SLIDE STARTS HERE
 }
 
 /* ================= FULLSCREEN VIEWER ================= */
@@ -201,7 +217,6 @@ function initFullscreen(card) {
 
   let fs = document.getElementById("fs-viewer");
 
-  // CREATE FULLSCREEN ONCE
   if (!fs) {
     fs = document.createElement("div");
     fs.id = "fs-viewer";
@@ -232,9 +247,12 @@ function initFullscreen(card) {
     `;
     document.body.appendChild(fs);
 
-    // CLOSE EVENTS
-    fs.querySelector("#fs-close").onclick = () => fs.style.display = "none";
-    fs.onclick = e => { if (e.target === fs) fs.style.display = "none"; };
+    fs.querySelector("#fs-close").onclick = () =>
+      fs.style.display = "none";
+
+    fs.onclick = e => {
+      if (e.target === fs) fs.style.display = "none";
+    };
   }
 
   const fsImg = fs.querySelector("#fs-img");
@@ -242,30 +260,43 @@ function initFullscreen(card) {
   const fsRight = fs.querySelector("#fs-right");
 
   let index = 0;
+  let timer;
 
-  // IMAGE CLICK → OPEN FULLSCREEN
+  const show = i => {
+    index = (i + imgs.length) % imgs.length;
+    fsImg.src = imgs[index].src;
+  };
+
+  const startAuto = () => {
+    stopAuto();
+    timer = setInterval(() => show(index + 1), 3000);
+  };
+
+  const stopAuto = () => {
+    if (timer) clearInterval(timer);
+  };
+
   imgs.forEach((img, i) => {
     img.onclick = () => {
       index = i;
       fsImg.src = img.src;
       fs.style.display = "flex";
+      startAuto();
     };
   });
 
-  // SAFETY CHECK (🔥 IMPORTANT FIX)
-  if (fsLeft && fsRight) {
-    fsLeft.onclick = e => {
-      e.stopPropagation();
-      index = (index - 1 + imgs.length) % imgs.length;
-      fsImg.src = imgs[index].src;
-    };
+  fsLeft.onclick = e => {
+    e.stopPropagation();
+    show(index - 1);
+  };
 
-    fsRight.onclick = e => {
-      e.stopPropagation();
-      index = (index + 1) % imgs.length;
-      fsImg.src = imgs[index].src;
-    };
-  }
+  fsRight.onclick = e => {
+    e.stopPropagation();
+    show(index + 1);
+  };
+
+  fs.addEventListener("mouseenter", stopAuto);
+  fs.addEventListener("mouseleave", startAuto);
 }
 
 /* ================= SELLER PROFILE ================= */
