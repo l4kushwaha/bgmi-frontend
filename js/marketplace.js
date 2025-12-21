@@ -211,16 +211,23 @@ function initSlider(card) {
 }
 
 /* ================= FULLSCREEN VIEWER ================= */
+let fsViewer = null;
+let fsImg = null;
+let fsLeft = null;
+let fsRight = null;
+let fsTimer = null;
+let fsIndex = 0;
+let fsImgs = [];
+
 function initFullscreen(card) {
   const imgs = [...card.querySelectorAll(".images-gallery img")];
   if (!imgs.length) return;
 
-  let fs = document.getElementById("fs-viewer");
-
-  if (!fs) {
-    fs = document.createElement("div");
-    fs.id = "fs-viewer";
-    fs.style.cssText = `
+  // 🔹 Create fullscreen viewer ONCE
+  if (!fsViewer) {
+    fsViewer = document.createElement("div");
+    fsViewer.id = "fs-viewer";
+    fsViewer.style.cssText = `
       position:fixed;inset:0;
       background:rgba(0,0,0,.9);
       display:none;
@@ -228,7 +235,8 @@ function initFullscreen(card) {
       justify-content:center;
       z-index:9999;
     `;
-    fs.innerHTML = `
+
+    fsViewer.innerHTML = `
       <span id="fs-close"
         style="position:absolute;top:20px;right:30px;
         font-size:34px;color:#fff;cursor:pointer">×</span>
@@ -245,58 +253,61 @@ function initFullscreen(card) {
         style="position:absolute;right:20px;
         font-size:42px;color:#fff;cursor:pointer">›</span>
     `;
-    document.body.appendChild(fs);
 
-    fs.querySelector("#fs-close").onclick = () =>
-      fs.style.display = "none";
+    document.body.appendChild(fsViewer);
 
-    fs.onclick = e => {
-      if (e.target === fs) fs.style.display = "none";
+    fsImg = fsViewer.querySelector("#fs-img");
+    fsLeft = fsViewer.querySelector("#fs-left");
+    fsRight = fsViewer.querySelector("#fs-right");
+
+    fsViewer.querySelector("#fs-close").onclick = () => {
+      fsViewer.style.display = "none";
+      stopFsAuto();
+    };
+
+    fsViewer.onclick = e => {
+      if (e.target === fsViewer) {
+        fsViewer.style.display = "none";
+        stopFsAuto();
+      }
+    };
+
+    fsLeft.onclick = e => {
+      e.stopPropagation();
+      showFs(fsIndex - 1);
+    };
+
+    fsRight.onclick = e => {
+      e.stopPropagation();
+      showFs(fsIndex + 1);
     };
   }
 
-  const fsImg = fs.querySelector("#fs-img");
-  const fsLeft = fs.querySelector("#fs-left");
-  const fsRight = fs.querySelector("#fs-right");
-
-  let index = 0;
-  let timer;
-
-  const show = i => {
-    index = (i + imgs.length) % imgs.length;
-    fsImg.src = imgs[index].src;
-  };
-
-  const startAuto = () => {
-    stopAuto();
-    timer = setInterval(() => show(index + 1), 3000);
-  };
-
-  const stopAuto = () => {
-    if (timer) clearInterval(timer);
-  };
-
+  // 🔹 Attach click to card images
   imgs.forEach((img, i) => {
     img.onclick = () => {
-      index = i;
+      fsImgs = imgs;
+      fsIndex = i;
       fsImg.src = img.src;
-      fs.style.display = "flex";
-      startAuto();
+      fsViewer.style.display = "flex";
+      startFsAuto();
     };
   });
+}
 
-  fsLeft.onclick = e => {
-    e.stopPropagation();
-    show(index - 1);
-  };
+function showFs(i) {
+  if (!fsImgs.length) return;
+  fsIndex = (i + fsImgs.length) % fsImgs.length;
+  fsImg.src = fsImgs[fsIndex].src;
+}
 
-  fsRight.onclick = e => {
-    e.stopPropagation();
-    show(index + 1);
-  };
+function startFsAuto() {
+  stopFsAuto();
+  fsTimer = setInterval(() => showFs(fsIndex + 1), 3000);
+}
 
-  fs.addEventListener("mouseenter", stopAuto);
-  fs.addEventListener("mouseleave", startAuto);
+function stopFsAuto() {
+  if (fsTimer) clearInterval(fsTimer);
 }
 
 /* ================= SELLER PROFILE ================= */
