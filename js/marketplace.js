@@ -63,7 +63,7 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
   });
 }
 
-/* ================= LOAD LISTINGS ================= */
+/* ================= LOAD ================= */
 async function loadListings() {
   const s = session();
   const res = await fetch(`${API_URL}/listings`, {
@@ -74,7 +74,7 @@ async function loadListings() {
   renderList();
 }
 
-/* ================= FILTER + SEARCH ================= */
+/* ================= SEARCH / FILTER ================= */
 function renderList() {
   let items = [...allItems];
   const q = searchInput?.value?.toLowerCase() || "";
@@ -143,6 +143,7 @@ function renderCard(item) {
     </div>
   `;
 
+  /* seller */
   card.querySelector(".seller-btn").onclick =
     () => openSellerProfile(item.seller_id);
 
@@ -152,14 +153,14 @@ function renderCard(item) {
   }
 
   initSlider(card);
+  initFullscreen(card);
+
   container.appendChild(card);
 }
 
-/* ================= IMAGE SLIDER (FIXED) ================= */
+/* ================= CARD SLIDER ================= */
 function initSlider(card) {
   const g = card.querySelector(".images-gallery");
-  if (!g) return;
-
   const imgs = [...g.querySelectorAll("img")];
   if (imgs.length <= 1) return;
 
@@ -173,26 +174,70 @@ function initSlider(card) {
   const show = n => {
     imgs[index].classList.remove("active");
     dots[index].classList.remove("active");
-
     index = (n + imgs.length) % imgs.length;
-
     imgs[index].classList.add("active");
     dots[index].classList.add("active");
   };
 
-  left.onclick = () => show(index - 1);
-  right.onclick = () => show(index + 1);
-  dots.forEach((d,i)=> d.onclick = () => show(i));
+  left.onclick = e => { e.stopPropagation(); show(index-1); };
+  right.onclick = e => { e.stopPropagation(); show(index+1); };
+  dots.forEach((d,i)=> d.onclick = e => { e.stopPropagation(); show(i); });
 
   const start = () => {
     stop();
-    timer = setInterval(() => show(index + 1), 3000);
+    timer = setInterval(() => show(index+1), 3000);
   };
   const stop = () => timer && clearInterval(timer);
 
   g.addEventListener("mouseenter", stop);
   g.addEventListener("mouseleave", start);
   start();
+}
+
+/* ================= FULLSCREEN VIEWER ================= */
+function initFullscreen(card) {
+  const imgs = card.querySelectorAll(".images-gallery img");
+  if (!imgs.length) return;
+
+  let fs = document.getElementById("fs-viewer");
+  if (!fs) {
+    fs = document.createElement("div");
+    fs.id = "fs-viewer";
+    fs.style = `
+      position:fixed;inset:0;background:rgba(0,0,0,.9);
+      display:none;align-items:center;justify-content:center;
+      z-index:9999
+    `;
+    fs.innerHTML = `
+      <span id="fs-close" style="position:absolute;top:20px;right:30px;
+        font-size:32px;color:#fff;cursor:pointer">×</span>
+      <span id="fs-left" style="position:absolute;left:20px;font-size:40px;color:#fff;cursor:pointer">‹</span>
+      <img id="fs-img" style="max-width:90%;max-height:90%;border-radius:12px">
+      <span id="fs-right" style="position:absolute;right:20px;font-size:40px;color:#fff;cursor:pointer">›</span>
+    `;
+    document.body.appendChild(fs);
+
+    fs.querySelector("#fs-close").onclick = () => fs.style.display="none";
+  }
+
+  let index = 0;
+
+  imgs.forEach((img,i)=>{
+    img.onclick = () => {
+      index = i;
+      fs.querySelector("#fs-img").src = img.src;
+      fs.style.display = "flex";
+    };
+  });
+
+  fs.querySelector("#fs-left").onclick = () => {
+    index = (index-1+imgs.length)%imgs.length;
+    fs.querySelector("#fs-img").src = imgs[index].src;
+  };
+  fs.querySelector("#fs-right").onclick = () => {
+    index = (index+1)%imgs.length;
+    fs.querySelector("#fs-img").src = imgs[index].src;
+  };
 }
 
 /* ================= SELLER PROFILE ================= */
@@ -228,20 +273,19 @@ function openEdit(id) {
   document.getElementById("edit-modal-bg").classList.add("active");
 
   f.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <input id="e-title" value="${editItem.title}">
-      <input id="e-price" value="${editItem.price}">
-      <input id="e-level" value="${editItem.level}">
-      <input id="e-rank" value="${editItem.highest_rank || ""}">
-    </div>
+    <label>Title</label><input id="e-title" value="${editItem.title}">
+    <label>Price</label><input id="e-price" value="${editItem.price}">
+    <label>Level</label><input id="e-level" value="${editItem.level}">
+    <label>Rank</label><input id="e-rank" value="${editItem.highest_rank || ""}">
 
-    <textarea id="e-upgraded">${safeArray(editItem.upgraded_guns).join(",")}</textarea>
-    <textarea id="e-mythic">${safeArray(editItem.mythic_items).join(",")}</textarea>
-    <textarea id="e-legendary">${safeArray(editItem.legendary_items).join(",")}</textarea>
-    <textarea id="e-gifts">${safeArray(editItem.gift_items).join(",")}</textarea>
-    <textarea id="e-titles">${safeArray(editItem.titles).join(",")}</textarea>
-    <textarea id="e-highlights">${editItem.account_highlights || ""}</textarea>
+    <label>Upgraded Guns</label><textarea id="e-upgraded">${safeArray(editItem.upgraded_guns).join(",")}</textarea>
+    <label>Mythic Items</label><textarea id="e-mythic">${safeArray(editItem.mythic_items).join(",")}</textarea>
+    <label>Legendary Items</label><textarea id="e-legendary">${safeArray(editItem.legendary_items).join(",")}</textarea>
+    <label>Gift Items</label><textarea id="e-gifts">${safeArray(editItem.gift_items).join(",")}</textarea>
+    <label>Titles</label><textarea id="e-titles">${safeArray(editItem.titles).join(",")}</textarea>
+    <label>Highlights</label><textarea id="e-highlights">${editItem.account_highlights || ""}</textarea>
 
+    <label>Images</label>
     <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     <button class="btn outline" id="add-img">Add Image</button>
   `;
