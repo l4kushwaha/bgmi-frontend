@@ -163,71 +163,125 @@ function renderCard(item) {
 
 /* ================= CARD SLIDER ================= */
 function initSlider(card) {
-  if (!card) return;
+
   const gallery = card.querySelector(".images-gallery");
+
   if (!gallery) return;
 
-  const imgs = [...gallery.querySelectorAll("img")];
+
+
+  const imgs = Array.from(gallery.querySelectorAll("img"));
+
   if (imgs.length <= 1) return;
 
-  const left = gallery.querySelector(".left");
-  const right = gallery.querySelector(".right");
-  const dots = [...gallery.querySelectorAll(".img-dots span")];
+
+
+  const leftBtn  = gallery.querySelector(".img-arrow.left");
+
+  const rightBtn = gallery.querySelector(".img-arrow.right");
+
+  const dotsWrap = gallery.querySelector(".img-dots");
+
+
+
+  if (!leftBtn || !rightBtn || !dotsWrap) return;
+
+
+
+  const dots = Array.from(dotsWrap.children);
+
+
 
   let index = 0;
+
   let timer = null;
 
-  const show = i => {
+
+
+  // --- show image ---
+
+  function show(I) {
+
     imgs.forEach(img => img.classList.remove("active"));
+
     dots.forEach(d => d.classList.remove("active"));
 
-    index = (i + imgs.length) % imgs.length;
+
+
+    index = (I + imgs.length) % imgs.length;
+
+
 
     imgs[index].classList.add("active");
+
     dots[index].classList.add("active");
-  };
 
-  const startAuto = () => {
-    stopAuto();
-    timer = setInterval(() => show(index + 1), 3000);
-  };
-
-  const stopAuto = () => {
-    if (timer) clearInterval(timer);
-    timer = null;
-  };
-
-  // 🔹 arrows
-  if (left && right) {
-    left.onclick = e => {
-      e.stopPropagation();
-      show(index - 1);
-      startAuto();
-    };
-
-    right.onclick = e => {
-      e.stopPropagation();
-      show(index + 1);
-      startAuto();
-    };
   }
 
-  // 🔹 dots
-  dots.forEach((d, i) => {
-    d.onclick = e => {
-      e.stopPropagation();
-      show(i);
-      startAuto();
-    };
+
+
+  // --- arrows ---
+
+  leftBtn.onclick  = e => { e.stopPropagation(); show(index - 1); restart(); };
+
+  rightBtn.onclick = e => { e.stopPropagation(); show(index + 1); restart(); };
+
+
+
+  // --- dots ---
+
+  dots.forEach((d, I) => {
+
+    d.onclick = e => { e.stopPropagation(); show(I); restart(); };
+
   });
 
-  // 🔹 hover pause
-  gallery.addEventListener("mouseenter", stopAuto);
-  gallery.addEventListener("mouseleave", startAuto);
 
-  // 🔹 start
+
+  // --- auto slide ---
+
+  function start() {
+
+    timer = setInterval(() => {
+
+      show(index + 1);
+
+    }, 3500);
+
+  }
+
+
+
+  function stop() {
+
+    if (timer) clearInterval(timer);
+
+  }
+
+
+
+  function restart() {
+
+    stop();
+
+    start();
+
+  }
+
+
+
+  gallery.addEventListener("mouseenter", stop);
+
+  gallery.addEventListener("mouseleave", start);
+
+
+
+  // init
+
   show(0);
-  startAuto();
+
+  start();
+
 }
 
 /* ================= FULLSCREEN VIEWER ================= */
