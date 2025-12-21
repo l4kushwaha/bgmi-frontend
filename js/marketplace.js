@@ -68,7 +68,7 @@ const CHAT_API = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
 
 
 
-async function startChatFromMarketplace(item, type = "chat") {
+window.startChatFromMarketplace = async function (item, type = "chat") {
 
   const s = session();
 
