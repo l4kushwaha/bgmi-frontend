@@ -157,10 +157,9 @@ function renderCard(item) {
 
   container.appendChild(card);
     setTimeout(() =>{
-      initSlider(card);},0)
+      initSlider(card);},0);
     }
-}
-}
+
 
 /* ================= CARD SLIDER ================= */
 function initSlider(card) {
