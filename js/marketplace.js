@@ -64,6 +64,74 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 }
 
 /* ================= LOAD ================= */
+async function startChatFromMarketplace(item, type = "chat") {
+
+  const s = session();
+
+  if (!s) {
+
+    alert("Please login first");
+
+    return;
+
+  }
+
+
+
+  const order_id = crypto.randomUUID();
+
+
+
+  const res = await fetch(
+
+    "https://bgmi_chat_service.bgmi-gateway.workers.dev/internal/create-room",
+
+    {
+
+      method: "POST",
+
+      headers: {
+
+        "Content-Type": "application/json",
+
+        Authorization: `Bearer ${s.token}`
+
+      },
+
+      body: JSON.stringify({
+
+        order_id,
+
+        buyer_id: s.user.id,
+
+        seller_id: item.seller_id,
+
+        type // "chat" | "buy"
+
+      })
+
+    }
+
+  );
+
+
+
+  if (!res.ok) {
+
+    alert("Unable to create chat");
+
+    return;
+
+  }
+
+
+
+  // redirect to chat page
+
+  window.location.href = `chat.html?room_id=${order_id}`;
+
+}
+
 async function loadListings() {
   const s = session();
   const res = await fetch(`${API_URL}/listings`, {
@@ -139,7 +207,12 @@ function renderCard(item) {
       ${isOwner(item)
         ? `<button class="btn edit-btn">Edit</button>
            <button class="btn delete-btn">Delete</button>`
-        : `<button class="btn buy-btn" onclick="alert('Buy coming soon')">Buy</button>`}
+        :
+         `
+         <button class="btn buy-btn">Buy</button>
+         <button class="btn outline chat-btn">Chat</button>
+         `
+        }
     </div>
   `;
 
@@ -150,6 +223,14 @@ function renderCard(item) {
   if (isOwner(item)) {
     card.querySelector(".edit-btn").onclick = () => openEdit(item.id);
     card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
+  }
+
+  if(!isOwner(item)) {
+    card.querySelector(".chat-btn").onclick =
+    () => startChatFromMarketplace(item,"chat");
+
+    card.querySelector(".buy-btn").onclick =
+    () => startChatFromMarketplace(item, "buy");
   }
 
   
