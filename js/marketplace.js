@@ -152,14 +152,18 @@ function renderCard(item) {
     card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
   }
 
-  initSlider(card);
+  
   initFullscreen(card);
 
   container.appendChild(card);
+    setTimeout(() =>{
+      initSlider(card);},0)
+    }
 }
 
 /* ================= CARD SLIDER ================= */
 function initSlider(card) {
+  if (!card) return;
   const gallery = card.querySelector(".images-gallery");
   if (!gallery) return;
 
