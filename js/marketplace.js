@@ -1,6 +1,7 @@
 (() => {
 /* ================= CONFIG ================= */
 const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+
 const container = document.getElementById("items-container");
 const searchInput = document.getElementById("search");
 const filterSelect = document.getElementById("filter");
@@ -20,12 +21,13 @@ const safeArray = v => {
 
 const toast = msg => {
   const t = document.getElementById("toast");
+  if (!t) return;
   t.textContent = msg;
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2500);
 };
 
-const session = () => {
+const getSession = () => {
   try {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -34,10 +36,14 @@ const session = () => {
   } catch { return null; }
 };
 
-const isOwner = item =>
-  session() &&
-  (String(session().user.seller_id) === String(item.seller_id) ||
-   session().user.role === "admin");
+const isOwner = item => {
+  const s = getSession();
+  return (
+    s &&
+    (String(s.user.seller_id) === String(item.seller_id) ||
+     s.user.role === "admin")
+  );
+};
 
 const stars = r =>
   "★".repeat(Math.round(r || 0)) +
@@ -56,8 +62,7 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
       const canvas = document.createElement("canvas");
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
-      canvas.getContext("2d")
-        .drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
       resolve(canvas.toDataURL("image/jpeg", quality));
     };
   });
@@ -65,7 +70,7 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 
 /* ================= LOAD ================= */
 async function loadListings() {
-  const s = session();
+  const s = getSession();
   const res = await fetch(`${API_URL}/listings`, {
     headers: s ? { Authorization: `Bearer ${s.token}` } : {}
   });
@@ -74,20 +79,24 @@ async function loadListings() {
   renderList();
 }
 
+/* ================= FILTER + SEARCH ================= */
 function renderList() {
   let items = [...allItems];
-  const q = searchInput?.value?.toLowerCase() || "";
-  const f = filterSelect?.value || "";
+  const q = searchInput ? searchInput.value.toLowerCase() : "";
+  const f = filterSelect ? filterSelect.value : "";
 
-  if (q)
+  if (q) {
     items = items.filter(i =>
       `${i.uid} ${i.title} ${i.highest_rank}`.toLowerCase().includes(q)
     );
+  }
 
-  if (f === "own" && session())
-    items = items.filter(i =>
-      String(i.seller_id) === String(session().user.seller_id)
+  const s = getSession();
+  if (f === "own" && s) {
+    items = items.filter(
+      i => String(i.seller_id) === String(s.user.seller_id)
     );
+  }
 
   if (f === "price_low") items.sort((a,b)=>a.price-b.price);
   if (f === "price_high") items.sort((a,b)=>b.price-a.price);
@@ -108,12 +117,13 @@ function renderCard(item) {
       ${images.map((img,i)=>`
         <img src="${img}" class="${i===0?"active":""}">
       `).join("")}
-      ${images.length>1?`
+      ${images.length > 1 ? `
         <button class="img-arrow left">‹</button>
         <button class="img-arrow right">›</button>
         <div class="img-dots">
           ${images.map((_,i)=>`<span class="${i===0?"active":""}"></span>`).join("")}
-        </div>`:""}
+        </div>
+      ` : ""}
     </div>
 
     <div class="card-content">
@@ -121,21 +131,37 @@ function renderCard(item) {
       UID: ${item.uid}<br>
       Level: ${item.level}<br>
       Rank: ${item.highest_rank || "-"}<br>
-      ${safeArray(item.upgraded_guns).length ? `<b>Upgraded:</b> ${safeArray(item.upgraded_guns).join(", ")}<br>` : ""}
-      ${safeArray(item.mythic_items).length ? `<b>Mythic:</b> ${safeArray(item.mythic_items).join(", ")}<br>` : ""}
-      ${safeArray(item.legendary_items).length ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>` : ""}
-      ${safeArray(item.gift_items).length ? `<b>Gifts:</b> ${safeArray(item.gift_items).join(", ")}<br>` : ""}
-      ${safeArray(item.titles).length ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>` : ""}
-      ${item.account_highlights ? `<b>Highlights:</b> ${item.account_highlights}` : ""}
+
+      ${safeArray(item.upgraded_guns).length
+        ? `<b>Upgraded:</b> ${safeArray(item.upgraded_guns).join(", ")}<br>`
+        : ""}
+      ${safeArray(item.mythic_items).length
+        ? `<b>Mythic:</b> ${safeArray(item.mythic_items).join(", ")}<br>`
+        : ""}
+      ${safeArray(item.legendary_items).length
+        ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>`
+        : ""}
+      ${safeArray(item.gift_items).length
+        ? `<b>Gifts:</b> ${safeArray(item.gift_items).join(", ")}<br>`
+        : ""}
+      ${safeArray(item.titles).length
+        ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>`
+        : ""}
+      ${item.account_highlights
+        ? `<b>Highlights:</b> ${item.account_highlights}`
+        : ""}
+
       <div class="price">₹${item.price}</div>
     </div>
 
     <div class="card-actions">
       <button class="btn outline seller-btn">Seller Profile</button>
-      ${isOwner(item)
-        ? `<button class="btn edit-btn">Edit</button>
-           <button class="btn delete-btn">Delete</button>`
-        : `<button class="btn buy-btn" onclick="alert('Buy coming soon')">Buy</button>`}
+      ${
+        isOwner(item)
+          ? `<button class="btn edit-btn">Edit</button>
+             <button class="btn delete-btn">Delete</button>`
+          : `<button class="btn buy-btn" onclick="alert('Buy coming soon')">Buy</button>`
+      }
     </div>
   `;
 
@@ -148,16 +174,17 @@ function renderCard(item) {
   }
 
   initSlider(card);
+  initFullscreen(card);
   container.appendChild(card);
 }
 
-/* ================= IMAGE SLIDER (FIXED) ================= */
+/* ================= SLIDER ================= */
 function initSlider(card){
   const g = card.querySelector(".images-gallery");
-  if(!g) return;
+  if (!g) return;
 
   const imgs = [...g.querySelectorAll("img")];
-  if(imgs.length <= 1) return;
+  if (imgs.length <= 1) return;
 
   const dots = [...g.querySelectorAll(".img-dots span")];
   const left = g.querySelector(".left");
@@ -169,9 +196,7 @@ function initSlider(card){
   const show = n => {
     imgs[index].classList.remove("active");
     dots[index].classList.remove("active");
-
     index = (n + imgs.length) % imgs.length;
-
     imgs[index].classList.add("active");
     dots[index].classList.add("active");
   };
@@ -180,16 +205,64 @@ function initSlider(card){
   right.onclick = () => show(index + 1);
   dots.forEach((d,i)=>d.onclick=()=>show(i));
 
-  const startAuto = () =>
+  const start = () => {
+    stop();
     timer = setInterval(() => show(index + 1), 3500);
+  };
+  const stop = () => timer && clearInterval(timer);
 
-  const stopAuto = () => timer && clearInterval(timer);
+  g.addEventListener("mouseenter", stop);
+  g.addEventListener("mouseleave", start);
 
-  g.addEventListener("mouseenter", stopAuto);
-  g.addEventListener("mouseleave", startAuto);
-
-  startAuto();
+  start();
 }
+
+/* ================= FULLSCREEN IMAGE VIEW ================= */
+function initFullscreen(card){
+  const imgs = card.querySelectorAll(".images-gallery img");
+  imgs.forEach(img=>{
+    img.onclick = () => {
+      const modal = document.createElement("div");
+      modal.style.cssText = `
+        position:fixed;inset:0;
+        background:rgba(0,0,0,.9);
+        display:flex;align-items:center;justify-content:center;
+        z-index:9999;cursor:zoom-out;
+      `;
+      const big = document.createElement("img");
+      big.src = img.src;
+      big.style.maxWidth = "92%";
+      big.style.maxHeight = "92%";
+      big.style.borderRadius = "16px";
+      modal.appendChild(big);
+      modal.onclick = () => modal.remove();
+      document.body.appendChild(modal);
+    };
+  });
+}
+
+/* ================= SELLER PROFILE ================= */
+window.openSellerProfile = async id => {
+  const bg = document.getElementById("seller-modal-bg");
+  const c = document.getElementById("seller-content");
+  bg.classList.add("active");
+  c.innerHTML = "Loading...";
+
+  const r = await fetch(`${API_URL}/seller/${id}`);
+  const s = await r.json();
+
+  c.innerHTML = `
+    <h3>${s.name}</h3>
+    <p><b>Status:</b> ${s.seller_verified ? "Verified" : "Pending"}</p>
+    <p><b>Badge:</b> ${s.badge || "None"}</p>
+    <p><b>Rating:</b> ${stars(s.avg_rating)}</p>
+    <p><b>Reviews:</b> ${s.review_count || 0}</p>
+    <button class="btn outline" onclick="alert('Chat coming soon')">Chat</button>
+  `;
+};
+
+window.closeSeller = () =>
+  document.getElementById("seller-modal-bg").classList.remove("active");
 
 /* ================= EDIT ================= */
 function openEdit(id){
@@ -199,8 +272,14 @@ function openEdit(id){
   const f = document.getElementById("edit-form");
   document.getElementById("edit-modal-bg").classList.add("active");
 
-  const field = (l,i,v)=>`<label><b>${l}</b></label><input id="${i}" value="${v||""}">`;
-  const area = (l,i,v)=>`<label><b>${l}</b></label><textarea id="${i}">${v||""}</textarea>`;
+  const field = (l,i,v)=>`
+    <label><b>${l}</b></label>
+    <input id="${i}" value="${v||""}">
+  `;
+  const area = (l,i,v)=>`
+    <label><b>${l}</b></label>
+    <textarea id="${i}">${v||""}</textarea>
+  `;
 
   f.innerHTML = `
     ${field("Title","e-title",editItem.title)}
@@ -233,7 +312,7 @@ function openEdit(id){
 }
 
 function renderEditImages(){
-  const box=document.getElementById("e-images");
+  const box = document.getElementById("e-images");
   box.innerHTML="";
   editImages.forEach((src,i)=>{
     const d=document.createElement("div");
@@ -242,7 +321,8 @@ function renderEditImages(){
       <img src="${src}" style="width:70px;height:70px;border-radius:8px;object-fit:cover">
       <span style="position:absolute;top:-6px;right:-6px;
         background:red;color:#fff;border-radius:50%;
-        padding:2px 6px;cursor:pointer">✖</span>`;
+        padding:2px 6px;cursor:pointer">✖</span>
+    `;
     d.querySelector("span").onclick=()=>{
       editImages.splice(i,1);
       renderEditImages();
@@ -253,11 +333,12 @@ function renderEditImages(){
 
 /* ================= SAVE ================= */
 document.getElementById("save-edit").onclick = async () => {
+  const s = getSession();
   await fetch(`${API_URL}/listings/${editItem.id}`,{
     method:"PUT",
     headers:{
       "Content-Type":"application/json",
-      Authorization:`Bearer ${session().token}`
+      Authorization:`Bearer ${s.token}`
     },
     body:JSON.stringify({
       title:e("e-title"),
@@ -285,17 +366,19 @@ const e = id => document.getElementById(id).value;
 
 /* ================= DELETE ================= */
 async function deleteListing(id){
-  if(!confirm("Delete listing?"))return;
+  const s = getSession();
+  if(!confirm("Delete listing?")) return;
   await fetch(`${API_URL}/listings/${id}`,{
     method:"DELETE",
-    headers:{Authorization:`Bearer ${session().token}`}
+    headers:{Authorization:`Bearer ${s.token}`}
   });
   toast("Listing deleted");
   loadListings();
 }
 
 /* ================= EVENTS ================= */
-searchInput?.addEventListener("input",renderList);
-filterSelect?.addEventListener("change",renderList);
+if (searchInput) searchInput.addEventListener("input", renderList);
+if (filterSelect) filterSelect.addEventListener("change", renderList);
+
 loadListings();
 })();
