@@ -1,6 +1,7 @@
 (() => {
   const CHAT_API = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
 
+  /* ================= SESSION ================= */
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -9,37 +10,46 @@
     return;
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const room_id = params.get("room_id");
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`
+  };
 
-  if (!room_id) {
-    alert("Invalid chat room");
-    return;
-  }
-
+  /* ================= DOM ================= */
   const chatBox = document.getElementById("chatBox");
   const input = document.getElementById("messageInput");
   const sendBtn = document.getElementById("sendBtn");
   const statusEl = document.getElementById("chatStatus");
   const waitingBox = document.getElementById("waitingBox");
 
-  if (!chatBox || !input || !sendBtn) return;
+  /* ================= STATE ================= */
+  const params = new URLSearchParams(location.search);
+  const room_id = params.get("room_id");
 
-  function headers() {
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    };
+  let chatStatus = "requested"; // requested | approved | half_paid | completed
+  let pollTimer = null;
+
+  if (!room_id) {
+    alert("Invalid chat room");
+    return;
   }
 
+  /* ================= UI ================= */
   function addMessage(msg, mine) {
     const div = document.createElement("div");
     div.className = `message ${mine ? "sent" : "received"}`;
 
     let html = `<span>${msg.message}</span>`;
 
-    if (msg.type === "image" && msg.message.startsWith("http")) {
-      html = `<img src="${msg.message}" class="chat-image">`;
+    if (msg.attachments?.length) {
+      html += msg.attachments
+        .map(
+          a =>
+            `<div class="attachments">
+              <img class="chat-image" src="${a.file_url}">
+            </div>`
+        )
+        .join("");
     }
 
     div.innerHTML = html;
@@ -47,73 +57,86 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  async function fetchMessages() {
+  function setWaiting(on) {
+    waitingBox.style.display = on ? "block" : "none";
+    input.disabled = on;
+    sendBtn.disabled = on;
+  }
+
+  /* ================= LOAD MESSAGES ================= */
+  async function loadMessages() {
     const res = await fetch(
       `${CHAT_API}/api/chat/messages?room_id=${room_id}`,
-      { headers: headers() }
+      { headers }
     );
-
-    if (!res.ok) return;
-
     const data = await res.json();
-    chatBox.innerHTML = "";
 
-    data.forEach(m => {
-      addMessage(m, m.sender_id === user.id);
-    });
+    chatBox.innerHTML = "";
+    data.forEach(m =>
+      addMessage(m, m.sender_id === user.id)
+    );
   }
 
-  async function checkRoomStatus() {
+  /* ================= CHECK ROOM STATUS ================= */
+  async function checkRoom() {
     const res = await fetch(
       `${CHAT_API}/api/chat/messages?room_id=${room_id}`,
-      { headers: headers() }
+      { headers }
     );
 
     if (!res.ok) return;
 
-    statusEl.textContent = "Connected";
-    waitingBox.style.display = "none";
-    sendBtn.disabled = false;
+    // status is inferred from DB (simplified)
+    if (chatStatus === "requested") {
+      statusEl.textContent = "⏳ Waiting for seller approval…";
+      setWaiting(true);
+    }
+
+    if (chatStatus === "approved") {
+      statusEl.textContent = "🟢 Chat active";
+      setWaiting(false);
+    }
   }
 
+  /* ================= SEND MESSAGE ================= */
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
     input.value = "";
-    sendBtn.disabled = true;
 
-    const payload = {
-      room_id,
-      message: text,
-      type: text.startsWith("http") ? "image" : "text",
-      sensitive: false
-    };
-
-    const res = await fetch(`${CHAT_API}/api/chat/send`, {
+    await fetch(`${CHAT_API}/api/chat/send`, {
       method: "POST",
-      headers: headers(),
-      body: JSON.stringify(payload)
+      headers,
+      body: JSON.stringify({
+        room_id,
+        message: text,
+        type: "text",
+        sensitive: false
+      })
     });
 
-    if (res.ok) {
-      addMessage({ message: text, type: payload.type }, true);
-    }
-
-    sendBtn.disabled = false;
+    addMessage({ message: text }, true);
   }
 
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", e => {
+  /* ================= POLLING ================= */
+  function startPolling() {
+    loadMessages();
+    checkRoom();
+
+    pollTimer = setInterval(() => {
+      loadMessages();
+      checkRoom();
+    }, 2500);
+  }
+
+  /* ================= EVENTS ================= */
+  sendBtn.onclick = sendMessage;
+  input.addEventListener("keypress", e => {
     if (e.key === "Enter") sendMessage();
   });
 
-  statusEl.textContent = "Loading...";
-  sendBtn.disabled = true;
-  waitingBox.style.display = "block";
-
-  fetchMessages();
-  checkRoomStatus();
-
-  setInterval(fetchMessages, 3000);
+  /* ================= INIT ================= */
+  statusEl.textContent = "Connecting…";
+  startPolling();
 })();
