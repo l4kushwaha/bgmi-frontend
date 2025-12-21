@@ -166,21 +166,21 @@ function initSlider(card) {
   const imgs = [...gallery.querySelectorAll("img")];
   if (imgs.length <= 1) return;
 
+  const left = gallery.querySelector(".left");
+  const right = gallery.querySelector(".right");
   const dots = [...gallery.querySelectorAll(".img-dots span")];
-  const left = gallery.querySelector(".img-arrow.left");
-  const right = gallery.querySelector(".img-arrow.right");
 
   let index = 0;
-  let timer;
+  let timer = null;
 
   const show = i => {
-    imgs[index].classList.remove("active");
-    dots[index]?.classList.remove("active");
+    imgs.forEach(img => img.classList.remove("active"));
+    dots.forEach(d => d.classList.remove("active"));
 
     index = (i + imgs.length) % imgs.length;
 
     imgs[index].classList.add("active");
-    dots[index]?.classList.add("active");
+    dots[index].classList.add("active");
   };
 
   const startAuto = () => {
@@ -190,24 +190,40 @@ function initSlider(card) {
 
   const stopAuto = () => {
     if (timer) clearInterval(timer);
+    timer = null;
   };
 
-  left.onclick = e => {
-    e.stopPropagation();
-    show(index - 1);
-  };
+  // 🔹 arrows
+  if (left && right) {
+    left.onclick = e => {
+      e.stopPropagation();
+      show(index - 1);
+      startAuto();
+    };
 
-  right.onclick = e => {
-    e.stopPropagation();
-    show(index + 1);
-  };
+    right.onclick = e => {
+      e.stopPropagation();
+      show(index + 1);
+      startAuto();
+    };
+  }
 
-  dots.forEach((d, i) => d.onclick = () => show(i));
+  // 🔹 dots
+  dots.forEach((d, i) => {
+    d.onclick = e => {
+      e.stopPropagation();
+      show(i);
+      startAuto();
+    };
+  });
 
+  // 🔹 hover pause
   gallery.addEventListener("mouseenter", stopAuto);
   gallery.addEventListener("mouseleave", startAuto);
 
-  startAuto(); // ✅ AUTO SLIDE STARTS HERE
+  // 🔹 start
+  show(0);
+  startAuto();
 }
 
 /* ================= FULLSCREEN VIEWER ================= */
