@@ -160,6 +160,7 @@ function renderCard(item) {
       initSlider(card);},0)
     }
 }
+}
 
 /* ================= CARD SLIDER ================= */
 function initSlider(card) {
