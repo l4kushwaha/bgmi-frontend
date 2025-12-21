@@ -196,48 +196,76 @@ function initSlider(card) {
 
 /* ================= FULLSCREEN VIEWER ================= */
 function initFullscreen(card) {
-  const imgs = card.querySelectorAll(".images-gallery img");
+  const imgs = [...card.querySelectorAll(".images-gallery img")];
   if (!imgs.length) return;
 
   let fs = document.getElementById("fs-viewer");
+
+  // CREATE FULLSCREEN ONCE
   if (!fs) {
     fs = document.createElement("div");
     fs.id = "fs-viewer";
-    fs.style = `
-      position:fixed;inset:0;background:rgba(0,0,0,.9);
-      display:none;align-items:center;justify-content:center;
-      z-index:9999
+    fs.style.cssText = `
+      position:fixed;inset:0;
+      background:rgba(0,0,0,.9);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
     `;
     fs.innerHTML = `
-      <span id="fs-close" style="position:absolute;top:20px;right:30px;
-        font-size:32px;color:#fff;cursor:pointer">×</span>
-      <span id="fs-left" style="position:absolute;left:20px;font-size:40px;color:#fff;cursor:pointer">‹</span>
-      <img id="fs-img" style="max-width:90%;max-height:90%;border-radius:12px">
-      <span id="fs-right" style="position:absolute;right:20px;font-size:40px;color:#fff;cursor:pointer">›</span>
+      <span id="fs-close"
+        style="position:absolute;top:20px;right:30px;
+        font-size:34px;color:#fff;cursor:pointer">×</span>
+
+      <span id="fs-left"
+        style="position:absolute;left:20px;
+        font-size:42px;color:#fff;cursor:pointer">‹</span>
+
+      <img id="fs-img"
+        style="max-width:90%;max-height:90%;
+        border-radius:14px">
+
+      <span id="fs-right"
+        style="position:absolute;right:20px;
+        font-size:42px;color:#fff;cursor:pointer">›</span>
     `;
     document.body.appendChild(fs);
 
-    fs.querySelector("#fs-close").onclick = () => fs.style.display="none";
+    // CLOSE EVENTS
+    fs.querySelector("#fs-close").onclick = () => fs.style.display = "none";
+    fs.onclick = e => { if (e.target === fs) fs.style.display = "none"; };
   }
+
+  const fsImg = fs.querySelector("#fs-img");
+  const fsLeft = fs.querySelector("#fs-left");
+  const fsRight = fs.querySelector("#fs-right");
 
   let index = 0;
 
-  imgs.forEach((img,i)=>{
+  // IMAGE CLICK → OPEN FULLSCREEN
+  imgs.forEach((img, i) => {
     img.onclick = () => {
       index = i;
-      fs.querySelector("#fs-img").src = img.src;
+      fsImg.src = img.src;
       fs.style.display = "flex";
     };
   });
 
-  fs.querySelector("#fs-left").onclick = () => {
-    index = (index-1+imgs.length)%imgs.length;
-    fs.querySelector("#fs-img").src = imgs[index].src;
-  };
-  fs.querySelector("#fs-right").onclick = () => {
-    index = (index+1)%imgs.length;
-    fs.querySelector("#fs-img").src = imgs[index].src;
-  };
+  // SAFETY CHECK (🔥 IMPORTANT FIX)
+  if (fsLeft && fsRight) {
+    fsLeft.onclick = e => {
+      e.stopPropagation();
+      index = (index - 1 + imgs.length) % imgs.length;
+      fsImg.src = imgs[index].src;
+    };
+
+    fsRight.onclick = e => {
+      e.stopPropagation();
+      index = (index + 1) % imgs.length;
+      fsImg.src = imgs[index].src;
+    };
+  }
 }
 
 /* ================= SELLER PROFILE ================= */
