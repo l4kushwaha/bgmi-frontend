@@ -86,7 +86,7 @@ window.startChatFromMarketplace = async function (item, type = "chat") {
 
 
 
-  const res = await fetch(`${CHAT_API}/internal/create-room`, {
+  const res = await fetch(`${CHAT_API}/api/chat/create`, {
 
     method: "POST",
 
@@ -130,7 +130,7 @@ window.startChatFromMarketplace = async function (item, type = "chat") {
 
   // 🔥 VERY IMPORTANT
 
-  window.location.href = `chat.html?room_id=${data.room_id}`;
+  window.location.href = `chat.html?room_id=${data.room_id || order_id}`;
 
 }
 
