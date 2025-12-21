@@ -1,304 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BGMI Marketplace Chat</title>
+<meta charset="UTF-8" />
+<title>BGMI Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #1a1a1a;
-    color: #fff;
-    display: flex;
-    height: 100vh;
-  }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
 
-  #sidebar {
-    width: 250px;
-    background: #0b3d91;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    box-sizing: border-box;
-  }
+/* ===== HEADER ===== */
+header{
+  padding:14px 18px;
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(12px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
+header h2{margin:0;font-size:18px}
+#chatStatus{font-size:13px;color:#aaa}
 
-  #searchContainer {
-    display: flex;
-    margin-bottom: 10px;
-  }
+/* ===== CHAT AREA ===== */
+#chatBox{
+  flex:1;
+  padding:14px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
 
-  #searchInput {
-    flex: 1;
-    padding: 6px;
-    border-radius: 4px;
-    border: none;
-    outline: none;
-  }
+/* messages */
+.message{
+  max-width:78%;
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:14px;
+  line-height:1.4;
+  animation:fadeIn .2s ease;
+}
+.sent{
+  align-self:flex-end;
+  background:#27ae60;
+  color:#fff;
+  border-bottom-right-radius:4px;
+}
+.received{
+  align-self:flex-start;
+  background:rgba(255,255,255,.15);
+  border-bottom-left-radius:4px;
+}
 
-  #searchBtn {
-    margin-left: 5px;
-    padding: 6px;
-    background: #3aafa9;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+/* attachments */
+.attachments img.chat-image{
+  max-width:200px;
+  border-radius:10px;
+  margin-top:6px;
+  cursor:pointer;
+}
 
-  #userList {
-    flex: 1;
-    overflow-y: auto;
-  }
+/* ===== WAITING ===== */
+#waitingBox{
+  text-align:center;
+  padding:12px;
+  font-size:13px;
+  color:#f1c40f;
+  display:none;
+}
 
-  .userItem {
-    padding: 8px;
-    border-bottom: 1px solid #0a2d6b;
-    cursor: pointer;
-  }
+/* ===== INPUT ===== */
+#inputBar{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  background:rgba(0,0,0,.35);
+  border-top:1px solid rgba(255,255,255,.15);
+}
+#messageInput{
+  flex:1;
+  padding:10px 14px;
+  border:none;
+  border-radius:20px;
+  outline:none;
+  font-family:'Poppins';
+}
+#sendBtn{
+  padding:0 18px;
+  border:none;
+  border-radius:20px;
+  background:#3498db;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+#sendBtn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
 
-  .userItem:hover {
-    background: #0a2d6b;
-  }
-
-  #chatContainer {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    box-sizing: border-box;
-  }
-
-  #presence {
-    margin-bottom: 5px;
-  }
-
-  #chatBox {
-    flex: 1;
-    background: #121212;
-    border: 1px solid #333;
-    padding: 10px;
-    overflow-y: auto;
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
-
-  .message {
-    padding: 8px 12px;
-    margin-bottom: 8px;
-    border-radius: 6px;
-    max-width: 70%;
-    word-wrap: break-word;
-  }
-
-  .sent {
-    background: #2b7a78;
-    align-self: flex-end;
-  }
-
-  .received {
-    background: #17252a;
-    align-self: flex-start;
-  }
-
-  .attachments a {
-    display: block;
-    color: #def2f1;
-    text-decoration: underline;
-    margin-top: 4px;
-    font-size: 0.85em;
-  }
-
-  #inputContainer {
-    display: flex;
-    gap: 5px;
-  }
-
-  #messageInput {
-    flex: 1;
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-    font-size: 1em;
-  }
-
-  #attachments {
-    width: 40px;
-  }
-
-  #sendBtn {
-    padding: 10px 16px;
-    background: #3aafa9;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #fff;
-    font-weight: bold;
-  }
-
-  #sendBtn:hover {
-    background: #2b7a78;
-  }
-
-  #chatPlaceholder {
-    text-align: center;
-    color: #aaa;
-    margin-top: 20px;
-  }
+/* ===== ANIMATION ===== */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:none}
+}
 </style>
 </head>
+
 <body>
 
-<div id="sidebar">
-  <div id="searchContainer">
-    <input type="text" id="searchInput" placeholder="Search users..." />
-    <button id="searchBtn">Go</button>
-  </div>
-  <div id="userList"></div>
+<header>
+  <h2>Secure Chat</h2>
+  <span id="chatStatus">Connecting...</span>
+</header>
+
+<div id="waitingBox">
+  ⏳ Waiting for seller approval…
 </div>
 
-<div id="chatContainer">
-  <div id="presence">🟢 Online</div>
-  <div id="chatBox"><p id="chatPlaceholder">Select a user to start chatting</p></div>
-  <div id="inputContainer">
-    <input type="text" id="messageInput" placeholder="Type a message..." />
-    <input type="file" id="attachments" multiple />
-    <button id="sendBtn">Send</button>
-  </div>
+<div id="chatBox"></div>
+
+<div id="inputBar">
+  <input id="messageInput" placeholder="Type message..." />
+  <button id="sendBtn">Send</button>
 </div>
+
+<!-- CHAT JS -->
+<script src="chat.js"></script>
 
 <script>
-  const API_BASE = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
-  const token = localStorage.getItem("token"); // JWT
+/*
+  HOW TO OPEN CHAT:
+  marketplace.js ya kisi bhi page se call karo:
 
-  let room_id = null;
-  let sse = null;
-
-  const searchInput = document.getElementById("searchInput");
-  const searchBtn = document.getElementById("searchBtn");
-  const userList = document.getElementById("userList");
-  const messagesDiv = document.getElementById("chatBox");
-  const input = document.getElementById("messageInput");
-  const sendBtn = document.getElementById("sendBtn");
-  const attachInput = document.getElementById("attachments");
-  const presenceDiv = document.getElementById("presence");
-
-  function authHeaders() {
-    return { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-  }
-
-  function addMessage(msg, mine=false) {
-    const div = document.createElement("div");
-    div.className = mine ? "sent message" : "received message";
-    div.id = `msg-${msg.id || ""}`;
-
-    let attachHTML = "";
-    if (msg.attachments && msg.attachments.length > 0) {
-      attachHTML = msg.attachments.map(a => `<a href="${a.file_url}" target="_blank">${a.file_url.split("/").pop()}</a>`).join("<br>");
-    }
-
-    div.innerHTML = `
-      <span>${msg.message}</span>
-      ${mine ? `<small>${msg.status || "sent"}</small>` : ""}
-      <div class="attachments">${attachHTML}</div>
-    `;
-    messagesDiv.appendChild(div);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
-
-  async function searchUsers() {
-    const q = searchInput.value.trim();
-    if (!q) return;
-    userList.innerHTML = "<p>Searching...</p>";
-
-    const res = await fetch(`${API_BASE}/api/chat/users/search?q=${encodeURIComponent(q)}`, { headers: authHeaders() });
-    const users = await res.json();
-
-    userList.innerHTML = "";
-    users.forEach(u => {
-      const div = document.createElement("div");
-      div.className = "userItem";
-      div.textContent = `${u.username} (${u.email})`;
-      div.onclick = async () => {
-        const roomRes = await fetch(`${API_BASE}/internal/create-room`, {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({ order_id: `room-${u.id}`, buyer_id: u.id, seller_id: u.id })
-        });
-        const roomData = await roomRes.json();
-        openChat(`room-${u.id}`);
-      };
-      userList.appendChild(div);
-    });
-  }
-
-  async function openChat(rid) {
-    room_id = rid;
-    messagesDiv.innerHTML = "<p id='chatPlaceholder'>Loading...</p>";
-
-    const res = await fetch(`${API_BASE}/api/chat/messages?room_id=${room_id}`, { headers: authHeaders() });
-    const data = await res.json();
-    messagesDiv.innerHTML = "";
-    data.forEach(m => addMessage(m, m.sender_id !== room_id));
-
-    connectSSE();
-    checkPresence();
-  }
-
-  async function sendMessage() {
-    if (!room_id) return;
-    const content = input.value.trim();
-    if (!content && attachInput.files.length === 0) return;
-
-    const attachments = Array.from(attachInput.files).map(f => ({
-      url: URL.createObjectURL(f),
-      mime_type: f.type
-    }));
-
-    input.value = "";
-    attachInput.value = "";
-
-    const body = { room_id, message: content, type: "text", attachments };
-
-    const res = await fetch(`${API_BASE}/api/chat/send`, {
-      method: "POST",
-      headers: authHeaders(),
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    addMessage({ message: content, attachments, status: "sent", id: data.message_id }, true);
-  }
-
-  function connectSSE() {
-    if (!room_id) return;
-    if (sse) sse.close();
-
-    sse = new EventSource(`${API_BASE}/api/chat/stream?room_id=${room_id}`);
-
-    sse.onmessage = e => {
-      const msg = JSON.parse(e.data);
-      addMessage(msg, msg.sender_id !== room_id);
-    };
-
-    sse.onerror = () => {
-      console.warn("SSE error, reconnecting in 3s");
-      sse.close();
-      setTimeout(connectSSE, 3000);
-    };
-  }
-
-  async function checkPresence() {
-    const res = await fetch(`${API_BASE}/api/user/presence`, { headers: authHeaders() });
-    const data = await res.json();
-    presenceDiv.textContent = data.online ? "🟢 Online" : "⚫ Offline";
-  }
-
-  /* ===== EVENTS ===== */
-  sendBtn.onclick = sendMessage;
-  input.addEventListener("keypress", e => e.key === "Enter" && sendMessage());
-  attachInput.addEventListener("change", () => input.focus());
-  searchBtn.onclick = searchUsers;
-  searchInput.addEventListener("keypress", e => e.key === "Enter" && searchUsers());
+  openChat("ROOM_ID_HERE");
+*/
 </script>
 
 </body>
