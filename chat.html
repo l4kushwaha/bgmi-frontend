@@ -1,152 +1,361 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8" />
-<title>BGMI Chat</title>
+
+<title>BGMI Secure Chat</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
+
+
 <style>
+
 *{box-sizing:border-box}
+
 body{
+
   margin:0;
+
   font-family:'Poppins',sans-serif;
+
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+
   color:#fff;
+
   height:100vh;
+
   display:flex;
+
   flex-direction:column;
+
 }
+
+
 
 /* ===== HEADER ===== */
+
 header{
+
   padding:14px 18px;
+
   background:rgba(255,255,255,.06);
+
   backdrop-filter:blur(12px);
+
   display:flex;
+
   justify-content:space-between;
+
   align-items:center;
+
   border-bottom:1px solid rgba(255,255,255,.15);
+
 }
+
 header h2{margin:0;font-size:18px}
+
 #chatStatus{font-size:13px;color:#aaa}
 
-/* ===== CHAT AREA ===== */
-#chatBox{
-  flex:1;
-  padding:14px;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+#presence{font-size:12px;color:#9be7ff}
 
-/* messages */
-.message{
-  max-width:78%;
-  padding:10px 14px;
-  border-radius:14px;
-  font-size:14px;
-  line-height:1.4;
-  animation:fadeIn .2s ease;
-}
-.sent{
-  align-self:flex-end;
-  background:#27ae60;
-  color:#fff;
-  border-bottom-right-radius:4px;
-}
-.received{
-  align-self:flex-start;
-  background:rgba(255,255,255,.15);
-  border-bottom-left-radius:4px;
-}
 
-/* attachments */
-.attachments img.chat-image{
-  max-width:200px;
-  border-radius:10px;
-  margin-top:6px;
-  cursor:pointer;
-}
 
 /* ===== WAITING ===== */
+
 #waitingBox{
+
   text-align:center;
-  padding:12px;
+
+  padding:10px;
+
   font-size:13px;
+
   color:#f1c40f;
+
   display:none;
+
+  border-bottom:1px solid rgba(255,255,255,.1);
+
 }
+
+
+
+/* ===== CHAT AREA ===== */
+
+#chatBox{
+
+  flex:1;
+
+  padding:14px;
+
+  overflow-y:auto;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:10px;
+
+}
+
+
+
+/* messages */
+
+.message{
+
+  max-width:78%;
+
+  padding:10px 14px;
+
+  border-radius:14px;
+
+  font-size:14px;
+
+  line-height:1.4;
+
+  animation:fadeIn .2s ease;
+
+  word-wrap:break-word;
+
+}
+
+.sent{
+
+  align-self:flex-end;
+
+  background:#27ae60;
+
+  color:#fff;
+
+  border-bottom-right-radius:4px;
+
+}
+
+.received{
+
+  align-self:flex-start;
+
+  background:rgba(255,255,255,.18);
+
+  border-bottom-left-radius:4px;
+
+}
+
+
+
+/* attachments */
+
+.attachments img.chat-image{
+
+  max-width:220px;
+
+  border-radius:10px;
+
+  margin-top:6px;
+
+  cursor:pointer;
+
+  display:block;
+
+}
+
+
 
 /* ===== INPUT ===== */
+
 #inputBar{
+
   display:flex;
+
   gap:8px;
+
   padding:12px;
+
   background:rgba(0,0,0,.35);
+
   border-top:1px solid rgba(255,255,255,.15);
-}
-#messageInput{
-  flex:1;
-  padding:10px 14px;
-  border:none;
-  border-radius:20px;
-  outline:none;
-  font-family:'Poppins';
-}
-#sendBtn{
-  padding:0 18px;
-  border:none;
-  border-radius:20px;
-  background:#3498db;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-#sendBtn:disabled{
-  opacity:.5;
-  cursor:not-allowed;
+
+  align-items:center;
+
 }
 
-/* ===== ANIMATION ===== */
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(5px)}
-  to{opacity:1;transform:none}
+
+
+#messageInput{
+
+  flex:1;
+
+  padding:10px 14px;
+
+  border:none;
+
+  border-radius:20px;
+
+  outline:none;
+
+  font-family:'Poppins';
+
 }
+
+
+
+#attachBtn{
+
+  padding:0 14px;
+
+  border:none;
+
+  border-radius:50%;
+
+  background:#34495e;
+
+  color:#fff;
+
+  cursor:pointer;
+
+  font-size:18px;
+
+}
+
+
+
+#sendBtn{
+
+  padding:0 18px;
+
+  border:none;
+
+  border-radius:20px;
+
+  background:#3498db;
+
+  color:#fff;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+}
+
+#sendBtn:disabled{
+
+  opacity:.5;
+
+  cursor:not-allowed;
+
+}
+
+
+
+/* ===== ANIMATION ===== */
+
+@keyframes fadeIn{
+
+  from{opacity:0;transform:translateY(5px)}
+
+  to{opacity:1;transform:none}
+
+}
+
 </style>
+
 </head>
+
+
 
 <body>
 
+
+
 <header>
+
   <h2>Secure Chat</h2>
-  <span id="chatStatus">Connecting...</span>
+
+  <div>
+
+    <div id="chatStatus">Connecting...</div>
+
+    <div id="presence"></div>
+
+  </div>
+
 </header>
 
+
+
+<!-- WAITING APPROVAL -->
+
 <div id="waitingBox">
+
   ⏳ Waiting for seller approval…
+
 </div>
+
+
+
+<!-- CHAT -->
 
 <div id="chatBox"></div>
 
+
+
+<!-- INPUT -->
+
 <div id="inputBar">
+
+  <button id="attachBtn">📎</button>
+
   <input id="messageInput" placeholder="Type message..." />
+
   <button id="sendBtn">Send</button>
+
+
+
+  <!-- hidden file input -->
+
+  <input type="file" id="attachments" accept="image/*" multiple hidden>
+
 </div>
 
+
+
 <!-- CHAT JS -->
+
 <script src="js/chat.js"></script>
 
-<script>
-/*
-  HOW TO OPEN CHAT:
-  marketplace.js ya kisi bhi page se call karo:
 
-  openChat("ROOM_ID_HERE");
+
+<script>
+
+/*
+
+  HOW THIS PAGE IS USED:
+
+
+
+  marketplace.js se:
+
+  window.location.href = "chat.html?room_id=ROOM_ID";
+
+
+
+  chat.js automatically room_id read karega
+
 */
+
 </script>
 
+
+
 </body>
+
 </html>
