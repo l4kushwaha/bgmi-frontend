@@ -484,7 +484,6 @@ window.openSellerProfile = async sellerId => {
     <p><b>Rating:</b> ${stars(s.avg_rating)}</p>
     <p><b>Reviews:</b> ${s.review_count || 0}</p>
     <p><b>Total Sales:</b> ${s.total_sales || 0}</p>
-    <button class="btn outline" onclick="alert('Chat coming soon')">Chat</button>
   `;
 };
 
