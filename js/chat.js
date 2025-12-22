@@ -1,231 +1,167 @@
 (() => {
-  /* ================= CONFIG ================= */
   const API = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
 
-  /* ================= SESSION ================= */
+  /* ===== SESSION ===== */
   const token = localStorage.getItem("token");
   const user  = JSON.parse(localStorage.getItem("user") || "null");
-
-  if (!token || !user) {
-    alert("Please login first");
-    return;
-  }
+  if (!token || !user) return alert("Login required");
 
   const headers = {
     "Authorization": "Bearer " + token,
     "Content-Type": "application/json"
   };
 
-  /* ================= DOM ================= */
+  /* ===== DOM ===== */
   const chatList   = document.getElementById("chatList");
   const chatBox    = document.getElementById("chatBox");
   const chatHeader = document.getElementById("chatHeader");
+  const waitingBox = document.getElementById("waitingBox");
   const msgInput   = document.getElementById("msgInput");
   const sendBtn    = document.getElementById("sendBtn");
-  const typingEl   = document.getElementById("typing");
+  const imgBtn     = document.getElementById("imageBtn");
+  const imgInput   = document.getElementById("imgInput");
 
-  /* ================= STATE ================= */
-  let currentRoom = null;
-  let currentStatus = null;
-  let lastMsgCount = 0;
+  let activeRoom = null;
+  let lastCount = 0;
 
-  /* ======================================================
-     LOAD SELLER DASHBOARD / CHAT LIST
-     ====================================================== */
-  async function loadChatList() {
-    chatList.innerHTML = "";
-
+  /* ===== LOAD CHAT LIST ===== */
+  async function loadChats() {
     const res = await fetch(API + "/api/chat/pending", { headers });
-    const rooms = await res.json();
+    const list = await res.json();
 
-    rooms.forEach(r => {
-      const div = document.createElement("div");
-      div.className = "chat-item";
-      div.innerHTML = `
-        <div class="chat-title">Order ${r.order_id}</div>
-        <div class="chat-last">Request pending</div>
-        <span class="badge">NEW</span>
+    chatList.innerHTML = "";
+    if (!Array.isArray(list) || !list.length) {
+      chatList.innerHTML = `<div class="center">No chats</div>`;
+      return;
+    }
+
+    list.forEach(c => {
+      const d = document.createElement("div");
+      d.className = "chat-item";
+      d.innerHTML = `
+        <b>Order ${c.order_id}</b>
+        ${c.status === "requested" ? `<span class="badge">NEW</span>` : ""}
+        <br><small>${c.status}</small>
       `;
-      div.onclick = () => openRoom(r.id);
-      chatList.appendChild(div);
+      d.onclick = () => openRoom(c.id);
+      chatList.appendChild(d);
     });
   }
 
-  /* ======================================================
-     OPEN CHAT ROOM
-     ====================================================== */
+  /* ===== OPEN ROOM ===== */
   async function openRoom(roomId) {
-    currentRoom = roomId;
+    activeRoom = roomId;
+    lastCount = 0;
     chatBox.innerHTML = "";
-    lastMsgCount = 0;
+    waitingBox.style.display = "none";
 
-    const res = await fetch(
-      API + "/api/chat/room?room_id=" + roomId,
-      { headers }
-    );
-
+    const res = await fetch(`${API}/api/chat/room?room_id=${roomId}`, { headers });
     if (!res.ok) {
       chatHeader.innerText = "Access denied";
       return;
     }
 
     const room = await res.json();
-    currentStatus = room.status;
+    chatHeader.innerText = `Order ${room.order_id}`;
 
     renderStatus(room);
     loadMessages();
   }
 
-  /* ======================================================
-     STATUS UI
-     ====================================================== */
+  /* ===== STATUS ===== */
   function renderStatus(room) {
-    chatHeader.innerText = "Order " + room.order_id;
+    waitingBox.style.display = "none";
 
-    /* SELLER – REQUESTED */
-    if (
-      String(room.seller_user_id) === String(user.id) &&
-      room.status === "requested"
-    ) {
-      chatHeader.innerHTML += " • New Request";
-
-      chatBox.innerHTML = `
-        <div style="padding:12px">
-          <b>Buyer sent a request</b><br><br>
-          <button id="approveBtn">Approve</button>
-          <button id="rejectBtn">Reject</button>
-        </div>
-      `;
-
-      document.getElementById("approveBtn").onclick =
-        () => approveRoom(true);
-      document.getElementById("rejectBtn").onclick =
-        () => approveRoom(false);
-
-      return;
-    }
-
-    /* BUYER – WAITING */
-    if (
-      String(room.buyer_id) === String(user.id) &&
-      room.status === "requested"
-    ) {
-      chatHeader.innerHTML += " • Waiting for seller approval";
-      return;
-    }
-
-    /* CHAT ACTIVE */
-    if (room.status === "approved") {
-      chatHeader.innerHTML += " • Chat active";
-    }
-
-    /* HALF PAID */
-    if (room.status === "half_paid") {
-      chatHeader.innerHTML += " • Half payment done";
-    }
-
-    /* COMPLETED */
-    if (room.status === "completed") {
-      chatHeader.innerHTML += " • Completed";
+    if (room.status === "requested") {
+      if (String(room.seller_user_id) === String(user.id)) {
+        waitingBox.style.display = "block";
+        waitingBox.innerHTML = `
+          <b>New request</b><br><br>
+          <button onclick="approve(true)">Approve</button>
+          <button onclick="approve(false)">Reject</button>
+        `;
+      } else {
+        waitingBox.style.display = "block";
+        waitingBox.innerText = "⏳ Waiting for seller approval";
+      }
     }
   }
 
-  /* ======================================================
-     APPROVE / REJECT
-     ====================================================== */
-  async function approveRoom(approve) {
+  /* ===== APPROVE ===== */
+  window.approve = async approve => {
     await fetch(API + "/api/chat/approve", {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        room_id: currentRoom,
-        approve
-      })
+      body: JSON.stringify({ room_id: activeRoom, approve })
     });
-    openRoom(currentRoom);
-  }
+  };
 
-  /* ======================================================
-     LOAD MESSAGES
-     ====================================================== */
+  /* ===== LOAD MESSAGES ===== */
   async function loadMessages() {
-    if (!currentRoom) return;
+    if (!activeRoom) return;
 
     const res = await fetch(
-      API + "/api/chat/messages?room_id=" + currentRoom,
+      `${API}/api/chat/messages?room_id=${activeRoom}`,
       { headers }
     );
     const msgs = await res.json();
-
-    if (!Array.isArray(msgs) || msgs.length === lastMsgCount) return;
-    lastMsgCount = msgs.length;
+    if (!Array.isArray(msgs) || msgs.length === lastCount) return;
+    lastCount = msgs.length;
 
     chatBox.innerHTML = "";
     msgs.forEach(m => {
-      const div = document.createElement("div");
-      div.className =
-        "msg " + (String(m.sender_id) === String(user.id) ? "sent" : "recv");
-      div.textContent = m.message;
-      chatBox.appendChild(div);
+      const d = document.createElement("div");
+      const mine = String(m.sender_id) === String(user.id);
+      d.className = "msg " + (mine ? "sent" : "recv");
+
+      if (m.type === "image") {
+        d.innerHTML = `<img class="chat-img" src="${m.message}">`;
+      } else {
+        d.textContent = m.message;
+      }
+      chatBox.appendChild(d);
     });
 
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  /* ======================================================
-     SEND MESSAGE
-     ====================================================== */
-  async function sendMessage() {
-    const text = msgInput.value.trim();
-    if (!text || !currentRoom) return;
+  /* ===== SEND MESSAGE ===== */
+  async function sendMessage(type = "text", content = "") {
+    if (!activeRoom) return;
+    if (type === "text" && !msgInput.value.trim()) return;
+
+    const payload = {
+      room_id: activeRoom,
+      type,
+      message: type === "text" ? msgInput.value.trim() : content
+    };
 
     msgInput.value = "";
-
     await fetch(API + "/api/chat/send", {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        room_id: currentRoom,
-        message: text,
-        type: "text",
-        sensitive: false
-      })
+      body: JSON.stringify(payload)
     });
-
     loadMessages();
   }
 
-  /* ======================================================
-     TYPING INDICATOR (UI ONLY)
-     ====================================================== */
-  let typingTimer;
-  msgInput.oninput = () => {
-    typingEl.innerText = "typing…";
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => {
-      typingEl.innerText = "";
-    }, 700);
+  sendBtn.onclick = () => sendMessage();
+  msgInput.onkeydown = e => e.key === "Enter" && sendMessage();
+
+  /* ===== IMAGE ===== */
+  imgBtn.onclick = () => imgInput.click();
+  imgInput.onchange = () => {
+    const f = imgInput.files[0];
+    const r = new FileReader();
+    r.onload = () => sendMessage("image", r.result);
+    r.readAsDataURL(f);
   };
 
-  /* ======================================================
-     EVENTS
-     ====================================================== */
-  sendBtn.onclick = sendMessage;
-  msgInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") sendMessage();
-  });
-
-  /* ======================================================
-     POLLING
-     ====================================================== */
+  /* ===== POLLING ===== */
   setInterval(() => {
-    if (currentRoom) {
-      loadMessages();
-    } else {
-      loadChatList();
-    }
+    loadChats();
+    loadMessages();
   }, 2000);
 
-  /* ================= INIT ================= */
-  loadChatList();
+  loadChats();
 })();

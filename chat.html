@@ -1,121 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>BGMI Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
+*{box-sizing:border-box}
+body{
   margin:0;
-  font-family: system-ui, sans-serif;
+  font-family:system-ui,Segoe UI,Roboto;
   background:#0f172a;
   color:#fff;
   height:100vh;
   display:flex;
 }
 
-/* LEFT PANEL */
-#sidebar {
-  width:320px;
+/* ===== SIDEBAR ===== */
+#sidebar{
+  width:300px;
   background:#020617;
   border-right:1px solid #1e293b;
   display:flex;
   flex-direction:column;
 }
-
-#sidebar h3 {
-  padding:14px;
+#sidebar h3{
   margin:0;
+  padding:14px;
   border-bottom:1px solid #1e293b;
 }
-
-.chat-item {
+#chatList{
+  flex:1;
+  overflow-y:auto;
+}
+.chat-item{
   padding:12px;
+  border-bottom:1px solid #1e293b;
   cursor:pointer;
-  border-bottom:1px solid #020617;
 }
-.chat-item:hover { background:#020617; }
-
-.chat-title { font-weight:600; }
-.chat-last  { font-size:13px; opacity:.7 }
-
-.badge {
-  float:right;
-  background:#22c55e;
-  padding:2px 7px;
-  border-radius:12px;
-  font-size:12px;
+.chat-item:hover{background:#020617}
+.chat-item .badge{
+  background:#f59e0b;
+  color:#000;
+  padding:2px 6px;
+  font-size:11px;
+  border-radius:6px;
+  margin-left:6px;
 }
 
-/* RIGHT PANEL */
-#chat {
+/* ===== CHAT AREA ===== */
+#chatArea{
   flex:1;
   display:flex;
   flex-direction:column;
 }
 
-#chatHeader {
+/* header */
+#chatHeader{
   padding:14px;
-  background:#020617;
   border-bottom:1px solid #1e293b;
+  background:#020617;
 }
 
-#chatBox {
+/* messages */
+#chatBox{
   flex:1;
   padding:14px;
-  overflow:auto;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.msg{
+  max-width:70%;
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:14px;
+}
+.sent{
+  align-self:flex-end;
+  background:#2563eb;
+}
+.recv{
+  align-self:flex-start;
+  background:#334155;
 }
 
-.msg {
-  max-width:60%;
-  margin:8px 0;
+/* input */
+#inputBar{
+  display:flex;
+  gap:8px;
   padding:10px;
+  border-top:1px solid #1e293b;
+}
+#msgInput{
+  flex:1;
+  padding:10px;
+  border:none;
   border-radius:10px;
 }
-.sent { background:#2563eb; margin-left:auto }
-.recv { background:#1e293b }
-
-#typing {
-  font-size:13px;
-  opacity:.6;
-  padding-left:10px;
-}
-
-#inputBox {
-  display:flex;
-  padding:10px;
-  background:#020617;
-}
-#inputBox input {
-  flex:1;
-  padding:10px;
-  border-radius:8px;
+#sendBtn{
+  padding:0 16px;
   border:none;
+  border-radius:10px;
+  background:#22c55e;
+  color:#000;
+  font-weight:600;
+  cursor:pointer;
 }
-#inputBox button {
-  margin-left:10px;
-  padding:10px 16px;
+#imageBtn{
+  background:#475569;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:0 12px;
+  cursor:pointer;
+}
+
+#waitingBox{
+  text-align:center;
+  padding:12px;
+  color:#fbbf24;
+}
+.center{
+  text-align:center;
+  padding:20px;
+  color:#94a3b8;
+}
+img.chat-img{
+  max-width:220px;
+  border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LEFT -->
+<!-- ===== LEFT ===== -->
 <div id="sidebar">
   <h3>Chats</h3>
   <div id="chatList"></div>
 </div>
 
-<!-- RIGHT -->
-<div id="chat">
+<!-- ===== RIGHT ===== -->
+<div id="chatArea">
   <div id="chatHeader">Select a chat</div>
+  <div id="waitingBox" style="display:none"></div>
   <div id="chatBox"></div>
-  <div id="typing"></div>
 
-  <div id="inputBox">
-    <input id="msgInput" placeholder="Type a message…" />
+  <div id="inputBar">
+    <button id="imageBtn">📷</button>
+    <input id="msgInput" placeholder="Type message…">
     <button id="sendBtn">Send</button>
+    <input type="file" id="imgInput" accept="image/*" hidden>
   </div>
 </div>
 
