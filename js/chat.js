@@ -160,7 +160,7 @@
 
     // SELLER VIEW (REQUESTED)
 
-    if (user.id === room.seller_id && room.status === "requested") {
+    if (String(ser.id) === String(room.seller_id) && room.status === "requested") {
 
       statusEl.textContent = "New chat request";
 
