@@ -64,72 +64,46 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 }
 
 /* ================= LOAD ================= */
-const CHAT_API = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
-
-
-
 window.startChatFromMarketplace = async function (item, type = "chat") {
+  const token = localStorage.getItem("token");
+  const user  = JSON.parse(localStorage.getItem("user") || "null");
 
-  const s = session();
-
-  if (!s) {
-
+  if (!token || !user) {
     alert("Please login first");
-
     return;
-
   }
 
+  try {
+    const res = await fetch(
+      "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/create",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          order_id: crypto.randomUUID(),
+          seller_user_id: item.seller_id   // ✅ FIXED
+        })
+      }
+    );
 
+    if (!res.ok) {
+      alert("Unable to start chat");
+      return;
+    }
 
-  const order_id = crypto.randomUUID();
+    const data = await res.json();
 
+    // redirect to chat page
+    window.location.href = `chat.html?room_id=${data.room_id}`;
 
-
-  const res = await fetch(`${CHAT_API}/api/chat/create`, {
-
-    method: "POST",
-
-    headers: {
-
-      "Content-Type": "application/json",
-
-      Authorization: `Bearer ${s.token}`
-
-    },
-
-    body: JSON.stringify({
-
-      order_id,
-
-      seller_user_id :item_seller_id,
-      type // chat | buy
-
-    })
-
-  });
-
-
-
-  if (!res.ok) {
-
-    toast("Unable to start chat");
-
-    return;
-
+  } catch (err) {
+    console.error(err);
+    alert("Chat service error");
   }
-
-
-
-  const data = await res.json();
-
-
-
-  // 🔥 VERY IMPORTANT
-
-  window.location.href = `chat.html?room_id=${data.room_id}`;
-
-}
+};
 
 async function loadListings() {
   const s = session();
