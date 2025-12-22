@@ -8,7 +8,7 @@
 
   const token = localStorage.getItem("token");
 
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const user  = JSON.parse(localStorage.getItem("user") || "null");
 
 
 
@@ -26,7 +26,7 @@
 
     "Content-Type": "application/json",
 
-    Authorization: `Bearer ${token}`
+    "Authorization": "Bearer " + token
 
   };
 
@@ -34,13 +34,13 @@
 
   /* ================= DOM ================= */
 
-  const chatBox = document.getElementById("chatBox");
+  const chatBox    = document.getElementById("chatBox");
 
-  const input = document.getElementById("messageInput");
+  const input      = document.getElementById("messageInput");
 
-  const sendBtn = document.getElementById("sendBtn");
+  const sendBtn    = document.getElementById("sendBtn");
 
-  const statusEl = document.getElementById("chatStatus");
+  const statusEl   = document.getElementById("chatStatus");
 
   const waitingBox = document.getElementById("waitingBox");
 
@@ -48,7 +48,7 @@
 
   /* ================= STATE ================= */
 
-  const params = new URLSearchParams(location.search);
+  const params  = new URLSearchParams(location.search);
 
   const room_id = params.get("room_id");
 
@@ -56,7 +56,7 @@
 
   let currentStatus = null;
 
-  let lastMsgCount = 0;
+  let lastMsgCount  = 0;
 
 
 
@@ -76,7 +76,7 @@
 
     waitingBox.style.display = show ? "block" : "none";
 
-    if (html) waitingBox.innerHTML = html;
+    waitingBox.innerHTML = html || "";
 
     input.disabled = show;
 
@@ -120,6 +120,8 @@
 
       statusEl.textContent = "Chat not available";
 
+      setWaiting(true, "Access denied");
+
       return;
 
     }
@@ -154,11 +156,13 @@
 
   function renderStatus(room) {
 
-    // SELLER VIEW
+
+
+    // SELLER VIEW (REQUESTED)
 
     if (user.id === room.seller_id && room.status === "requested") {
 
-      statusEl.textContent = "New request";
+      statusEl.textContent = "New chat request";
 
       setWaiting(true, `
 
@@ -174,7 +178,7 @@
 
       document.getElementById("approveBtn").onclick = () => approve(true);
 
-      document.getElementById("rejectBtn").onclick = () => approve(false);
+      document.getElementById("rejectBtn").onclick  = () => approve(false);
 
       return;
 
@@ -204,35 +208,21 @@
 
       setWaiting(false);
 
-
-
-      // BUY FLOW – HALF PAYMENT BUTTON
-
-      if (room.type === "buy" && user.id === room.buyer_id) {
-
-        waitingBox.style.display = "block";
-
-        waitingBox.innerHTML = `
-
-          <button id="halfPayBtn">💰 Pay 50%</button>
-
-        `;
-
-        document.getElementById("halfPayBtn").onclick = halfPayment;
-
-      }
+      return;
 
     }
 
 
 
-    // HALF PAYMENT DONE
+    // HALF PAID
 
     if (room.status === "half_paid") {
 
       statusEl.textContent = "💰 Half payment completed";
 
       setWaiting(false);
+
+      return;
 
     }
 
@@ -245,6 +235,8 @@
       statusEl.textContent = "✅ Deal completed";
 
       setWaiting(true, "Chat closed");
+
+      return;
 
     }
 
@@ -272,26 +264,6 @@
 
 
 
-  /* ================= HALF PAYMENT ================= */
-
-  async function halfPayment() {
-
-    await fetch(`${CHAT_API}/api/chat/half-payment`, {
-
-      method: "POST",
-
-      headers,
-
-      body: JSON.stringify({ room_id })
-
-    });
-
-    loadRoom();
-
-  }
-
-
-
   /* ================= LOAD MESSAGES ================= */
 
   async function loadMessages() {
@@ -308,7 +280,7 @@
 
 
 
-    if (msgs.length === lastMsgCount) return;
+    if (!Array.isArray(msgs) || msgs.length === lastMsgCount) return;
 
     lastMsgCount = msgs.length;
 
@@ -318,7 +290,7 @@
 
     msgs.forEach(m =>
 
-      addMessage(m, m.sender_id === user.id)
+      addMessage(m, String(m.sender_id) === String(user.id))
 
     );
 
@@ -378,7 +350,7 @@
 
   sendBtn.onclick = sendMessage;
 
-  input.addEventListener("keypress", e => {
+  input.addEventListener("keydown", e => {
 
     if (e.key === "Enter") sendMessage();
 
