@@ -1,249 +1,124 @@
 <!DOCTYPE html>
-
-<html lang="en">
-
+<html>
 <head>
-
 <meta charset="UTF-8">
-
-<title>BGMI Secure Chat</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-
+<title>BGMI Chat</title>
 
 <style>
-
-*{box-sizing:border-box}
-
-body{
-
+body {
   margin:0;
-
-  font-family:Poppins,sans-serif;
-
+  font-family: system-ui, sans-serif;
   background:#0f172a;
-
-  color:#e5e7eb;
-
-  height:100vh;
-
-  display:flex;
-
-  flex-direction:column;
-
-}
-
-
-
-/* HEADER */
-
-header{
-
-  padding:14px 18px;
-
-  background:#020617;
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:center;
-
-  border-bottom:1px solid #1e293b;
-
-}
-
-header h2{margin:0;font-size:16px;font-weight:600}
-
-#chatStatus{font-size:13px;color:#94a3b8}
-
-
-
-/* CHAT */
-
-#chatBox{
-
-  flex:1;
-
-  padding:14px;
-
-  overflow-y:auto;
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:10px;
-
-}
-
-
-
-.message{
-
-  max-width:75%;
-
-  padding:10px 14px;
-
-  border-radius:16px;
-
-  font-size:14px;
-
-  animation:fadeIn .2s ease;
-
-  line-height:1.4;
-
-}
-
-.sent{
-
-  align-self:flex-end;
-
-  background:#2563eb;
-
-  border-bottom-right-radius:4px;
-
-}
-
-.received{
-
-  align-self:flex-start;
-
-  background:#1e293b;
-
-  border-bottom-left-radius:4px;
-
-}
-
-
-
-/* WAITING */
-
-#waitingBox{
-
-  padding:12px;
-
-  text-align:center;
-
-  font-size:14px;
-
-  background:#020617;
-
-  border-top:1px solid #1e293b;
-
-  display:none;
-
-}
-
-
-
-/* INPUT */
-
-#inputBar{
-
-  display:flex;
-
-  gap:8px;
-
-  padding:12px;
-
-  background:#020617;
-
-  border-top:1px solid #1e293b;
-
-}
-
-#messageInput{
-
-  flex:1;
-
-  padding:10px 14px;
-
-  border:none;
-
-  border-radius:20px;
-
-  outline:none;
-
-  font-family:Poppins;
-
-}
-
-#sendBtn{
-
-  padding:0 18px;
-
-  border:none;
-
-  border-radius:20px;
-
-  background:#2563eb;
-
   color:#fff;
+  height:100vh;
+  display:flex;
+}
 
-  font-weight:600;
+/* LEFT PANEL */
+#sidebar {
+  width:320px;
+  background:#020617;
+  border-right:1px solid #1e293b;
+  display:flex;
+  flex-direction:column;
+}
 
+#sidebar h3 {
+  padding:14px;
+  margin:0;
+  border-bottom:1px solid #1e293b;
+}
+
+.chat-item {
+  padding:12px;
   cursor:pointer;
+  border-bottom:1px solid #020617;
+}
+.chat-item:hover { background:#020617; }
 
+.chat-title { font-weight:600; }
+.chat-last  { font-size:13px; opacity:.7 }
+
+.badge {
+  float:right;
+  background:#22c55e;
+  padding:2px 7px;
+  border-radius:12px;
+  font-size:12px;
 }
 
-#sendBtn:disabled{opacity:.5}
-
-
-
-@keyframes fadeIn{
-
-  from{opacity:0;transform:translateY(4px)}
-
-  to{opacity:1}
-
+/* RIGHT PANEL */
+#chat {
+  flex:1;
+  display:flex;
+  flex-direction:column;
 }
 
+#chatHeader {
+  padding:14px;
+  background:#020617;
+  border-bottom:1px solid #1e293b;
+}
+
+#chatBox {
+  flex:1;
+  padding:14px;
+  overflow:auto;
+}
+
+.msg {
+  max-width:60%;
+  margin:8px 0;
+  padding:10px;
+  border-radius:10px;
+}
+.sent { background:#2563eb; margin-left:auto }
+.recv { background:#1e293b }
+
+#typing {
+  font-size:13px;
+  opacity:.6;
+  padding-left:10px;
+}
+
+#inputBox {
+  display:flex;
+  padding:10px;
+  background:#020617;
+}
+#inputBox input {
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+}
+#inputBox button {
+  margin-left:10px;
+  padding:10px 16px;
+}
 </style>
-
 </head>
-
-
 
 <body>
 
-
-
-<header>
-
-  <h2>Secure Chat</h2>
-
-  <span id="chatStatus">Connecting…</span>
-
-</header>
-
-
-
-<div id="chatBox"></div>
-
-
-
-<div id="waitingBox"></div>
-
-
-
-<div id="inputBar">
-
-  <input id="messageInput" placeholder="Type a message…" />
-
-  <button id="sendBtn">Send</button>
-
+<!-- LEFT -->
+<div id="sidebar">
+  <h3>Chats</h3>
+  <div id="chatList"></div>
 </div>
 
+<!-- RIGHT -->
+<div id="chat">
+  <div id="chatHeader">Select a chat</div>
+  <div id="chatBox"></div>
+  <div id="typing"></div>
 
+  <div id="inputBox">
+    <input id="msgInput" placeholder="Type a message…" />
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
 
 <script src="js/chat.js"></script>
-
 </body>
-
 </html>
