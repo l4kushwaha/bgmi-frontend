@@ -158,9 +158,15 @@
 
 
 
-    // SELLER VIEW (REQUESTED)
+    // 🔥 SELLER VIEW (REQUESTED)
 
-    if (String(ser.id) === String(room.seller_id) && room.status === "requested") {
+    if (
+
+      String(user.id) === String(room.seller_id) &&
+
+      room.status === "requested"
+
+    ) {
 
       statusEl.textContent = "New chat request";
 
@@ -186,9 +192,15 @@
 
 
 
-    // BUYER WAITING
+    // 🔵 BUYER WAITING
 
-    if (user.id === room.buyer_id && room.status === "requested") {
+    if (
+
+      String(user.id) === String(room.buyer_id) &&
+
+      room.status === "requested"
+
+    ) {
 
       statusEl.textContent = "⏳ Waiting for seller approval";
 
@@ -200,7 +212,7 @@
 
 
 
-    // CHAT ACTIVE
+    // 🟢 CHAT ACTIVE
 
     if (room.status === "approved") {
 
@@ -214,7 +226,7 @@
 
 
 
-    // HALF PAID
+    // 💰 HALF PAID
 
     if (room.status === "half_paid") {
 
@@ -228,7 +240,7 @@
 
 
 
-    // COMPLETED
+    // ✅ COMPLETED
 
     if (room.status === "completed") {
 
@@ -276,17 +288,19 @@
 
     );
 
+
+
     const msgs = await res.json();
-
-
 
     if (!Array.isArray(msgs) || msgs.length === lastMsgCount) return;
 
+
+
     lastMsgCount = msgs.length;
 
-
-
     chatBox.innerHTML = "";
+
+
 
     msgs.forEach(m =>
 
