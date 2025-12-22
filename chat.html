@@ -1,161 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>BGMI Chat</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #0f172a;
+      color: #fff;
+    }
 
-<style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,Segoe UI,Roboto;
-  background:#0f172a;
-  color:#fff;
-  height:100vh;
-  display:flex;
-}
+    /* LEFT SIDEBAR */
+    .sidebar {
+      width: 320px;
+      background: #020617;
+      border-right: 1px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+    }
 
-/* ===== SIDEBAR ===== */
-#sidebar{
-  width:300px;
-  background:#020617;
-  border-right:1px solid #1e293b;
-  display:flex;
-  flex-direction:column;
-}
-#sidebar h3{
-  margin:0;
-  padding:14px;
-  border-bottom:1px solid #1e293b;
-}
-#chatList{
-  flex:1;
-  overflow-y:auto;
-}
-.chat-item{
-  padding:12px;
-  border-bottom:1px solid #1e293b;
-  cursor:pointer;
-}
-.chat-item:hover{background:#020617}
-.chat-item .badge{
-  background:#f59e0b;
-  color:#000;
-  padding:2px 6px;
-  font-size:11px;
-  border-radius:6px;
-  margin-left:6px;
-}
+    .sidebar h2 {
+      margin: 12px;
+      font-size: 18px;
+    }
 
-/* ===== CHAT AREA ===== */
-#chatArea{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
+    #searchChats {
+      margin: 8px;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
 
-/* header */
-#chatHeader{
-  padding:14px;
-  border-bottom:1px solid #1e293b;
-  background:#020617;
-}
+    #chatList {
+      flex: 1;
+      overflow-y: auto;
+    }
 
-/* messages */
-#chatBox{
-  flex:1;
-  padding:14px;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.msg{
-  max-width:70%;
-  padding:10px 14px;
-  border-radius:14px;
-  font-size:14px;
-}
-.sent{
-  align-self:flex-end;
-  background:#2563eb;
-}
-.recv{
-  align-self:flex-start;
-  background:#334155;
-}
+    .chat-item {
+      padding: 12px;
+      border-bottom: 1px solid #1e293b;
+      cursor: pointer;
+    }
 
-/* input */
-#inputBar{
-  display:flex;
-  gap:8px;
-  padding:10px;
-  border-top:1px solid #1e293b;
-}
-#msgInput{
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-}
-#sendBtn{
-  padding:0 16px;
-  border:none;
-  border-radius:10px;
-  background:#22c55e;
-  color:#000;
-  font-weight:600;
-  cursor:pointer;
-}
-#imageBtn{
-  background:#475569;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  padding:0 12px;
-  cursor:pointer;
-}
+    .chat-item:hover {
+      background: #020617;
+    }
 
-#waitingBox{
-  text-align:center;
-  padding:12px;
-  color:#fbbf24;
-}
-.center{
-  text-align:center;
-  padding:20px;
-  color:#94a3b8;
-}
-img.chat-img{
-  max-width:220px;
-  border-radius:10px;
-}
-</style>
+    .chat-item.active {
+      background: #1e293b;
+    }
+
+    .chat-title {
+      font-weight: bold;
+    }
+
+    .chat-preview {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .chat-meta {
+      font-size: 12px;
+      opacity: 0.6;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* RIGHT PANEL */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chatStatus {
+      padding: 12px;
+      border-bottom: 1px solid #1e293b;
+      background: #020617;
+    }
+
+    #chatBox {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      background: #020617;
+    }
+
+    .message {
+      max-width: 70%;
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .sent {
+      background: #2563eb;
+      align-self: flex-end;
+    }
+
+    .received {
+      background: #1e293b;
+      align-self: flex-start;
+    }
+
+    #waitingBox {
+      padding: 10px;
+      text-align: center;
+      background: #020617;
+    }
+
+    .input-box {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #1e293b;
+      background: #020617;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+
+    #sendBtn {
+      margin-left: 8px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- ===== LEFT ===== -->
-<div id="sidebar">
-  <h3>Chats</h3>
-  <div id="chatList"></div>
-</div>
-
-<!-- ===== RIGHT ===== -->
-<div id="chatArea">
-  <div id="chatHeader">Select a chat</div>
-  <div id="waitingBox" style="display:none"></div>
-  <div id="chatBox"></div>
-
-  <div id="inputBar">
-    <button id="imageBtn">📷</button>
-    <input id="msgInput" placeholder="Type message…">
-    <button id="sendBtn">Send</button>
-    <input type="file" id="imgInput" accept="image/*" hidden>
+  <!-- LEFT -->
+  <div class="sidebar">
+    <h2>Chats</h2>
+    <input id="searchChats" placeholder="Search chats">
+    <div id="chatList"></div>
   </div>
-</div>
 
-<script src="js/chat.js"></script>
+  <!-- RIGHT -->
+  <div class="chat-panel">
+    <div id="chatStatus">Loading…</div>
+    <div id="waitingBox"></div>
+    <div id="chatBox"></div>
+
+    <div class="input-box">
+      <input id="messageInput" placeholder="Type a message">
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script src="js/chat.js"></script>
 </body>
 </html>
