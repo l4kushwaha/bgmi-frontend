@@ -64,7 +64,7 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 }
 
 /* ================= LOAD ================= */
-window.startChatFromMarketplace = async function (item, type = "chat") {
+window.startChatFromMarketplace = async function (item, intent) {
   const token = localStorage.getItem("token");
   const user  = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -84,7 +84,8 @@ window.startChatFromMarketplace = async function (item, type = "chat") {
         },
         body: JSON.stringify({
           order_id: crypto.randomUUID(),
-          seller_user_id: item.seller_id   // ✅ FIXED
+          seller_user_id: item.seller_id,  // ✅ FIXED
+          intent
         })
       }
     );

@@ -1,234 +1,249 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<title>BGMI Secure Chat</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>BGMI Secure Chat</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+
 
 <style>
+
 *{box-sizing:border-box}
 
 body{
+
   margin:0;
-  font-family:'Poppins',sans-serif;
-  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  color:#fff;
+
+  font-family:Poppins,sans-serif;
+
+  background:#0f172a;
+
+  color:#e5e7eb;
+
   height:100vh;
+
   display:flex;
+
   flex-direction:column;
+
 }
 
-/* ===== HEADER ===== */
+
+
+/* HEADER */
+
 header{
+
   padding:14px 18px;
-  background:rgba(255,255,255,.06);
-  backdrop-filter:blur(12px);
+
+  background:#020617;
+
   display:flex;
+
   justify-content:space-between;
+
   align-items:center;
-  border-bottom:1px solid rgba(255,255,255,.15);
-}
-header h2{
-  margin:0;
-  font-size:18px;
-}
-#chatStatus{
-  font-size:13px;
-  color:#f1c40f;
+
+  border-bottom:1px solid #1e293b;
+
 }
 
-/* ===== SELLER DASHBOARD ===== */
-#sellerDashboard{
-  display:none;
-  padding:12px;
-  background:rgba(0,0,0,.45);
-  border-bottom:1px solid rgba(255,255,255,.15);
-}
-#sellerDashboard h3{
-  margin:0 0 10px;
-  font-size:15px;
-}
-.request{
-  padding:10px;
-  margin-bottom:8px;
-  background:rgba(255,255,255,.08);
-  border-radius:10px;
-}
-.request button{
-  margin:4px;
-  padding:6px 12px;
-  border:none;
-  border-radius:14px;
-  font-weight:600;
-  cursor:pointer;
-}
-.approve{background:#27ae60;color:#fff}
-.reject{background:#c0392b;color:#fff}
+header h2{margin:0;font-size:16px;font-weight:600}
 
-/* ===== CHAT ===== */
+#chatStatus{font-size:13px;color:#94a3b8}
+
+
+
+/* CHAT */
+
 #chatBox{
+
   flex:1;
+
   padding:14px;
+
   overflow-y:auto;
+
   display:flex;
+
   flex-direction:column;
+
   gap:10px;
+
 }
 
-/* messages */
+
+
 .message{
-  max-width:78%;
+
+  max-width:75%;
+
   padding:10px 14px;
-  border-radius:14px;
+
+  border-radius:16px;
+
   font-size:14px;
+
+  animation:fadeIn .2s ease;
+
   line-height:1.4;
+
 }
+
 .sent{
+
   align-self:flex-end;
-  background:#27ae60;
-  color:#fff;
+
+  background:#2563eb;
+
+  border-bottom-right-radius:4px;
+
 }
+
 .received{
+
   align-self:flex-start;
-  background:rgba(255,255,255,.15);
+
+  background:#1e293b;
+
+  border-bottom-left-radius:4px;
+
 }
 
-/* ===== WAITING ===== */
+
+
+/* WAITING */
+
 #waitingBox{
-  display:none;
+
   padding:12px;
+
   text-align:center;
-  background:rgba(0,0,0,.45);
-  border-top:1px solid rgba(255,255,255,.15);
-}
-#waitingBox button{
-  margin:6px;
-  padding:8px 14px;
-  border:none;
-  border-radius:18px;
-  cursor:pointer;
-  font-weight:600;
+
+  font-size:14px;
+
+  background:#020617;
+
+  border-top:1px solid #1e293b;
+
+  display:none;
+
 }
 
-/* ===== INPUT ===== */
+
+
+/* INPUT */
+
 #inputBar{
+
   display:flex;
+
   gap:8px;
+
   padding:12px;
-  background:rgba(0,0,0,.45);
-  border-top:1px solid rgba(255,255,255,.15);
+
+  background:#020617;
+
+  border-top:1px solid #1e293b;
+
 }
+
 #messageInput{
+
   flex:1;
+
   padding:10px 14px;
+
   border:none;
+
   border-radius:20px;
+
+  outline:none;
+
+  font-family:Poppins;
+
 }
+
 #sendBtn{
+
   padding:0 18px;
+
   border:none;
+
   border-radius:20px;
-  background:#3498db;
+
+  background:#2563eb;
+
   color:#fff;
+
   font-weight:600;
+
+  cursor:pointer;
+
 }
+
 #sendBtn:disabled{opacity:.5}
+
+
+
+@keyframes fadeIn{
+
+  from{opacity:0;transform:translateY(4px)}
+
+  to{opacity:1}
+
+}
+
 </style>
+
 </head>
+
+
 
 <body>
 
-<!-- HEADER -->
+
+
 <header>
-  <h2>BGMI Secure Chat</h2>
+
+  <h2>Secure Chat</h2>
+
   <span id="chatStatus">Connecting…</span>
+
 </header>
 
-<!-- SELLER DASHBOARD -->
-<div id="sellerDashboard">
-  <h3>🔔 Pending Chat Requests</h3>
-  <div id="requestsList"></div>
-</div>
 
-<!-- CHAT -->
+
 <div id="chatBox"></div>
 
-<!-- WAITING / BUY ACTIONS -->
+
+
 <div id="waitingBox"></div>
 
-<!-- INPUT -->
+
+
 <div id="inputBar">
-  <input id="messageInput" placeholder="Type message…" />
+
+  <input id="messageInput" placeholder="Type a message…" />
+
   <button id="sendBtn">Send</button>
+
 </div>
 
-<!-- CHAT JS -->
-<script src="js/chat.js"></script>
 
-<script>
-/* ===== SELLER DASHBOARD LOGIC ===== */
-(async () => {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  const token = localStorage.getItem("token");
-  if (!user || !token) return;
 
-  // seller only
-  if (user.role !== "seller") return;
-
-  const dash = document.getElementById("sellerDashboard");
-  const list = document.getElementById("requestsList");
-
-  dash.style.display = "block";
-
-  async function loadRequests(){
-    const res = await fetch(
-      "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/pending",
-      { headers:{ Authorization:"Bearer "+token } }
-    );
-    if(!res.ok) return;
-
-    const data = await res.json();
-    list.innerHTML = "";
-
-    data.forEach(r=>{
-      const div = document.createElement("div");
-      div.className = "request";
-      div.innerHTML = `
-        <b>Buyer ID:</b> ${r.buyer_id}<br>
-        <button class="approve">Approve</button>
-        <button class="reject">Reject</button>
-      `;
-
-      div.querySelector(".approve").onclick = () =>
-        action(r.id,true);
-      div.querySelector(".reject").onclick = () =>
-        action(r.id,false);
-
-      list.appendChild(div);
-    });
-  }
-
-  async function action(room_id, approve){
-    await fetch(
-      "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/approve",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          Authorization:"Bearer "+token
-        },
-        body:JSON.stringify({ room_id, approve })
-      }
-    );
-    loadRequests();
-  }
-
-  loadRequests();
-  setInterval(loadRequests,4000);
-})();
-</script>
+<script src="chat.js"></script>
 
 </body>
+
 </html>
