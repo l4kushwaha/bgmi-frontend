@@ -130,7 +130,7 @@ window.startChatFromMarketplace = async function (item, type = "chat") {
 
   // 🔥 VERY IMPORTANT
 
-  window.location.href = `chat.html?room_id=${data.room_id || order_id}`;
+  window.location.href = `chat.html?room_id=${data.room_id}`;
 
 }
 
