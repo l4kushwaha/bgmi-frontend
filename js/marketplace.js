@@ -101,11 +101,7 @@ window.startChatFromMarketplace = async function (item, type = "chat") {
     body: JSON.stringify({
 
       order_id,
-
-      buyer_id: s.user.id,
-
       seller_id: item.seller_id,
-
       type // chat | buy
 
     })
