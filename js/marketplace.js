@@ -70,9 +70,10 @@ const CHAT_API = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
 
 window.startChatFromMarketplace = async function (item, type = "chat") {
 
-  const s = session();
+  const token =localStorage.getItem("token");
+  const user =JSON.parse(localStorage.getItem("user")|| "null");
 
-  if (!s) {
+  if (!token || !user) {
 
     alert("Please login first");
 
@@ -101,7 +102,7 @@ window.startChatFromMarketplace = async function (item, type = "chat") {
     body: JSON.stringify({
 
       order_id,
-      seller_user_id :item_seller_user_id,
+      seller_user_id :item_seller_id,
       type // chat | buy
 
     })
