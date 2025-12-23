@@ -73,6 +73,12 @@ window.startChatFromMarketplace = async function (item, intent) {
     return;
   }
 
+  if(!item.seller_id){
+    console.error("Missing seller_user_id ",item);
+    alert("seller info missing");
+    return;
+  }
+
   try {
     const res = await fetch(
       "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/create",
@@ -83,14 +89,15 @@ window.startChatFromMarketplace = async function (item, intent) {
           "Authorization": "Bearer " + token
         },
         body: JSON.stringify({
-          order_id: crypto.randomUUID(),
+          order_id: "order-"+item.id,
           seller_user_id: item.seller_id,  // ✅ FIXED
-          intent
+          intent: intent
         })
       }
     );
 
     if (!res.ok) {
+      console.error("chat creation failed",data);
       alert("Unable to start chat");
       return;
     }
@@ -101,7 +108,7 @@ window.startChatFromMarketplace = async function (item, intent) {
     window.location.href = `chat.html?room_id=${data.room_id}`;
 
   } catch (err) {
-    console.error(err);
+    console.error("chat error",err);
     alert("Chat service error");
   }
 };
