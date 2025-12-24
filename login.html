@@ -1,166 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - BGMI Market</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Signup Form</title>
 
-  <!-- Toastr CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <style>
+        @import url("styles/style1.css");
+    </style>
 
-  <style>
-    /* ========== GLOBAL RESET ========== */
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-
-    body {
-      min-height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background: radial-gradient(circle at top left, #150026, #08080f, #140023);
-      overflow:hidden;
-      color:#fff;
-      position:relative;
-    }
-
-    /* Floating bubbles */
-    .bubble {
-      position:absolute;
-      border-radius:50%;
-      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,204,0,0.1));
-      animation: float 15s infinite ease-in-out;
-      pointer-events:none;
-      z-index:0;
-    }
-    @keyframes float {
-      0%,100%{ transform: translateY(0) scale(1); opacity:0.5; }
-      50%{ transform: translateY(-30px) scale(1.1); opacity:1; }
-    }
-
-    /* Auth container */
-    .auth-container {
-      position: relative;
-      z-index: 10;
-      background: rgba(255,255,255,0.08);
-      padding: 2rem;
-      border-radius: 20px;
-      width: 320px;
-      text-align: center;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-      animation: fadeIn 1s ease forwards;
-    }
-    @keyframes fadeIn { from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
-
-    .auth-container h2 {
-      font-size: 1.6rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(90deg,#ff8800,#ffcc00,#ff00ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .form-group { margin-bottom: 1rem; text-align:left; }
-    .form-group label { display:block; font-size:0.9rem; margin-bottom:0.3rem; color:#ffc; }
-    .form-group input {
-      width:100%;
-      padding:0.6rem 0.8rem;
-      border-radius:10px;
-      border:none;
-      outline:none;
-      font-size:0.95rem;
-      background: rgba(255,255,255,0.1);
-      color:#fff;
-    }
-    .form-group input::placeholder { color: #ccc; }
-
-    button {
-      width:100%;
-      padding:0.8rem;
-      border:none;
-      border-radius:30px;
-      font-size:1rem;
-      font-weight:600;
-      background: linear-gradient(90deg,#ff8800,#ff00ff);
-      color:#fff;
-      cursor:pointer;
-      transition:all 0.3s ease;
-      margin-top:0.5rem;
-      box-shadow: 0 0 20px rgba(255,0,255,0.4);
-    }
-    button:hover { transform: scale(1.05); box-shadow:0 0 40px rgba(255,0,255,0.8); }
-
-    .text-small { font-size:0.85rem; margin-top:0.5rem; }
-    .text-small a { color:#ffcc00; text-decoration:none; transition:0.3s; }
-    .text-small a:hover { color:#ff00ff; text-shadow:0 0 8px #ff00ff; }
-
-    .tagline {
-      position:absolute;
-      bottom:20px;
-      width:100%;
-      text-align:center;
-      font-size:0.9rem;
-      color:#ccc;
-      animation: glowPulse 3s infinite ease-in-out;
-    }
-    @keyframes glowPulse {
-      0%,100%{ opacity:0.8; text-shadow: 0 0 10px #ffcc00; }
-      50%{ opacity:1; text-shadow: 0 0 20px #ff00ff; }
-    }
-  </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-  <!-- Floating Bubbles -->
-  <script>
-    for(let i=0;i<20;i++){
-      const bubble=document.createElement("div");
-      bubble.classList.add("bubble");
-      const size=Math.random()*80+20;
-      bubble.style.width=`${size}px`;
-      bubble.style.height=`${size}px`;
-      bubble.style.left=`${Math.random()*100}vw`;
-      bubble.style.top=`${Math.random()*100}vh`;
-      bubble.style.animationDuration=`${10+Math.random()*8}s`;
-      bubble.style.animationDelay=`${Math.random()*4}s`;
-      document.body.appendChild(bubble);
-    }
-  </script>
 
-  <!-- Login Form -->
-  <div class="auth-container">
-    <h2>🔐 Login to BGMI Market</h2>
+<div class="auth-wrapper">
+    <div class="background-shape"></div>
+    <div class="secondary-shape"></div>
 
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Enter your email" required />
+    <!-- LOGIN -->
+    <div class="credentials-panel signin">
+        <h2 class="slide-element">Login</h2>
+        <form action="#" method="post">
+
+            <div class="field-wrapper slide-element">
+                <input type="text" id="login-username" aria-label="Username" required>
+                <label for="login-username">Username</label>
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="field-wrapper slide-element">
+                <input type="password" id="login-password" aria-label="Password" required>
+                <label for="login-password">Password</label>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <div class="field-wrapper slide-element">
+                <button class="submit-button" type="submit">Login</button>
+            </div>
+            <div class="switch-link slide-element">
+              <a href="forgot_password.html" class="forgot-password-link">
+                    Forgot Password?
+                       </a>
+              </div>
+
+            <div class="switch-link slide-element">
+                <p>Don't have an account?<br>
+                    <a href="#" class="register-trigger">Sign Up</a>
+                </p>
+            </div>
+        </form>
     </div>
 
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter your password" required />
+    <div class="welcome-section signin">
+        <h2 class="slide-element">WELCOME BACK!</h2>
     </div>
 
-    <button id="loginBtn" onclick="loginUser()">Login</button>
+    <!-- SIGNUP -->
+    <div class="credentials-panel signup">
+        <h2 class="slide-element">Register</h2>
+        <form action="#" method="post">
 
-    <p class="text-small"><a href="forgot_password.html">Forgot Password?</a></p>
-    <p class="text-small">Don’t have an account? <a href="register.html">Register</a></p>
-  </div>
+            <div class="field-wrapper slide-element">
+                <input type="text" id="signup-username" aria-label="Username" required>
+                <label for="signup-username">Username</label>
+                <i class="fa-solid fa-user"></i>
+            </div>
 
-  <p class="tagline">✨ Secure your gaming future with BGMI Market – Where Legends Trade ✨</p>
+            <div class="field-wrapper slide-element">
+                <input type="email" id="signup-email" aria-label="Email" required>
+                <label for="signup-email">Email</label>
+                <i class="fa-solid fa-envelope"></i>
+            </div>
 
-  <!-- Toastr JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-  <script>
-    toastr.options = {
-      "closeButton": true,
-      "progressBar": true,
-      "positionClass": "toast-top-right",
-      "timeOut": "3000"
-    };
-  </script>
+            <div class="field-wrapper slide-element">
+                <input type="password" id="signup-password" aria-label="Password" required>
+                <label for="signup-password">Password</label>
+                <i class="fa-solid fa-lock"></i>
+            </div>
 
-  <!-- Auth JS -->
-  <script src="js/auth.js"></script>
+            <div class="field-wrapper slide-element">
+                <button class="submit-button" type="submit">Register</button>
+            </div>
+
+            <div class="switch-link slide-element">
+                <p>Already have an account?<br>
+                    <a href="#" class="login-trigger">Sign In</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <div class="welcome-section signup">
+        <h2 class="slide-element">WELCOME!</h2>
+    </div>
+</div>
+
+<div class="footer">
+    <p>Made with ❤️ by <a href="#" target="_blank">Sillent_hunter</a></p>
+</div>
+
+<script src="js/style.js"></script>
+<script src="js/auth.js"></script>
+
 </body>
 </html>

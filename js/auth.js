@@ -1,203 +1,281 @@
 (() => {
-  // 🌐 Base URLs
-  const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
-  const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev";
-  const BASE_AUTH_SERVICE = "https://auth-service.bgmi-gateway.workers.dev/api/auth";
+  const API = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
 
-  const AUTH_API = window.AUTH_API || (() => {
-    if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
-    return BASE_AUTH_SERVICE;
-  })();
-  window.AUTH_API = AUTH_API;
+  /* ================= SESSION ================= */
+  const token = localStorage.getItem("token");
+  const user  = JSON.parse(localStorage.getItem("user") || "null");
 
-  // ===============================
-  // 🔓 JWT Decode Helper
-  // ===============================
-  function decodeJWT(token) {
-    try { return JSON.parse(atob(token.split(".")[1])); } 
-    catch { return null; }
+  if (!token || !user) {
+    location.href = "/login";
+    return;
   }
 
-  // ===============================
-  // 🧩 Universal Fetch Helper
-  // ===============================
-  async function apiFetch(url, options = {}, retry = true) {
-    const token = localStorage.getItem("token");
-    const headers = { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers };
-    if (!(options.body instanceof FormData)) headers["Content-Type"] = "application/json";
-    try {
-      const res = await fetch(url, { ...options, headers });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || data.message || "Request failed");
-      return data;
-    } catch (err) {
-      if (retry && !url.includes(BASE_GATEWAY_API)) {
-        return apiFetch(url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth"), options, false);
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + token
+  };
+
+  /* ================= DOM ================= */
+  const chatListBox = document.getElementById("chatList");
+  const chatBox = document.getElementById("chatBox");
+  const chatStatus = document.getElementById("chatStatus");
+  const waitingBox = document.getElementById("waitingBox");
+  const input = document.getElementById("messageInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const imgBtn = document.getElementById("imgBtn");
+  const imgInput = document.getElementById("imageInput");
+  const search = document.getElementById("searchChats");
+  const sound = document.getElementById("notifySound");
+  const onlineStatus = document.getElementById("onlineStatus");
+  const buyBox = document.getElementById("buyBox");
+  const halfPayBtn = document.getElementById("halfPayBtn");
+
+  /* ================= HELPERS ================= */
+  function disable(state) {
+    input.disabled = state;
+    sendBtn.disabled = state;
+    imgBtn.disabled = state;
+  }
+
+  async function safeFetch(url, options = {}) {
+    const res = await fetch(url, options);
+
+    if (res.status === 401) {
+      localStorage.clear();
+      alert("Session expired. Please login again.");
+      location.href = "/login";
+      throw new Error("Unauthorized");
+    }
+
+    return res;
+  }
+
+  /* ================= STATE ================= */
+  let chats = [];
+  let activeRoom = null;
+  let lastCount = 0;
+  let canSend = false;
+
+  /* ================= ONLINE STATUS ================= */
+  function updateOnline() {
+    onlineStatus.textContent = navigator.onLine ? "🟢 Online" : "🔴 Offline";
+  }
+  window.addEventListener("online", updateOnline);
+  window.addEventListener("offline", updateOnline);
+  updateOnline();
+
+  /* ================= LOAD MY CHATS ================= */
+  async function loadMyChats() {
+    const r = await safeFetch(`${API}/api/chat/my`, { headers });
+    chats = await r.json();
+    renderChatList();
+  }
+
+  /* ================= RENDER CHAT LIST ================= */
+  function renderChatList() {
+    const q = search.value.toLowerCase();
+    chatListBox.innerHTML = "";
+
+    chats
+      .filter(c =>
+        !q ||
+        (c.order_id || "").toLowerCase().includes(q) ||
+        (c.last_message || "").toLowerCase().includes(q)
+      )
+      .forEach(c => {
+        const div = document.createElement("div");
+        div.className = "chat-item" + (activeRoom === c.id ? " active" : "");
+        div.innerHTML = `
+          <div class="chat-title">Order: ${c.order_id}</div>
+          <div class="chat-preview">${c.last_message || "No messages"}</div>
+          <div class="chat-meta">${c.status}</div>
+        `;
+        div.onclick = () => openChat(c.id);
+        chatListBox.appendChild(div);
+      });
+  }
+
+  /* ================= OPEN CHAT ================= */
+  async function openChat(room_id) {
+    activeRoom = room_id;
+    lastCount = 0;
+    chatBox.innerHTML = "";
+    waitingBox.innerHTML = "";
+    canSend = false;
+
+    const r = await safeFetch(`${API}/api/chat/room?room_id=${room_id}`, { headers });
+    const room = await r.json();
+
+    renderStatus(room);
+    await loadMessages();
+    renderChatList();
+  }
+
+  /* ================= STATUS UI ================= */
+  function renderStatus(room) {
+    waitingBox.innerHTML = "";
+    canSend = false;
+    disable(true);
+
+    const isBuyer = String(room.buyer_id) === String(user.id);
+    const isSeller = String(room.seller_user_id) === String(user.id);
+
+    if (room.status === "requested") {
+      chatStatus.textContent = "Request pending";
+
+      if (isSeller) {
+        waitingBox.innerHTML = `
+          <button onclick="approve(true)">Accept</button>
+          <button onclick="approve(false)">Reject</button>
+        `;
+      } else {
+        waitingBox.textContent = "⏳ Waiting for seller approval";
       }
-      throw err;
+
+      buyBox.style.display = "none";
+      return;
     }
-  }
 
-  // ===============================
-  // 🔔 Toast Helper
-  // ===============================
-  function showToast(message, type = "info") {
-    if (window.toastr) toastr[type](message);
-    else alert(message);
-  }
+    if (room.status === "approved") {
+      chatStatus.textContent = "Chat active";
+      canSend = true;
+      disable(false);
 
-  // ===============================
-  // 🧾 REGISTER USER
-  // ===============================
-  async function registerUser() {
-    const full_name = document.getElementById("full_name")?.value.trim();
-    const email = document.getElementById("email")?.value.trim();
-    const phone = document.getElementById("phone")?.value.trim() || "";
-    const password = document.getElementById("password")?.value.trim();
-
-    if (!full_name || !email || !password) return showToast("Please fill all required fields", "error");
-
-    const btn = document.getElementById("registerBtn");
-    if (btn) btn.innerText = "Registering...";
-
-    try {
-      const payload = { full_name, email, phone, password };
-      const data = await apiFetch(`${AUTH_API}/register`, { method: "POST", body: JSON.stringify(payload) });
-      showToast("Registered successfully!", "success");
-
-      // Auto-login after registration
-      await loginUser({ emailInput: email, passwordInput: password, autoLogin: true });
-    } catch (err) {
-      if (err.message.includes("exists")) showToast("You are already registered. Please login", "warning");
-      else showToast(err.message, "error");
-    } finally { if (btn) btn.innerText = "Register"; }
-  }
-
-  // ===============================
-  // 🔐 LOGIN USER
-  // ===============================
-  async function loginUser({ emailInput, passwordInput, autoLogin = false } = {}) {
-    const email = emailInput || document.getElementById("email")?.value.trim();
-    const password = passwordInput || document.getElementById("password")?.value.trim();
-
-    if (!email || !password) return showToast("Enter email and password", "error");
-    const btn = document.getElementById("loginBtn");
-    if (btn) btn.innerText = "Logging in...";
-
-    try {
-      const data = await apiFetch(`${AUTH_API}/login`, { method: "POST", body: JSON.stringify({ email, password }) });
-      const jwtPayload = decodeJWT(data.access_token);
-
-      localStorage.setItem("token", data.access_token);
-      if (data.refresh_token) localStorage.setItem("refresh_token", data.refresh_token);
-
-      const userInfo = { id: jwtPayload?.id, name: jwtPayload?.email?.split("@")[0] || "Player", email, role: jwtPayload?.role };
-      localStorage.setItem("user", JSON.stringify(userInfo));
-
-      // Role-based redirect
-      if (userInfo.role === "admin") window.location.href = "admin_dashboard.html";
-      else window.location.href = "index.html";
-
-    } catch (err) {
-      if (err.message.includes("password")) showToast("Wrong password", "error");
-      else if (err.message.includes("not found")) showToast("Please create an account", "warning");
-      else showToast(err.message || "Login failed", "error");
-    } finally { if (btn) btn.innerText = "Login"; }
-  }
-
-  // ===============================
-  // 🔁 FORGOT PASSWORD
-  // ===============================
-  async function sendResetLink() {
-    const email = document.getElementById("email")?.value.trim();
-    if (!email) return showToast("Please enter your email", "error");
-
-    const btn = document.getElementById("forgotBtn");
-    if (btn) btn.innerText = "Sending...";
-    try {
-      await apiFetch(`${AUTH_API}/forgot-password`, { method: "POST", body: JSON.stringify({ email }) });
-      showToast("OTP sent to your email", "success");
-    } catch (err) {
-      showToast(err.message || "Failed to send OTP", "error");
-    } finally { if (btn) btn.innerText = "Send OTP"; }
-  }
-
-  // ===============================
-  // 🔄 RESET PASSWORD
-  // ===============================
-  async function resetPassword() {
-    const otpInput = document.getElementById("resetToken")?.value.trim();
-    const new_password = document.getElementById("newPassword")?.value.trim();
-    if (!otpInput || !new_password) return showToast("OTP and new password required", "error");
-
-    const btn = document.getElementById("resetBtn");
-    if (btn) btn.innerText = "Resetting...";
-    try {
-      await apiFetch(`${AUTH_API}/reset-password`, { method: "POST", body: JSON.stringify({ otp: otpInput, new_password }) });
-      showToast("Password reset successful! Please log in", "success");
-    } catch (err) {
-      showToast(err.message || "Failed to reset password", "error");
-    } finally { if (btn) btn.innerText = "Reset Password"; }
-  }
-
-  // ===============================
-  // 🚪 LOGOUT
-  // ===============================
-  function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user");
-    updateFrontendAuth();
-    if (!window.location.href.includes("index.html")) window.location.href = "login.html";
-  }
-
-  // ===============================
-  // 👤 CURRENT USER UTILITIES
-  // ===============================
-  function getCurrentUser() { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } }
-  function isAdmin() { return getCurrentUser()?.role === "admin"; }
-
-  // ===============================
-  // 🧠 FRONTEND AUTH STATE
-  // ===============================
-  function updateFrontendAuth() {
-    const user = getCurrentUser();
-    const guestView = document.getElementById("guest-view");
-    const userDashboard = document.getElementById("user-dashboard");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const usernameEl = document.getElementById("username");
-
-    if (user) {
-      guestView?.classList.replace("visible", "hidden");
-      userDashboard?.classList.replace("hidden", "visible");
-      logoutBtn?.classList.replace("hidden", "visible");
-      if (usernameEl) usernameEl.textContent = user.name;
-    } else {
-      guestView?.classList.replace("hidden", "visible");
-      userDashboard?.classList.replace("visible", "hidden");
-      logoutBtn?.classList.replace("visible", "hidden");
+      if (room.intent === "buy" && isBuyer) {
+        buyBox.style.display = "block";
+      } else {
+        buyBox.style.display = "none";
+      }
+      return;
     }
+
+    if (room.status === "half_paid") {
+      chatStatus.textContent = "Half payment completed";
+      canSend = true;
+      disable(false);
+      buyBox.style.display = "none";
+      return;
+    }
+
+    chatStatus.textContent = "Chat closed";
+    buyBox.style.display = "none";
   }
 
-  // ===============================
-  // 🌐 AUTO-RUN ON PAGE LOAD
-  // ===============================
-  window.addEventListener("load", () => {
-    updateFrontendAuth();
-    const params = new URLSearchParams(window.location.search);
-    const otp = params.get("otp");
-    if (otp && document.getElementById("resetToken")) document.getElementById("resetToken").value = otp;
+  /* ================= APPROVE ================= */
+  window.approve = async function(ok) {
+    await safeFetch(`${API}/api/chat/approve`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ room_id: activeRoom, approve: ok })
+    });
+    await loadMyChats();
+    await openChat(activeRoom);
+  };
+
+  /* ================= LOAD MESSAGES ================= */
+  async function loadMessages() {
+    if (!activeRoom) return;
+
+    const r = await safeFetch(`${API}/api/chat/messages?room_id=${activeRoom}`, { headers });
+    const msgs = await r.json();
+    if (!Array.isArray(msgs)) return;
+
+    if (lastCount && msgs.length > lastCount) sound?.play();
+    lastCount = msgs.length;
+
+    chatBox.innerHTML = "";
+    msgs.forEach(m => {
+      const div = document.createElement("div");
+      div.className =
+        "message " +
+        (String(m.sender_id) === String(user.id) ? "sent" : "received");
+
+      if (m.type === "image") {
+        const img = document.createElement("img");
+        img.src = m.ciphertext;
+        img.className = "chat-image";
+        div.appendChild(img);
+      } else {
+        div.textContent = m.ciphertext;
+      }
+
+      chatBox.appendChild(div);
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  /* ================= SEND MESSAGE ================= */
+  async function sendMessage(msg, type = "text") {
+    if (!activeRoom || !msg || !canSend) return;
+
+    const r = await safeFetch(`${API}/api/chat/send`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        room_id: activeRoom,
+        message: msg,
+        type,
+        sensitive: false
+      })
+    });
+
+    if (!r.ok) {
+      const e = await r.json();
+      alert(e.error || "Message failed");
+      return;
+    }
+
+    input.value = "";
+    await loadMessages();
+    await loadMyChats();
+  }
+
+  /* ================= HALF PAYMENT ================= */
+  halfPayBtn.onclick = async () => {
+    if (!activeRoom) return;
+
+    await safeFetch(`${API}/api/chat/half-payment`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ room_id: activeRoom })
+    });
+
+    alert("Half payment completed");
+    openChat(activeRoom);
+  };
+
+  /* ================= EVENTS ================= */
+  sendBtn.onclick = () => sendMessage(input.value.trim());
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") sendBtn.click();
   });
 
-  // ===============================
-  // 🌟 EXPORT FUNCTIONS
-  // ===============================
-  window.registerUser = registerUser;
-  window.loginUser = loginUser;
-  window.sendResetLink = sendResetLink;
-  window.resetPassword = resetPassword;
-  window.logout = logout;
-  window.getCurrentUser = getCurrentUser;
-  window.isAdmin = isAdmin;
-  window.updateFrontendAuth = updateFrontendAuth;
+  imgBtn.onclick = () => imgInput.click();
+
+  imgInput.onchange = () => {
+    const file = imgInput.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image too large (max 2MB)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => sendMessage(reader.result, "image");
+    reader.readAsDataURL(file);
+  };
+
+  search.oninput = renderChatList;
+
+  /* ================= POLLING ================= */
+  setInterval(() => {
+    loadMyChats();
+    if (activeRoom) loadMessages();
+  }, 3000);
+
+  /* ================= INIT ================= */
+  loadMyChats();
 })();
