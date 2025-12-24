@@ -68,17 +68,7 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 // ✅ COMMON FUNCTION (ADD THIS)
 async function startChatOrBuy(order_id, seller_user_id, intent) {
   try {
-   const token = req.headers.get("Authorization")?.split(" ")[1] || null;
-if (!token) return json({ error: "unauthorized", message: "No token" }, 401);
-
-// ✅ Safe check without console.log
-const isValid = await jwt.verify(token, env.JWT_SECRET);
-if (!isValid) return json({ error: "unauthorized", message: "Invalid token" }, 401);
-
-// ✅ Decode safely
-const payload = jwt.decode(token)?.payload || {};
-if (!payload.id) return json({ error: "unauthorized", message: "Invalid payload" }, 401);
-
+    const token = localStorage.getItem("token");
   
     if (!token) {
       alert("Please login first");
