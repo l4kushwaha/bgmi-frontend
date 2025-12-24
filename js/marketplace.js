@@ -69,7 +69,8 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 async function startChatOrBuy(order_id, seller_user_id, intent) {
   try {
     const token = localStorage.getItem("token");
-  
+   console.log("TOKEN:", token);
+
     if (!token) {
       alert("Please login first");
       location.href = "/login";
