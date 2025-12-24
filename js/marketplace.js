@@ -64,22 +64,16 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 }
 
 /* ================= LOAD ================= */
-window.startChatFromMarketplace = async function (item, intent) {
-  const token = localStorage.getItem("token");
-  const user  = JSON.parse(localStorage.getItem("user") || "null");
-
-  if (!token || !user) {
-    alert("Please login first");
-    return;
-  }
-
-  if(!item.seller_id){
-    console.error("Missing seller_user_id ",item);
-    alert("seller info missing");
-    return;
-  }
-
+// ✅ COMMON FUNCTION (ADD THIS)
+async function startChatOrBuy(order_id, seller_user_id, intent) {
   try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login first");
+      location.href = "/login";
+      return;
+    }
+
     const res = await fetch(
       "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/create",
       {
@@ -89,29 +83,38 @@ window.startChatFromMarketplace = async function (item, intent) {
           "Authorization": "Bearer " + token
         },
         body: JSON.stringify({
-          order_id: "order-"+item.id,
-          seller_user_id: item.seller_id,  // ✅ FIXED
-          intent: intent
+          order_id,
+          seller_user_id,
+          intent // 🔥 chat OR buy
         })
       }
     );
 
+    const data = await res.json();
+
     if (!res.ok) {
-      console.error("chat creation failed",data);
-      alert("Unable to start chat");
+      alert(data.error || "Unable to start chat");
       return;
     }
 
-    const data = await res.json();
-
     // redirect to chat page
-    window.location.href = `chat.html?room_id=${data.room_id}`;
+    location.href = `/chat.html?room_id=${data.room_id}`;
 
   } catch (err) {
-    console.error("chat error",err);
-    alert("Chat service error");
+    console.error("chat error", err);
+    alert("Something went wrong");
   }
-};
+}
+
+// ✅ CHAT BUTTON
+function startChat(order_id, seller_user_id) {
+  startChatOrBuy(order_id, seller_user_id, "chat");
+}
+
+// ✅ BUY BUTTON
+function startBuy(order_id, seller_user_id) {
+  startChatOrBuy(order_id, seller_user_id, "buy");
+}
 
 async function loadListings() {
   const s = session();
@@ -206,13 +209,13 @@ function renderCard(item) {
     card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
   }
 
-  if(!isOwner(item)) {
-    card.querySelector(".chat-btn").onclick =
-    () => startChatFromMarketplace(item,"chat");
+ if (!isOwner(item)) {
+  card.querySelector(".chat-btn").onclick = () =>
+    startChat(item.order_id, item.user_id); // CHAT
 
-    card.querySelector(".buy-btn").onclick =
-    () => startChatFromMarketplace(item, "buy");
-  }
+  card.querySelector(".buy-btn").onclick = () =>
+    startBuy(item.order_id, item.user_id); // BUY
+}
 
   
   initFullscreen(card);

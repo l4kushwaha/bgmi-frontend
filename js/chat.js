@@ -106,35 +106,45 @@
 
   /* ================= STATUS UI ================= */
   function renderStatus(room) {
-    waitingBox.innerHTML = "";
-    canSend = false;
+  waitingBox.innerHTML = "";
+  canSend = false;
 
-    if (room.status === "requested") {
-      if (String(room.seller_user_id) === String(user.id)) {
-        chatStatus.textContent = "New request";
-        waitingBox.innerHTML = `
-          <button onclick="approve(true)">Accept</button>
-          <button onclick="approve(false)">Reject</button>
-        `;
-      } else {
-        chatStatus.textContent = "Waiting for seller approval";
-        waitingBox.textContent = "⏳ Request sent";
-      }
-      disable(true);
-      return;
+  // REQUESTED
+  if (room.status === "requested") {
+    if (String(room.seller_user_id) === String(user.id)) {
+      chatStatus.textContent = "New request";
+      waitingBox.innerHTML = `
+        <button onclick="approve(true)">Accept</button>
+        <button onclick="approve(false)">Reject</button>
+      `;
+    } else {
+      chatStatus.textContent = "Waiting for seller approval";
+      waitingBox.textContent = "⏳ Request sent";
     }
-
-    if (room.status === "approved" || room.status === "half_paid") {
-      chatStatus.textContent = "Chat active";
-      canSend = true;
-      disable(false);
-      return;
-    }
-
-    chatStatus.textContent = "Chat closed";
-    waitingBox.textContent = "🚫 This chat is closed";
     disable(true);
+    return;
   }
+
+  // APPROVED / HALF PAID
+  if (room.status === "approved" || room.status === "half_paid") {
+    chatStatus.textContent = "Chat active";
+    canSend = true;
+    disable(false);
+
+    // 🔥 BUY INTENT UI
+    if (room.intent === "buy") {
+      document.getElementById("buyBox").style.display = "block";
+    } else {
+      document.getElementById("buyBox").style.display = "none";
+    }
+    return;
+  }
+
+  // CLOSED
+  chatStatus.textContent = "Chat closed";
+  document.getElementById("buyBox").style.display = "none";
+  disable(true);
+}
 
   function disable(d) {
     input.disabled = d;
@@ -213,6 +223,24 @@
     await loadMessages();
     await loadMyChats();
   }
+
+
+  document.getElementById("halfPayBtn").onclick = async () => {
+  if (!activeRoom) return;
+
+  await fetch(
+    "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/half-payment",
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ room_id: activeRoom })
+    }
+  );
+
+  alert("Half payment done");
+  openChat(activeRoom);
+};
+
 
   /* ================= EVENTS ================= */
   sendBtn.onclick = () => sendMessage(input.value.trim());

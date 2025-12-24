@@ -3,79 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <title>Chat</title>
+
 <style>
 body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #0b141a;
 }
+
 .app {
   display: flex;
   height: 100vh;
 }
+
+/* ========== SIDEBAR ========== */
 .sidebar {
   width: 320px;
   background: #111b21;
   display: flex;
   flex-direction: column;
 }
+
 .sidebar-header {
   padding: 10px;
   border-bottom: 1px solid #222;
 }
+
 .sidebar-header input {
   width: 100%;
   padding: 8px;
   border-radius: 6px;
   border: none;
 }
+
 #onlineStatus {
   margin-top: 6px;
   font-size: 12px;
   color: #25d366;
 }
+
 .chat-list {
   flex: 1;
   overflow-y: auto;
 }
+
 .chat-item {
   padding: 12px;
   border-bottom: 1px solid #222;
   cursor: pointer;
 }
+
 .chat-item:hover,
 .chat-item.active {
   background: #202c33;
 }
+
 .chat-title {
   font-weight: bold;
   color: #fff;
 }
+
 .chat-preview {
   font-size: 13px;
   color: #aaa;
 }
+
 .chat-meta {
   font-size: 11px;
   color: #25d366;
 }
 
+/* ========== CHAT PANEL ========== */
 .chat-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   background: #0b141a;
 }
+
 .chat-header {
   padding: 12px;
   background: #202c33;
   color: #fff;
 }
+
 #chatBox {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
 }
+
+/* ========== MESSAGES ========== */
 .message {
   max-width: 65%;
   padding: 8px 10px;
@@ -83,26 +101,37 @@ body {
   border-radius: 8px;
   font-size: 14px;
 }
+
 .sent {
   background: #005c4b;
   color: #fff;
   margin-left: auto;
 }
+
 .received {
   background: #202c33;
   color: #fff;
 }
+
+img.chat-image {
+  max-width: 220px;
+  border-radius: 8px;
+}
+
+/* ========== INPUT ========== */
 .chat-input {
   display: flex;
   padding: 8px;
   background: #202c33;
 }
+
 .chat-input input {
   flex: 1;
   padding: 10px;
   border-radius: 6px;
   border: none;
 }
+
 .chat-input button {
   margin-left: 6px;
   padding: 10px;
@@ -111,14 +140,31 @@ body {
   background: #25d366;
   cursor: pointer;
 }
+
+/* ========== WAITING / STATUS ========== */
 #waitingBox {
   padding: 10px;
   text-align: center;
   color: #ffcc00;
+  font-size: 14px;
 }
-img.chat-image {
-  max-width: 220px;
-  border-radius: 8px;
+
+/* ========== BUY FLOW UI ========== */
+#buyBox {
+  display: none;
+  padding: 10px;
+  background: #111b21;
+  border-top: 1px solid #222;
+  text-align: center;
+}
+
+#buyBox button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #ffcc00;
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -127,6 +173,7 @@ img.chat-image {
 
 <div class="app">
 
+  <!-- ===== SIDEBAR ===== -->
   <div class="sidebar">
     <div class="sidebar-header">
       <input id="searchChats" placeholder="Search chats">
@@ -135,28 +182,43 @@ img.chat-image {
     <div id="chatList" class="chat-list"></div>
   </div>
 
+  <!-- ===== CHAT PANEL ===== -->
   <div class="chat-panel">
+
     <div class="chat-header">
       <div id="chatStatus">Select a chat</div>
     </div>
 
+    <!-- waiting / approval info -->
     <div id="waitingBox"></div>
+
+    <!-- messages -->
     <div id="chatBox"></div>
 
+    <!-- BUY FLOW (hidden by default) -->
+    <div id="buyBox">
+      <button id="halfPayBtn">Pay 50% Advance</button>
+    </div>
+
+    <!-- input -->
     <div class="chat-input">
       <input id="messageInput" placeholder="Type a message">
       <input type="file" id="imageInput" hidden>
       <button id="imgBtn">📷</button>
       <button id="sendBtn">Send</button>
     </div>
+
   </div>
 
 </div>
 
+<!-- notification sound -->
 <audio id="notifySound">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3">
 </audio>
 
+<!-- MAIN CHAT SCRIPT -->
 <script src="js/chat.js"></script>
+
 </body>
 </html>
