@@ -29,6 +29,13 @@
   const sound = document.getElementById("notifySound");
   const onlineStatus = document.getElementById("onlineStatus");
 
+  function disable(d) {
+  input.disabled = d;
+  sendBtn.disabled = d;
+  imgBtn.disabled = d;
+}
+
+
   /* ================= STATE ================= */
   let chats = [];
   let activeRoom = null;
