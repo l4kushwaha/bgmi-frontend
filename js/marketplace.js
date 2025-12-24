@@ -67,30 +67,15 @@ function compressImage(file, maxW = 1200, quality = 0.75) {
 /* ================= LOAD ================= */
 // ✅ COMMON FUNCTION (ADD THIS)
 async function startChatOrBuy(order_id, seller_user_id, intent) {
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  if (!token || !user) {
+    alert("Please login first");
+    return;
+  }
+
   try {
-   const token = req.headers.get("Authorization")?.split(" ")[1] || null;
-if (!token) return json({ error: "unauthorized", message: "No token" }, 401);
-
-// ✅ Safe check without console.log
-const isValid = await jwt.verify(token, env.JWT_SECRET);
-if (!isValid) return json({ error: "unauthorized", message: "Invalid token" }, 401);
-
-// ✅ Decode safely
-const payload = jwt.decode(token)?.payload || {};
-if (!payload.id) return json({ error: "unauthorized", message: "Invalid payload" }, 401);
-
-    if (!token) {
-      alert("Please login first");
-      location.href = "/login";
-      return;
-    }
-
-     if (!order_id || !seller_user_id) {
-      console.error("Invalid chat data", { order_id, seller_user_id });
-      alert("Invalid item data");
-      return;
-    }
-
     const res = await fetch(
       "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/create",
       {
@@ -99,11 +84,7 @@ if (!payload.id) return json({ error: "unauthorized", message: "Invalid payload"
           "Content-Type": "application/json",
           "Authorization": "Bearer " + token
         },
-        body: JSON.stringify({
-          order_id,
-          seller_user_id,
-          intent // 🔥 chat OR buy
-        })
+        body: JSON.stringify({ order_id, seller_user_id, intent })
       }
     );
 
