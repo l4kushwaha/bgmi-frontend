@@ -4,6 +4,8 @@ const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 const container = document.getElementById("items-container");
 const searchInput = document.getElementById("search");
 const filterSelect = document.getElementById("filter");
+console.log("TOKEN:", token);
+
 
 let allItems = [];
 let editItem = null;
