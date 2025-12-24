@@ -105,38 +105,12 @@
   }
 
   /* ================= STATUS UI ================= */
-  function renderStatus(room) {
+ function renderStatus(room) {
   waitingBox.innerHTML = "";
   canSend = false;
 
-  // REQUESTED
-  if (room.status === "requested") {
-    if (String(room.seller_user_id) === String(user.id)) {
-      chatStatus.textContent = "New request";
-      waitingBox.innerHTML = `
-        <button onclick="approve(true)">Accept</button>
-        <button onclick="approve(false)">Reject</button>
-      `;
-    } else {
-      chatStatus.textContent = "Waiting for seller approval";
-      waitingBox.textContent = "⏳ Request sent";
-    }
-    disable(true);
-    return;
-  }
-
-  // APPROVED / HALF PAID
-  if (room.status === "approved" || room.status === "half_paid") {
-    chatStatus.textContent = "Chat active";
-    canSend = true;
-    disable(false);
-
-    // 🔥 BUY INTENT UI
-   function renderStatus(room) {
-  waitingBox.innerHTML = "";
-  canSend = false;
-
-  const isBuyer  = String(room.buyer_id) === String(user.id);
+  const buyBox = document.getElementById("buyBox");
+  const isBuyer = String(room.buyer_id) === String(user.id);
   const isSeller = String(room.seller_user_id) === String(user.id);
 
   // REQUESTED
@@ -151,44 +125,40 @@
       chatStatus.textContent = "Waiting for seller approval";
       waitingBox.textContent = "⏳ Request sent";
     }
-    document.getElementById("buyBox").style.display = "none";
+    buyBox.style.display = "none";
     disable(true);
     return;
   }
 
-  // APPROVED / HALF PAID
-  if (room.status === "approved" || room.status === "half_paid") {
+  // APPROVED
+  if (room.status === "approved") {
     chatStatus.textContent = "Chat active";
     canSend = true;
     disable(false);
 
-    // ✅ BUY BOX — ONLY FOR BUYER
-    if (room.intent === "buy" && isBuyer && room.status === "approved") {
-      document.getElementById("buyBox").style.display = "block";
+    // ✅ ONLY BUYER sees Pay 50%
+    if (room.intent === "buy" && isBuyer) {
+      buyBox.style.display = "block";
     } else {
-      document.getElementById("buyBox").style.display = "none";
+      buyBox.style.display = "none";
     }
+    return;
+  }
+
+  // HALF PAID
+  if (room.status === "half_paid") {
+    chatStatus.textContent = "Half payment done";
+    canSend = true;
+    disable(false);
+    buyBox.style.display = "none";
     return;
   }
 
   // CLOSED
   chatStatus.textContent = "Chat closed";
-  document.getElementById("buyBox").style.display = "none";
+  buyBox.style.display = "none";
   disable(true);
 }
-
-
-  // CLOSED
-  chatStatus.textContent = "Chat closed";
-  document.getElementById("buyBox").style.display = "none";
-  disable(true);
-}
-
-  function disable(d) {
-    input.disabled = d;
-    sendBtn.disabled = d;
-    imgBtn.disabled = d;
-  }
 
   /* ================= APPROVE ================= */
   window.approve = async function(ok) {
