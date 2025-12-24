@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - BGMI Market</title>
 
+  <!-- Toastr CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
   <style>
     /* ========== GLOBAL RESET ========== */
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
@@ -39,7 +42,6 @@
       position: relative;
       z-index: 10;
       background: rgba(255,255,255,0.08);
-
       padding: 2rem;
       border-radius: 20px;
       width: 320px;
@@ -146,6 +148,17 @@
   </div>
 
   <p class="tagline">✨ Secure your gaming future with BGMI Market – Where Legends Trade ✨</p>
+
+  <!-- Toastr JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script>
+    toastr.options = {
+      "closeButton": true,
+      "progressBar": true,
+      "positionClass": "toast-top-right",
+      "timeOut": "3000"
+    };
+  </script>
 
   <!-- Auth JS -->
   <script src="js/auth.js"></script>
