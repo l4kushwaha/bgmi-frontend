@@ -74,6 +74,12 @@ async function startChatOrBuy(order_id, seller_user_id, intent) {
       return;
     }
 
+     if (!order_id || !seller_user_id) {
+      console.error("Invalid chat data", { order_id, seller_user_id });
+      alert("Invalid item data");
+      return;
+    }
+
     const res = await fetch(
       "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/create",
       {
@@ -211,10 +217,10 @@ function renderCard(item) {
 
  if (!isOwner(item)) {
   card.querySelector(".chat-btn").onclick = () =>
-    startChat(item.id, item.user_id); // CHAT
+    startChat(item.id, item.seller_id); // CHAT
 
   card.querySelector(".buy-btn").onclick = () =>
-    startBuy(item.id, item.user_id); // BUY
+    startBuy(item.id, item.seller_id); // BUY
 }
 
   
