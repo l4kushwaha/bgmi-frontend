@@ -211,10 +211,10 @@ function renderCard(item) {
 
  if (!isOwner(item)) {
   card.querySelector(".chat-btn").onclick = () =>
-    startChat(item.order_id, item.user_id); // CHAT
+    startChat(item.id, item.user_id); // CHAT
 
   card.querySelector(".buy-btn").onclick = () =>
-    startBuy(item.order_id, item.user_id); // BUY
+    startBuy(item.id, item.user_id); // BUY
 }
 
   
