@@ -211,6 +211,7 @@ async function resetPassword() {
             method: "POST",
             body: JSON.stringify({ token, password })
         });
+        console.log(data);
 
         showToast(data.message || "Password reset successful!", "success");
 
