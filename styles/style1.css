@@ -562,6 +562,38 @@
         }
     }
 
+    #toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  color: #fff;
+  opacity: 0.95;
+  min-width: 200px;
+  font-family: sans-serif;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  animation: slideIn 0.5s ease, fadeOut 0.5s 3s forwards;
+}
+
+.toast.success { background: #4caf50; }
+.toast.error   { background: #f44336; }
+.toast.info    { background: #2196f3; }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+
     @media (max-width: 480px) {
 
         .credentials-panel.signin,
