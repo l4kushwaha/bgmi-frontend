@@ -1,265 +1,223 @@
 (() => {
-    const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
-    const BASE_GATEWAY_API = "https://bgmi-gateway.bgmi-gateway.workers.dev";
-    const BASE_AUTH_SERVICE = "https://auth-service.bgmi-gateway.workers.dev/api/auth";
+  /* ===================== CONFIG ===================== */
+  const BASE_LOCAL_API = "http://127.0.0.1:5000/api";
+  const BASE_AUTH_SERVICE = "https://auth-service.bgmi-gateway.workers.dev/api/auth";
 
-    const AUTH_API = window.AUTH_API || (() => {
-        if (window.location.hostname.includes("localhost")) return BASE_LOCAL_API + "/auth";
-        return BASE_AUTH_SERVICE;
-    })();
-    window.AUTH_API = AUTH_API;
+  const AUTH_API = location.hostname.includes("localhost")
+    ? BASE_LOCAL_API + "/auth"
+    : BASE_AUTH_SERVICE;
 
-    console.log("🔑 Using AUTH_API:", AUTH_API);
+  console.log("🔑 AUTH_API:", AUTH_API);
 
-    // ===================== TOAST =====================
-    let toastContainer = document.getElementById("toast-container");
-    if (!toastContainer) {
-        toastContainer = document.createElement("div");
-        toastContainer.id = "toast-container";
-        document.body.appendChild(toastContainer);
+  /* ===================== TOAST ===================== */
+  let toastContainer = document.getElementById("toast-container");
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toast-container";
+    document.body.appendChild(toastContainer);
+  }
+
+  function showToast(msg, type = "info") {
+    const t = document.createElement("div");
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    toastContainer.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+  }
+
+  /* ===================== JWT ===================== */
+  function decodeJWT(token) {
+    try {
+      return JSON.parse(atob(token.split(".")[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  function isTokenExpired(token) {
+    const p = decodeJWT(token);
+    if (!p?.exp) return true;
+    return Date.now() >= p.exp * 1000;
+  }
+
+  /* ===================== FETCH HELPER ===================== */
+  async function apiFetch(url, options = {}, retry = true) {
+    let token = localStorage.getItem("token");
+
+    if (token && isTokenExpired(token)) {
+      const refreshed = await refreshAccessToken();
+      if (!refreshed) throw new Error("Session expired");
+      token = localStorage.getItem("token");
     }
 
-    function showToast(message, type = "info") {
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        toastContainer.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+
+    const res = await fetch(url, { ...options, headers });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      if (res.status === 401 && retry) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) return apiFetch(url, options, false);
+      }
+      throw new Error(data.error || data.message || "Request failed");
+    }
+    return data;
+  }
+
+  /* ===================== REFRESH TOKEN ===================== */
+  async function refreshAccessToken() {
+    const refresh = localStorage.getItem("refresh_token");
+    if (!refresh) return false;
+
+    try {
+      const res = await fetch(`${AUTH_API}/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refresh })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.access_token) throw new Error();
+
+      localStorage.setItem("token", data.access_token);
+      return true;
+    } catch {
+      logout(true);
+      return false;
+    }
+  }
+
+  /* ===================== EMAIL CHECK ===================== */
+  function isValidEmail(email) {
+    const r = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const fake = ["tempmail.com", "mailinator.com", "10minutemail.com", "yopmail.com"];
+    return r.test(email) && !fake.some(d => email.endsWith("@" + d));
+  }
+
+  /* ===================== REGISTER ===================== */
+  async function registerUser() {
+    const username = document.getElementById("register_name")?.value.trim();
+    const email = document.getElementById("register_email")?.value.trim();
+    const password = document.getElementById("register_password")?.value.trim();
+
+    if (!username || !email || !password)
+      return showToast("All fields required", "error");
+
+    if (!isValidEmail(email))
+      return showToast("Invalid email", "error");
+
+    try {
+      await apiFetch(`${AUTH_API}/register`, {
+        method: "POST",
+        body: JSON.stringify({ username, email, password })
+      });
+
+      showToast("Registered successfully!", "success");
+
+      document.getElementById("login_email").value = email;
+      document.getElementById("login_password").value = password;
+      await loginUser(true);
+    } catch (e) {
+      showToast(e.message, "error");
+    }
+  }
+
+  /* ===================== LOGIN ===================== */
+  async function loginUser(auto = false) {
+    const email = document.getElementById("login_email")?.value.trim();
+    const password = document.getElementById("login_password")?.value.trim();
+
+    if (!email || !password)
+      return showToast("Email & password required", "error");
+
+    try {
+      const data = await apiFetch(`${AUTH_API}/login`, {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+
+      const payload = decodeJWT(data.access_token);
+      if (!payload) throw new Error("Invalid session");
+
+      const user = {
+        id: payload.id,
+        email: payload.email,
+        role: payload.role,
+        name: payload.email.split("@")[0]
+      };
+
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      showToast("Login successful!", "success");
+      location.href = user.role === "admin"
+        ? "admin_dashboard.html"
+        : "index.html";
+    } catch (e) {
+      showToast(e.message, "error");
+    }
+  }
+
+  /* ===================== LOGOUT ===================== */
+  function logout(silent = false) {
+    localStorage.clear();
+    if (!silent) showToast("Logged out", "success");
+    location.href = "login.html";
+  }
+
+  /* ===================== USER HELPERS ===================== */
+  function getCurrentUser() {
+    try { return JSON.parse(localStorage.getItem("user")); }
+    catch { return null; }
+  }
+
+  function isAdmin() {
+    return getCurrentUser()?.role === "admin";
+  }
+
+  /* ===================== ROUTE PROTECTION ===================== */
+  function protectRoute({ auth = true, admin = false } = {}) {
+    const user = getCurrentUser();
+    const token = localStorage.getItem("token");
+
+    if (auth && (!user || !token)) {
+      location.href = "login.html";
+      return;
     }
 
-    // ===================== JWT DECODE =====================
-    function decodeJWT(token) {
-        try {
-            const payload = token.split(".")[1];
-            return JSON.parse(atob(payload));
-        } catch (err) {
-            console.error("JWT decode failed", err);
-            return null;
-        }
+    if (admin && user?.role !== "admin") {
+      location.href = "index.html";
     }
+  }
 
-    // ===================== FETCH HELPER =====================
-    async function apiFetch(url, options = {}, retry = true) {
-        const token = localStorage.getItem("token");
-        const headers = {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...options.headers
-        };
-        if (!(options.body instanceof FormData)) headers["Content-Type"] = "application/json";
-
-        try {
-            const res = await fetch(url, { ...options, headers });
-            const data = await res.json().catch(() => ({}));
-
-            if (!res.ok) throw new Error(data.error || data.message || "Request failed");
-            return data;
-        } catch (err) {
-            console.error("API Error:", err);
-            if (retry && !url.includes(BASE_GATEWAY_API)) {
-                const fallbackUrl = url.replace(AUTH_API, BASE_GATEWAY_API + "/api/auth");
-                return apiFetch(fallbackUrl, options, false);
-            }
-            showToast(err.message || "Error connecting to Auth Service", "error");
-            throw err;
-        }
+  function redirectIfLoggedIn() {
+    const user = getCurrentUser();
+    if (user) {
+      location.href = user.role === "admin"
+        ? "admin_dashboard.html"
+        : "index.html";
     }
+  }
 
-    // ===================== EMAIL VALIDATION =====================
-    function isValidEmail(email) {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!regex.test(email)) return false;
-        const fakeDomains = ["tempmail.com","mailinator.com","10minutemail.com","yopmail.com"];
-        return !fakeDomains.some(d => email.endsWith("@" + d));
+  /* ===================== AUTO CHECK ===================== */
+  window.addEventListener("load", () => {
+    const token = localStorage.getItem("token");
+    if (token && isTokenExpired(token)) {
+      refreshAccessToken();
     }
+  });
 
-    // ===================== REGISTER =====================
-    async function registerUser() {
-        const full_name = document.getElementById("register-name")?.value.trim();
-        const email = document.getElementById("register-email")?.value.trim();
-        const password = document.getElementById("register-password")?.value.trim();
-
-        if (!full_name || !email || !password) {
-            showToast("Please fill all fields!", "error");
-            return;
-        }
-
-        if (!isValidEmail(email)) {
-            showToast("Fake or invalid email detected!", "error");
-            return;
-        }
-
-        const btn = document.querySelector("#registerBtn");
-        if (btn) btn.innerText = "Registering...";
-
-        try {
-            const data = await apiFetch(`${AUTH_API}/register`, {
-                method: "POST",
-                body: JSON.stringify({ username: full_name, email, password })
-            });
-
-            showToast("Registration successful! Logging in...", "success");
-            // Auto-login after registration
-            document.getElementById("login-email").value = email;
-            document.getElementById("login-password").value = password;
-            await loginUser(true);
-        } catch (err) {
-            showToast(err.message || "Registration failed!", "error");
-        } finally {
-            if (btn) btn.innerText = "Register";
-        }
-    }
-
-    // ===================== LOGIN =====================
-    async function loginUser(auto = false) {
-        const emailEl = document.getElementById(auto ? "login-email" : "login-email") || document.getElementById("register-email");
-        const passwordEl = document.getElementById(auto ? "login-password" : "login-password") || document.getElementById("register-password");
-        const email = emailEl?.value.trim();
-        const password = passwordEl?.value.trim();
-
-        if (!email || !password) {
-            showToast("Enter both email and password!", "error");
-            return;
-        }
-
-        const btn = document.querySelector("#loginBtn");
-        if (btn) btn.innerText = "Logging in...";
-
-        try {
-            const data = await apiFetch(`${AUTH_API}/login`, {
-                method: "POST",
-                body: JSON.stringify({ email, password })
-            });
-
-            const jwtPayload = decodeJWT(data.access_token);
-            if (!jwtPayload || !jwtPayload.id) throw new Error("Invalid session");
-
-            const userInfo = {
-                id: Number(jwtPayload.id),
-                name: jwtPayload.email?.split("@")[0] || "Player",
-                email: jwtPayload.email,
-                role: jwtPayload.role || "user"
-            };
-
-            localStorage.setItem("token", data.access_token);
-            localStorage.setItem("user", JSON.stringify(userInfo));
-
-            if (userInfo.role === "admin") {
-                showToast("Welcome, Admin!", "success");
-                return window.location.href = "admin_dashboard.html";
-            }
-
-            showToast("Login successful!", "success");
-            window.location.href = "index.html";
-        } catch (err) {
-            if (err.message.includes("credentials")) {
-                showToast("Wrong password!", "error");
-            } else if (err.message.includes("not found")) {
-                showToast("You are not a registered user!", "error");
-            } else {
-                showToast(err.message || "Login failed!", "error");
-            }
-        } finally {
-            if (btn) btn.innerText = "Login";
-        }
-    }
-
-    // ===================== FORGOT PASSWORD =====================
-    async function sendResetLink() {
-        const email = document.getElementById("login-email")?.value.trim();
-        if (!email) {
-            showToast("Enter your email!", "error");
-            return;
-        }
-
-        try {
-            await apiFetch(`${AUTH_API}/forgot-password`, {
-                method: "POST",
-                body: JSON.stringify({ email })
-            });
-            showToast("OTP sent to your email!", "success");
-        } catch (err) {
-            showToast(err.message || "Failed to send OTP", "error");
-        }
-    }
-
-    // ===================== RESET PASSWORD =====================
-    async function resetPassword() {
-        const otp = document.getElementById("resetToken")?.value.trim();
-        const new_password = document.getElementById("newPassword")?.value.trim();
-        if (!otp || !new_password) {
-            showToast("OTP and new password are required!", "error");
-            return;
-        }
-
-        try {
-            await apiFetch(`${AUTH_API}/reset-password`, {
-                method: "POST",
-                body: JSON.stringify({ otp, new_password })
-            });
-            showToast("Password reset successful!", "success");
-            window.location.href = "login.html";
-        } catch (err) {
-            showToast(err.message || "Password reset failed", "error");
-        }
-    }
-
-    // ===================== LOGOUT =====================
-    function logout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        showToast("Logged out successfully!", "success");
-        window.location.href = "login.html";
-    }
-
-    // ===================== CURRENT USER =====================
-    function getCurrentUser() {
-        try { return JSON.parse(localStorage.getItem("user")) || null; }
-        catch { return null; }
-    }
-
-    function isAdmin() {
-        const user = getCurrentUser();
-        return user?.role === "admin";
-    }
-
-    // ===================== FRONTEND AUTH STATE =====================
-    function updateFrontendAuth() {
-        const user = getCurrentUser();
-        const guestView = document.getElementById("guest-view");
-        const userDashboard = document.getElementById("user-dashboard");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const usernameEl = document.getElementById("username");
-
-        if (user) {
-            guestView?.classList.replace("visible", "hidden");
-            userDashboard?.classList.replace("hidden", "visible");
-            logoutBtn?.classList.replace("hidden", "visible");
-            if (usernameEl) usernameEl.textContent = user.name || "Player";
-        } else {
-            guestView?.classList.replace("hidden", "visible");
-            userDashboard?.classList.replace("visible", "hidden");
-            logoutBtn?.classList.replace("visible", "hidden");
-        }
-    }
-
-    // ===================== AUTO-RUN =====================
-    window.addEventListener("load", () => {
-        updateFrontendAuth();
-        const params = new URLSearchParams(window.location.search);
-        const otp = params.get("otp");
-        if (otp && document.getElementById("resetToken")) {
-            document.getElementById("resetToken").value = otp;
-        }
-    });
-
-    // ===================== EXPORT =====================
-    window.registerUser = registerUser;
-    window.loginUser = loginUser;
-    window.sendResetLink = sendResetLink;
-    window.resetPassword = resetPassword;
-    window.logout = logout;
-    window.getCurrentUser = getCurrentUser;
-    window.isAdmin = isAdmin;
-    window.updateFrontendAuth = updateFrontendAuth;
-
+  /* ===================== EXPORT ===================== */
+  window.registerUser = registerUser;
+  window.loginUser = loginUser;
+  window.logout = logout;
+  window.getCurrentUser = getCurrentUser;
+  window.isAdmin = isAdmin;
+  window.protectRoute = protectRoute;
+  window.redirectIfLoggedIn = redirectIfLoggedIn;
 })();
