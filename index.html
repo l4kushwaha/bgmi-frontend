@@ -14,7 +14,6 @@
       font-family: 'Poppins', sans-serif;
     }
 
-    /* ========== BACKGROUND ANIMATION ========== */
     body {
       min-height: 100vh;
       display: flex;
@@ -45,13 +44,12 @@
       pointer-events: none;
       z-index: 0;
     }
-
     @keyframes float {
       0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
       50% { transform: translateY(-30px) scale(1.1); opacity: 1; }
     }
 
-    /* ========== HEADER ========== */
+    /* HEADER */
     header {
       width: 100%;
       -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -69,18 +67,12 @@
       flex-wrap: wrap;
       animation: slideDown 1s ease forwards;
     }
-
     @keyframes slideDown {
       from { transform: translateY(-100%); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
 
-    .header-left {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
+    .header-left { display: flex; flex-direction: column; align-items: flex-start; }
     header h1 {
       font-size: 1.9rem;
       background: linear-gradient(90deg, #ff8800, #ffcc00, #ff00ff);
@@ -90,36 +82,11 @@
       text-shadow: 0 0 20px rgba(255,204,0,0.4);
       font-weight: 700;
     }
+    .tagline { font-size: 0.9rem; color: #ccc; font-style: italic; margin-top: 4px; letter-spacing: 1px; animation: glowPulse 3s infinite ease-in-out; }
+    @keyframes glowPulse { 0%,100%{opacity:0.8;text-shadow:0 0 10px #ffcc00;}50%{opacity:1;text-shadow:0 0 20px #ff00ff;} }
 
-    .tagline {
-      font-size: 0.9rem;
-      color: #ccc;
-      font-style: italic;
-      margin-top: 4px;
-      letter-spacing: 1px;
-      animation: glowPulse 3s infinite ease-in-out;
-    }
-
-    @keyframes glowPulse {
-      0%,100% { opacity: 0.8; text-shadow: 0 0 10px #ffcc00; }
-      50% { opacity: 1; text-shadow: 0 0 20px #ff00ff; }
-    }
-
-    nav ul {
-      display: flex;
-      gap: 1.5rem;
-      list-style: none;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-      position: relative;
-      transition: 0.3s;
-    }
-
+    nav ul { display: flex; gap: 1.5rem; list-style: none; flex-wrap: wrap; }
+    nav a { color: #fff; text-decoration: none; font-weight: 500; position: relative; transition: 0.3s; }
     nav a:hover { color: #ffcc00; }
     nav a::after {
       content: "";
@@ -133,97 +100,63 @@
     }
     nav a:hover::after { width: 100%; }
 
-    /* ========== MAIN ========== */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-      width: 100%;
-      z-index: 1;
-      position: relative;
-    }
+    /* MAIN */
+    main { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:2rem; width:100%; z-index:1; position:relative; }
 
-    /* ANNOUNCEMENTS */
     .announcement-bar {
-      width: 100%;
+      width:100%;
       background: rgba(255,255,255,0.1);
       -webkit-backdrop-filter: blur(15px);
       backdrop-filter: blur(15px);
       border-radius: 15px;
       padding: 0.8rem 1rem;
       margin-bottom: 1.5rem;
-      overflow: hidden;
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(255,255,255,0.2);
+      box-shadow:0 4px 20px rgba(0,0,0,0.3);
     }
+    .announcement-bar p { display:inline-block; white-space:nowrap; animation: scrollText 15s linear infinite; font-size:0.95rem; color:#fff; font-weight:500; }
+    @keyframes scrollText {0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
 
-    .announcement-bar p {
-      display: inline-block;
-      white-space: nowrap;
-      animation: scrollText 15s linear infinite;
-      font-size: 0.95rem;
-      color: #fff;
-      font-weight: 500;
-    }
+    section { -webkit-backdrop-filter: blur(25px) saturate(180%); backdrop-filter: blur(25px) saturate(180%); background: rgba(255,255,255,0.08); padding: 2.5rem; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); max-width: 900px; width: 90%; text-align:center; animation: fadeIn 1.3s ease-out forwards; transform:translateY(20px); opacity:0; margin-bottom:2rem; }
+    @keyframes fadeIn { to { opacity:1; transform:translateY(0); } }
 
-    @keyframes scrollText {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
+    h2 { font-size:2rem; margin-bottom:1rem; background:linear-gradient(90deg,#ff6600,#ffcc00,#ff0099); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+    p { color:#e2e2e2; margin-bottom:1.5rem; font-size:1rem; }
+    button { background:linear-gradient(90deg,#ff8800,#ff00ff); border:none; padding:0.8rem 1.5rem; border-radius:30px; font-weight:600; font-size:1rem; color:#fff; margin:0.5rem; cursor:pointer; transition:all 0.3s ease; box-shadow:0 0 20px rgba(255,0,255,0.4);}
+    button:hover{transform:scale(1.07); box-shadow:0 0 40px rgba(255,0,255,0.8);}
 
-    section {
-      -webkit-backdrop-filter: blur(25px) saturate(180%);
-      backdrop-filter: blur(25px) saturate(180%);
-      background: rgba(255,255,255,0.08);
-      padding: 2.5rem;
-      border-radius: 25px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-      max-width: 900px;
-      width: 90%;
-      text-align: center;
-      animation: fadeIn 1.3s ease-out forwards;
-      transform: translateY(20px);
-      opacity: 0;
-      margin-bottom: 2rem;
-    }
+    .quick-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.5rem; margin-top:2rem; animation:cardsFade 1.5s ease forwards;}
+    @keyframes cardsFade { from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
 
-    @keyframes fadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h2 { font-size: 2rem; margin-bottom: 1rem; background: linear-gradient(90deg, #ff6600, #ffcc00, #ff0099); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
-    p { color: #e2e2e2; margin-bottom: 1.5rem; font-size: 1rem; }
-    button { background: linear-gradient(90deg, #ff8800, #ff00ff); border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; color: #fff; margin: 0.5rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 20px rgba(255,0,255,0.4); }
-    button:hover { transform: scale(1.07); box-shadow: 0 0 40px rgba(255,0,255,0.8); }
-
-    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 2rem; animation: cardsFade 1.5s ease forwards; }
-    @keyframes cardsFade { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-    .card { -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px); background: rgba(255,255,255,0.12); border-radius: 20px; padding: 1.5rem; transition: 0.4s ease; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; box-shadow: 0 4px 30px rgba(0,0,0,0.3); transform-style: preserve-3d; }
+    .card { -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px); background: rgba(255,255,255,0.12); border-radius:20px; padding:1.5rem; transition:0.4s ease; border:1px solid rgba(255,255,255,0.2); cursor:pointer; box-shadow:0 4px 30px rgba(0,0,0,0.3); transform-style: preserve-3d; }
     .card:hover { transform: translateY(-10px) scale(1.05) rotateX(3deg); box-shadow: 0 0 35px rgba(255,204,0,0.6); }
-    .card h3 { color: #ffcc00; margin-bottom: 0.5rem; }
-    .card p { color: #ddd; font-size: 0.9rem; }
+    .card h3 { color: #ffcc00; margin-bottom:0.5rem; }
+    .card p { color:#ddd; font-size:0.9rem; }
 
-    /* FOOTER */
-    footer { width: 100%; text-align: center; padding: 1.5rem 1rem; background: rgba(255,255,255,0.05); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.2); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); color: #ccc; animation: fadeUp 1.5s ease-in-out; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
-    footer a { color: #ffcc00; text-decoration: none; transition: 0.3s; }
-    footer a:hover { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; }
-    .socials { margin-top: 0.5rem; font-size: 0.95rem; }
+    footer { width:100%; text-align:center; padding:1.5rem 1rem; background:rgba(255,255,255,0.05); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-top:1px solid rgba(255,255,255,0.2); box-shadow:0 -4px 20px rgba(0,0,0,0.3); color:#ccc; animation: fadeUp 1.5s ease-in-out; }
+    @keyframes fadeUp { from{opacity:0; transform:translateY(50px);} to{opacity:1; transform:translateY(0);} }
+    footer a { color:#ffcc00; text-decoration:none; transition:0.3s; }
+    footer a:hover { color:#ff00ff; text-shadow:0 0 10px #ff00ff; }
+    .socials { margin-top:0.5rem; font-size:0.95rem; }
 
-    .hidden { display: none; }
-    .visible { display: block; }
+    .hidden { display:none; }
+    .visible { display:block; }
 
-    @media (max-width: 768px) {
-      h2 { font-size: 1.6rem; }
-      header h1 { font-size: 1.5rem; }
-      .tagline { font-size: 0.8rem; }
-      section { padding: 1.5rem; }
-    }
+    /* ================== AUTH WRAPPER ================== */
+    .auth-wrapper { position:relative; width:350px; max-width:90%; z-index:5; margin-top:1.5rem; }
+    .auth-container { background: rgba(255,255,255,0.08); border-radius:20px; padding:2rem; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+    .auth-container h2 { font-size:1.6rem; margin-bottom:1rem; background:linear-gradient(90deg,#ff8800,#ffcc00,#ff00ff); -webkit-background-clip:text; color:transparent;}
+    .form-group { margin-bottom:1rem; text-align:left;}
+    .form-group label { display:block; font-size:0.9rem; margin-bottom:0.3rem; color:#ffc; }
+    .form-group input { width:100%; padding:0.6rem 0.8rem; border-radius:10px; border:none; outline:none; font-size:0.95rem; background: rgba(255,255,255,0.1); color:#fff; }
+    .form-group input::placeholder { color:#ccc; }
+    .auth-container button { width:100%; padding:0.8rem; border:none; border-radius:30px; font-size:1rem; font-weight:600; background:linear-gradient(90deg,#ff8800,#ff00ff); color:#fff; cursor:pointer; transition:all 0.3s ease; margin-top:0.5rem; }
+    .auth-container .text-small { font-size:0.85rem; margin-top:0.5rem; }
+    .auth-container .text-small a { color:#ffcc00; text-decoration:none; transition:0.3s; }
+    .auth-container .text-small a:hover { color:#ff00ff; text-shadow:0 0 8px #ff00ff; }
+
   </style>
 </head>
 
@@ -269,15 +202,48 @@
       <p id="announcement-text">🎉 Welcome to BGMI Market! | New IDs added daily! | Popularity section coming soon!</p>
     </div>
 
-    <!-- Guest View -->
-    <section id="guest-view" class="visible">
+    <!-- GUEST VIEW & LOGIN/REGISTER -->
+    <div id="guest-view" class="visible">
       <h2>Welcome to BGMI Market 🎯</h2>
       <p>Buy, sell, and manage BGMI IDs securely with escrow & 2.5% service charge system.</p>
-      <button onclick="window.location='login.html'">Login</button>
-      <button onclick="window.location='register.html'">Register</button>
-    </section>
+      <div class="auth-wrapper">
+        <!-- LOGIN -->
+        <div class="auth-container" id="login-container">
+          <h2>🔐 Login</h2>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="Enter password">
+          </div>
+          <button id="loginBtn">Login</button>
+          <p class="text-small">Don't have an account? <a href="#" id="showRegister">Register</a></p>
+        </div>
 
-    <!-- User Dashboard -->
+        <!-- REGISTER -->
+        <div class="auth-container hidden" id="register-container">
+          <h2>🆕 Register</h2>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="register-name" placeholder="Enter full name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="register-email" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="register-password" placeholder="Enter password">
+          </div>
+          <button id="registerBtn">Register</button>
+          <p class="text-small">Already have an account? <a href="#" id="showLogin">Login</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- USER DASHBOARD -->
     <section id="user-dashboard" class="hidden">
       <h2 id="greeting">Welcome back, Player 👋</h2>
       <p>Explore your marketplace, manage your wallet, and track your sales.</p>
@@ -311,15 +277,14 @@
     <p>© 2025 BGMI Market | Crafted with ❤️ by <strong>@am_sillent_hunter</strong></p>
     <div class="socials">
       📩 Email: <a href="mailto:l4kushwaha@gmail.com">l4kushwaha@gmail.com</a> |
-      📸 Instagram: <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener">@am_sillent_hunter</a>
+      📸 Instagram: <a href="https://instagram.com/am_sillent_hunter" target="_blank">@am_sillent_hunter</a>
     </div>
   </footer>
 
   <!-- SCRIPTS -->
-  <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // ======== Dashboard & Greeting ========
+    // ===== DASHBOARD & GUEST TO USER SWITCH =====
     function updateDashboard() {
       const user = JSON.parse(localStorage.getItem("user"));
       const token = localStorage.getItem("token");
@@ -329,16 +294,16 @@
       const logoutBtn = document.getElementById("logoutBtn");
       const greetingEl = document.getElementById("greeting");
 
-      if (user && token) {
+      if(user && token){
         guestView.classList.replace("visible","hidden");
         userDashboard.classList.replace("hidden","visible");
         logoutBtn.classList.replace("hidden","visible");
 
         const hour = new Date().getHours();
         let timeGreeting = "Hello";
-        if(hour < 12) timeGreeting = "Good Morning";
-        else if(hour < 18) timeGreeting = "Good Afternoon";
-        else timeGreeting = "Good Evening";
+        if(hour<12) timeGreeting="Good Morning";
+        else if(hour<18) timeGreeting="Good Afternoon";
+        else timeGreeting="Good Evening";
 
         greetingEl.textContent = `${timeGreeting}, ${user.name || user.username || "Player"} 👋`;
       } else {
@@ -348,31 +313,36 @@
       }
     }
 
-    updateDashboard(); // initial
+    updateDashboard();
 
-    // ======== Logout ========
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      if(window.logout) window.logout(); // auth.js logout if available
+    // ===== Logout =====
+    document.getElementById("logoutBtn").addEventListener("click",()=>{
+      if(window.logout) window.logout();
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       updateDashboard();
     });
 
-    // ======== Announcements ========
-    const announcements = [
+    // ===== Announcements =====
+    const announcements=[
       "🎉 Welcome to BGMI Market!",
       "🆕 New IDs added daily!",
       "⭐ Popularity section coming soon!",
       "💼 Sell your ID securely!",
       "💰 Track wallet transactions in real-time!"
     ];
+    let index=0;
+    const announcementText=document.getElementById("announcement-text");
+    setInterval(()=>{ index=(index+1)%announcements.length; announcementText.textContent=announcements[index]; },5000);
 
-    let index = 0;
-    const announcementText = document.getElementById("announcement-text");
-    setInterval(() => {
-      index = (index + 1) % announcements.length;
-      announcementText.textContent = announcements[index];
-    }, 5000);
+    // ===== AUTH LOGIN/REGISTER SWITCH =====
+    const showRegister=document.getElementById("showRegister");
+    const showLogin=document.getElementById("showLogin");
+    const loginContainer=document.getElementById("login-container");
+    const registerContainer=document.getElementById("register-container");
+
+    showRegister.addEventListener("click",(e)=>{ e.preventDefault(); loginContainer.classList.add("hidden"); registerContainer.classList.remove("hidden"); });
+    showLogin.addEventListener("click",(e)=>{ e.preventDefault(); registerContainer.classList.add("hidden"); loginContainer.classList.remove("hidden"); });
   </script>
 </body>
 </html>
