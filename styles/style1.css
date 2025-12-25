@@ -241,7 +241,7 @@
         color: #00d4ff;
     }
 
-    .loginBtn ,.registerBtn {
+    .loginBtn .registerBtn {
         position: relative;
         width: 100%;
         height: 45px;
@@ -255,7 +255,7 @@
         z-index: 1;
     }
 
-    .loginBtn,.registerbtn::before {
+    .loginBtn .registerbtn::before {
         content: "";
         position: absolute;
         height: 300%;
@@ -267,7 +267,7 @@
         transition: .5s;
     }
 
-    .loginBtn,.registerBtn:hover:before {
+    .loginBtn .registerBtn:hover:before {
         top: 0;
     }
 
