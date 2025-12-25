@@ -5,268 +5,268 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BGMI Market | Home</title>
 
+  <!-- Fonts (local / CSP safe recommended for prod) -->
+  <link rel="stylesheet" href="assets/fonts/poppins.css">
+
   <style>
-    /* ================= GLOBAL RESET ================= */
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
     body {
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-      align-items:center;
-      overflow-x:hidden;
-      color:#fff;
-      position:relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       background: radial-gradient(circle at top left, #150026, #08080f, #140023);
-      animation:hueShift 15s infinite alternate ease-in-out;
-      background-size:400% 400%;
+      animation: hueShift 15s infinite alternate;
+      background-size: 400% 400%;
+      color: #fff;
+      overflow-x: hidden;
     }
+
     @keyframes hueShift {
-      0%{background-position:left top; filter:hue-rotate(0deg);}
-      100%{background-position:right bottom; filter:hue-rotate(60deg);}
+      0% { background-position: left top; }
+      100% { background-position: right bottom; }
     }
 
-    /* ================= FLOATING BUBBLES ================= */
-    .bubble{position:absolute;border-radius:50%;background:linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,204,0,0.1));backdrop-filter:blur(12px);animation:float 15s infinite ease-in-out;pointer-events:none; z-index:0;}
-    @keyframes float{0%,100%{transform:translateY(0) scale(1);opacity:0.5;}50%{transform:translateY(-30px) scale(1.1);opacity:1;}}
-
-    /* ================= HEADER ================= */
-    header{
-      width:100%;
-      backdrop-filter:blur(20px) saturate(180%);
-      background:rgba(255,255,255,0.08);
-      border-bottom:1px solid rgba(255,255,255,0.2);
-      box-shadow:0 4px 30px rgba(0,0,0,0.4);
-      padding:1.2rem 2rem;
-      position:sticky;
-      top:0;
-      z-index:100;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      flex-wrap:wrap;
-      animation:slideDown 1s ease forwards;
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      animation: float 15s infinite ease-in-out;
+      z-index: 0;
     }
-    @keyframes slideDown{from{transform:translateY(-100%); opacity:0;} to{transform:translateY(0);opacity:1;}}
-    .header-left{display:flex; flex-direction:column; align-items:flex-start;}
-    header h1{font-size:1.9rem; background:linear-gradient(90deg,#ff8800,#ffcc00,#ff00ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 20px rgba(255,204,0,0.4);font-weight:700;}
-    .tagline{font-size:0.9rem;color:#ccc;font-style:italic;margin-top:4px;letter-spacing:1px;animation:glowPulse 3s infinite ease-in-out;}
-    @keyframes glowPulse{0%,100%{opacity:0.8;text-shadow:0 0 10px #ffcc00;}50%{opacity:1;text-shadow:0 0 20px #ff00ff;}}
-    nav ul{display:flex; gap:1.5rem; list-style:none; flex-wrap:wrap;}
-    nav a{color:#fff;text-decoration:none;font-weight:500;position:relative;transition:0.3s;}
-    nav a:hover{color:#ffcc00;}
-    nav a::after{content:""; position:absolute; bottom:-5px; left:0; width:0; height:2px; background:linear-gradient(90deg,#ff9900,#ff00ff); transition:width 0.3s;}
-    nav a:hover::after{width:100%;}
 
-    /* ================= MAIN ================= */
-    main{flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:2rem; width:100%; z-index:1; position:relative;}
-    .announcement-bar{width:100%; background:rgba(255,255,255,0.1); backdrop-filter:blur(15px); border-radius:15px; padding:0.8rem 1rem; margin-bottom:1.5rem; overflow:hidden; position:relative; border:1px solid rgba(255,255,255,0.2); box-shadow:0 4px 20px rgba(0,0,0,0.3);}
-    .announcement-bar p{display:inline-block; white-space:nowrap; animation:scrollText 15s linear infinite; font-size:0.95rem; color:#fff; font-weight:500;}
-    @keyframes scrollText{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-30px); }
+    }
 
-    section{backdrop-filter:blur(25px) saturate(180%); background:rgba(255,255,255,0.08); padding:2.5rem; border-radius:25px; box-shadow:0 10px 40px rgba(0,0,0,0.5); max-width:900px; width:90%; text-align:center; animation:fadeIn 1.3s ease-out forwards; transform:translateY(20px); opacity:0; margin-bottom:2rem;}
-    @keyframes fadeIn{to{opacity:1; transform:translateY(0);}}
-    h2{font-size:2rem; margin-bottom:1rem; background:linear-gradient(90deg,#ff6600,#ffcc00,#ff0099); -webkit-background-clip:text; color:transparent; -webkit-text-fill-color:transparent;}
-    p{color:#e2e2e2; margin-bottom:1.5rem; font-size:1rem;}
-    button{background:linear-gradient(90deg,#ff8800,#ff00ff); border:none; padding:0.8rem 1.5rem; border-radius:30px; font-weight:600; font-size:1rem; color:#fff; margin:0.5rem; cursor:pointer; transition:all 0.3s ease; box-shadow:0 0 20px rgba(255,0,255,0.4);}
-    button:hover{transform:scale(1.07); box-shadow:0 0 40px rgba(255,0,255,0.8);}
+    header {
+      width: 100%;
+      padding: 1.2rem 2rem;
+      backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-    .quick-actions{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.5rem; margin-top:2rem; animation:cardsFade 1.5s ease forwards;}
-    @keyframes cardsFade{from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);}}
+    header h1 {
+      font-size: 1.8rem;
+      background: linear-gradient(90deg,#ff8800,#ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-    .card{backdrop-filter:blur(25px); background:rgba(255,255,255,0.12); border-radius:20px; padding:1.5rem; transition:0.4s ease; border:1px solid rgba(255,255,255,0.2); cursor:pointer; box-shadow:0 4px 30px rgba(0,0,0,0.3); transform-style: preserve-3d;}
-    .card:hover{transform:translateY(-10px) scale(1.05) rotateX(3deg); box-shadow:0 0 35px rgba(255,204,0,0.6);}
-    .card h3{color:#ffcc00; margin-bottom:0.5rem;}
-    .card p{color:#ddd; font-size:0.9rem;}
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
 
-    /* ================= FOOTER ================= */
-    footer{width:100%; text-align:center; padding:1.5rem 1rem; background:rgba(255,255,255,0.05); backdrop-filter:blur(20px); border-top:1px solid rgba(255,255,255,0.2); box-shadow:0 -4px 20px rgba(0,0,0,0.3); color:#ccc; animation:fadeUp 1.5s ease-in-out;}
-    @keyframes fadeUp{from{opacity:0; transform:translateY(50px);} to{opacity:1; transform:translateY(0);}}
-    footer a{color:#ffcc00; text-decoration:none; transition:0.3s;}
-    footer a:hover{color:#ff00ff; text-shadow:0 0 10px #ff00ff;}
-    .socials{margin-top:0.5rem; font-size:0.95rem;}
+    nav a {
+      text-decoration: none;
+      color: #fff;
+      transition: 0.3s;
+    }
 
-    /* ================= AUTH ================= */
-    .auth-wrapper{position:relative; width:350px; max-width:90%; z-index:5; margin-top:1.5rem;}
-    .auth-container{background:rgba(255,255,255,0.08); border-radius:20px; padding:2rem; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.5);}
-    .auth-container h2{font-size:1.6rem; margin-bottom:1rem; background:linear-gradient(90deg,#ff8800,#ffcc00,#ff00ff); -webkit-background-clip:text; color:transparent;}
-    .form-group{margin-bottom:1rem; text-align:left;}
-    .form-group label{display:block; font-size:0.9rem; margin-bottom:0.3rem; color:#ffc;}
-    .form-group input{width:100%; padding:0.6rem 0.8rem; border-radius:10px; border:none; outline:none; font-size:0.95rem; background:rgba(255,255,255,0.1); color:#fff;}
-    .form-group input::placeholder{color:#ccc;}
-    .auth-container button{width:100%; padding:0.8rem; border:none; border-radius:30px; font-size:1rem; font-weight:600; background:linear-gradient(90deg,#ff8800,#ff00ff); color:#fff; cursor:pointer; transition:all 0.3s ease; margin-top:0.5rem;}
-    .auth-container .text-small{font-size:0.85rem; margin-top:0.5rem;}
-    .auth-container .text-small a{color:#ffcc00; text-decoration:none; transition:0.3s;}
-    .auth-container .text-small a:hover{color:#ff00ff; text-shadow:0 0 8px #ff00ff;}
+    nav a:hover {
+      color: #ffcc00;
+    }
 
-    /* ================= TOAST ================= */
-    #toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:#fff; padding:0.8rem 1.5rem; border-radius:10px; font-weight:600; opacity:0; pointer-events:none; transition:opacity 0.4s ease, transform 0.4s ease; z-index:999;}
-    #toast.show{opacity:1; transform:translateX(-50%) translateY(-10px);}
-    
-    .hidden{display:none;}
-    .visible{display:block;}
+    main {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      z-index: 1;
+    }
+
+    section {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(25px);
+      border-radius: 25px;
+      padding: 2.5rem;
+      width: 90%;
+      max-width: 900px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      font-size: 2rem;
+      background: linear-gradient(90deg,#ff8800,#ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      margin: 1rem 0;
+      color: #ddd;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(90deg,#ff8800,#ff00ff);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255,0,255,0.7);
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.12);
+      padding: 1.5rem;
+      border-radius: 20px;
+      transition: 0.4s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.05);
+      box-shadow: 0 0 30px rgba(255,204,0,0.6);
+    }
+
+    footer {
+      width: 100%;
+      padding: 1.2rem;
+      text-align: center;
+      backdrop-filter: blur(15px);
+      background: rgba(255,255,255,0.05);
+      color: #ccc;
+    }
+
+    .hidden { display: none; }
   </style>
 </head>
 
 <body>
-  <!-- Floating Bubbles -->
-  <script>
-    for(let i=0;i<25;i++){
-      const bubble=document.createElement("div");
-      bubble.classList.add("bubble");
-      const size=Math.random()*100+20;
-      bubble.style.width=`${size}px`;
-      bubble.style.height=`${size}px`;
-      bubble.style.left=`${Math.random()*100}vw`;
-      bubble.style.top=`${Math.random()*100}vh`;
-      bubble.style.animationDelay=`${Math.random()*10}s`;
-      bubble.style.background=`radial-gradient(circle, rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},0.1), rgba(255,255,255,0))`;
-      document.body.appendChild(bubble);
+
+<!-- Floating bubbles -->
+<script>
+  for(let i=0;i<20;i++){
+    const b=document.createElement("div");
+    b.className="bubble";
+    const s=Math.random()*80+20;
+    b.style.width=b.style.height=s+"px";
+    b.style.left=Math.random()*100+"vw";
+    b.style.top=Math.random()*100+"vh";
+    b.style.animationDelay=Math.random()*10+"s";
+    document.body.appendChild(b);
+  }
+</script>
+
+<header>
+  <h1>🎮 BGMI Market</h1>
+  <nav>
+    <ul>
+      <li><a href="marketplace.html">Marketplace</a></li>
+      <li><a href="sell.html">Sell ID</a></li>
+      <li><a href="wallet.html">Wallet</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="popularity.html">Popularity</a></li>
+      <li id="adminNav" class="hidden">
+        <a href="admin_dashboard.html">Admin Dashboard</a>
+      </li>
+      <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- GUEST -->
+  <section id="guest-view">
+    <h2>Welcome to BGMI Market 🎯</h2>
+    <p>Please login to access marketplace & dashboard.</p>
+    <button onclick="window.location='login.html'">Login</button>
+  </section>
+
+  <!-- USER -->
+  <section id="user-dashboard" class="hidden">
+    <h2 id="greeting">Welcome 👋</h2>
+    <p>Manage your BGMI journey securely.</p>
+
+    <div class="quick-actions">
+      <div class="card" onclick="location.href='marketplace.html'">🛒 Marketplace</div>
+      <div class="card" onclick="location.href='sell.html'">💼 Sell ID</div>
+      <div class="card" onclick="location.href='wallet.html'">💰 Wallet</div>
+      <div class="card" onclick="location.href='profile.html'">👤 Profile</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  © 2025 BGMI Market | Built with ❤️ by @am_sillent_hunter
+</footer>
+
+<script src="js/auth.js"></script>
+
+<script>
+  function updateDashboard() {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const guest = document.getElementById("guest-view");
+    const userDash = document.getElementById("user-dashboard");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminNav = document.getElementById("adminNav");
+    const greeting = document.getElementById("greeting");
+
+    if (token && user) {
+      guest.classList.add("hidden");
+      userDash.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+
+      greeting.textContent = `Welcome back, ${user.name || "Player"} 👋`;
+
+      if (user.role === "admin") {
+        adminNav.classList.remove("hidden");
+      }
+    } else {
+      guest.classList.remove("hidden");
+      userDash.classList.add("hidden");
+      logoutBtn.classList.add("hidden");
+      adminNav.classList.add("hidden");
     }
-  </script>
+  }
 
-  <!-- HEADER -->
-  <header>
-    <div class="header-left">
-      <h1>🎮 BGMI Market</h1>
-      <p class="tagline">“Your Trusted Hub for Buying & Selling Premium BGMI IDs”</p>
-    </div>
-    <nav id="nav-bar">
-      <ul>
-        <li><a href="marketplace.html">Marketplace</a></li>
-        <li><a href="sell.html">Sell ID</a></li>
-        <li><a href="wallet.html">Wallet</a></li>
-        <li><a href="profile.html">Profile</a></li>
-        <li><a href="popularity.html">Popularity</a></li>
-        <li><a href="chat.html">Messages</a></li>
-        <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
-      </ul>
-    </nav>
-  </header>
+  updateDashboard();
 
-  <!-- MAIN -->
-  <main>
-    <!-- ANNOUNCEMENTS -->
-    <div class="announcement-bar">
-      <p id="announcement-text">🎉 Welcome to BGMI Market! | New IDs added daily! | Popularity section coming soon!</p>
-    </div>
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    if (window.logout) logout();
+    localStorage.clear();
+    location.reload();
+  });
+</script>
 
-    <!-- GUEST VIEW -->
-    <div id="guest-view" class="visible">
-      <h2>Welcome to BGMI Market 🎯</h2>
-      <p>Buy, sell, and manage BGMI IDs securely with escrow & 2.5% service charge system.</p>
-      <div class="auth-wrapper">
-        <!-- LOGIN -->
-        <div class="auth-container" id="login-container">
-          <h2>🔐 Login</h2>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="email" placeholder="Enter email">
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="password" placeholder="Enter password">
-          </div>
-          <button class="loginBtn">Login</button>
-          <p class="text-small">Don't have an account? <a href="#" id="showRegister">Register</a></p>
-        </div>
-
-        <!-- REGISTER -->
-        <div class="auth-container hidden" id="register-container">
-          <h2>🆕 Register</h2>
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="full_name" placeholder="Enter full name">
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="email" placeholder="Enter email">
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="password" placeholder="Enter password">
-          </div>
-          <button class="registerBtn">Register</button>
-          <p class="text-small">Already have an account? <a href="#" id="showLogin">Login</a></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- USER DASHBOARD -->
-    <section id="user-dashboard" class="hidden">
-      <h2 id="username">Welcome back, Player 👋</h2>
-      <p>Explore your marketplace, manage your wallet, and track your sales.</p>
-      <div class="quick-actions">
-        <div class="card" onclick="window.location='marketplace.html'">
-          <h3>🛒 Marketplace</h3>
-          <p>Explore verified BGMI IDs</p>
-        </div>
-        <div class="card" onclick="window.location='sell.html'">
-          <h3>💼 Sell ID</h3>
-          <p>List your BGMI account</p>
-        </div>
-        <div class="card" onclick="window.location='wallet.html'">
-          <h3>💰 Wallet</h3>
-          <p>Check your balance & transactions</p>
-        </div>
-        <div class="card" onclick="window.location='profile.html'">
-          <h3>👤 Profile</h3>
-          <p>Manage your KYC & info</p>
-        </div>
-        <div class="card" onclick="window.location='popularity.html'">
-          <h3>⭐ Popularity</h3>
-          <p>Check trending IDs (Coming Soon!)</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2025 BGMI Market | Crafted with ❤️ by <strong>@am_sillent_hunter</strong></p>
-    <div class="socials">
-      📩 Email: <a href="mailto:l4kushwaha@gmail.com">l4kushwaha@gmail.com</a> |
-      📸 Instagram: <a href="https://instagram.com/am_sillent_hunter" target="_blank">@am_sillent_hunter</a>
-    </div>
-  </footer>
-
-  <!-- TOAST -->
-  <div id="toast"></div>
-
-  <!-- SCRIPTS -->
-  <script src="js/auth.js"></script>
-  <script>
-    // ===== DASHBOARD & GUEST TO USER SWITCH =====
-    window.addEventListener("load", ()=>{
-      if(window.updateFrontendAuth) window.updateFrontendAuth();
-    });
-
-    // ===== AUTH TOGGLE =====
-    document.getElementById("showRegister").addEventListener("click", e=>{
-      e.preventDefault();
-      document.getElementById("login-container").classList.add("hidden");
-      document.getElementById("register-container").classList.remove("hidden");
-    });
-    document.getElementById("showLogin").addEventListener("click", e=>{
-      e.preventDefault();
-      document.getElementById("register-container").classList.add("hidden");
-      document.getElementById("login-container").classList.remove("hidden");
-    });
-
-    // ===== LOGIN BUTTON =====
-    document.querySelector(".loginBtn").addEventListener("click", ()=>{
-      if(window.loginUser) window.loginUser();
-    });
-
-    // ===== REGISTER BUTTON =====
-    document.querySelector(".registerBtn").addEventListener("click", ()=>{
-      if(window.registerUser) window.registerUser();
-    });
-
-    // ===== LOGOUT BUTTON =====
-    document.getElementById("logoutBtn").addEventListener("click", ()=>{
-      if(window.logout) window.logout();
-    });
-  </script>
 </body>
 </html>
