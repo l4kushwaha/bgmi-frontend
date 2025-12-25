@@ -169,6 +169,60 @@
     }
   });
 
+  /* ===================== FORGOT PASSWORD ===================== */
+async function sendResetLink() {
+    const email = document.getElementById("email")?.value.trim();
+
+    if (!email) {
+        showToast("Please enter your email", "error");
+        return;
+    }
+
+    try {
+        const data = await apiFetch(`${AUTH_API}/forgot-password`, {
+            method: "POST",
+            body: JSON.stringify({ email })
+        });
+
+        showToast(data.message || "Reset link sent! Check your email.", "success");
+    } catch (err) {
+        showToast(err.message || "Failed to send reset link", "error");
+    }
+}
+
+/* ===================== RESET PASSWORD ===================== */
+async function resetPassword() {
+    const token = new URLSearchParams(window.location.search).get("token");
+    const password = document.getElementById("reset-password")?.value.trim();
+    const confirm = document.getElementById("reset-confirm")?.value.trim();
+
+    if (!password || !confirm) {
+        showToast("All fields required", "error");
+        return;
+    }
+
+    if (password !== confirm) {
+        showToast("Passwords do not match", "error");
+        return;
+    }
+
+    try {
+        const data = await apiFetch(`${AUTH_API}/reset-password`, {
+            method: "POST",
+            body: JSON.stringify({ token, password })
+        });
+
+        showToast(data.message || "Password reset successful!", "success");
+
+        setTimeout(() => location.href = "login.html", 1000);
+
+    } catch (err) {
+        showToast(err.message || "Failed to reset password", "error");
+    }
+}
+
+
+
   /* ===================== EXPORT ===================== */
   window.loginUser = loginUser;
   window.registerUser = registerUser;
@@ -176,5 +230,7 @@
   window.getCurrentUser = getCurrentUser;
   window.isAdmin = isAdmin;
   window.protectRoute = protectRoute;
+  window.sendResetLink = sendResetLink;
+  window.resetPassword = resetPassword;
 
 })();
