@@ -163,12 +163,11 @@
 
   /* ===================== HELPERS ===================== */
   function getCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem("user"));
-    } catch {
-      return null;
-    }
-  }
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  return decodeJWT(token); // 🔥 always latest
+}
+
 
   function isAdmin() {
     return getCurrentUser()?.role === "admin";
@@ -193,7 +192,7 @@
  window.addEventListener("load", async () => {
   const token = localStorage.getItem("token");
 
-  if (token && isTokenExpired(token)) {
+  if (token) {
     try {
       await refreshAccessToken();
     } catch {
