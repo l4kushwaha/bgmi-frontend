@@ -93,9 +93,6 @@
     }
 
     try {
-      if (token && isTokenExpired(token)) {
-  await refreshAccessToken();
-}
 
       const data = await apiFetch(`${AUTH_API}/login`, {
         method: "POST",
