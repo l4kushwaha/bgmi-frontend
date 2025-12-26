@@ -195,74 +195,81 @@
 
 
   /* ===================== AUTO REFRESH ===================== */
- window.addEventListener("load", async () => {
-  const refreshToken = localStorage.getItem("refresh_token");
+window.addEventListener("load", async () => {
+  // ❌ skip refresh on auth pages
+  if (
+    location.pathname.includes("login") ||
+    location.pathname.includes("register") ||
+    location.pathname.includes("forgot")
+  ) {
+    return;
+  }
 
+  const refreshToken = localStorage.getItem("refresh_token");
   if (refreshToken) {
     try {
-      await refreshAccessToken(); // 🔥 ALWAYS SYNC WITH DB
-    } catch (err) {
-      console.warn("Refresh failed");
+      await refreshAccessToken();
+    } catch {
       localStorage.clear();
       location.href = "login.html";
     }
   }
 });
 
-
-
   /* ===================== FORGOT PASSWORD ===================== */
 async function sendResetLink() {
-    const email = document.getElementById("email")?.value.trim();
+  const email = document.getElementById("email")?.value.trim();
+  const btn = document.getElementById("forgotBtn");
 
-    if (!email) {
-        showToast("Please enter your email", "error");
-        return;
-    }
+  if (!email) {
+    showToast("Please enter your email", "error");
+    return;
+  }
 
-    try {
-        const data = await apiFetch(`${AUTH_API}/forgot-password`, {
-            method: "POST",
-            body: JSON.stringify({ email })
-        });
+  btn.disabled = true;
+  btn.textContent = "Sending...";
 
-        showToast(data.message || "Reset link sent! Check your email.", "success");
-    } catch (err) {
-        showToast(err.message || "Failed to send reset link", "error");
-    }
+  try {
+    const data = await apiFetch(`${AUTH_API}/forgot-password`, {
+      method: "POST",
+      body: JSON.stringify({ email })
+    });
+
+    showToast(data.message || "OTP sent to email", "success");
+  } catch (err) {
+    showToast(err.message || "Failed to send OTP", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send OTP";
+  }
 }
 
 /* ===================== RESET PASSWORD ===================== */
 async function resetPassword() {
-    const token = new URLSearchParams(window.location.search).get("token");
-    const password = document.getElementById("reset-password")?.value.trim();
-    const confirm = document.getElementById("reset-confirm")?.value.trim();
+  const otp = document.getElementById("resetToken")?.value.trim();
+  const newPassword = document.getElementById("newPassword")?.value.trim();
 
-    if (!password || !confirm) {
-        showToast("All fields required", "error");
-        return;
-    }
+  if (!otp || !newPassword) {
+    showToast("OTP and new password required", "error");
+    return;
+  }
 
-    if (password !== confirm) {
-        showToast("Passwords do not match", "error");
-        return;
-    }
+  try {
+    const data = await apiFetch(`${AUTH_API}/reset-password`, {
+      method: "POST",
+      body: JSON.stringify({
+        otp,
+        newPassword
+      })
+    });
 
-    try {
-        const data = await apiFetch(`${AUTH_API}/reset-password`, {
-            method: "POST",
-            body: JSON.stringify({ token, password })
-        });
-        console.log(data);
-
-        showToast(data.message || "Password reset successful!", "success");
-
-        setTimeout(() => location.href = "login.html", 1000);
-
-    } catch (err) {
-        showToast(err.message || "Failed to reset password", "error");
-    }
+    showToast("Password reset successful!", "success");
+    setTimeout(() => location.href = "login.html", 1000);
+  } catch (err) {
+    showToast(err.message || "Reset failed", "error");
+  }
 }
+
 
 
 
