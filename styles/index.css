@@ -516,9 +516,9 @@ body {
 }
 
 .card-wrapper-guest {
-  width: 100%;              /* center column ke hisaab se */
+  width: 75%;              /* center column ke hisaab se */
   max-width: 420px;         /* desktop pe limit */
-  aspect-ratio: 1/ 1.6;   /* wide : short (width zyada) */
+  aspect-ratio: 1/1.6;   /* wide : short (width zyada) */
   
   border-radius: 24px;
   position: relative;
@@ -635,4 +635,11 @@ body {
   opacity: 0.1;
   mask-image: linear-gradient(to right, transparent, black, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, black, transparent);
+}
+
+#guest-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
 }
