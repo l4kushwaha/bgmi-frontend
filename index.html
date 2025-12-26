@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="styles/index.css">
 
 <style>
-  /* ---------- Body & Background ---------- */
   * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
   body {
     min-height: 100vh;
@@ -29,11 +28,9 @@
     100% { background-position: right bottom; }
   }
 
-  /* ---------- Floating Bubbles ---------- */
   .bubble { position:absolute; border-radius:50%; background:rgba(255,255,255,0.08); backdrop-filter:blur(12px); animation:float 15s infinite ease-in-out; z-index:0; }
   @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-30px);} }
 
-  /* ---------- Header ---------- */
   header {
     width:100%;
     padding:1.2rem 2rem;
@@ -56,20 +53,21 @@
   nav a { text-decoration:none; color:#fff; transition:0.3s; }
   nav a:hover { color:#ffcc00; }
 
-  /* ---------- Main Section ---------- */
   main { flex:1; width:100%; display:flex; justify-content:center; padding:2rem; z-index:1; }
-  section { width:90%; max-width:1000px; text-align:center; }
+  section { width:90%; max-width:1200px; text-align:center; }
 
-  /* ---------- 3D Cards Container ---------- */
+  /* Horizontal gallery */
   .gallery-container {
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
+    display:flex;
+    flex-direction: row;   /* horizontal */
     gap:40px;
-    justify-items:center; /* horizontally center cards in their column */
-}
+    align-items:flex-start;
+    justify-content:center;
+    flex-wrap: wrap;       /* wrap if screen small */
+    perspective: 1000px;
+    padding: 40px 20px;
+  }
 
-
-  /* ---------- Footer ---------- */
   footer {
     width:100%;
     padding:1.2rem;
@@ -82,7 +80,6 @@
   .hidden { display:none; }
 </style>
 </head>
-
 <body>
 
 <!-- Floating bubbles -->
@@ -109,30 +106,26 @@
       <li><a href="profile.html">Profile</a></li>
       <li><a href="popularity.html">Popularity</a></li>
       <li><a href="chat.html">Message</a></li>
-      <li id="adminNav" class="hidden">
-        <a href="admin_dashboard.html">Admin Dashboard</a>
-      </li>
+      <li id="adminNav" class="hidden"><a href="admin_dashboard.html">Admin Dashboard</a></li>
       <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
     </ul>
   </nav>
 </header>
 
 <main>
-
-  <!-- GUEST -->
   <section id="guest-view">
     <h2>Welcome to BGMI Market 🎯</h2>
     <p>Please login to access marketplace & dashboard.</p>
     <button onclick="window.location='login.html'">Login</button>
   </section>
 
-  <!-- USER DASHBOARD -->
   <section id="user-dashboard" class="hidden">
     <h2 id="greeting">Welcome 👋</h2>
     <p>Manage your BGMI journey securely.</p>
 
+    <!-- 3D Cards -->
     <div class="gallery-container">
-      <!-- Card 1: Marketplace -->
+
       <div class="card-wrapper-1">
         <div class="inner-wrapper-1">
           <div class="border-layer-1"><div class="card-main-1"></div></div>
@@ -153,7 +146,6 @@
         </div>
       </div>
 
-      <!-- Card 2: Popularity -->
       <div class="card-wrapper-2">
         <div class="inner-wrapper-2">
           <div class="border-layer-2"><div class="card-main-2"></div></div>
@@ -174,7 +166,6 @@
         </div>
       </div>
 
-      <!-- Card 3: Profile -->
       <div class="card-wrapper-3">
         <div class="inner-wrapper-3">
           <div class="border-layer-3"><div class="card-main-3"></div></div>
