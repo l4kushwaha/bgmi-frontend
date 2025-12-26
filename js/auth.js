@@ -196,19 +196,19 @@
 
   /* ===================== AUTO REFRESH ===================== */
  window.addEventListener("load", async () => {
-  const token = localStorage.getItem("token");
   const refreshToken = localStorage.getItem("refresh_token");
 
-  if (token && isTokenExpired(token) && refreshToken) {
+  if (refreshToken) {
     try {
-      await refreshAccessToken();
+      await refreshAccessToken(); // 🔥 ALWAYS SYNC WITH DB
     } catch (err) {
-      console.warn("Refresh failed, logging out");
+      console.warn("Refresh failed");
       localStorage.clear();
       location.href = "login.html";
     }
   }
 });
+
 
 
   /* ===================== FORGOT PASSWORD ===================== */
