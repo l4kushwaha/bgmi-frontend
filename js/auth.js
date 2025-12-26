@@ -165,8 +165,9 @@
   function getCurrentUser() {
   const token = localStorage.getItem("token");
   if (!token) return null;
-  return decodeJWT(token); // 🔥 always latest
+  return decodeJWT(token); // always latest from token
 }
+
 
 
   function isAdmin() {
@@ -174,33 +175,41 @@
   }
 
   /* ===================== ROUTE PROTECTION ===================== */
-  function protectRoute({ admin = false } = {}) {
-    const user = getCurrentUser();
-    const token = localStorage.getItem("token");
+ function protectRoute({ admin = false } = {}) {
+  const user = getCurrentUser();
+  const token = localStorage.getItem("token");
 
-    if (!user || !token) {
+  if (!user || !token) {
+    if (window.location.pathname !== "/login.html") {
       location.href = "login.html";
-      return;
     }
+    return;
+  }
 
-    if (admin && user.role !== "admin") {
+  if (admin && user.role !== "admin") {
+    if (window.location.pathname !== "/index.html") {
       location.href = "index.html";
     }
   }
+}
+
 
   /* ===================== AUTO REFRESH ===================== */
  window.addEventListener("load", async () => {
   const token = localStorage.getItem("token");
+  const refreshToken = localStorage.getItem("refresh_token");
 
-  if (token) {
+  if (token && isTokenExpired(token) && refreshToken) {
     try {
       await refreshAccessToken();
-    } catch {
+    } catch (err) {
+      console.warn("Refresh failed, logging out");
       localStorage.clear();
-      location.href = "login.html";
+      return; // ✅ redirect ke liye return
     }
   }
 });
+
 
   /* ===================== FORGOT PASSWORD ===================== */
 async function sendResetLink() {
