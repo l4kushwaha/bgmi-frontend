@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BGMI Market | Home</title>
-<link rel="stylesheet" href="styles/index.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BGMI Market | Home</title>
+  <link rel="stylesheet" href="assets/poppins.css">
+  <link rel="stylesheet" href="3dgrib.css">
 </head>
 <body>
 
@@ -32,7 +33,9 @@
       <li><a href="profile.html">Profile</a></li>
       <li><a href="popularity.html">Popularity</a></li>
       <li><a href="chat.html">Message</a></li>
-      <li id="adminNav" class="hidden"><a href="admin_dashboard.html">Admin Dashboard</a></li>
+      <li id="adminNav" class="hidden">
+        <a href="admin_dashboard.html">Admin Dashboard</a>
+      </li>
       <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
     </ul>
   </nav>
@@ -40,20 +43,88 @@
 
 <main>
 
-  <!-- Guest View -->
+  <!-- GUEST -->
   <section id="guest-view">
     <h2>Welcome to BGMI Market 🎯</h2>
     <p>Please login to access marketplace & dashboard.</p>
     <button onclick="window.location='login.html'">Login</button>
   </section>
 
-  <!-- User / Admin Dashboard -->
+  <!-- USER -->
   <section id="user-dashboard" class="hidden">
     <h2 id="greeting">Welcome 👋</h2>
     <p>Manage your BGMI journey securely.</p>
 
-    <div class="cards-container" id="cardsContainer">
-      <!-- Cards injected via JS -->
+    <div class="gallery-container">
+      <!-- Card 1: Marketplace -->
+      <div class="card-wrapper-1">
+        <div class="inner-wrapper-1">
+          <div class="border-layer-1">
+            <div class="card-main-1"></div>
+          </div>
+          <div class="glow-1-layer-1"></div>
+          <div class="glow-1-layer-2"></div>
+        </div>
+        <div class="overlay-1-1"></div>
+        <div class="background-glow-1"></div>
+        <div class="card-content">
+          <div class="content-header">
+            <a href="marketplace.html" class="glass-badge">Marketplace</a>
+            <p class="card-title">Explore & Buy</p>
+          </div>
+          <hr class="card-divider" />
+          <div class="content-footer">
+            <p class="card-description">Browse BGMI accounts & items securely.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Popularity -->
+      <div class="card-wrapper-2">
+        <div class="inner-wrapper-2">
+          <div class="border-layer-2">
+            <div class="card-main-2"></div>
+          </div>
+          <div class="glow-2-layer-1"></div>
+          <div class="glow-2-layer-2"></div>
+        </div>
+        <div class="overlay-2-1"></div>
+        <div class="background-glow-2"></div>
+        <div class="card-content">
+          <div class="content-header">
+            <a href="popularity.html" class="glass-badge">Popularity</a>
+            <p class="card-title">Rank & Shine</p>
+          </div>
+          <hr class="card-divider" />
+          <div class="content-footer">
+            <p class="card-description">Check top players & trending accounts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Profile -->
+      <div class="card-wrapper-3">
+        <div class="inner-wrapper-3">
+          <div class="border-layer-3">
+            <div class="card-main-3"></div>
+          </div>
+          <div class="glow-3-layer-1"></div>
+          <div class="glow-3-layer-2"></div>
+        </div>
+        <div class="overlay-3-1"></div>
+        <div class="background-glow-3"></div>
+        <div class="card-content">
+          <div class="content-header">
+            <a href="profile.html" class="glass-badge">Profile</a>
+            <p class="card-title">Your Space</p>
+          </div>
+          <hr class="card-divider" />
+          <div class="content-footer">
+            <p class="card-description">Manage account info, stats & settings.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -63,82 +134,43 @@
   © 2025 BGMI Market | Built with ❤️ by @am_sillent_hunter
 </footer>
 
+<script src="js/auth.js"></script>
 <script>
-function getGreeting(){
-  const hour = new Date().getHours();
-  if(hour<12) return "Good Morning";
-  else if(hour<16) return "Good Afternoon";
-  else if(hour<20) return "Good Evening";
-  else return "Good Night";
-}
+  function updateDashboard() {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
 
-function updateDashboard() {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+    const guest = document.getElementById("guest-view");
+    const userDash = document.getElementById("user-dashboard");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminNav = document.getElementById("adminNav");
+    const greeting = document.getElementById("greeting");
 
-  const guest = document.getElementById("guest-view");
-  const userDash = document.getElementById("user-dashboard");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const adminNav = document.getElementById("adminNav");
-  const greeting = document.getElementById("greeting");
-  const cardsContainer = document.getElementById("cardsContainer");
+    if (token && user) {
+      guest.classList.add("hidden");
+      userDash.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
 
-  if(token && user){
-    guest.classList.add("hidden");
-    userDash.classList.remove("hidden");
-    logoutBtn.classList.remove("hidden");
+      greeting.textContent = `Welcome back, ${user.name || "Player"} 👋`;
 
-    // clean username
-    const username = user.name || user.email?.split('@')[0] || "Player";
-    greeting.textContent = `${getGreeting()}, ${username} 👋`;
-
-    // cards
-    const cards = [
-      {title:"Marketplace", desc:"Buy and sell BGMI IDs.", color:"#48dd84", link:"marketplace.html"},
-      {title:"Popularity", desc:"Check player stats & ranking.", color:"#48c4dd", link:"popularity.html"},
-      {title:"Profile", desc:"View and edit your profile.", color:"#dd48c4", link:"profile.html"}
-    ];
-
-    if(user.role==="admin"){
-      adminNav.classList.remove("hidden");
-      cards.push({title:"Admin Dashboard", desc:"Manage platform settings.", color:"#ffd700", link:"admin_dashboard.html"});
+      if (user.role === "admin") {
+        adminNav.classList.remove("hidden");
+      }
+    } else {
+      guest.classList.remove("hidden");
+      userDash.classList.add("hidden");
+      logoutBtn.classList.add("hidden");
+      adminNav.classList.add("hidden");
     }
-
-    // inject cards
-    cardsContainer.innerHTML="";
-    cards.forEach(card=>{
-      const cardEl = document.createElement("div");
-      cardEl.className="card-wrapper";
-      cardEl.style.color=card.color;
-      cardEl.innerHTML=`
-        <div class="inner-wrapper">
-          <div class="border-layer">
-            <div class="card-main"></div>
-          </div>
-          <div class="card-content">
-            <h3>${card.title}</h3>
-            <p>${card.desc}</p>
-            <button onclick="location.href='${card.link}'">Open</button>
-          </div>
-        </div>
-      `;
-      cardsContainer.appendChild(cardEl);
-    });
-
-  } else {
-    guest.classList.remove("hidden");
-    userDash.classList.add("hidden");
-    logoutBtn.classList.add("hidden");
-    adminNav.classList.add("hidden");
   }
-}
 
-updateDashboard();
+  updateDashboard();
 
-document.getElementById("logoutBtn").addEventListener("click",()=>{
-  localStorage.clear();
-  location.reload();
-});
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    if (window.logout) logout();
+    localStorage.clear();
+    location.reload();
+  });
 </script>
 
 </body>
