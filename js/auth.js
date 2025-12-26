@@ -54,6 +54,34 @@
     return data;
   }
 
+  async function refreshAccessToken() {
+  const refreshToken = localStorage.getItem("refresh_token");
+  if (!refreshToken) throw new Error("No refresh token");
+
+  const res = await fetch(`${AUTH_API}/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: refreshToken })
+  });
+
+  if (!res.ok) throw new Error("Refresh failed");
+
+  const data = await res.json();
+  localStorage.setItem("token", data.access_token);
+
+  // 🔥 UPDATE USER FROM NEW TOKEN
+  const payload = decodeJWT(data.access_token);
+  const user = {
+    id: payload.id,
+    email: payload.email,
+    role: payload.role,
+    name: payload.email.split("@")[0]
+  };
+  localStorage.setItem("user", JSON.stringify(user));
+
+  return data.access_token;
+}
+
   /* ===================== LOGIN ===================== */
   async function loginUser() {
     const email = document.getElementById("login-email")?.value.trim();
@@ -65,6 +93,10 @@
     }
 
     try {
+      if (token && isTokenExpired(token)) {
+  await refreshAccessToken();
+}
+
       const data = await apiFetch(`${AUTH_API}/login`, {
         method: "POST",
         body: JSON.stringify({ email, password })
@@ -161,13 +193,18 @@
   }
 
   /* ===================== AUTO REFRESH ===================== */
-  window.addEventListener("load", () => {
-    const token = localStorage.getItem("token");
-    if (token && isTokenExpired(token)) {
+ window.addEventListener("load", async () => {
+  const token = localStorage.getItem("token");
+
+  if (token && isTokenExpired(token)) {
+    try {
+      await refreshAccessToken();
+    } catch {
       localStorage.clear();
       location.href = "login.html";
     }
-  });
+  }
+});
 
   /* ===================== FORGOT PASSWORD ===================== */
 async function sendResetLink() {
