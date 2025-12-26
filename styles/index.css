@@ -519,8 +519,8 @@ body {
 .card-wrapper-guest {
   display: grid;
   place-items: center;
-  width: 200px;            /* desired width */
-  height: 320px;           /* desired height (1.6x width) */
+  width: 340px;            /* desired width */
+  height: 200px;           /* desired height (1.6x width) */
   border-radius: 24px;
   position: relative;
   background: linear-gradient(-30deg, var(--gradient-1), transparent, var(--gradient-1)),
