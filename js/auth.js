@@ -205,7 +205,7 @@
     } catch (err) {
       console.warn("Refresh failed, logging out");
       localStorage.clear();
-      return; // ✅ redirect ke liye return
+      location.href = "login.html";
     }
   }
 });
