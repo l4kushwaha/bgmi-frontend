@@ -517,8 +517,8 @@ body {
 
 
 .card-wrapper-guest {
-  width: 320px;      /* wider */
-  height: 200px;     /* shorter */
+  width: 300px;      /* wider */
+  height: 180px;     /* shorter */
   border-radius: 24px;
   position: relative;
   background:
