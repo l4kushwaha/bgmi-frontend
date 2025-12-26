@@ -190,15 +190,6 @@
     b.style.animationDelay=Math.random()*10+"s";
     document.body.appendChild(b);
   }
-
-
-if(token && user){
-  guest.classList.add("hidden");
-  userDash.classList.remove("hidden");
-  logoutBtn.classList.remove("hidden");
-
-  if(user.role==="admin"){ adminNav.classList.remove("hidden"); }
-}
 </script>
 
 <header>
@@ -309,39 +300,39 @@ if(token && user){
 
 <script src="js/auth.js"></script>
 <script>
-function getUsername(email) {
-  if(!email) return "Player";
-  return email.split("@")[0]; // Gmail se pehle ka part
-}
-
 function getTimeGreeting() {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) return "Good Morning";
-  else if (hour >= 12 && hour < 17) return "Good Afternoon";
-  else if (hour >= 17 && hour < 21) return "Good Evening";
-  else return "Good Night";
+  if (hour >= 12 && hour < 17) return "Good Afternoon";
+  if (hour >= 17 && hour < 21) return "Good Evening";
+  return "Good Night";
 }
 
 function updateDashboard() {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
+
   const guest = document.getElementById("guest-view");
   const userDash = document.getElementById("user-dashboard");
   const logoutBtn = document.getElementById("logoutBtn");
   const adminNav = document.getElementById("adminNav");
   const greeting = document.getElementById("greeting");
 
-  if(token && user){
+  if (token && user) {
     guest.classList.add("hidden");
     userDash.classList.remove("hidden");
     logoutBtn.classList.remove("hidden");
 
-    // Username Gmail se pehle ka part
-    const username = getUsername(user.name || user.email);
+    const username =
+      user.name ||
+      (user.email ? user.email.split("@")[0] : "Player");
+
     greeting.textContent = `${getTimeGreeting()}, ${username} 👋`;
 
-    if(user.role==="admin"){ adminNav.classList.remove("hidden"); }
-  }else{
+    if (user.role === "admin") {
+      adminNav.classList.remove("hidden");
+    }
+  } else {
     guest.classList.remove("hidden");
     userDash.classList.add("hidden");
     logoutBtn.classList.add("hidden");
@@ -349,15 +340,14 @@ function updateDashboard() {
   }
 }
 
-updateDashboard();
+document.addEventListener("DOMContentLoaded", updateDashboard);
 
-document.getElementById("logoutBtn").addEventListener("click", ()=>{
-  if(window.logout) logout();
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
   localStorage.clear();
-  location.reload();
+  location.href = "login.html";
 });
-
 </script>
+
 
 </body>
 </html>
