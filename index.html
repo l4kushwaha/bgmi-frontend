@@ -196,6 +196,7 @@ if(token && user){
   guest.classList.add("hidden");
   userDash.classList.remove("hidden");
   logoutBtn.classList.remove("hidden");
+
   if(user.role==="admin"){ adminNav.classList.remove("hidden"); }
 }
 </script>
@@ -217,22 +218,18 @@ if(token && user){
 </header>
 
 <main>
-<section id="guest-view">
-  <div class="gallery-container">
-    <div class="card-wrapper-guest">
-      <div class="card-main-guest"></div>
-      <div class="glow-guest-layer-1"></div>
-      <div class="glow-guest-layer-2"></div>
-      <div class="overlay-guest"></div>
-      <div class="background-glow-guest"></div>
-      <div class="card-content-guest">
-        <h2>Welcome to BGMI Market 🎯</h2>
-        <p>Please login to explore marketplace & dashboard.</p>
-        <button onclick="window.location='login.html'">Login</button>
-      </div>
-    </div>
+<div class="card-wrapper-guest">
+  <div class="card-main-guest"></div>
+  <div class="glow-guest-layer-1"></div>
+  <div class="glow-guest-layer-2"></div>
+  <div class="background-glow-guest"></div>
+  <div class="card-content-guest">
+    <h2>Welcome to BGMI Market 🎯</h2>
+    <p>Please login to explore marketplace & dashboard.</p>
+    <button onclick="window.location='login.html'">Login</button>
   </div>
-</section>
+</div>
+
 
   <section id="user-dashboard" class="hidden">
     <h2 id="greeting">Welcome 👋</h2>
