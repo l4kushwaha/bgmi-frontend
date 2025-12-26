@@ -515,22 +515,20 @@ body {
   box-shadow: 0 6px 20px rgba(255, 136, 0, 0.7);
 }
 
-
 .card-wrapper-guest {
-  width: 300px;      /* wider */
-  height: 180px;     /* shorter */
+  width: 100%;              /* center column ke hisaab se */
+  max-width: 420px;         /* desktop pe limit */
+  aspect-ratio: 1.6 / 1;   /* wide : short (width zyada) */
+  
   border-radius: 24px;
   position: relative;
   background:
     linear-gradient(-30deg, var(--gradient-1), transparent, var(--gradient-1)),
     linear-gradient(to bottom, var(--color-neutral-900), var(--color-neutral-900));
+
   transform-style: preserve-3d;
   transition: transform 0.5s ease;
   overflow: hidden;
-}
-
-.card-wrapper-guest:hover {
-  transform: rotateY(6deg) rotateX(4deg);
 }
 
 
