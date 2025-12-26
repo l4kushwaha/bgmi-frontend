@@ -152,6 +152,29 @@
                 <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
                 <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
             </filter>
+            <filter id="turbulent-guest" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="10" />
+  <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+    <animate attributeName="dy" values="700; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="10" />
+  <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+    <animate attributeName="dy" values="0; -700" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise3" seed="11" />
+  <feOffset in="noise3" dx="0" dy="0" result="offsetNoise3">
+    <animate attributeName="dx" values="490; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise4" seed="11" />
+  <feOffset in="noise4" dx="0" dy="0" result="offsetNoise4">
+    <animate attributeName="dx" values="0; -490" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
+  <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
+  <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
+  <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
+</filter>
+
         </defs>
     </svg>
 
@@ -167,6 +190,27 @@
     b.style.animationDelay=Math.random()*10+"s";
     document.body.appendChild(b);
   }
+
+  function getTimeGreeting() {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return "Good Morning";
+  else if (hour >= 12 && hour < 17) return "Good Afternoon";
+  else if (hour >= 17 && hour < 21) return "Good Evening";
+  else return "Good Night";
+}
+
+if(token && user){
+  guest.classList.add("hidden");
+  userDash.classList.remove("hidden");
+  logoutBtn.classList.remove("hidden");
+
+  // Username Gmail se pehle ka word
+  let username = (user.name || "Player");
+  greeting.textContent = `${getTimeGreeting()}, ${username} 👋`;
+
+  if(user.role==="admin"){ adminNav.classList.remove("hidden"); }
+}
+
 </script>
 
 <header>
@@ -186,11 +230,22 @@
 </header>
 
 <main>
-  <section id="guest-view">
-    <h2>Welcome to BGMI Market 🎯</h2>
-    <p>Please login to access marketplace & dashboard.</p>
-    <button onclick="window.location='login.html'">Login</button>
-  </section>
+<section id="guest-view">
+  <div class="gallery-container">
+    <div class="card-wrapper-guest">
+      <div class="card-main-guest"></div>
+      <div class="glow-guest-layer-1"></div>
+      <div class="glow-guest-layer-2"></div>
+      <div class="overlay-guest"></div>
+      <div class="background-glow-guest"></div>
+      <div class="card-content-guest">
+        <h2>Welcome to BGMI Market 🎯</h2>
+        <p>Please login to explore marketplace & dashboard.</p>
+        <button onclick="window.location='login.html'">Login</button>
+      </div>
+    </div>
+  </div>
+</section>
 
   <section id="user-dashboard" class="hidden">
     <h2 id="greeting">Welcome 👋</h2>
