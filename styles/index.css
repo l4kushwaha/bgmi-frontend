@@ -638,9 +638,10 @@ body {
 }
 
 #guest-view {
+  display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60vh;
+  min-height: 100vh;
 }
 
 .hidden {
