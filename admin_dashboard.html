@@ -4,9 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin Dashboard | BGMI Store</title>
-<link rel="stylesheet" href="style.css" />
-<link rel="stylesheet" href="responsive.css" />
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- ================= INTERNAL CSS ================= -->
 <style>
   body {
     font-family: 'Poppins', sans-serif;
@@ -24,7 +23,10 @@
     border-bottom: 1px solid #333;
   }
 
-  header h1 { font-size: 22px; color: #00ffc6; }
+  header h1 {
+    font-size: 22px;
+    color: #00ffc6;
+  }
 
   .logout-btn {
     background: crimson;
@@ -46,7 +48,7 @@
     background: #1a1a1a;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
   }
 
   h2 {
@@ -55,14 +57,19 @@
     margin-bottom: 10px;
   }
 
-  .user-list li {
-    border-bottom: 1px solid #333;
-    padding: 6px 0;
-    display: flex;
-    justify-content: space-between;
+  .wallet-card {
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
   }
 
-  .toggle-btn, .refresh-btn {
+  .wallet-balance {
+    font-size: 30px;
+    color: #00ffc6;
+  }
+
+  .refresh-btn, .toggle-btn {
     background: #00ffc6;
     border: none;
     padding: 6px 10px;
@@ -73,30 +80,32 @@
     margin-left: 5px;
   }
 
-  .wallet-card {
-    background: #111;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
+  .user-list li {
+    border-bottom: 1px solid #333;
+    padding: 6px 0;
+    display: flex;
+    justify-content: space-between;
   }
 
-  .wallet-balance { font-size: 30px; color: #00ffc6; }
-
   @media(max-width:900px){
-    main { grid-template-columns: 1fr; }
+    main {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
+
 <body>
+
 <header>
   <h1>👑 Admin Dashboard</h1>
   <button class="logout-btn" onclick="logout()">Logout</button>
 </header>
 
 <main>
-  <!-- Left Panel -->
+  <!-- LEFT -->
   <section>
-    <h2>Admin Wallet (Service Charges)
+    <h2>Admin Wallet
       <button class="refresh-btn" onclick="fetchWallet()">Refresh</button>
     </h2>
     <div class="wallet-card">
@@ -107,113 +116,132 @@
     <h2>Module Control
       <button class="refresh-btn" onclick="fetchModules()">Refresh</button>
     </h2>
-    <div id="modules"><p>Loading module statuses...</p></div>
+    <div id="modules">Loading...</div>
   </section>
 
-  <!-- Right Panel -->
+  <!-- RIGHT -->
   <section>
     <h2>Registered Users
       <button class="refresh-btn" onclick="fetchUsers()">Refresh</button>
     </h2>
-    <ul id="userList" class="user-list"><li>Loading users...</li></ul>
+    <ul id="userList" class="user-list">Loading...</ul>
   </section>
 </main>
 
+<!-- ================= INTERNAL JS ================= -->
 <script>
-  const GATEWAY_URL = "http://localhost:5000";
-  const ADMIN_KEY = "ELEGENT1832";
+/* ================= CONFIG ================= */
+const GATEWAY_URL = location.hostname.includes("localhost")
+  ? "http://127.0.0.1:5000"
+  : "https://bgmi-gateway.workers.dev";
 
-  // Check JWT token in localStorage
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user || user.role !== "admin" || !user.token) {
-    alert("❌ Unauthorized access. Redirecting...");
-    window.location.href = "login.html";
-  }
+/* ================= AUTH CHECK ================= */
+const token = localStorage.getItem("token");
+const user = JSON.parse(localStorage.getItem("user"));
 
-  // Logout function
-  function logout() {
-    localStorage.clear();
-    window.location.href = "login.html";
-  }
+if (!token || !user || user.role !== "admin") {
+  alert("❌ Unauthorized access");
+  location.href = "login.html";
+}
 
-  // Fetch wallet balance
-  async function fetchWallet() {
-    try {
-      const res = await fetch(`${GATEWAY_URL}/api/wallet/admin-balance`, {
-        headers: { "Authorization": `Bearer ${user.token}` }
-      });
-      const data = await res.json();
-      document.getElementById("walletBalance").innerText = res.ok ? `₹${data.balance.toFixed(2)}` : "Error fetching balance";
-    } catch (err) {
-      console.error(err);
-      document.getElementById("walletBalance").innerText = "Server unreachable";
-    }
-  }
+/* ================= LOGOUT ================= */
+function logout() {
+  localStorage.clear();
+  location.href = "login.html";
+}
 
-  // Fetch modules
-  async function fetchModules() {
-    try {
-      const res = await fetch(`${GATEWAY_URL}/health/modules`);
-      const data = await res.json();
-      const modulesDiv = document.getElementById("modules");
-      modulesDiv.innerHTML = "";
-      for (const [name, status] of Object.entries(data)) {
-        const color = status === "running" ? "lime" : "crimson";
-        modulesDiv.innerHTML += `
-          <div style="margin-bottom:8px;">
-            <b>${name}</b> — <span style="color:${color}">${status}</span>
-            <button class="toggle-btn" onclick="toggleModule('${name}')">
-              ${status === "running" ? "Stop" : "Start"}
-            </button>
-          </div>`;
+/* ================= FETCH WALLET ================= */
+async function fetchWallet() {
+  try {
+    const res = await fetch(`${GATEWAY_URL}/api/wallet/admin-balance`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
       }
-    } catch (err) {
-      console.error(err);
-      document.getElementById("modules").innerHTML = "<p>Failed to load modules</p>";
-    }
-  }
+    });
 
-  // Toggle module
-  async function toggleModule(name) {
-    try {
-      const res = await fetch(`${GATEWAY_URL}/api/admin/module/${name}/toggle`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ admin_key: ADMIN_KEY })
-      });
-      const data = await res.json();
-      alert(data.message || "Toggled successfully!");
-      fetchModules();
-    } catch (err) {
-      alert("⚠️ Error toggling module");
-    }
+    const data = await res.json();
+    document.getElementById("walletBalance").innerText =
+      res.ok ? `₹${data.balance.toFixed(2)}` : "Error";
+  } catch {
+    document.getElementById("walletBalance").innerText = "Server error";
   }
+}
 
-  // Fetch registered users
-  async function fetchUsers() {
-    try {
-      const res = await fetch(`${GATEWAY_URL}/api/auth/all-users`, {
-        headers: { "Authorization": `Bearer ${user.token}` }
-      });
-      const users = await res.json();
-      const userList = document.getElementById("userList");
-      userList.innerHTML = "";
-      users.forEach(u => {
-        userList.innerHTML += `<li>
-          <span>${u.full_name} (${u.email})</span>
+/* ================= FETCH MODULES ================= */
+async function fetchModules() {
+  try {
+    const res = await fetch(`${GATEWAY_URL}/health/modules`);
+    const data = await res.json();
+
+    const box = document.getElementById("modules");
+    box.innerHTML = "";
+
+    Object.entries(data).forEach(([name, status]) => {
+      const color = status === "running" ? "lime" : "crimson";
+
+      box.innerHTML += `
+        <div style="margin-bottom:8px;">
+          <b>${name}</b> —
+          <span style="color:${color}">${status}</span>
+          <button class="toggle-btn" onclick="toggleModule('${name}')">
+            ${status === "running" ? "Stop" : "Start"}
+          </button>
+        </div>`;
+    });
+  } catch {
+    document.getElementById("modules").innerHTML = "Failed to load modules";
+  }
+}
+
+/* ================= TOGGLE MODULE ================= */
+async function toggleModule(name) {
+  try {
+    const res = await fetch(`${GATEWAY_URL}/api/admin/module/${name}/toggle`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    alert(data.message || "Updated");
+    fetchModules();
+  } catch {
+    alert("Module toggle failed");
+  }
+}
+
+/* ================= FETCH USERS ================= */
+async function fetchUsers() {
+  try {
+    const res = await fetch(`${GATEWAY_URL}/api/auth/all-users`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const users = await res.json();
+    const ul = document.getElementById("userList");
+    ul.innerHTML = "";
+
+    users.forEach(u => {
+      ul.innerHTML += `
+        <li>
+          <span>${u.full_name || "User"} (${u.email})</span>
           <span>${u.phone || "N/A"}</span>
         </li>`;
-      });
-    } catch (err) {
-      console.error(err);
-      document.getElementById("userList").innerHTML = "<li>Failed to load users</li>";
-    }
+    });
+  } catch {
+    document.getElementById("userList").innerHTML = "Failed to load users";
   }
+}
 
-  // Initialize dashboard
-  fetchWallet();
-  fetchModules();
-  fetchUsers();
+/* ================= INIT ================= */
+fetchWallet();
+fetchModules();
+fetchUsers();
 </script>
+
 </body>
 </html>
