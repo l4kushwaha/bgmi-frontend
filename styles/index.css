@@ -517,10 +517,11 @@ body {
 
 
 .card-wrapper-guest {
+  display: grid.card-wrapper-guest {
   display: grid;
   place-items: center;
-  width: 320px;   /* width adjustable */
-  aspect-ratio: 1/1.6;  /* width:height = 1:1.6 */
+  width: 200px;   /* pehle 320px tha, ab kam karke height ke hisaab se adjust karenge */
+  aspect-ratio: 1.6/1;  /* height > width (swapped) */
   border-radius: 24px;
   position: relative;
   background: linear-gradient(-30deg, var(--gradient-1), transparent, var(--gradient-1)),
@@ -533,6 +534,7 @@ body {
 .card-wrapper-guest:hover {
   transform: rotateY(5deg) rotateX(5deg);
 }
+
 
 .card-main-guest {
   grid-area: 1 / 1 / -1 / -1;
