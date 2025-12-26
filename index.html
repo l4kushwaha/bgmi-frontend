@@ -1,12 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BGMI Market | Home</title>
-  <link rel="stylesheet" href="assets/poppins.css">
-  <link rel="stylesheet" href="styles/index.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGMI Market | Home</title>
+
+<!-- Fonts -->
+<link rel="stylesheet" href="assets/poppins.css">
+<!-- 3D Cards CSS -->
+<link rel="stylesheet" href="styles/index.css">
+
+<style>
+  /* ---------- Body & Background ---------- */
+  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at top left, #150026, #08080f, #140023);
+    animation: hueShift 15s infinite alternate;
+    background-size: 400% 400%;
+    color: #fff;
+    overflow-x: hidden;
+  }
+  @keyframes hueShift {
+    0% { background-position: left top; }
+    100% { background-position: right bottom; }
+  }
+
+  /* ---------- Floating Bubbles ---------- */
+  .bubble { position:absolute; border-radius:50%; background:rgba(255,255,255,0.08); backdrop-filter:blur(12px); animation:float 15s infinite ease-in-out; z-index:0; }
+  @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-30px);} }
+
+  /* ---------- Header ---------- */
+  header {
+    width:100%;
+    padding:1.2rem 2rem;
+    backdrop-filter:blur(20px);
+    background: rgba(255,255,255,0.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:100;
+  }
+  header h1 {
+    font-size:1.8rem;
+    background: linear-gradient(90deg,#ff8800,#ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  nav ul { list-style:none; display:flex; gap:1.2rem; flex-wrap:wrap; }
+  nav a { text-decoration:none; color:#fff; transition:0.3s; }
+  nav a:hover { color:#ffcc00; }
+
+  /* ---------- Main Section ---------- */
+  main { flex:1; width:100%; display:flex; justify-content:center; padding:2rem; z-index:1; }
+  section { width:90%; max-width:1000px; text-align:center; }
+
+  /* ---------- 3D Cards Container ---------- */
+  .gallery-container {
+    display:flex;
+    flex-direction:column;  /* vertical stacking */
+    gap:40px;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    width:100%;
+    padding:1.2rem;
+    text-align:center;
+    backdrop-filter:blur(15px);
+    background:rgba(255,255,255,0.05);
+    color:#ccc;
+  }
+
+  .hidden { display:none; }
+</style>
 </head>
+
 <body>
 
 <!-- Floating bubbles -->
@@ -50,18 +126,16 @@
     <button onclick="window.location='login.html'">Login</button>
   </section>
 
-  <!-- USER -->
+  <!-- USER DASHBOARD -->
   <section id="user-dashboard" class="hidden">
     <h2 id="greeting">Welcome 👋</h2>
     <p>Manage your BGMI journey securely.</p>
 
-    <div class="quick-actions">
+    <div class="gallery-container">
       <!-- Card 1: Marketplace -->
       <div class="card-wrapper-1">
         <div class="inner-wrapper-1">
-          <div class="border-layer-1">
-            <div class="card-main-1"></div>
-          </div>
+          <div class="border-layer-1"><div class="card-main-1"></div></div>
           <div class="glow-1-layer-1"></div>
           <div class="glow-1-layer-2"></div>
         </div>
@@ -82,9 +156,7 @@
       <!-- Card 2: Popularity -->
       <div class="card-wrapper-2">
         <div class="inner-wrapper-2">
-          <div class="border-layer-2">
-            <div class="card-main-2"></div>
-          </div>
+          <div class="border-layer-2"><div class="card-main-2"></div></div>
           <div class="glow-2-layer-1"></div>
           <div class="glow-2-layer-2"></div>
         </div>
@@ -105,9 +177,7 @@
       <!-- Card 3: Profile -->
       <div class="card-wrapper-3">
         <div class="inner-wrapper-3">
-          <div class="border-layer-3">
-            <div class="card-main-3"></div>
-          </div>
+          <div class="border-layer-3"><div class="card-main-3"></div></div>
           <div class="glow-3-layer-1"></div>
           <div class="glow-3-layer-2"></div>
         </div>
@@ -124,8 +194,8 @@
           </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </section>
 
 </main>
@@ -139,24 +209,19 @@
   function updateDashboard() {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
-
     const guest = document.getElementById("guest-view");
     const userDash = document.getElementById("user-dashboard");
     const logoutBtn = document.getElementById("logoutBtn");
     const adminNav = document.getElementById("adminNav");
     const greeting = document.getElementById("greeting");
 
-    if (token && user) {
+    if(token && user){
       guest.classList.add("hidden");
       userDash.classList.remove("hidden");
       logoutBtn.classList.remove("hidden");
-
       greeting.textContent = `Welcome back, ${user.name || "Player"} 👋`;
-
-      if (user.role === "admin") {
-        adminNav.classList.remove("hidden");
-      }
-    } else {
+      if(user.role==="admin"){ adminNav.classList.remove("hidden"); }
+    }else{
       guest.classList.remove("hidden");
       userDash.classList.add("hidden");
       logoutBtn.classList.add("hidden");
@@ -166,8 +231,8 @@
 
   updateDashboard();
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    if (window.logout) logout();
+  document.getElementById("logoutBtn").addEventListener("click", ()=>{
+    if(window.logout) logout();
     localStorage.clear();
     location.reload();
   });
