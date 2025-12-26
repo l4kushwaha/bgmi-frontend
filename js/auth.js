@@ -275,5 +275,7 @@ async function resetPassword() {
   window.protectRoute = protectRoute;
   window.sendResetLink = sendResetLink;
   window.resetPassword = resetPassword;
+  window.refreshAccessToken = refreshAccessToken;
+
 
 })();
