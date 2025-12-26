@@ -518,7 +518,7 @@ body {
 .card-wrapper-guest {
   width: 100%;              /* center column ke hisaab se */
   max-width: 420px;         /* desktop pe limit */
-  aspect-ratio: 1.6 / 1;   /* wide : short (width zyada) */
+  aspect-ratio: 1/ 1.6;   /* wide : short (width zyada) */
   
   border-radius: 24px;
   position: relative;
@@ -538,6 +538,11 @@ body {
     height: 175px;
   }
 }
+
+.card-wrapper-guest:hover {
+  transform: rotateY(8deg) rotateX(6deg) scale(1.02);
+}
+
 
 .card-main-guest {
   grid-area: 1 / 1 / -1 / -1;
