@@ -255,11 +255,11 @@ async function resetPassword() {
   }
 
   try {
-    const data = await apiFetch(`${AUTH_API}/reset-password`, {
+    await apiFetch(`${AUTH_API}/reset-password`, {
       method: "POST",
       body: JSON.stringify({
         otp,
-        newPassword
+        new_password: newPassword // ✅ FIX
       })
     });
 
@@ -269,9 +269,6 @@ async function resetPassword() {
     showToast(err.message || "Reset failed", "error");
   }
 }
-
-
-
 
   /* ===================== EXPORT ===================== */
   window.loginUser = loginUser;
