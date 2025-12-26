@@ -517,21 +517,28 @@ body {
 
 
 .card-wrapper-guest {
-  display: grid;
-  place-items: center;
-  width: 340px;            /* desired width */
-  height: 200px;           /* desired height (1.6x width) */
+  width: 320px;      /* wider */
+  height: 200px;     /* shorter */
   border-radius: 24px;
   position: relative;
-  background: linear-gradient(-30deg, var(--gradient-1), transparent, var(--gradient-1)),
-              linear-gradient(to bottom, var(--color-neutral-900), var(--color-neutral-900));
+  background:
+    linear-gradient(-30deg, var(--gradient-1), transparent, var(--gradient-1)),
+    linear-gradient(to bottom, var(--color-neutral-900), var(--color-neutral-900));
   transform-style: preserve-3d;
-  transition: transform 0.6s ease;
+  transition: transform 0.5s ease;
   overflow: hidden;
 }
 
 .card-wrapper-guest:hover {
-  transform: rotateY(5deg) rotateX(5deg);
+  transform: rotateY(6deg) rotateX(4deg);
+}
+
+
+@media (max-width: 768px) {
+  .card-wrapper-guest {
+    width: 280px;
+    height: 175px;
+  }
 }
 
 .card-main-guest {
