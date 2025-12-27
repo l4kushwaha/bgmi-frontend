@@ -1,8 +1,94 @@
-<div id="wallet">
-  <h2>Wallet Balance: ₹<span id="balance">0</span></h2>
-  <button onclick="withdrawFunds()">Withdraw</button>
-  <div id="transactions"></div>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BGMI Marketplace Phase-1 Test</title>
+</head>
+<body>
+  <h1>BGMI Marketplace Phase-1 Test</h1>
 
-<script src="js/wallet.js"></script>
+  <button onclick="createPayment()">Create Payment</button>
+  <button onclick="confirmOrder()">Confirm Order</button>
+  <button onclick="addUPI()">Add Seller UPI</button>
+  <button onclick="withdraw()">Withdraw</button>
 
+  <pre id="output"></pre>
+
+  <script>
+    const API_BASE = "https://bgmi-marketplace.bgmi-gateway.workers.dev";
+    let lastOrderId = ""; // store razorpay order id
+
+    function log(msg) {
+      const out = document.getElementById("output");
+      out.textContent += msg + "\n";
+    }
+
+    async function createPayment() {
+      const body = {
+        buyerId: "buyer_1",
+        sellerId: "seller_1",
+        amount: 1000
+      };
+
+      try {
+        const res = await fetch(API_BASE + "/payment/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        lastOrderId = data.orderId;
+        log("Payment Created: " + JSON.stringify(data));
+      } catch(e) {
+        log("Error: " + e);
+      }
+    }
+
+    async function confirmOrder() {
+      if (!lastOrderId) { log("No orderId. Run payment first."); return; }
+      const body = { razorpayOrderId: lastOrderId };
+
+      try {
+        const res = await fetch(API_BASE + "/order/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        log("Order Confirmed: " + JSON.stringify(data));
+      } catch(e) {
+        log("Error: " + e);
+      }
+    }
+
+    async function addUPI() {
+      const body = { sellerId: "seller_1", upiId: "seller@upi" };
+      try {
+        const res = await fetch(API_BASE + "/seller/add-upi", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        log("UPI Added: " + JSON.stringify(data));
+      } catch(e) {
+        log("Error: " + e);
+      }
+    }
+
+    async function withdraw() {
+      const body = { sellerId: "seller_1", amount: 500 };
+      try {
+        const res = await fetch(API_BASE + "/seller/withdraw", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        log("Withdraw Requested: " + JSON.stringify(data));
+      } catch(e) {
+        log("Error: " + e);
+      }
+    }
+  </script>
+</body>
+</html>
