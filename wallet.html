@@ -1,94 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>BGMI Marketplace Phase-1 Test</title>
+  <meta charset="UTF-8" />
+  <title>BGMI Wallet Payment</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script defer src="wallet.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      width: 350px;
+      text-align: center;
+    }
+    button {
+      padding: 12px;
+      width: 100%;
+      background: #22c55e;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .info {
+      margin-bottom: 20px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+  </style>
 </head>
 <body>
-  <h1>BGMI Marketplace Phase-1 Test</h1>
 
-  <button onclick="createPayment()">Create Payment</button>
-  <button onclick="confirmOrder()">Confirm Order</button>
-  <button onclick="addUPI()">Add Seller UPI</button>
-  <button onclick="withdraw()">Withdraw</button>
+  <div class="box">
+    <h2>Service Charge Payment</h2>
+    <div class="info" id="infoText">Loading…</div>
+    <button id="payBtn">Pay Service Charge</button>
+  </div>
 
-  <pre id="output"></pre>
-
-  <script>
-    const API_BASE = "https://bgmi-marketplace.bgmi-gateway.workers.dev";
-    let lastOrderId = ""; // store razorpay order id
-
-    function log(msg) {
-      const out = document.getElementById("output");
-      out.textContent += msg + "\n";
-    }
-
-    async function createPayment() {
-      const body = {
-        buyerId: "buyer_1",
-        sellerId: "seller_1",
-        amount: 1000
-      };
-
-      try {
-        const res = await fetch(API_BASE + "/payment/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        lastOrderId = data.orderId;
-        log("Payment Created: " + JSON.stringify(data));
-      } catch(e) {
-        log("Error: " + e);
-      }
-    }
-
-    async function confirmOrder() {
-      if (!lastOrderId) { log("No orderId. Run payment first."); return; }
-      const body = { razorpayOrderId: lastOrderId };
-
-      try {
-        const res = await fetch(API_BASE + "/order/confirm", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        log("Order Confirmed: " + JSON.stringify(data));
-      } catch(e) {
-        log("Error: " + e);
-      }
-    }
-
-    async function addUPI() {
-      const body = { sellerId: "seller_1", upiId: "seller@upi" };
-      try {
-        const res = await fetch(API_BASE + "/seller/add-upi", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        log("UPI Added: " + JSON.stringify(data));
-      } catch(e) {
-        log("Error: " + e);
-      }
-    }
-
-    async function withdraw() {
-      const body = { sellerId: "seller_1", amount: 500 };
-      try {
-        const res = await fetch(API_BASE + "/seller/withdraw", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        log("Withdraw Requested: " + JSON.stringify(data));
-      } catch(e) {
-        log("Error: " + e);
-      }
-    }
-  </script>
 </body>
 </html>

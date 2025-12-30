@@ -1,78 +1,86 @@
+const WALLET_API = "https://bgmi-wallet-service.bgmi-gateway.workers.dev";
+const CHAT_API   = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
 
-// ===== wallet.js =====
-const WALLET_API = "http://localhost:5003"; // Wallet Service URL
 const token = localStorage.getItem("token");
+const room  = JSON.parse(localStorage.getItem("activeRoom") || "null");
 
-// Fetch wallet balance
-async function getWalletBalance() {
-  try {
-    const res = await fetch(`${WALLET_API}/wallet/balance`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    document.getElementById("balance").textContent = data.balance || 0;
-  } catch (err) {
-    console.error("Error loading wallet:", err);
-  }
+if (!token || !room) {
+  alert("Session expired");
+  location.href = "/login";
 }
 
-// Fetch transactions
-async function loadTransactions() {
-  try {
-    const res = await fetch(`${WALLET_API}/wallet/transactions`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
+const headers = {
+  "Content-Type": "application/json",
+  Authorization: "Bearer " + token
+};
 
-    const container = document.getElementById("transactions");
-    if (!data.length) {
-      container.innerHTML = "<p>No transactions yet.</p>";
-      return;
-    }
+const infoText = document.getElementById("infoText");
+const payBtn = document.getElementById("payBtn");
 
-    container.innerHTML = data
-      .map(
-        (t) => `
-      <div class="transaction">
-        <p>${t.type.toUpperCase()} - ₹${t.amount}</p>
-        <p>${new Date(t.date).toLocaleString()}</p>
-      </div>`
-      )
-      .join("");
-  } catch (err) {
-    console.error("Error fetching transactions:", err);
-  }
-}
+/* ================= INIT ================= */
+(async () => {
+  const r = await fetch(`${WALLET_API}/create-order`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      order_id: room.order_id,
+      amount: room.amount
+    })
+  });
 
-// Withdraw funds
-async function withdrawFunds() {
-  const amount = prompt("Enter amount to withdraw:");
-  if (!amount || isNaN(amount) || amount <= 0) return alert("Invalid amount");
+  const data = await r.json();
+  if (!r.ok) return alert(data.error);
 
-  try {
-    const res = await fetch(`${WALLET_API}/wallet/withdraw`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ amount }),
-    });
+  window.razorpayData = data;
 
-    const data = await res.json();
-    if (res.ok) {
-      alert("Withdrawal successful!");
-      getWalletBalance();
-      loadTransactions();
-    } else {
-      alert(data.message || "Withdrawal failed");
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
+  infoText.innerHTML = `
+    Total Amount: ₹${data.amount}<br>
+    Service Charge (10%): ₹${data.admin_fee}<br>
+    Seller Receives: ₹${data.seller_amount}
+  `;
+})();
 
-window.onload = function () {
-  getWalletBalance();
-  loadTransactions();
+/* ================= PAY ================= */
+payBtn.onclick = () => {
+  const d = window.razorpayData;
+
+  const options = {
+    key: d.key,
+    amount: d.admin_fee * 100,
+    currency: "INR",
+    name: "BGMI Marketplace",
+    description: "Service Charge",
+    order_id: d.razorpay_order_id,
+    handler: async function (res) {
+
+      // VERIFY PAYMENT
+      const vr = await fetch(`${WALLET_API}/verify`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          razorpay_payment_id: res.razorpay_payment_id,
+          razorpay_order_id: res.razorpay_order_id,
+          razorpay_signature: res.razorpay_signature,
+          order_id: room.order_id,
+          seller_id: room.seller_user_id
+        })
+      });
+
+      const v = await vr.json();
+      if (!vr.ok) return alert(v.error);
+
+      // 🔔 Notify chat
+      await fetch(`${CHAT_API}/api/chat/half-payment`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ room_id: room.id })
+      });
+
+      alert("Service charge paid successfully");
+      location.href = "/chat.html";
+    },
+    theme: { color: "#22c55e" }
+  };
+
+  new Razorpay(options).open();
 };

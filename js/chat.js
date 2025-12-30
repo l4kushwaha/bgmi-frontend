@@ -193,22 +193,36 @@
     lastCount = msgs.length;
     chatBox.innerHTML = "";
 
-    msgs.forEach(m => {
-      const div = document.createElement("div");
-      div.className = "message " +
-        (String(m.sender_id) === String(user.id) ? "sent" : "received");
+msgs.forEach(m => {
+  const div = document.createElement("div");
 
-      if (m.type === "image") {
-        const img = document.createElement("img");
-        img.src = m.ciphertext;
-        img.className = "chat-image";
-        div.appendChild(img);
-      } else {
-        div.textContent = m.ciphertext;
-      }
+  // 🔔 SYSTEM MESSAGE
+  if (m.type === "system") {
+    div.className = "message system";
+    div.textContent = "ℹ️ " + m.ciphertext;
+  }
+  // IMAGE
+  else if (m.type === "image") {
+    div.className =
+      "message " +
+      (String(m.sender_id) === String(user.id) ? "sent" : "received");
 
-      chatBox.appendChild(div);
-    });
+    const img = document.createElement("img");
+    img.src = m.ciphertext;
+    img.className = "chat-image";
+    div.appendChild(img);
+  }
+  // TEXT
+  else {
+    div.className =
+      "message " +
+      (String(m.sender_id) === String(user.id) ? "sent" : "received");
+    div.textContent = m.ciphertext;
+  }
+
+  chatBox.appendChild(div);
+});
+
 
     chatBox.scrollTop = chatBox.scrollHeight;
   }
@@ -240,21 +254,41 @@
   }
 
 
-  document.getElementById("halfPayBtn").onclick = async () => {
+document.getElementById("halfPayBtn").onclick = async () => {
   if (!activeRoom) return;
 
-  await fetch(
-    "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/half-payment",
+  const room = chats.find(c => c.id === activeRoom);
+  if (!room) return alert("Room not found");
+
+  // 🔥 Call Wallet Microservice
+  const r = await fetch(
+    "https://bgmi-wallet-service.bgmi-gateway.workers.dev/pay/service-charge",
     {
       method: "POST",
       headers,
-      body: JSON.stringify({ room_id: activeRoom })
+      body: JSON.stringify({
+        order_id: room.order_id,
+        seller_id: room.seller_user_id,
+        amount: 1000 // example
+      })
     }
   );
 
-  alert("Half payment done");
+  const data = await r.json();
+  if (!r.ok) return alert(data.error || "Payment failed");
+
+  alert("₹" + data.admin_fee + " service charge paid");
+
+  // 🔔 Notify chat backend (status update)
+  await fetch(API + "/api/chat/half-payment", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ room_id: activeRoom })
+  });
+
   openChat(activeRoom);
 };
+
 
 
   /* ================= EVENTS ================= */
