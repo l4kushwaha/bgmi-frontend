@@ -110,9 +110,52 @@ function startChat(order_id, seller_user_id) {
 }
 
 // ✅ BUY BUTTON
-function startBuy(order_id, seller_user_id) {
-  startChatOrBuy(order_id, seller_user_id, "buy");
+async function startBuy(order_id, seller_user_id) {
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  if (!token || !user) {
+    alert("Please login first");
+    return;
+  }
+
+  try {
+    // 1️⃣ Call Wallet Service first (10% admin fee)
+    const amount = 1000; // replace with actual order amount from your data
+    const resWallet = await fetch(
+      "https://bgmi-wallet-service.bgmi-gateway.workers.dev/pay/service-charge",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ order_id, seller_id: seller_user_id, amount })
+      }
+    );
+    const walletData = await resWallet.json();
+    if (!resWallet.ok) return alert(walletData.error || "Payment failed");
+
+    alert(`₹${walletData.admin_fee} service charge paid to admin`);
+
+    // 2️⃣ Create chat room with intent "buy"
+    const resChat = await fetch(
+      "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/create",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ order_id, seller_user_id, intent: "buy" })
+      }
+    );
+    const chatData = await resChat.json();
+    if (!resChat.ok) return alert(chatData.error || "Unable to start chat");
+
+    // 3️⃣ Redirect to chat
+    location.href = `/chat.html?room_id=${chatData.room_id}`;
+
+  } catch (err) {
+    console.error("Buy flow error", err);
+    alert("Something went wrong");
+  }
 }
+
 
 async function loadListings() {
   const s = session();
