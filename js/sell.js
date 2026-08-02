@@ -80,6 +80,9 @@
     const giftArray = (document.getElementById("gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
     const gunsArray = (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
     const titlesArray = (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const xSuitArray = (document.getElementById("x_suit")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const supercarArray = (document.getElementById("supercar")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const ultimateArray = (document.getElementById("ultimate")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
 
     let price = 0;
     price += level * 8;
@@ -89,6 +92,9 @@
     price += giftArray.length * 1000;
     price += titlesArray.length * 100;
     price += gunsArray.length * 300;
+    price += xSuitArray.length * 400;
+    price += supercarArray.length * 1500;
+    price += ultimateArray.length * 250;
     price = Math.max(999, Math.round(price / 50) * 50);
 
     const out = document.getElementById("estimatedPrice");
@@ -115,6 +121,9 @@
       gift_items: (document.getElementById("gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       upgraded_guns: (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       titles: (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      x_suit: (document.getElementById("x_suit")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      supercar: (document.getElementById("supercar")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      ultimate: (document.getElementById("ultimate")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       images
     };
 

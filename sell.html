@@ -6,6 +6,7 @@
 <title>Sell BGMI Account</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/effects.css">
 <style>
 :root {
   --primary: #00ffff;
@@ -115,7 +116,7 @@ button.ghost{
 
 <body>
 <form id="sellForm" novalidate>
-  <h2>Sell Your BGMI Account</h2>
+  <h2 class="anim-gradient glitch" data-text="Sell Your BGMI Account">Sell Your BGMI Account</h2>
 
   <input id="uid" placeholder="BGMI UID (required)" required>
   <input id="title" placeholder="Account Title (required)" required>
@@ -131,6 +132,9 @@ button.ghost{
     <input id="gift" placeholder="Gift Items">
     <input id="guns" placeholder="Upgraded Guns">
     <input id="titles" placeholder="Titles">
+    <input id="x_suit" placeholder="X Suit">
+    <input id="supercar" placeholder="Supercar">
+    <input id="ultimate" placeholder="Ultimate">
   </div>
 
   <textarea id="highlights" placeholder="Account highlights / description"></textarea>
@@ -154,6 +158,7 @@ button.ghost{
 
 <div id="toast"></div>
 <script src="js/sell.js"></script>
+<script src="assets/effects.js" defer></script>
 <script>
   // Drag hover effect
   const dropArea = document.getElementById("drop-area");

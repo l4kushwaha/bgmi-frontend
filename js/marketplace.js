@@ -234,6 +234,9 @@ function renderCard(item) {
   const legendary = escArray(item.legendary_items).join(", ");
   const gifts = escArray(item.gift_items).join(", ");
   const titles = escArray(item.titles).join(", ");
+  const xSuit = escArray(item.x_suit).join(", ");
+  const supercar = escArray(item.supercar).join(", ");
+  const ultimate = escArray(item.ultimate).join(", ");
 
   card.innerHTML = `
     <div class="images-gallery">
@@ -260,6 +263,9 @@ function renderCard(item) {
       ${legendary ? `<b>Legendary:</b> ${legendary}<br>` : ""}
       ${gifts ? `<b>Gifts:</b> ${gifts}<br>` : ""}
       ${titles ? `<b>Titles:</b> ${titles}<br>` : ""}
+      ${xSuit ? `<b>X Suit:</b> ${xSuit}<br>` : ""}
+      ${supercar ? `<b>Supercar:</b> ${supercar}<br>` : ""}
+      ${ultimate ? `<b>Ultimate:</b> ${ultimate}<br>` : ""}
       ${item.account_highlights ? `<b>Highlights:</b> ${esc(item.account_highlights)}` : ""}
 
       <div class="price">₹${esc(item.price)}</div>
@@ -570,6 +576,9 @@ function openEdit(id) {
     <label>Legendary Items</label><textarea id="e-legendary">${esc(safeArray(editItem.legendary_items).join(","))}</textarea>
     <label>Gift Items</label><textarea id="e-gifts">${esc(safeArray(editItem.gift_items).join(","))}</textarea>
     <label>Titles</label><textarea id="e-titles">${esc(safeArray(editItem.titles).join(","))}</textarea>
+    <label>X Suit</label><textarea id="e-x_suit">${esc(safeArray(editItem.x_suit).join(","))}</textarea>
+    <label>Supercar</label><textarea id="e-supercar">${esc(safeArray(editItem.supercar).join(","))}</textarea>
+    <label>Ultimate</label><textarea id="e-ultimate">${esc(safeArray(editItem.ultimate).join(","))}</textarea>
     <label>Highlights</label><textarea id="e-highlights">${esc(editItem.account_highlights || "")}</textarea>
 
     <label>Images</label>
@@ -629,6 +638,9 @@ document.getElementById("save-edit").onclick = async () => {
       legendary_items:e("e-legendary").split(","),
       gift_items:e("e-gifts").split(","),
       titles:e("e-titles").split(","),
+      x_suit:e("e-x_suit").split(","),
+      supercar:e("e-supercar").split(","),
+      ultimate:e("e-ultimate").split(","),
       account_highlights:e("e-highlights"),
       images:editImages
     })
