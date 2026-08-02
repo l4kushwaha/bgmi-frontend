@@ -130,6 +130,27 @@
   }
   .btn-ghost:hover{border-color:#00ffc6;color:#00ffc6;box-shadow:0 0 14px rgba(0,255,198,.25)}
 
+  /* ---------- CATEGORY TOGGLE ---------- */
+  .cat-toggle {
+    display:flex; gap:.5rem; margin: 0 0 1.3rem;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px; padding:.35rem;
+  }
+  .cat-toggle button {
+    flex:1; padding:.65rem .5rem;
+    border:none; border-radius:10px; cursor:pointer;
+    background:transparent; color:rgba(255,255,255,.7);
+    font-size:.85rem; font-weight:700; transition:.25s;
+  }
+  .cat-toggle button.active {
+    background:linear-gradient(90deg,#00ffc6,#00b894); color:#062;
+    box-shadow:0 0 16px rgba(0,255,198,.4);
+  }
+
+  /* ---------- POPULARITY SECTION (hidden by default) ---------- */
+  .hidden-sec{display:none !important}
+
   /* ---------- DROP AREA ---------- */
   #drop-area{
     border:2px dashed rgba(0,255,198,.35);
@@ -204,10 +225,16 @@
   <div class="page">
     <form id="sellForm" class="sell-card flip-in" novalidate>
       <h2 class="title anim-gradient glitch" data-text="Sell Your BGMI Account">Sell Your BGMI Account</h2>
-      <p class="subtitle">List your account and get paid directly via UPI 🚀</p>
+      <p class="subtitle">List your account &amp; get paid directly via UPI 🚀</p>
+
+      <!-- CATEGORY TOGGLE -->
+      <div class="cat-toggle">
+        <button type="button" id="catAccount" class="active">🎮 Sell Account</button>
+        <button type="button" id="catPopularity">🔥 Sell Popularity</button>
+      </div>
 
       <!-- ACCOUNT INFO -->
-      <div class="sec">
+      <div class="sec" id="secAccount">
         <div class="sec-head">🏷️ Account Info</div>
         <label for="uid">BGMI UID <span class="req">*</span></label>
         <input id="uid" placeholder="e.g. 5301234567" required autocomplete="off">
@@ -226,7 +253,7 @@
       </div>
 
       <!-- ITEMS -->
-      <div class="sec">
+      <div class="sec" id="secItems">
         <div class="sec-head">🎁 Items &amp; Rarities</div>
         <div class="grid">
           <input id="mythic" placeholder="Mythic Items">
@@ -241,11 +268,23 @@
         <p style="font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.3rem">Comma-separated values (e.g. <i>Ice Flame, Glacier M4</i>)</p>
       </div>
 
+      <!-- POPULARITY INFO (hidden by default) -->
+      <div class="sec hidden-sec" id="secPopularity">
+        <div class="sec-head">🔥 Popularity Boost Details</div>
+        <label for="popUid">Player UID (jis account ko boost chahiye) <span class="req">*</span></label>
+        <input id="popUid" placeholder="e.g. 5301234567" autocomplete="off">
+        <label for="popPoints">Popularity Points <span class="req">*</span></label>
+        <input id="popPoints" type="number" min="1" placeholder="e.g. 1000" autocomplete="off">
+        <label for="popTitle">Boost Title <span class="req">*</span></label>
+        <input id="popTitle" placeholder="e.g. 🔥 Instant 1000 Popularity Boost" autocomplete="off">
+        <p style="font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.3rem">Buyer ko full payment seedha aapke UPI pe milti hai. Popularity points khareedne waale player ko credit hote hain.</p>
+      </div>
+
       <!-- DETAILS -->
       <div class="sec">
         <div class="sec-head">📝 Details</div>
-        <label for="highlights">Account Highlights / Description</label>
-        <textarea id="highlights" placeholder="Mythic outfits, exclusive skins, special titles…"></textarea>
+        <label for="highlights">Description</label>
+        <textarea id="highlights" placeholder="Mythic outfits, exclusive skins, special titles… (popularity boost ke liye delivery time likhein)"></textarea>
       </div>
 
       <!-- PRICE -->

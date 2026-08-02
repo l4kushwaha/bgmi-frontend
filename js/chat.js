@@ -42,6 +42,17 @@
   const micBtn = document.getElementById("micBtn");
   const effBtn = document.getElementById("effBtn");
   const effectsPop = document.getElementById("effectsPop");
+  const callAudioBtn = document.getElementById("callAudioBtn");
+  const callVideoBtn = document.getElementById("callVideoBtn");
+  const callOverlay = document.getElementById("callOverlay");
+  const callAvatar = document.getElementById("callAvatar");
+  const callName = document.getElementById("callName");
+  const callState = document.getElementById("callState");
+  const callAcceptBtn = document.getElementById("callAcceptBtn");
+  const callDeclineBtn = document.getElementById("callDeclineBtn");
+  const callEndBtn = document.getElementById("callEndBtn");
+  const remoteVideo = document.getElementById("callVideoRemote");
+  const localVideo = document.getElementById("callVideoLocal");
 
   /* ================= STATE ================= */
   let chats = [];
@@ -53,6 +64,22 @@
   let lastGlobal = 0;
   let selectedEffect = "";
   let recState = { active: false, mediaRecorder: null, chunks: [], start: 0, timer: null };
+
+  /* ===== CALL STATE ===== */
+  const callStateMachine = {
+    active: false,          // in a call (ringing/connected)
+    roomId: null,
+    callId: null,
+    kind: "audio",
+    peer: null,             // RTCPeerConnection
+    localStream: null,
+    remoteStream: null,
+    pollTimer: null,
+    eventSeq: 0,
+    initiator: false,
+    gotOffer: false,
+    myOffer: null
+  };
 
   const CHANNELS = [
     { id: "bgmi", label: "🎯 BGMI" },
@@ -125,7 +152,24 @@
   }
   tabGlobal.onclick = () => setMode("global");
   tabChats.onclick = () => setMode("chats");
-  exitPrivate.onclick = () => { activeRoom = null; chatBox.innerHTML = ""; waitingBox.innerHTML = ""; chatStatus.textContent = "Select a chat"; renderChatList(); };
+  exitPrivate.onclick = () => { activeRoom = null; chatBox.innerHTML = ""; waitingBox.innerHTML = ""; chatStatus.textContent = "Select a chat"; callAudioBtn.style.display = "none"; callVideoBtn.style.display = "none"; renderChatList(); };
+
+  /* incoming call watcher: jab koi active room me callee hai to call detect karo */
+  let incomingWatcher = null;
+  function startIncomingWatcher() {
+    stopIncomingWatcher();
+    incomingWatcher = setInterval(async () => {
+      if (!activeRoom || callStateMachine.active) return;
+      try {
+        const r = await safeFetch(API + `/api/chat/call/poll?room_id=${activeRoom}&since=0`, { headers });
+        const d = await r.json();
+        if (d.call && d.call.status === "ringing" && String(d.call.callee_id) === String(user.id)) {
+          handleIncoming(d.call);
+        }
+      } catch {}
+    }, 2500);
+  }
+  function stopIncomingWatcher() { if (incomingWatcher) { clearInterval(incomingWatcher); incomingWatcher = null; } }
 
   /* ================= CHANNEL PILLS ================= */
   function renderPills() {
@@ -276,6 +320,7 @@
     waitingBox.innerHTML = "";
     canSend = false;
     exitPrivate.style.display = "inline-block";
+    startIncomingWatcher();
 
     const r = await safeFetch(`${API}/api/chat/room?room_id=${room_id}`, { headers });
     const room = await r.json();
@@ -294,6 +339,10 @@
     const buyBox = document.getElementById("buyBox");
     const isBuyer = String(room.buyer_id) === String(user.id);
     const isSeller = String(room.seller_user_id) === String(user.id);
+    const callable = room.status === "approved" || room.status === "half_paid";
+
+    callAudioBtn.style.display = callable ? "block" : "none";
+    callVideoBtn.style.display = callable ? "block" : "none";
 
     if (room.status === "requested") {
       if (isSeller) {
@@ -528,6 +577,243 @@
     }
   }
   micBtn.onclick = toggleRec;
+
+  /* ================= CALLING SYSTEM ================= */
+  async function initCallMedia(kind) {
+    const c = {
+      audio: { echoCancellation: true, noiseSuppression: true },
+      video: kind === "video" ? { width: { ideal: 640 }, height: { ideal: 480 } } : false
+    };
+    return navigator.mediaDevices.getUserMedia(c);
+  }
+
+  function callPeer() {
+    if (callStateMachine.peer) return callStateMachine.peer;
+    const cfg = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+    const pc = new RTCPeerConnection(cfg);
+    callStateMachine.peer = pc;
+
+    callStateMachine.localStream?.getTracks().forEach(t => pc.addTrack(t, callStateMachine.localStream));
+
+    pc.ontrack = e => {
+      callStateMachine.remoteStream = e.streams[0];
+      remoteVideo.srcObject = e.streams[0];
+      remoteVideo.style.display = "block";
+      localVideo.style.display = callStateMachine.kind === "video" ? "block" : "none";
+    };
+
+    pc.onicecandidate = e => {
+      if (e.candidate && callStateMachine.callId) {
+        fireAndForget(sendCallEvent("ice", e.candidate.toJSON()));
+      }
+    };
+
+    pc.onconnectionstatechange = () => {
+      const st = pc.connectionState;
+      if (st === "connected") {
+        callState.textContent = "Connected";
+        callAcceptBtn.style.display = "none";
+        callDeclineBtn.style.display = "none";
+        callEndBtn.style.display = "block";
+        callStateMachine.active = true;
+        stopPollingCalls();
+        stopRing();
+      } else if (st === "failed" || st === "closed" || st === "disconnected") {
+        if (st === "failed" || st === "closed") endCallLocal(true);
+      }
+    };
+
+    return pc;
+  }
+
+  function showCallOverlay(name, state, kind) {
+    callOverlay.classList.add("open");
+    callAvatar.textContent = (name || "?").charAt(0).toUpperCase();
+    callName.textContent = name || "…";
+    callState.textContent = state;
+    localVideo.style.display = "none";
+    remoteVideo.style.display = "none";
+  }
+
+  async function fireAndForget(p) { try { await p; } catch {} }
+
+  async function sendCallEvent(type, payload) {
+    await safeFetch(API + "/api/chat/call/event", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ call_id: callStateMachine.callId, type, payload })
+    });
+  }
+
+  function startPollingCalls() {
+    if (callStateMachine.pollTimer) return;
+    callStateMachine.pollTimer = setInterval(async () => {
+      try {
+        const r = await safeFetch(API + `/api/chat/call/poll?room_id=${callStateMachine.roomId}&since=${callStateMachine.eventSeq}`, { headers });
+        const d = await r.json();
+        if (d.call && d.call.id !== callStateMachine.callId && d.call.status === "ringing" && String(d.call.callee_id) === String(user.id)) {
+          handleIncoming(d.call);
+        }
+        if (d.events && d.events.length) {
+          d.events.forEach(e => {
+            callStateMachine.eventSeq = Math.max(callStateMachine.eventSeq, Number(e.id) || 0);
+            handleCallEvent(e);
+          });
+        }
+      } catch {}
+    }, 2000);
+  }
+
+  function stopPollingCalls() {
+    if (callStateMachine.pollTimer) { clearInterval(callStateMachine.pollTimer); callStateMachine.pollTimer = null; }
+  }
+
+  let ringTimer = null;
+  function startRing() {
+    stopRing();
+    ringTimer = setInterval(() => { try { sound.currentTime = 0; sound.play(); } catch {} }, 1600);
+  }
+  function stopRing() { if (ringTimer) { clearInterval(ringTimer); ringTimer = null; } }
+
+  async function handleCallEvent(e) {
+    const c = callStateMachine;
+    if (e.type === "offer" && !c.initiator) {
+      if (c.active) return;
+      c.gotOffer = true;
+      const pc = callPeer();
+      await pc.setRemoteDescription(e.payload);
+      c.peer.offer = e.payload;
+      callAcceptBtn.style.display = "block";
+      callDeclineBtn.style.display = "block";
+      callEndBtn.style.display = "none";
+      callState.textContent = "Incoming call…";
+    } else if (e.type === "answer" && c.initiator) {
+      if (c.peer) await c.peer.setRemoteDescription(e.payload);
+    } else if (e.type === "ice") {
+      if (c.peer) { try { await c.peer.addIceCandidate(e.payload); } catch {} }
+    } else if (e.type === "hangup") {
+      endCallLocal(true);
+    }
+  }
+
+  async function handleIncoming(call) {
+    const c = callStateMachine;
+    if (c.active) return;
+    c.active = true;
+    c.roomId = call.room_id;
+    c.callId = call.id;
+    c.kind = call.kind;
+    c.initiator = false;
+    c.eventSeq = 0;
+
+    showCallOverlay("Incoming " + call.kind + " call", "Ringing…", call.kind);
+    callAcceptBtn.style.display = "block";
+    callDeclineBtn.style.display = "block";
+    callEndBtn.style.display = "none";
+    startRing();
+    startPollingCalls();
+  }
+
+  async function startCall(kind) {
+    if (!activeRoom) return;
+    const c = callStateMachine;
+    if (c.active) return alert("Already in a call");
+
+    try {
+      c.localStream = await initCallMedia(kind);
+    } catch {
+      return alert("Microphone/Camera access denied");
+    }
+    localVideo.srcObject = c.localStream;
+
+    const r = await safeFetch(API + "/api/chat/call/start", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ room_id: activeRoom, kind })
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      c.localStream.getTracks().forEach(t => t.stop());
+      return alert(d.error === "call_already_active" ? "Ek call already active hai" : (d.error || "Unable to start call"));
+    }
+
+    c.active = true;
+    c.roomId = activeRoom;
+    c.callId = d.call_id;
+    c.kind = kind;
+    c.initiator = true;
+    c.eventSeq = 0;
+
+    const room = chats.find(ch => ch.id === activeRoom);
+    const otherName = room?.other_name || room?.seller_name || "User";
+    showCallOverlay("Calling " + otherName + "…", "Ringing…", kind);
+    callAcceptBtn.style.display = "none";
+    callDeclineBtn.style.display = "block";
+    callEndBtn.style.display = "block";
+
+    const pc = callPeer();
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    c.myOffer = offer;
+    await sendCallEvent("offer", offer);
+    startPollingCalls();
+  }
+
+  async function acceptCall() {
+    const c = callStateMachine;
+    try {
+      c.localStream = await initCallMedia(c.kind);
+    } catch {
+      return alert("Microphone/Camera access denied");
+    }
+    localVideo.srcObject = c.localStream;
+    localVideo.style.display = c.kind === "video" ? "block" : "none";
+
+    const pc = callPeer();
+    if (c.gotOffer) {
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await sendCallEvent("answer", answer);
+    }
+    callState.textContent = "Connecting…";
+    callAcceptBtn.style.display = "none";
+    callDeclineBtn.style.display = "none";
+    callEndBtn.style.display = "block";
+    startPollingCalls();
+  }
+
+  async function endCallLocal(silent) {
+    const c = callStateMachine;
+    if (!c.active && !c.callId) return;
+
+    if (c.callId && !silent) fireAndForget(sendCallEvent("hangup", { by: user.id }));
+    stopPollingCalls();
+    stopRing();
+    try { fireAndForget(safeFetch(API + "/api/chat/call/state", { method: "POST", headers, body: JSON.stringify({ call_id: c.callId, status: "ended" }) })); } catch {}
+
+    c.peer?.close();
+    c.peer = null;
+    c.localStream?.getTracks().forEach(t => t.stop());
+    c.localStream = null;
+    c.remoteStream = null;
+    remoteVideo.srcObject = null;
+    localVideo.srcObject = null;
+    remoteVideo.style.display = "none";
+    localVideo.style.display = "none";
+    c.active = false;
+    c.callId = null;
+    c.roomId = null;
+    c.gotOffer = false;
+    c.initiator = false;
+    callOverlay.classList.remove("open");
+  }
+
+  callAudioBtn.onclick = () => startCall("audio");
+  callVideoBtn.onclick = () => startCall("video");
+  callAcceptBtn.onclick = acceptCall;
+  callDeclineBtn.onclick = () => endCallLocal(false);
+  callEndBtn.onclick = () => endCallLocal(false);
+
 
   /* ================= EVENTS ================= */
   sendBtn.onclick = () => {

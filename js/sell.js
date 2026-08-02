@@ -116,36 +116,91 @@
     if (document.getElementById("price").value) out.textContent = "";
   });
 
+  // ===== CATEGORY TOGGLE =====
+  let category = "account";
+  const catAccount = document.getElementById("catAccount");
+  const catPopularity = document.getElementById("catPopularity");
+  const secAccount = document.getElementById("secAccount");
+  const secItems = document.getElementById("secItems");
+  const secPopularity = document.getElementById("secPopularity");
+
+  function setCategory(cat) {
+    category = cat;
+    catAccount.classList.toggle("active", cat === "account");
+    catPopularity.classList.toggle("active", cat === "popularity");
+    secAccount.classList.toggle("hidden-sec", cat !== "account");
+    secItems.classList.toggle("hidden-sec", cat !== "account");
+    secPopularity.classList.toggle("hidden-sec", cat !== "popularity");
+    const titleEl = document.querySelector(".title");
+    if (cat === "popularity") {
+      titleEl.textContent = "Sell Your Popularity";
+      titleEl.setAttribute("data-text", "Sell Your Popularity");
+      document.querySelector(".subtitle").textContent = "Boost kisi bhi BGMI player ki popularity — direct UPI payment 🔥";
+    } else {
+      titleEl.textContent = "Sell Your BGMI Account";
+      titleEl.setAttribute("data-text", "Sell Your BGMI Account");
+      document.querySelector(".subtitle").textContent = "List your account &amp; get paid directly via UPI 🚀";
+    }
+  }
+  catAccount.onclick = () => setCategory("account");
+  catPopularity.onclick = () => setCategory("popularity");
+
   // ===== SUBMIT LISTING =====
   form.onsubmit = async e => {
     e.preventDefault();
 
     const uid = document.getElementById("uid").value.trim();
     const title = document.getElementById("title").value.trim();
-    if (!/^\d{1,12}$/.test(uid)) return showToast("Enter a valid BGMI UID (digits only)", true);
-    if (!title) return showToast("Account title is required", true);
 
-    let price = Number(document.getElementById("price").value);
-    if (!price) price = calcEstimate();
-    if (!Number.isFinite(price) || price < 1) return showToast("Enter a valid price (₹)", true);
+    let payload;
+    if (category === "popularity") {
+      const popUid = document.getElementById("popUid").value.trim();
+      const points = Number(document.getElementById("popPoints").value);
+      const popTitle = document.getElementById("popTitle").value.trim();
+      if (!/^\d{1,12}$/.test(popUid)) return showToast("Enter a valid player UID (digits only)", true);
+      if (!Number.isFinite(points) || points < 1) return showToast("Enter valid popularity points", true);
+      if (!popTitle) return showToast("Boost title is required", true);
 
-    const payload = {
-      uid,
-      title,
-      description: document.getElementById("highlights")?.value.trim() || "",
-      price,
-      level: +document.getElementById("level").value || 0,
-      highest_rank: document.getElementById("rank")?.value || "",
-      mythic_items: (document.getElementById("mythic")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      legendary_items: (document.getElementById("legendary")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      honor_gift: (document.getElementById("honor_gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      upgraded_guns: (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      titles: (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      x_suit: (document.getElementById("x_suit")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      supercar: (document.getElementById("supercar")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      ultimate: (document.getElementById("ultimate")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      images
-    };
+      let price = Number(document.getElementById("price").value);
+      if (!price) price = points; // auto: ₹1 per point base
+      if (!Number.isFinite(price) || price < 1) return showToast("Enter a valid price (₹)", true);
+
+      payload = {
+        category: "popularity",
+        points,
+        uid: popUid,
+        title: popTitle,
+        description: document.getElementById("highlights")?.value.trim() || "",
+        price,
+        images
+      };
+    } else {
+      if (!/^\d{1,12}$/.test(uid)) return showToast("Enter a valid BGMI UID (digits only)", true);
+      if (!title) return showToast("Account title is required", true);
+
+      let price = Number(document.getElementById("price").value);
+      if (!price) price = calcEstimate();
+      if (!Number.isFinite(price) || price < 1) return showToast("Enter a valid price (₹)", true);
+
+      payload = {
+        category: "account",
+        uid,
+        title,
+        description: document.getElementById("highlights")?.value.trim() || "",
+        price,
+        level: +document.getElementById("level").value || 0,
+        highest_rank: document.getElementById("rank")?.value || "",
+        mythic_items: (document.getElementById("mythic")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        legendary_items: (document.getElementById("legendary")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        honor_gift: (document.getElementById("honor_gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        upgraded_guns: (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        titles: (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        x_suit: (document.getElementById("x_suit")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        supercar: (document.getElementById("supercar")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        ultimate: (document.getElementById("ultimate")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+        images
+      };
+    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Listing...";

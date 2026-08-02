@@ -195,6 +195,9 @@ function renderList() {
       String(i.seller_id) === String(session().user.seller_id)
     );
 
+  if (f === "account" || f === "popularity")
+    items = items.filter(i => (i.category || "account") === f);
+
   if (f === "price_low") items.sort((a,b)=>a.price-b.price);
   if (f === "price_high") items.sort((a,b)=>b.price-a.price);
   if (f === "new") items.sort((a,b)=>b.id-a.id);
@@ -220,6 +223,8 @@ function renderCard(item) {
   const supercar = escArray(item.supercar).join(", ");
   const ultimate = escArray(item.ultimate).join(", ");
 
+  const isPopularity = (item.category || "account") === "popularity";
+
   card.innerHTML = `
     <div class="images-gallery">
       ${images.map((img,i)=>`
@@ -235,20 +240,25 @@ function renderCard(item) {
     </div>
 
     <div class="card-content">
+      <span class="cat-chip ${isPopularity?"pop":"acc"}">${isPopularity?"🔥 POPULARITY":"🎮 ACCOUNT"}</span>
       <strong>${esc(item.title)}</strong><br>
-      UID: ${esc(item.uid)}<br>
-      Level: ${esc(item.level)}<br>
-      Rank: ${esc(item.highest_rank || "-")}<br>
+      ${isPopularity ? `
+        <span class="pop-points">⚡ ${esc(item.points || 0)} Popularity Points</span><br>
+        UID: ${esc(item.uid)}<br>` : `
+        UID: ${esc(item.uid)}<br>
+        Level: ${esc(item.level)}<br>
+        Rank: ${esc(item.highest_rank || "-")}<br>`}
 
-      ${upgraded ? `<b>Upgraded:</b> ${upgraded}<br>` : ""}
-      ${mythic ? `<b>Mythic:</b> ${mythic}<br>` : ""}
-      ${legendary ? `<b>Legendary:</b> ${legendary}<br>` : ""}
-      ${gifts ? `<b>Honor Gifts:</b> ${gifts}<br>` : ""}
-      ${titles ? `<b>Titles:</b> ${titles}<br>` : ""}
-      ${xSuit ? `<b>X Suit:</b> ${xSuit}<br>` : ""}
-      ${supercar ? `<b>Supercar:</b> ${supercar}<br>` : ""}
-      ${ultimate ? `<b>Ultimate:</b> ${ultimate}<br>` : ""}
-      ${item.account_highlights ? `<b>Highlights:</b> ${esc(item.account_highlights)}` : ""}
+      ${isPopularity ? "" : `
+        ${upgraded ? `<b>Upgraded:</b> ${upgraded}<br>` : ""}
+        ${mythic ? `<b>Mythic:</b> ${mythic}<br>` : ""}
+        ${legendary ? `<b>Legendary:</b> ${legendary}<br>` : ""}
+        ${gifts ? `<b>Honor Gifts:</b> ${gifts}<br>` : ""}
+        ${titles ? `<b>Titles:</b> ${titles}<br>` : ""}
+        ${xSuit ? `<b>X Suit:</b> ${xSuit}<br>` : ""}
+        ${supercar ? `<b>Supercar:</b> ${supercar}<br>` : ""}
+        ${ultimate ? `<b>Ultimate:</b> ${ultimate}<br>` : ""}
+        ${item.account_highlights ? `<b>Highlights:</b> ${esc(item.account_highlights)}` : ""}`}
 
       <div class="price price-pulse">₹${esc(item.price)}</div>
     </div>

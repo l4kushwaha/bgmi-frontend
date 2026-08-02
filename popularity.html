@@ -159,6 +159,15 @@
     <p class="empty">Loading leaderboard…</p>
   </div>
 
+  <!-- POPULARITY LEADERBOARD -->
+  <h3 class="section-title anim-gradient reveal">🔥 Popularity Leaderboard</h3>
+  <div class="rank-list" id="popRankList">
+    <p class="empty">Loading…</p>
+  </div>
+  <div style="text-align:center;margin-top:1.4rem">
+    <a href="sell.html" class="nav-slide soon-tag" style="text-decoration:none;background:rgba(255,120,0,.15);color:#ff9d3c;padding:.6rem 1.4rem;border-radius:999px;font-weight:700">🔥 Sell Your Popularity →</a>
+  </div>
+
   <!-- COMING SOON -->
   <h3 class="section-title anim-gradient reveal">Coming Soon</h3>
   <div class="soon-grid">
@@ -254,6 +263,37 @@
     }
   }
 
+  async function loadPopLeaderboard() {
+    const list = document.getElementById("popRankList");
+    try {
+      const res = await fetch(MARKET_API + "/popularity/leaderboard?limit=10");
+      const data = await res.json();
+      const rows = Array.isArray(data) ? data : [];
+      if (!rows.length) {
+        list.innerHTML = '<p class="empty">Abhi tak koi popularity boost nahi hua — pehle bano! 🔥</p>';
+        return;
+      }
+      list.innerHTML = "";
+      rows.forEach((r, i) => {
+        const top = i < 3 ? " top-" + (i + 1) : "";
+        const div = document.createElement("div");
+        div.className = "rank-row reveal" + top;
+        div.innerHTML = `
+          <div class="rank-badge">${i + 1}</div>
+          <div class="rank-info">
+            <div class="name">Player #${escapeHtml(r.user_id)}</div>
+            <div class="meta">${escapeHtml(r.boosts || 0)} boost(s) · ⚡ popularity</div>
+          </div>
+          <div class="rank-right"><span style="color:#ff9d3c">⚡ ${escapeHtml(r.total_points)}</span> <small>points</small></div>
+        `;
+        list.appendChild(div);
+      });
+      initRevealScan();
+    } catch {
+      list.innerHTML = '<p class="empty">Leaderboard unavailable right now.</p>';
+    }
+  }
+
   function initRevealScan() {
     if (!("IntersectionObserver" in window)) {
       document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
@@ -268,6 +308,7 @@
   }
 
   loadStats();
+  loadPopLeaderboard();
 </script>
 <script src="assets/effects.js" defer></script>
 

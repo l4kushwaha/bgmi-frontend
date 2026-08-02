@@ -247,6 +247,21 @@ header{
 
 .card-content strong{font-size:16px}
 
+.cat-chip{
+  display:inline-block; padding:.2rem .55rem; border-radius:999px;
+  font-size:.62rem; font-weight:800; letter-spacing:.08em;
+  margin-bottom:.4rem;
+}
+.cat-chip.acc{background:rgba(0,255,255,.15); color:#00eaff; border:1px solid rgba(0,255,255,.4)}
+.cat-chip.pop{background:rgba(255,120,0,.18); color:#ff9d3c; border:1px solid rgba(255,120,0,.5)}
+
+.pop-points{
+  display:inline-block; margin-top:.15rem;
+  font-weight:700; color:#ff9d3c;
+  background:rgba(255,120,0,.12); padding:.15rem .5rem; border-radius:8px;
+  box-shadow:0 0 12px rgba(255,120,0,.25);
+}
+
 .price{
 
   font-size:18px;
@@ -464,6 +479,10 @@ body.dark .modal{background:#1e1e1e;color:#fff}
   <select id="filter">
 
     <option value="">All Listings</option>
+
+    <option value="account">🎮 Accounts</option>
+
+    <option value="popularity">🔥 Popularity</option>
 
     <option value="own">My Listings</option>
 

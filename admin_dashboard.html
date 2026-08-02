@@ -139,6 +139,7 @@
     <button class="tab" data-tab="users">Users</button>
     <button class="tab" data-tab="listings">Listings</button>
     <button class="tab" data-tab="kyc">KYC Queue</button>
+    <button class="tab" data-tab="sellers">Seller Verify</button>
     <button class="tab" data-tab="payments">Payments</button>
     <button class="tab" data-tab="withdrawals">Withdrawals</button>
     <button class="tab" data-tab="chats">Chats</button>
@@ -192,6 +193,21 @@
     <table>
       <thead><tr><th>Doc ID</th><th>User</th><th>Type</th><th>Status</th><th>Remarks</th><th>Actions</th></tr></thead>
       <tbody id="kycBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="tab-sellers">
+    <div class="toolbar">
+      <select id="sellerStatusFilter" onchange="loadSellerVerifications()">
+        <option value="">All statuses</option><option value="pending">Pending</option>
+        <option value="approved">Approved</option><option value="rejected">Rejected</option>
+      </select>
+      <div class="spacer"></div>
+      <span style="font-size:.8rem;color:#94a3b8">Badges: <b style="color:#00ffc6">trusted</b> / <b style="color:#ffd166">gold</b> / <b style="color:#60a5fa">diamond</b></span>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>User</th><th>Requested</th><th>Status</th><th>Badge</th><th>Reason</th><th>Reviewed</th><th>Actions</th></tr></thead>
+      <tbody id="sellersBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
     </table>
   </div>
 
@@ -277,9 +293,10 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   if (t.dataset.tab === "overview") loadOverview();
   if (t.dataset.tab === "activity") loadActivity(true);
   if (t.dataset.tab === "withdrawals") loadWithdrawals();
+  if (t.dataset.tab === "sellers") loadSellerVerifications();
 });
 
-function refreshAll() { loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); toast("Dashboard refreshed"); }
+function refreshAll() { loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); loadSellerVerifications(); toast("Dashboard refreshed"); }
 
 /* ---- OVERVIEW ---- */
 async function loadOverview() {
@@ -452,6 +469,48 @@ async function kycDecision(id, decision) {
   toast(ok ? "KYC " + decision : "Failed", ok ? "ok" : "err"); loadKyc(); loadOverview();
 }
 
+/* ---- SELLER VERIFICATIONS ---- */
+async function loadSellerVerifications() {
+  const st = document.getElementById("sellerStatusFilter").value;
+  const { ok, data } = await api(`market/admin/seller-verifications${st ? "?status=" + st : ""}`);
+  const body = document.getElementById("sellersBody");
+  if (!ok) return body.innerHTML = `<tr><td colspan="8" class="empty">Failed: ${data.error}</td></tr>`;
+  const list = Array.isArray(data) ? data : (data.value || []);
+  if (!list.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No seller verification requests</td></tr>`;
+  body.innerHTML = list.map(v => `
+    <tr>
+      <td>${v.id}</td>
+      <td>${esc(v.user_id)}</td>
+      <td>${esc((v.created_at||"").slice(0,16).replace("T"," "))}</td>
+      <td>${statusBadge(v.status)}</td>
+      <td>${esc(v.badge || "—")}</td>
+      <td style="max-width:200px">${esc(v.reason || "—")}</td>
+      <td>${esc((v.reviewed_at||"").slice(0,16).replace("T"," ") || "—")}</td>
+      <td style="white-space:nowrap">
+        ${v.status === "pending" ? `
+          <select id="badgeSel-${v.id}" style="padding:.3rem;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:#111b21;color:#fff;font-size:.8rem">
+            <option value="trusted">✅ trusted</option>
+            <option value="gold">🥇 gold</option>
+            <option value="diamond">💎 diamond</option>
+          </select>
+          <button class="mini" onclick="sellerDecision(${v.id},'approve')">Approve</button>
+          <button class="mini danger" onclick="sellerDecision(${v.id},'reject')">Reject</button>` : "—"}
+      </td>
+    </tr>`).join("");
+}
+
+async function sellerDecision(id, decision) {
+  const badge = document.getElementById("badgeSel-" + id)?.value || "trusted";
+  const reason = decision === "reject" ? (prompt("Rejection reason (optional):") || "Not eligible") : null;
+  if (decision === "reject" && reason === null) return;
+  const { ok } = await api(`market/admin/seller-verifications/${id}`, {
+    method: "POST",
+    body: JSON.stringify({ decision, badge, reason })
+  });
+  toast(ok ? "Seller " + decision : "Failed", ok ? "ok" : "err");
+  loadSellerVerifications(); loadOverview();
+}
+
 /* ---- PAYMENTS ---- */
 async function loadPayments() {
   const { ok, data } = await api("wallet/admin/payments");
@@ -559,8 +618,8 @@ function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;",
 
 /* ---- INIT ---- */
 document.getElementById("whoEmail").textContent = user.email || "admin";
-loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals();
-setInterval(() => { loadOverview(); loadChats(); loadKyc(); loadWithdrawals(); }, 30000);
+loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); loadSellerVerifications();
+setInterval(() => { loadOverview(); loadChats(); loadKyc(); loadWithdrawals(); loadSellerVerifications(); }, 30000);
 </script>
 <script src="assets/effects.js" defer></script>
 </body>

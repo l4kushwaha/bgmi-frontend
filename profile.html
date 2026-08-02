@@ -129,6 +129,16 @@
 
       <div class="stat-line"><strong>KYC:</strong> <b id="kyc-status">Pending</b></div>
       <div class="stat-line"><strong>Seller:</strong> <b id="seller-badge">Standard</b></div>
+      <div class="stat-line"><strong>🔥 Popularity Points:</strong> <b id="pop-points">0</b></div>
+
+      <!-- VERIFY -->
+      <div id="verify-box" style="margin:.9rem auto 0;max-width:340px;padding:.9rem;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14)">
+        <div style="display:flex;align-items:center;gap:.5rem;justify-content:center">
+          <b id="verify-badge-status">🛡️ Not Verified</b>
+          <button id="getVerifiedBtn" class="btn grad2" style="margin:0;padding:.45rem .9rem;font-size:.82rem">Get Verified</button>
+        </div>
+        <p id="verify-msg" class="msg" style="font-size:.78rem"></p>
+      </div>
 
       <!-- BIO + SOCIALS -->
       <label for="bio">Bio</label>
@@ -174,6 +184,7 @@
 
   <script>
     const VERIFY_BASE = "https://verification_service.bgmi-gateway.workers.dev";
+    const MARKET_BASE = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) window.location.href = "login.html";
@@ -212,7 +223,77 @@
       } catch {
         kycStatus.textContent = "Not submitted";
       }
+
+      loadPopularity();
+      loadVerifyStatus();
     }
+
+    // ===== POPULARITY POINTS =====
+    async function loadPopularity() {
+      try {
+        const r = await fetch(MARKET_BASE + "/popularity/me", { headers: authHeaders() });
+        const data = await r.json();
+        const el = document.getElementById("pop-points");
+        el.textContent = data.total ?? data.points ?? 0;
+      } catch {}
+    }
+
+    // ===== SELLER VERIFICATION =====
+    const badgeMap = {
+      pending: "⏳ Pending Review",
+      approved: "✅ Verified Seller",
+      rejected: "❌ Rejected",
+      none: "🛡️ Not Verified"
+    };
+
+    async function loadVerifyStatus() {
+      try {
+        const r = await fetch(MARKET_BASE + "/seller/verify-status", { headers: authHeaders() });
+        const data = await r.json();
+        const badgeEl = document.getElementById("verify-badge-status");
+        const btn = document.getElementById("getVerifiedBtn");
+        const msg = document.getElementById("verify-msg");
+        const status = data.request?.status || "none";
+
+        if (status === "approved") {
+          badgeEl.textContent = `🏅 ${badgeMap.approved} (${data.badge || "trusted"})`;
+          badgeEl.style.color = "#00ffc6";
+          btn.style.display = "none";
+          msg.textContent = "Admin ne aapko verified seller ka badge de diya hai. 🎉";
+        } else if (status === "pending") {
+          badgeEl.textContent = badgeMap.pending;
+          btn.disabled = true;
+          btn.textContent = "⏳ Under Review";
+          msg.textContent = "Request submitted hai. Admin approve karega tabhi badge milega.";
+        } else if (status === "rejected") {
+          badgeEl.textContent = badgeMap.rejected;
+          msg.textContent = (data.request?.reason || "Try again later.") + " Dobaara request kar sakte ho.";
+        } else {
+          badgeEl.textContent = badgeMap.none;
+          btn.textContent = "Get Verified";
+        }
+      } catch {}
+    }
+
+    document.getElementById("getVerifiedBtn").onclick = async () => {
+      const msg = document.getElementById("verify-msg");
+      msg.className = "msg";
+      msg.textContent = "Submitting request…";
+      try {
+        const r = await fetch(MARKET_BASE + "/seller/verify-request", {
+          method: "POST",
+          headers: authHeaders()
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || "Request failed");
+        msg.className = "msg ok";
+        msg.textContent = "✅ Request sent! Admin review karega. 📩";
+        loadVerifyStatus();
+      } catch (err) {
+        msg.className = "msg err";
+        msg.textContent = "❌ " + err.message;
+      }
+    };
 
     function renderSocials(ig, fb) {
       const row = document.getElementById("socialRow");

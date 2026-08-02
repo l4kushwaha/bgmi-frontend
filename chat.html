@@ -87,6 +87,46 @@ img.chat-image { max-width:220px; border-radius:8px; display:block; }
 #sendBtn:hover { transform:translateY(-1px); box-shadow:0 0 16px rgba(0,255,198,.5); }
 #sendBtn:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
 
+/* ========== CALLING ========== */
+.call-btn {
+  flex:none; width:38px; height:38px; border:none; border-radius:50%;
+  cursor:pointer; font-size:1.05rem; background:rgba(255,255,255,.08); color:#fff; transition:.2s;
+  display:none;
+}
+.call-btn:hover { transform:translateY(-1px); }
+#callAudioBtn:hover { background:#25d366; box-shadow:0 0 14px rgba(37,211,102,.6); }
+#callVideoBtn:hover { background:#00c6ff; box-shadow:0 0 14px rgba(0,198,255,.6); }
+
+.call-overlay {
+  position:fixed; inset:0; z-index:999; display:none;
+  align-items:center; justify-content:center; flex-direction:column; gap:.6rem;
+  background:rgba(5,10,15,.94); backdrop-filter:blur(10px);
+}
+.call-overlay.open { display:flex; }
+.call-avatar {
+  width:96px; height:96px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:2.4rem; font-weight:800; color:#062;
+  background:linear-gradient(90deg,#00ffc6,#22c55e);
+  box-shadow:0 0 30px rgba(0,255,198,.45);
+}
+.call-name { font-size:1.15rem; font-weight:700; }
+.call-state { font-size:.85rem; color:#aaa; }
+.call-actions { display:flex; gap:.9rem; margin-top:.6rem; }
+.call-action {
+  width:56px; height:56px; border:none; border-radius:50%; cursor:pointer;
+  font-size:1.4rem; color:#fff; transition:.2s;
+}
+.call-action.accept { background:linear-gradient(90deg,#00ffc6,#22c55e); box-shadow:0 0 18px rgba(0,255,198,.5); }
+.call-action.decline, .call-action.end { background:#ff2d2d; box-shadow:0 0 18px rgba(255,45,45,.5); }
+.call-action:hover { transform:scale(1.08); }
+.call-ring { animation:pulse 1.2s infinite; }
+
+#callVideoLocal, #callVideoRemote {
+  position:fixed; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,.25);
+}
+#callVideoLocal { width:26vw; max-width:280px; aspect-ratio:3/4; right:14px; bottom:14px; z-index:1001; background:#000; }
+#callVideoRemote { inset:0; width:100%; height:100%; z-index:998; background:#000; }
+
 /* scrollbar */
 ::-webkit-scrollbar { width:6px; }
 ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:3px; }
@@ -126,7 +166,11 @@ img.chat-image { max-width:220px; border-radius:8px; display:block; }
     <div id="privateBox" style="display:none;flex:1;flex-direction:column;min-height:0;">
       <div class="chat-header">
         <div id="chatStatus">Select a chat</div>
-        <span class="exit" id="exitPrivate" style="display:none">✕ Close</span>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <button class="call-btn" id="callAudioBtn" title="Voice call">📞</button>
+          <button class="call-btn" id="callVideoBtn" title="Video call">📹</button>
+          <span class="exit" id="exitPrivate" style="display:none">✕ Close</span>
+        </div>
       </div>
       <div id="waitingBox"></div>
       <div id="chatBox"></div>
@@ -160,6 +204,20 @@ img.chat-image { max-width:220px; border-radius:8px; display:block; }
 <audio id="notifySound">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3">
 </audio>
+
+<!-- ===== CALL OVERLAY ===== -->
+<video id="callVideoRemote" playsinline autoplay muted></video>
+<video id="callVideoLocal" playsinline autoplay muted></video>
+<div class="call-overlay" id="callOverlay">
+  <div class="call-avatar" id="callAvatar">?</div>
+  <div class="call-name" id="callName">Calling…</div>
+  <div class="call-state" id="callState">Ringing…</div>
+  <div class="call-actions">
+    <button class="call-action accept" id="callAcceptBtn" style="display:none" title="Accept">📞</button>
+    <button class="call-action decline" id="callDeclineBtn" title="Decline">✖</button>
+    <button class="call-action end" id="callEndBtn" style="display:none" title="End call">🛑</button>
+  </div>
+</div>
 
 <!-- MAIN CHAT SCRIPT -->
 <script src="js/upi.js"></script>
