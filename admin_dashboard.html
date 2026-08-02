@@ -17,23 +17,32 @@
   header {
     position:sticky; top:0; z-index:10; backdrop-filter:blur(18px);
     background:rgba(17,17,25,.75); border-bottom:1px solid #222;
-    padding:15px 25px; display:flex; justify-content:space-between; align-items:center;
+    padding:13px 25px; display:flex; justify-content:space-between; align-items:center;
+    gap:12px; flex-wrap:wrap;
   }
-  header h1 { font-size:22px; background:linear-gradient(90deg,#00ffc6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .logout-btn { background:crimson; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; transition:.3s; }
-  .logout-btn:hover { box-shadow:0 0 16px rgba(220,20,60,.5); }
+  header h1 { font-size:21px; background:linear-gradient(90deg,#00ffc6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .head-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .who { font-size:.78rem; opacity:.75; text-align:right; }
+  .who b { color:#00ffc6; display:block; }
+  .btn { border:none; padding:8px 16px; border-radius:9px; cursor:pointer; font-weight:600; font-size:.82rem; transition:.3s; }
+  .btn.ghost { background:rgba(255,255,255,.07); color:#eee; border:1px solid #2a2a3a; }
+  .btn.ghost:hover { border-color:#00ffc6; color:#00ffc6; }
+  .btn.danger { background:crimson; color:#fff; }
+  .btn.danger:hover { box-shadow:0 0 16px rgba(220,20,60,.5); }
 
-  .wrap { position:relative; z-index:1; padding:22px; max-width:1200px; margin:0 auto; }
-  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+  .wrap { position:relative; z-index:1; padding:22px; max-width:1280px; margin:0 auto; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:14px; }
   .stat {
     background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
-    border-radius:16px; padding:16px; text-align:center; animation:pop .5s ease both;
+    border-radius:16px; padding:15px; text-align:center; animation:pop .5s ease both;
   }
-  .stat:nth-child(2){animation-delay:.08s}.stat:nth-child(3){animation-delay:.16s}.stat:nth-child(4){animation-delay:.24s}
-  .stat small { opacity:.55; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
-  .stat .val { font-size:1.6rem; font-weight:700; margin-top:4px; color:#00ffc6; }
+  .stat small { opacity:.55; font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; }
+  .stat .val { font-size:1.5rem; font-weight:700; margin-top:4px; color:#00ffc6; }
+  .stat.accent .val { color:#8b5cf6; }
+  .stat.warn .val { color:#ffd166; }
+  .stat.red .val { color:#f87171; }
 
-  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0; }
   .tab {
     padding:9px 16px; border-radius:12px; border:1px solid #2a2a3a; cursor:pointer;
     background:rgba(255,255,255,.04); color:#ccc; font-weight:600; font-size:.85rem; transition:.3s;
@@ -44,8 +53,8 @@
   .panel { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:18px; display:none; }
   .panel.active { display:block; animation:fade .4s ease both; }
   table { width:100%; border-collapse:collapse; font-size:.85rem; }
-  th { text-align:left; color:#00ffc6; opacity:.85; padding:10px 8px; border-bottom:1px solid #2a2a3a; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; }
-  td { padding:10px 8px; border-bottom:1px solid #1c1c28; }
+  th { text-align:left; color:#00ffc6; opacity:.85; padding:10px 8px; border-bottom:1px solid #2a2a3a; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+  td { padding:10px 8px; border-bottom:1px solid #1c1c28; vertical-align:middle; }
   tr { transition:.2s; } tr:hover { background:rgba(255,255,255,.04); }
   .mini { background:#16a34a; color:#fff; border:none; padding:4px 10px; border-radius:8px; cursor:pointer; font-size:.72rem; font-weight:600; transition:.2s; }
   .mini.danger { background:crimson; }
@@ -55,10 +64,41 @@
   .badge.green{background:rgba(34,197,94,.15);color:#4ade80}.badge.red{background:rgba(239,68,68,.15);color:#f87171}
   .badge.yellow{background:rgba(255,183,3,.15);color:#ffd166}.badge.gray{background:rgba(148,163,184,.15);color:#cbd5e1}
   .empty { opacity:.55; padding:18px 0; text-align:center; }
+
+  .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  .toolbar input, .toolbar select {
+    background:rgba(255,255,255,.06); border:1px solid #2a2a3a; color:#fff;
+    padding:8px 14px; border-radius:10px; font-size:.85rem; outline:none; min-width:220px;
+  }
+  .toolbar input:focus { border-color:#00ffc6; }
+  .toolbar .spacer { flex:1; }
+
+  .feed { list-style:none; }
+  .feed li { display:flex; gap:12px; align-items:flex-start; padding:11px 8px; border-bottom:1px solid #1c1c28; font-size:.85rem; }
+  .feed .dot { width:10px; height:10px; border-radius:50%; margin-top:5px; flex:none; }
+  .feed .t { color:#00ffc6; font-weight:600; }
+  .feed .meta { opacity:.5; font-size:.72rem; }
+  .feed .badge { margin-left:auto; }
+
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .kpi { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px 18px; }
+  .kpi b { font-size:1.3rem; color:#00ffc6; }
+  .kpi small { opacity:.55; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:4px; }
+
+  #toasts { position:fixed; right:18px; bottom:18px; z-index:99; display:flex; flex-direction:column; gap:10px; }
+  .toast {
+    padding:12px 18px; border-radius:12px; background:rgba(20,20,30,.95); border:1px solid #333;
+    color:#fff; font-size:.85rem; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,.5);
+    animation:slideIn .3s ease both; max-width:340px;
+  }
+  .toast.ok { border-color:#22c55e; }
+  .toast.err { border-color:#ef4444; }
+  @keyframes slideIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:none} }
+
   @keyframes pop { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:none} }
   @keyframes fade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
-  @media (max-width:760px){ .stats{grid-template-columns:1fr 1fr} .wrap{padding:14px} }
-  @media (max-width:480px){ .stats{grid-template-columns:1fr} }
+  @media (max-width:900px){ .stats{grid-template-columns:1fr 1fr} .grid2{grid-template-columns:1fr} }
+  @media (max-width:520px){ .stats{grid-template-columns:1fr} .wrap{padding:14px} .toolbar input{min-width:100%} }
 </style>
 </head>
 <body>
@@ -66,26 +106,57 @@
 
 <header>
   <h1>👑 Admin Dashboard</h1>
-  <button class="logout-btn" onclick="logout()">Logout</button>
+  <div class="head-right">
+    <div class="who"><b id="whoEmail">admin</b>Super Admin</div>
+    <button class="btn ghost" onclick="refreshAll()">↻ Refresh</button>
+    <button class="btn danger" onclick="logout()">Logout</button>
+  </div>
 </header>
 
 <div class="wrap">
   <div class="stats">
     <div class="stat"><small>Total Users</small><div class="val" id="stUsers">—</div></div>
     <div class="stat"><small>Registered Today</small><div class="val" id="stToday">—</div></div>
-    <div class="stat"><small>Banned</small><div class="val" id="stBanned">—</div></div>
+    <div class="stat red"><small>Banned</small><div class="val" id="stBanned">—</div></div>
+    <div class="stat accent"><small>Total Listings</small><div class="val" id="stListings">—</div></div>
+    <div class="stat warn"><small>Pending KYC</small><div class="val" id="stKyc">—</div></div>
+    <div class="stat warn"><small>Pending Payouts</small><div class="val" id="stWithdraw">—</div></div>
+    <div class="stat"><small>Open Chats</small><div class="val" id="stChats">—</div></div>
     <div class="stat"><small>Admin Fees (₹)</small><div class="val" id="stEarnings">—</div></div>
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="users">Users</button>
+    <button class="tab active" data-tab="overview">Overview</button>
+    <button class="tab" data-tab="users">Users</button>
     <button class="tab" data-tab="listings">Listings</button>
     <button class="tab" data-tab="kyc">KYC Queue</button>
     <button class="tab" data-tab="payments">Payments</button>
+    <button class="tab" data-tab="withdrawals">Withdrawals</button>
     <button class="tab" data-tab="chats">Chats</button>
+    <button class="tab" data-tab="activity">Activity</button>
   </div>
 
-  <div class="panel active" id="tab-users">
+  <div class="panel active" id="tab-overview">
+    <div class="grid2">
+      <div class="kpi"><small>Total Platform Volume (paid)</small><b id="kVolume">₹0</b></div>
+      <div class="kpi"><small>Released to Sellers</small><b id="kReleased">₹0</b></div>
+      <div class="kpi"><small>Pending Payment Orders</small><b id="kPendingPay">0</b></div>
+      <div class="kpi"><small>Pending Withdrawal Amount</small><b id="kPendingWd">₹0</b></div>
+    </div>
+    <h3 style="margin-bottom:12px;font-size:.95rem;color:#8b5cf6;">Recent Activity</h3>
+    <ul class="feed" id="activityFeed"><li class="empty">Loading…</li></ul>
+  </div>
+
+  <div class="panel" id="tab-users">
+    <div class="toolbar">
+      <input id="userSearch" placeholder="🔍 Search email or username…" oninput="loadUsers()" />
+      <select id="userRoleFilter" onchange="loadUsers()">
+        <option value="">All roles</option><option value="admin">Admin</option>
+        <option value="seller">Seller</option><option value="user">User</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="exportUsers()">⬇ Export CSV</button>
+    </div>
     <table>
       <thead><tr><th>ID</th><th>Email</th><th>Username</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
       <tbody id="usersBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
@@ -93,6 +164,15 @@
   </div>
 
   <div class="panel" id="tab-listings">
+    <div class="toolbar">
+      <input id="listingSearch" placeholder="🔍 Search title or UID…" oninput="loadListings()" />
+      <select id="listingStatusFilter" onchange="loadListings()">
+        <option value="">All statuses</option><option value="available">Available</option>
+        <option value="hidden">Hidden</option><option value="sold">Sold</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="exportListings()">⬇ Export CSV</button>
+    </div>
     <table>
       <thead><tr><th>ID</th><th>Title</th><th>UID</th><th>Seller</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody id="listingsBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
@@ -107,9 +187,25 @@
   </div>
 
   <div class="panel" id="tab-payments">
+    <div class="toolbar"><div class="spacer"></div><button class="btn ghost" onclick="exportPayments()">⬇ Export CSV</button></div>
     <table>
       <thead><tr><th>Order</th><th>Buyer</th><th>Seller</th><th>Total</th><th>Fee</th><th>Seller Gets</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody id="paymentsBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="tab-withdrawals">
+    <div class="toolbar">
+      <select id="wdFilter" onchange="loadWithdrawals()">
+        <option value="">All statuses</option><option value="pending">Pending</option>
+        <option value="processed">Processed</option><option value="rejected">Rejected</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="exportWithdrawals()">⬇ Export CSV</button>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>Seller</th><th>UPI</th><th>Amount</th><th>Status</th><th>Requested</th><th>Actions</th></tr></thead>
+      <tbody id="wdBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
     </table>
   </div>
 
@@ -119,7 +215,13 @@
       <tbody id="chatsBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
     </table>
   </div>
+
+  <div class="panel" id="tab-activity">
+    <ul class="feed" id="activityFeedFull"><li class="empty">Loading…</li></ul>
+  </div>
 </div>
+
+<div id="toasts"></div>
 
 <script>
 const GATEWAY = "https://bgmi-gateway.bgmi-gateway.workers.dev";
@@ -143,10 +245,19 @@ async function api(path, opts = {}) {
 
 const fmt = n => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 const statusBadge = s => {
-  const map = { available:"green", active:"green", approved:"green", paid:"green", released:"green", submitted:"yellow", pending:"yellow", requested:"yellow", half_paid:"yellow", hidden:"red", banned:"red", rejected:"red", closed:"red", sold:"gray" };
+  const map = { available:"green", active:"green", approved:"green", paid:"green", released:"green", processed:"green", submitted:"yellow", pending:"yellow", requested:"yellow", half_paid:"yellow", created:"yellow", hidden:"red", banned:"red", rejected:"red", closed:"red", sold:"gray" };
   const c = map[s] || "gray";
   return `<span class="badge ${c}">${s || "—"}</span>`;
 };
+
+/* ---- TOASTS ---- */
+function toast(msg, type = "ok") {
+  const el = document.createElement("div");
+  el.className = "toast " + (type === "err" ? "err" : "ok");
+  el.textContent = msg;
+  document.getElementById("toasts").appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
 
 /* ---- TABS ---- */
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
@@ -154,29 +265,80 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
   t.classList.add("active");
   document.getElementById("tab-" + t.dataset.tab).classList.add("active");
+  if (t.dataset.tab === "overview") loadOverview();
+  if (t.dataset.tab === "activity") loadActivity(true);
+  if (t.dataset.tab === "withdrawals") loadWithdrawals();
 });
+
+function refreshAll() { loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); toast("Dashboard refreshed"); }
 
 /* ---- OVERVIEW ---- */
 async function loadOverview() {
-  const [s, e] = await Promise.all([
+  const [s, e, l, k, c] = await Promise.all([
     api("auth/admin/stats"),
-    api("wallet/admin/earnings")
+    api("wallet/admin/earnings"),
+    api("market/admin/listings"),
+    api("verify/admin/queue"),
+    api("chat/admin/rooms")
   ]);
   if (s.ok && s.data) {
     document.getElementById("stUsers").textContent = s.data.total_users ?? "—";
     document.getElementById("stToday").textContent = s.data.registered_today ?? "—";
     document.getElementById("stBanned").textContent = s.data.banned_users ?? "—";
   }
-  if (e.ok && e.data) document.getElementById("stEarnings").textContent = fmt(e.data.total_admin_fees);
+  document.getElementById("stListings").textContent = l.ok ? (l.data.length ?? 0) : "—";
+  document.getElementById("stKyc").textContent = k.ok ? (k.data.length ?? 0) : "—";
+  document.getElementById("stChats").textContent = c.ok ? ((c.data||[]).filter(r => r.status !== "closed").length) : "—";
+  if (e.ok && e.data) {
+    document.getElementById("stEarnings").textContent = fmt(e.data.total_admin_fees);
+    document.getElementById("kVolume").textContent = fmt(e.data.total_volume);
+    document.getElementById("kReleased").textContent = fmt(e.data.total_released);
+    document.getElementById("kPendingPay").textContent = e.data.pending_payments ?? 0;
+    document.getElementById("kPendingWd").textContent = fmt(e.data.pending_withdrawal_amount);
+    document.getElementById("stWithdraw").textContent = e.data.pending_withdrawals ?? 0;
+  }
+  if (s.ok && s.data) renderFeed(document.getElementById("activityFeed"), s.data.recent_activity || []);
+}
+
+function renderFeed(el, list) {
+  if (!list || !list.length) return el.innerHTML = `<li class="empty">No recent activity</li>`;
+  el.innerHTML = list.map(a => {
+    const { icon, color, label } = activityMeta(a.type);
+    return `<li><span class="dot" style="background:${color}"></span>
+      <div><div><span class="t">${label}</span> <span class="meta">user #${esc(a.user_id)}</span></div>
+      <div class="meta">${esc(a.details || "")}</div></div>
+      <span class="badge gray">${esc((a.timestamp||"").slice(0,16).replace("T"," "))}</span></li>`;
+  }).join("");
+}
+
+function activityMeta(type) {
+  const map = {
+    login_success: { label:"🔓 User logged in", color:"#22c55e" },
+    login_failed: { label:"⚠️ Failed login", color:"#f87171" },
+    register: { label:"✨ New user registered", color:"#00ffc6" },
+    admin_user_update: { label:"🛠 Admin updated user", color:"#8b5cf6" },
+    password_reset: { label:"🔑 Password reset", color:"#ffd166" },
+    profile_update: { label:"✏️ Profile updated", color:"#60a5fa" },
+    otp_request: { label:"📩 OTP requested", color:"#fb923c" }
+  };
+  return map[type] || { label: type || "activity", color: "#94a3b8" };
+}
+
+async function loadActivity(full = false) {
+  const { ok, data } = await api("auth/admin/stats");
+  if (ok) renderFeed(document.getElementById(full ? "activityFeedFull" : "activityFeed"), data.recent_activity || []);
 }
 
 /* ---- USERS ---- */
 async function loadUsers() {
-  const { ok, data } = await api("auth/admin/users?limit=100");
+  const q = document.getElementById("userSearch").value.trim();
+  const roleF = document.getElementById("userRoleFilter").value;
+  const { ok, data } = await api(`auth/admin/users?limit=200&q=${encodeURIComponent(q)}`);
   const body = document.getElementById("usersBody");
   if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
-  if (!data.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No users</td></tr>`;
-  body.innerHTML = data.map(u => `
+  const rows = (data || []).filter(u => !roleF || u.role === roleF);
+  if (!rows.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No users found</td></tr>`;
+  body.innerHTML = rows.map(u => `
     <tr>
       <td>${u.id}</td>
       <td>${esc(u.email)}</td>
@@ -184,29 +346,47 @@ async function loadUsers() {
       <td>${u.role || "user"}</td>
       <td>${statusBadge(u.status)}</td>
       <td>${esc((u.created_at||"").slice(0,10))}</td>
-      <td>
+      <td style="white-space:nowrap">
         ${u.role !== "admin" ? `<button class="mini" onclick="setRole(${u.id},'admin')">Make Admin</button>` : `<button class="mini warn" onclick="setRole(${u.id},'user')">Demote</button>`}
         ${u.status !== "banned" ? `<button class="mini danger" onclick="setStatus(${u.id},'banned')">Ban</button>` : `<button class="mini" onclick="setStatus(${u.id},'active')">Unban</button>`}
+        <button class="mini danger" onclick="delUser(${u.id})">Delete</button>
       </td>
     </tr>`).join("");
 }
 
 async function setRole(id, role) {
   const { ok } = await api(`auth/admin/users/${id}`, { method: "PATCH", body: JSON.stringify({ role }) });
-  alert(ok ? "Updated" : "Failed"); loadUsers();
+  toast(ok ? "Role updated" : "Failed to update", ok ? "ok" : "err"); loadUsers(); loadOverview();
 }
 async function setStatus(id, status) {
   const { ok } = await api(`auth/admin/users/${id}`, { method: "PATCH", body: JSON.stringify({ status }) });
-  alert(ok ? "Updated" : "Failed"); loadUsers();
+  toast(ok ? (status === "banned" ? "User banned" : "User activated") : "Failed", ok ? "ok" : "err"); loadUsers(); loadOverview();
+}
+async function delUser(id) {
+  if (!confirm(`Delete user #${id} permanently? This cannot be undone.`)) return;
+  const { ok } = await api(`auth/admin/users/${id}`, { method: "DELETE" });
+  toast(ok ? "User deleted" : "Delete failed", ok ? "ok" : "err"); loadUsers(); loadOverview();
+}
+
+function exportUsers() {
+  api(`auth/admin/users?limit=500`).then(({ data }) => downloadCSV("users.csv",
+    ["ID","Email","Username","Role","Status","Joined"],
+    (data||[]).map(u => [u.id, u.email, u.username, u.role, u.status, u.created_at])));
 }
 
 /* ---- LISTINGS ---- */
+let _listings = [];
 async function loadListings() {
+  const q = document.getElementById("listingSearch").value.trim().toLowerCase();
+  const st = document.getElementById("listingStatusFilter").value;
   const { ok, data } = await api("market/admin/listings");
   const body = document.getElementById("listingsBody");
   if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
-  if (!data.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No listings</td></tr>`;
-  body.innerHTML = data.map(l => `
+  _listings = (data || []).filter(l =>
+    (!st || l.status === st) &&
+    (!q || String(l.title).toLowerCase().includes(q) || String(l.uid).toLowerCase().includes(q)));
+  if (!_listings.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No listings found</td></tr>`;
+  body.innerHTML = _listings.map(l => `
     <tr>
       <td>${l.id}</td>
       <td>${esc(l.title)}</td>
@@ -214,17 +394,28 @@ async function loadListings() {
       <td>${esc(l.seller_id)}</td>
       <td>${fmt(l.price)}</td>
       <td>${statusBadge(l.status)}</td>
-      <td>
+      <td style="white-space:nowrap">
         <button class="mini" onclick="moderate(${l.id},'available')">Show</button>
         <button class="mini warn" onclick="moderate(${l.id},'hidden')">Hide</button>
-        <button class="mini danger" onclick="moderate(${l.id},'sold')">Mark Sold</button>
+        <button class="mini" onclick="moderate(${l.id},'sold')">Sold</button>
+        <button class="mini danger" onclick="delListing(${l.id})">Delete</button>
       </td>
     </tr>`).join("");
 }
 
 async function moderate(id, status) {
   const { ok } = await api(`market/admin/listings/${id}`, { method: "PATCH", body: JSON.stringify({ status }) });
-  alert(ok ? "Moderated" : "Failed"); loadListings();
+  toast(ok ? "Listing moderated" : "Failed", ok ? "ok" : "err"); loadListings(); loadOverview();
+}
+async function delListing(id) {
+  if (!confirm(`Delete listing #${id} permanently?`)) return;
+  const { ok } = await api(`market/listings/${id}`, { method: "DELETE" });
+  toast(ok ? "Listing deleted" : "Delete failed", ok ? "ok" : "err"); loadListings(); loadOverview();
+}
+
+function exportListings() {
+  downloadCSV("listings.csv", ["ID","Title","UID","Seller","Price","Level","Rank","Status"],
+    _listings.map(l => [l.id, l.title, l.uid, l.seller_id, l.price, l.level, l.highest_rank, l.status]));
 }
 
 /* ---- KYC ---- */
@@ -249,7 +440,7 @@ async function loadKyc() {
 
 async function kycDecision(id, decision) {
   const { ok } = await api("verify/admin/decision", { method: "POST", body: JSON.stringify({ doc_id: id, decision }) });
-  alert(ok ? "Done" : "Failed"); loadKyc();
+  toast(ok ? "KYC " + decision : "Failed", ok ? "ok" : "err"); loadKyc(); loadOverview();
 }
 
 /* ---- PAYMENTS ---- */
@@ -272,8 +463,52 @@ async function loadPayments() {
 }
 
 async function release(order_id) {
+  if (!confirm(`Release escrow for order ${order_id} to seller?`)) return;
   const { ok } = await api("wallet/pay/release", { method: "POST", body: JSON.stringify({ order_id }) });
-  alert(ok ? "Released to seller" : "Failed"); loadPayments();
+  toast(ok ? "Released to seller" : "Release failed", ok ? "ok" : "err"); loadPayments(); loadOverview();
+}
+
+function exportPayments() {
+  api("wallet/admin/payments").then(({ data }) => downloadCSV("payments.csv",
+    ["Order ID","Buyer","Seller","Total","Admin Fee","Seller Amount","Status","Paid At"],
+    (data||[]).map(p => [p.order_id, p.buyer_id, p.seller_id, p.total_amount, p.admin_fee, p.seller_amount, p.status, p.paid_at])));
+}
+
+/* ---- WITHDRAWALS ---- */
+async function loadWithdrawals() {
+  const st = document.getElementById("wdFilter").value;
+  const { ok, data } = await api(`wallet/admin/withdrawals${st ? "?status=" + st : ""}`);
+  const body = document.getElementById("wdBody");
+  if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
+  const list = Array.isArray(data) ? data : (data.value || []);
+  if (!list.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No withdrawal requests</td></tr>`;
+  body.innerHTML = list.map(w => `
+    <tr>
+      <td>${w.id}</td>
+      <td>${esc(w.seller_id)}</td>
+      <td>${esc(w.upi_id)}</td>
+      <td>${fmt(w.amount)}</td>
+      <td>${statusBadge(w.status)}</td>
+      <td>${esc((w.created_at||"").slice(0,16).replace("T"," "))}</td>
+      <td style="white-space:nowrap">
+        ${w.status === "pending" ? `<button class="mini" onclick="wdAction(${w.id},'process')">Mark Paid</button>
+        <button class="mini danger" onclick="wdAction(${w.id},'reject')">Reject</button>` : "—"}
+      </td>
+    </tr>`).join("");
+}
+
+async function wdAction(id, action) {
+  if (!confirm(`${action === "process" ? "Mark withdrawal #" + id + " as PAID (you sent the money)?" : "Reject withdrawal #" + id + "?"}`)) return;
+  const { ok } = await api(`wallet/admin/withdrawals/${id}/${action}`, { method: "POST" });
+  toast(ok ? (action === "process" ? "Marked paid" : "Rejected") : "Failed", ok ? "ok" : "err"); loadWithdrawals(); loadOverview();
+}
+
+function exportWithdrawals() {
+  api("wallet/admin/withdrawals").then(({ data }) => {
+    const list = Array.isArray(data) ? data : (data.value || []);
+    downloadCSV("withdrawals.csv", ["ID","Seller","UPI","Amount","Status","Requested"],
+      list.map(w => [w.id, w.seller_id, w.upi_id, w.amount, w.status, w.created_at]));
+  });
 }
 
 /* ---- CHATS ---- */
@@ -297,15 +532,26 @@ async function loadChats() {
 
 async function closeRoom(id) {
   const { ok } = await api("chat/admin/close", { method: "POST", body: JSON.stringify({ room_id: id }) });
-  alert(ok ? "Closed" : "Failed"); loadChats();
+  toast(ok ? "Room closed" : "Failed", ok ? "ok" : "err"); loadChats(); loadOverview();
+}
+
+/* ---- CSV ---- */
+function downloadCSV(name, headers, rows) {
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 /* ---- HELPERS ---- */
 function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
 
 /* ---- INIT ---- */
-loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats();
-setInterval(() => { loadOverview(); }, 60000);
+document.getElementById("whoEmail").textContent = user.email || "admin";
+loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals();
+setInterval(() => { loadOverview(); loadChats(); loadKyc(); loadWithdrawals(); }, 30000);
 </script>
 <script src="assets/effects.js" defer></script>
 </body>
