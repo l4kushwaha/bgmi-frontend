@@ -72,7 +72,7 @@
 
   // ===== PRICE ESTIMATOR =====
   const rankValues = { gold: 10, platinum: 30, ace: 50, diamond: 40, conquer: 200 };
-  function estimatePrice() {
+  function calcEstimate() {
     const level = +document.getElementById("level").value || 0;
     const rank = document.getElementById("rank").value.trim().toLowerCase();
     const mythicArray = (document.getElementById("mythic")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
@@ -96,22 +96,42 @@
     price += supercarArray.length * 1500;
     price += ultimateArray.length * 250;
     price = Math.max(999, Math.round(price / 50) * 50);
-
-    const out = document.getElementById("estimatedPrice");
-    out.textContent = `Estimated price: ₹${price}`;
-    out.dataset.value = price;
     return price;
   }
+
+  function estimatePrice() {
+    const price = calcEstimate();
+    const priceInput = document.getElementById("price");
+    const out = document.getElementById("estimatedPrice");
+    priceInput.value = price;
+    out.textContent = `⚡ Estimated ₹${price} — adjust the price above if needed`;
+    showToast(`Estimated price: ₹${price}`);
+    priceInput.focus();
+  }
   estimateBtn.onclick = estimatePrice;
+
+  // Auto-fill estimate when price is empty on submit
+  document.getElementById("price").addEventListener("input", () => {
+    const out = document.getElementById("estimatedPrice");
+    if (document.getElementById("price").value) out.textContent = "";
+  });
 
   // ===== SUBMIT LISTING =====
   form.onsubmit = async e => {
     e.preventDefault();
-    const price = estimatePrice();
+
+    const uid = document.getElementById("uid").value.trim();
+    const title = document.getElementById("title").value.trim();
+    if (!/^\d{1,12}$/.test(uid)) return showToast("Enter a valid BGMI UID (digits only)", true);
+    if (!title) return showToast("Account title is required", true);
+
+    let price = Number(document.getElementById("price").value);
+    if (!price) price = calcEstimate();
+    if (!Number.isFinite(price) || price < 1) return showToast("Enter a valid price (₹)", true);
 
     const payload = {
-      uid: document.getElementById("uid").value.trim(),
-      title: document.getElementById("title").value.trim(),
+      uid,
+      title,
       description: document.getElementById("highlights")?.value.trim() || "",
       price,
       level: +document.getElementById("level").value || 0,

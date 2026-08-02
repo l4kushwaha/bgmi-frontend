@@ -3,118 +3,194 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sell BGMI Account</title>
+<title>Sell BGMI Account | BGMI Market</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/webfonts/poppins.css">
 <link rel="stylesheet" href="assets/effects.css">
 <style>
-:root {
-  --primary: #00ffff;
-  --secondary: #ff00ff;
-  --bg: #111;
-  --card-bg: rgba(255,255,255,.06);
-  --text-light: #fff;
-  --text-muted: rgba(255,255,255,.7);
-  --success: #27ae60;
-  --error: #c0392b;
-}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:"Poppins",sans-serif}
+  html,body{min-height:100%}
+  body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background: radial-gradient(circle at top left, #150026, #08080f, #140023);
+    animation: hueShift 15s infinite alternate;
+    background-size:400% 400%;
+    color:#fff;
+    overflow-x:hidden;
+  }
+  @keyframes hueShift {
+    0% { background-position: left top; }
+    100% { background-position: right bottom; }
+  }
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:"Poppins",sans-serif}
-body{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:url("https://i.ytimg.com/vi/aoV3MROF_OY/hq720.jpg") center/cover no-repeat;
-  position:relative;
-  color:var(--text-light);
-  transition: background 0.3s, color 0.3s;
-}
-body::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.5)}
+  /* ---------- HEADER ---------- */
+  header{
+    width:100%;
+    padding:1rem 1.6rem;
+    backdrop-filter:blur(20px);
+    background:rgba(255,255,255,.07);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    position:sticky;top:0;z-index:100;
+  }
+  header h1{font-size:1.35rem;line-height:1.1}
+  header nav{display:flex;gap:.9rem;flex-wrap:wrap}
+  header nav a{
+    color:#fff;text-decoration:none;font-size:.85rem;font-weight:500;
+    transition:.3s;position:relative;
+  }
+  header nav a:hover{color:#00ffc6}
+  @media(max-width:720px){ header{flex-direction:column;align-items:flex-start} }
 
-form{
-  position:relative;z-index:2;
-  width:540px;max-width:96%;
-  padding:26px;border-radius:16px;
-  background:var(--card-bg);
-  border:1px solid rgba(255,255,255,.15);
-  backdrop-filter: blur(6px);
-}
-h2{text-align:center;color:var(--primary);text-shadow:0 0 8px var(--primary);margin-bottom:14px}
+  /* ---------- LAYOUT ---------- */
+  main{flex:1;width:100%;display:flex;justify-content:center;padding:2rem 1rem 3rem;z-index:1}
+  .page{width:100%;max-width:640px}
 
-input,textarea,button{
-  width:100%;padding:10px;
-  border-radius:10px;border:none;outline:none;margin:7px 0;
-  font-size:14px;
-  transition: all 0.2s;
-}
-input,textarea{
-  background:rgba(255,255,255,.08);
-  color:var(--text-light)
-}
-input:focus,textarea:focus{background:rgba(255,255,255,.15)}
-input::placeholder,textarea::placeholder{color:var(--text-muted)}
+  .sell-card{
+    position:relative;
+    padding:1.8rem;
+    border-radius:20px;
+    background:rgba(255,255,255,.055);
+    border:1px solid rgba(255,255,255,.13);
+    backdrop-filter:blur(14px);
+    box-shadow:0 0 0 1px rgba(0,255,198,.05), 0 20px 60px rgba(0,0,0,.45);
+  }
+  .sell-card .title{
+    font-size:1.35rem;
+    text-align:center;
+    margin-bottom:.25rem;
+  }
+  .sell-card .subtitle{
+    text-align:center;font-size:.82rem;color:rgba(255,255,255,.55);
+    margin-bottom:1.3rem;
+  }
 
-.row{display:flex;gap:8px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  /* ---------- SECTIONS ---------- */
+  .sec{margin-bottom:1.2rem}
+  .sec-head{
+    display:flex;align-items:center;gap:.5rem;
+    font-size:.78rem;font-weight:700;letter-spacing:1.5px;
+    text-transform:uppercase;color:#00ffc6;margin-bottom:.7rem;
+  }
+  .sec-head::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,198,.4),transparent)}
 
-button.primary{
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:var(--text-light);font-weight:700;cursor:pointer;
-  transition: transform 0.2s;
-}
-button.primary:hover{transform:scale(1.05);}
-button.ghost{
-  background:transparent;color:var(--text-light);
-  border:1px solid rgba(255,255,255,.2);
-  cursor:pointer;
-}
+  label{display:block;font-size:.78rem;color:rgba(255,255,255,.75);margin:0 0 .25rem .1rem}
+  .req{color:#ff5e5e}
 
-#drop-area{
-  border:2px dashed rgba(0,255,255,.3);
-  padding:14px;border-radius:10px;
-  text-align:center;color:var(--primary);cursor:pointer;
-  transition: background 0.2s;
-}
-#drop-area.hover{background:rgba(0,255,255,.08)}
+  input,textarea{
+    width:100%;padding:.7rem .85rem;
+    border-radius:11px;border:1px solid rgba(255,255,255,.14);
+    outline:none;margin:0 0 .7rem;
+    font-size:14px;color:#fff;
+    background:rgba(255,255,255,.07);
+    transition:border-color .2s, box-shadow .2s, background .2s;
+  }
+  input:focus,textarea:focus{
+    background:rgba(255,255,255,.11);
+    border-color:#00ffc6;
+    box-shadow:0 0 0 3px rgba(0,255,198,.14);
+  }
+  input::placeholder,textarea::placeholder{color:rgba(255,255,255,.4)}
+  textarea{resize:vertical;min-height:80px}
 
-#preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.preview-img{
-  width:70px;height:70px;
-  border-radius:8px;overflow:hidden;
-  position:relative;border:1px solid rgba(0,255,255,.2);
-  transition: transform 0.2s;
-}
-.preview-img:hover{transform:scale(1.05);}
-.preview-img img{width:100%;height:100%;object-fit:cover}
-.preview-img .remove{
-  position:absolute;top:3px;right:3px;
-  background:#ff4d4d;color:#fff;
-  width:18px;height:18px;border-radius:50%;
-  font-size:12px;line-height:18px;
-  text-align:center;cursor:pointer
-}
+  .row{display:flex;gap:.7rem}
+  .row > div{flex:1;min-width:0}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+  @media(max-width:600px){ .grid{grid-template-columns:repeat(2,1fr)} }
 
-#estimatedPrice{font-size:14px;color:var(--primary);margin-top:4px}
+  /* ---------- PRICE ---------- */
+  .price-row{display:flex;gap:.7rem;align-items:flex-start}
+  .price-row .price-input{flex:1}
+  .price-box{font-size:1.1rem;font-weight:700}
+  .price-box .cur{color:#00ffc6}
+  #estimatedPrice{font-size:.8rem;color:#ffd27d;margin:.15rem 0 .7rem .1rem;min-height:1.1em}
 
-#toast{
-  position:fixed;bottom:24px;left:50%;
-  transform:translateX(-50%);
-  padding:10px 18px;border-radius:20px;
-  background:var(--success);color:#fff;
-  display:none;z-index:9999;
-  opacity:0;transition:opacity 0.3s;
-}
-#toast.show{display:block;opacity:1;}
-#toast.err{background:var(--error)}
+  /* ---------- BUTTONS ---------- */
+  button{
+    border:none;border-radius:11px;cursor:pointer;font-family:inherit;
+    font-size:.88rem;font-weight:700;transition:.25s;
+  }
+  .btn-primary{
+    width:100%;padding:.85rem;
+    background:linear-gradient(90deg,#00ffc6,#00b894);
+    color:#062;font-size:.95rem;letter-spacing:.4px;
+    box-shadow:0 0 18px rgba(0,255,198,.35);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,255,198,.6)}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+  .btn-ghost{
+    padding:.7rem .9rem;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+  }
+  .btn-ghost:hover{border-color:#00ffc6;color:#00ffc6;box-shadow:0 0 14px rgba(0,255,198,.25)}
 
-@media(max-width:600px){
-  .grid{grid-template-columns:repeat(2,1fr)}
-}
+  /* ---------- DROP AREA ---------- */
+  #drop-area{
+    border:2px dashed rgba(0,255,198,.35);
+    padding:1.1rem;border-radius:12px;
+    text-align:center;color:#00ffc6;cursor:pointer;font-size:.86rem;
+    background:rgba(0,255,198,.04);
+    transition:background .2s,border-color .2s;
+  }
+  #drop-area.hover{background:rgba(0,255,198,.1);border-color:#fff}
+  #drop-area small{display:block;color:rgba(255,255,255,.45);font-size:.7rem;margin-top:3px}
+
+  #preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:.7rem}
+  .preview-img{
+    width:70px;height:70px;border-radius:9px;overflow:hidden;
+    position:relative;border:1px solid rgba(0,255,198,.3);
+    transition:transform .2s;
+  }
+  .preview-img:hover{transform:scale(1.05)}
+  .preview-img img{width:100%;height:100%;object-fit:cover}
+  .preview-img .remove{
+    position:absolute;top:3px;right:3px;
+    background:#ff4d4d;color:#fff;width:18px;height:18px;border-radius:50%;
+    font-size:12px;line-height:18px;text-align:center;cursor:pointer
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    width:100%;padding:1.1rem;text-align:center;
+    backdrop-filter:blur(15px);background:rgba(255,255,255,.04);
+    color:#aaa;font-size:.8rem;
+  }
+
+  /* ---------- TOAST ---------- */
+  #toast{
+    position:fixed;bottom:24px;left:50%;
+    transform:translateX(-50%) translateY(20px);
+    padding:11px 20px;border-radius:22px;
+    background:#27ae60;color:#fff;font-size:.85rem;
+    display:block;opacity:0;visibility:hidden;z-index:9999;
+    transition:all .3s;box-shadow:0 8px 30px rgba(0,0,0,.4);
+  }
+  #toast.show{opacity:1;visibility:visible;transform:translateX(-50%)}
+  #toast.err{background:#c0392b}
 </style>
 </head>
 
 <body>
+
+<header>
+  <h1><span class="wiggle" style="display:inline-block">💰</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
+  <nav>
+    <a href="index.html" class="nav-slide">Home</a>
+    <a href="marketplace.html" class="nav-slide">Marketplace</a>
+    <a href="wallet.html" class="nav-slide">Wallet</a>
+    <a href="profile.html" class="nav-slide">Profile</a>
+    <a href="popularity.html" class="nav-slide">Popularity</a>
+    <a href="chat.html" class="nav-slide">Message</a>
+    <a href="#" id="logoutLink" class="nav-slide">Logout</a>
+  </nav>
+</header>
+
 <div class="marquee-wrap">
   <div class="marquee-inner">
     <span>💰 <b>SELL</b> Your ID Fast</span>
@@ -123,51 +199,99 @@ button.ghost{
     <span>🎁 <b>HONOR GIFT</b> listings supported</span>
   </div>
 </div>
-<form id="sellForm" novalidate>
-  <h2 class="anim-gradient glitch under-bar" data-text="Sell Your BGMI Account">Sell Your BGMI Account</h2>
 
-  <input id="uid" placeholder="BGMI UID (required)" required>
-  <input id="title" placeholder="Account Title (required)" required>
+<main>
+  <div class="page">
+    <form id="sellForm" class="sell-card flip-in" novalidate>
+      <h2 class="title anim-gradient glitch" data-text="Sell Your BGMI Account">Sell Your BGMI Account</h2>
+      <p class="subtitle">List your account and get paid directly via UPI 🚀</p>
 
-  <div class="row">
-    <input id="level" type="number" placeholder="Account Level">
-    <input id="rank" placeholder="Highest Rank">
+      <!-- ACCOUNT INFO -->
+      <div class="sec">
+        <div class="sec-head">🏷️ Account Info</div>
+        <label for="uid">BGMI UID <span class="req">*</span></label>
+        <input id="uid" placeholder="e.g. 5301234567" required autocomplete="off">
+        <label for="title">Account Title <span class="req">*</span></label>
+        <input id="title" placeholder="e.g. Legendary Conqueror ID" required autocomplete="off">
+        <div class="row">
+          <div>
+            <label for="level">Account Level</label>
+            <input id="level" type="number" placeholder="e.g. 76">
+          </div>
+          <div>
+            <label for="rank">Highest Rank</label>
+            <input id="rank" placeholder="e.g. Ace / Conqueror">
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEMS -->
+      <div class="sec">
+        <div class="sec-head">🎁 Items &amp; Rarities</div>
+        <div class="grid">
+          <input id="mythic" placeholder="Mythic Items">
+          <input id="legendary" placeholder="Legendary Items">
+          <input id="honor_gift" placeholder="Honor Gift">
+          <input id="guns" placeholder="Upgraded Guns">
+          <input id="titles" placeholder="Titles">
+          <input id="x_suit" placeholder="X Suit">
+          <input id="supercar" placeholder="Supercar">
+          <input id="ultimate" placeholder="Ultimate">
+        </div>
+        <p style="font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.3rem">Comma-separated values (e.g. <i>Ice Flame, Glacier M4</i>)</p>
+      </div>
+
+      <!-- DETAILS -->
+      <div class="sec">
+        <div class="sec-head">📝 Details</div>
+        <label for="highlights">Account Highlights / Description</label>
+        <textarea id="highlights" placeholder="Mythic outfits, exclusive skins, special titles…"></textarea>
+      </div>
+
+      <!-- PRICE -->
+      <div class="sec">
+        <div class="sec-head">💸 Price</div>
+        <div class="price-row">
+          <div class="price-input">
+            <label for="price">Your Price (₹) <span class="req">*</span></label>
+            <input class="price-box" id="price" type="number" min="1" placeholder="e.g. 5000" required autocomplete="off">
+          </div>
+          <button type="button" id="estimateBtn" class="btn-ghost" style="margin-top:1.55rem">⚡ Estimate</button>
+        </div>
+        <div id="estimatedPrice"></div>
+      </div>
+
+      <!-- IMAGES -->
+      <div class="sec">
+        <div class="sec-head">🖼️ Images <span style="text-transform:none;letter-spacing:0;opacity:.6">(optional)</span></div>
+        <div id="drop-area">
+          Drag &amp; drop images here or <b>click to upload</b>
+          <small>JPG / PNG • max 5 images</small>
+        </div>
+        <input id="fileElem" type="file" multiple accept="image/*" hidden>
+        <div id="preview"></div>
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn-primary">🚀 List for Sale</button>
+    </form>
   </div>
+</main>
 
-  <div class="grid">
-    <input id="mythic" placeholder="Mythic Items">
-    <input id="legendary" placeholder="Legendary Items">
-    <input id="honor_gift" placeholder="Honor Gift">
-    <input id="guns" placeholder="Upgraded Guns">
-    <input id="titles" placeholder="Titles">
-    <input id="x_suit" placeholder="X Suit">
-    <input id="supercar" placeholder="Supercar">
-    <input id="ultimate" placeholder="Ultimate">
-  </div>
-
-  <textarea id="highlights" placeholder="Account highlights / description"></textarea>
-
-  <div id="drop-area">
-    <input id="fileElem" type="file" multiple accept="image/*" hidden>
-    Drag & drop images here or click to upload (optional)
-  </div>
-  <div id="preview"></div>
-
-  <div class="row" style="margin-top:10px">
-    <div style="flex:1">
-      <button type="button" id="estimateBtn" class="ghost">Estimate Price</button>
-      <div id="estimatedPrice"></div>
-    </div>
-    <div style="width:160px">
-      <button type="submit" id="submitBtn" class="primary">List for Sale</button>
-    </div>
-  </div>
-</form>
+<footer>
+  <p>© 2026 BGMI Market | <span class="heartbeat" style="display:inline-block">❤️</span> Sell your ID with full security</p>
+</footer>
 
 <div id="toast"></div>
 <script src="js/sell.js"></script>
 <script src="assets/effects.js" defer></script>
 <script>
+  // Logout
+  document.getElementById("logoutLink").addEventListener("click", e => {
+    e.preventDefault();
+    localStorage.clear();
+    location.href = "login.html";
+  });
+
   // Drag hover effect
   const dropArea = document.getElementById("drop-area");
   dropArea.addEventListener("dragenter", e => { e.preventDefault(); dropArea.classList.add("hover"); });
