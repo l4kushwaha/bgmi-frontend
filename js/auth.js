@@ -75,7 +75,7 @@
     id: payload.id,
     email: payload.email,
     role: payload.role,
-    name: payload.email.split("@")[0]
+    name: payload.name || payload.email.split("@")[0]
   };
   localStorage.setItem("user", JSON.stringify(user));
 
@@ -107,7 +107,7 @@
         id: payload.id,
         email: payload.email,
         role: payload.role,
-        name: payload.email.split("@")[0]
+        name: payload.name || payload.email.split("@")[0]
       };
       localStorage.setItem("user", JSON.stringify(user));
 

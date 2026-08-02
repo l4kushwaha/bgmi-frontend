@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="assets/webfonts/poppins.css">
 <!-- 3D Cards CSS -->
 <link rel="stylesheet" href="styles/index.css">
+<!-- Shared Neon Effects -->
+<link rel="stylesheet" href="assets/effects.css">
 
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
@@ -78,6 +80,53 @@
   }
 
   .hidden { display:none; }
+
+  /* How it works steps */
+  #how-it-works, #features { padding: 2.5rem 1rem; }
+  #how-it-works h2, #features h2 { margin-bottom: 1.4rem; }
+  .steps .step-card {
+    flex: 1 1 200px; max-width: 260px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 1.6rem 1.2rem;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .step-card:hover { transform: translateY(-8px); box-shadow: 0 0 26px rgba(0,255,198,.25); }
+  .step-num {
+    width: 46px; height: 46px; margin: 0 auto .8rem;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    font-weight: 800; font-size: 1.2rem; color: #061;
+    background: linear-gradient(135deg,#ff8800,#ff00ff,#00ffc6);
+    box-shadow: 0 0 18px rgba(255,0,255,.5);
+    animation: stepPulse 2.4s infinite;
+  }
+  @keyframes stepPulse { 0%,100% { box-shadow: 0 0 12px rgba(255,0,255,.4);} 50% { box-shadow: 0 0 26px rgba(0,255,198,.7);} }
+  .step-card h3 { color:#fff; margin-bottom:.4rem; }
+  .step-card p { color: rgba(255,255,255,.7); font-size:.92rem; }
+
+  /* Features pills */
+  .features .feature-pill {
+    padding: .8rem 1.4rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 999px;
+    font-weight: 600;
+    transition: all .3s ease;
+  }
+  .feature-pill:hover { border-color:#00ffc6; box-shadow: 0 0 20px rgba(0,255,198,.4); transform: translateY(-3px); }
+
+  /* Rich footer */
+  footer { width:100%; padding:2.4rem 2rem 1.2rem; backdrop-filter:blur(15px); background:rgba(255,255,255,0.04); color:#ccc; }
+  .footer-grid { display:flex; flex-wrap:wrap; gap:2rem; justify-content:space-between; max-width:1200px; margin:0 auto; text-align:left; }
+  .footer-col { flex:1 1 200px; min-width:160px; }
+  .footer-col h4 { color:#fff; margin-bottom:.8rem; }
+  .footer-col a { display:block; color:#aaa; text-decoration:none; padding:.25rem 0; transition:.3s; }
+  .footer-col a:hover { color:#00ffc6; padding-left:.4rem; }
+  .footer-col p { font-size:.88rem; line-height:1.5; }
+  .footer-note { margin-top:1.6rem; font-size:.85rem; border-top:1px solid rgba(255,255,255,.1); padding-top:1rem; }
 </style>
 </head>
 <body>
@@ -193,20 +242,31 @@
 </script>
 
 <header>
-  <h1>🎮 BGMI Market</h1>
+  <h1><span class="wiggle" style="display:inline-block">🎮</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
   <nav>
     <ul>
-      <li><a href="marketplace.html">Marketplace</a></li>
-      <li><a href="sell.html">Sell ID</a></li>
-      <li><a href="wallet.html">Wallet</a></li>
-      <li><a href="profile.html">Profile</a></li>
-      <li><a href="popularity.html">Popularity</a></li>
-      <li><a href="chat.html">Message</a></li>
-      <li id="adminNav" class="hidden"><a href="admin_dashboard.html">Admin Dashboard</a></li>
+      <li><a href="marketplace.html" class="nav-slide">Marketplace</a></li>
+      <li><a href="sell.html" class="nav-slide">Sell ID</a></li>
+      <li><a href="wallet.html" class="nav-slide">Wallet</a></li>
+      <li><a href="profile.html" class="nav-slide">Profile</a></li>
+      <li><a href="popularity.html" class="nav-slide">Popularity</a></li>
+      <li><a href="chat.html" class="nav-slide">Message</a></li>
+      <li id="adminNav" class="hidden"><a href="admin_dashboard.html" class="nav-slide">Admin Dashboard</a></li>
       <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
     </ul>
   </nav>
 </header>
+
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span>🚀 <b>LIVE</b> • Buy &amp; Sell Verified BGMI IDs</span>
+    <span>🔥 <b>INSTANT</b> UPI Payments</span>
+    <span>🛡️ <b>SECURE</b> Escrow Protection</span>
+    <span>💬 Global &amp; Private <b>CHAT</b> Live</span>
+    <span>🏆 Top Sellers <b>RANKED</b> Daily</span>
+    <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
+  </div>
+</div>
 
 <main>
 <section id="guest-view">
@@ -216,22 +276,22 @@
     <div class="glow-guest-layer-2"></div>
     <div class="background-glow-guest"></div>
     <div class="card-content-guest">
-      <h2>Welcome to BGMI Market 🎯</h2>
-      <p>Please login to explore marketplace & dashboard.</p>
-      <button onclick="window.location='login.html'">Login</button>
+      <h2 class="bounce-in">Welcome to BGMI Market <span class="wiggle">🎯</span></h2>
+      <p class="reveal visible">Please login to explore marketplace &amp; dashboard.</p>
+      <button class="btn-neon bounce-in blast" onclick="window.location='login.html'">Login</button>
     </div>
   </div>
 </section>
 
 
   <section id="user-dashboard" class="hidden">
-    <h2 id="greeting">Welcome 👋</h2>
-    <p>Manage your BGMI journey securely.</p>
+    <h2 id="greeting" class="anim-gradient reveal under-bar">Welcome 👋</h2>
+    <p class="reveal" data-delay="1">Manage your BGMI journey securely. <span class="pulse-dot"></span> Live &amp; Safe</p>
 
     <!-- 3D Cards -->
     <div class="gallery-container">
 
-      <div class="card-wrapper-1">
+      <div class="card-wrapper-1 reveal zoom card-in" data-delay="1">
         <div class="inner-wrapper-1">
           <div class="border-layer-1"><div class="card-main-1"></div></div>
           <div class="glow-1-layer-1"></div>
@@ -241,17 +301,17 @@
         <div class="background-glow-1"></div>
         <div class="card-content">
           <div class="content-header">
-            <a href="marketplace.html" class="glass-badge">Marketplace</a>
-            <p class="card-title">Explore & Buy</p>
+            <a href="marketplace.html" class="glass-badge sweep">Marketplace</a>
+            <p class="card-title">Explore &amp; Buy</p>
           </div>
           <hr class="card-divider" />
           <div class="content-footer">
-            <p class="card-description">Browse BGMI accounts & items securely.</p>
+            <p class="card-description">Browse BGMI accounts &amp; items securely.</p>
           </div>
         </div>
       </div>
 
-      <div class="card-wrapper-2">
+      <div class="card-wrapper-2 reveal zoom card-in" data-delay="2">
         <div class="inner-wrapper-2">
           <div class="border-layer-2"><div class="card-main-2"></div></div>
           <div class="glow-2-layer-1"></div>
@@ -261,17 +321,17 @@
         <div class="background-glow-2"></div>
         <div class="card-content">
           <div class="content-header">
-            <a href="popularity.html" class="glass-badge">Popularity</a>
-            <p class="card-title">Rank & Shine</p>
+            <a href="popularity.html" class="glass-badge sweep">Popularity</a>
+            <p class="card-title">Rank &amp; Shine</p>
           </div>
           <hr class="card-divider" />
           <div class="content-footer">
-            <p class="card-description">Check top players & trending accounts.</p>
+            <p class="card-description">Check top players &amp; trending accounts.</p>
           </div>
         </div>
       </div>
 
-      <div class="card-wrapper-3">
+      <div class="card-wrapper-3 reveal zoom card-in" data-delay="3">
         <div class="inner-wrapper-3">
           <div class="border-layer-3"><div class="card-main-3"></div></div>
           <div class="glow-3-layer-1"></div>
@@ -281,12 +341,12 @@
         <div class="background-glow-3"></div>
         <div class="card-content">
           <div class="content-header">
-            <a href="profile.html" class="glass-badge">Profile</a>
+            <a href="profile.html" class="glass-badge sweep">Profile</a>
             <p class="card-title">Your Space</p>
           </div>
           <hr class="card-divider" />
           <div class="content-footer">
-            <p class="card-description">Manage account info, stats & settings.</p>
+            <p class="card-description">Manage account info, stats &amp; settings.</p>
           </div>
         </div>
       </div>
@@ -294,13 +354,80 @@
     </div>
   </section>
 
+  <!-- ============ HOW IT WORKS ============ -->
+  <section id="how-it-works">
+    <h2 class="anim-gradient reveal under-bar">How It Works</h2>
+    <div class="gallery-container steps">
+      <div class="step-card reveal zoom card-in" data-delay="1">
+        <div class="step-num coin-spin">1</div>
+        <h3>Create Account</h3>
+        <p>Sign up in seconds &amp; get your secure wallet.</p>
+      </div>
+      <div class="step-card reveal zoom card-in" data-delay="2">
+        <div class="step-num coin-spin">2</div>
+        <h3>Buy / Sell IDs</h3>
+        <p>List your BGMI ID or grab a verified one from the marketplace.</p>
+      </div>
+      <div class="step-card reveal zoom card-in" data-delay="3">
+        <div class="step-num coin-spin">3</div>
+        <h3>Pay Securely</h3>
+        <p>Direct UPI payments with escrow protection till delivery.</p>
+      </div>
+      <div class="step-card reveal zoom card-in" data-delay="4">
+        <div class="step-num coin-spin">4</div>
+        <h3>Get Paid</h3>
+        <p>Sellers withdraw earnings to UPI anytime, anywhere.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section id="features">
+    <h2 class="anim-gradient reveal under-bar">Why BGMI Market?</h2>
+    <div class="gallery-container features">
+      <div class="feature-pill reveal bob" data-delay="1">🛡️ Verified Sellers</div>
+      <div class="feature-pill reveal bob" data-delay="2">⚡ Instant UPI Payments</div>
+      <div class="feature-pill reveal bob" data-delay="3">🤝 Buyer Protection</div>
+      <div class="feature-pill reveal bob" data-delay="4">💬 Live Chat &amp; Deals</div>
+      <div class="feature-pill reveal bob" data-delay="5">📈 Top Seller Rankings</div>
+      <div class="feature-pill reveal bob" data-delay="6">🔐 Secure Escrow Wallet</div>
+    </div>
+  </section>
+
 </main>
 
 <footer>
-  © 2025 BGMI Market | Built with ❤️ by @am_sillent_hunter
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h4>🎮 BGMI Market</h4>
+      <p>The most trusted marketplace to buy &amp; sell BGMI IDs with secure UPI payments.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="sell.html">Sell Your ID</a>
+      <a href="popularity.html">Popularity</a>
+      <a href="chat.html">Messages</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#about">About Us</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#terms">Terms &amp; Conditions</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Follow Us</h4>
+      <a href="#instagram">📸 Instagram</a>
+      <a href="#telegram">✈️ Telegram</a>
+      <a href="#discord">🎧 Discord</a>
+    </div>
+  </div>
+  <p class="footer-note">© 2026 BGMI Market | Built with <span class="heartbeat" style="display:inline-block">❤️</span> by @am_sillent_hunter | <span class="pulse-dot"></span> All systems operational</p>
 </footer>
 
 <script src="js/auth.js"></script>
+<script src="assets/effects.js" defer></script>
 <script>
 function getTimeGreeting() {
   const hour = new Date().getHours();

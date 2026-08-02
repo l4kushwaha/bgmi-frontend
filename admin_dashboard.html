@@ -105,13 +105,22 @@
 <div class="orb a"></div><div class="orb b"></div>
 
 <header>
-  <h1>👑 Admin Dashboard</h1>
+  <h1><span class="wiggle">👑</span> <span class="anim-gradient glitch" data-text="Admin Dashboard">Admin Dashboard</span></h1>
   <div class="head-right">
     <div class="who"><b id="whoEmail">admin</b>Super Admin</div>
     <button class="btn ghost" onclick="refreshAll()">↻ Refresh</button>
     <button class="btn danger" onclick="logout()">Logout</button>
   </div>
 </header>
+
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span>👑 <b>ADMIN</b> Control Panel</span>
+    <span>🛡️ <b>SECURE</b> Access Only</span>
+    <span>📊 Live <b>MONITORING</b></span>
+    <span>🔥 All Systems <b>OPERATIONAL</b></span>
+  </div>
+</div>
 
 <div class="wrap">
   <div class="stats">
@@ -451,21 +460,21 @@ async function loadPayments() {
   if (!data.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No payments</td></tr>`;
   body.innerHTML = data.map(p => `
     <tr>
-      <td>${esc(p.order_id)}</td>
+      <td>${esc(p.order_id)}${p.utr ? `<br><small style="opacity:.55">UTR: ${esc(p.utr)}</small>` : ""}</td>
       <td>${esc(p.buyer_id)}</td>
       <td>${esc(p.seller_id)}</td>
       <td>${fmt(p.total_amount)}</td>
       <td>${fmt(p.admin_fee)}</td>
       <td>${fmt(p.seller_amount)}</td>
       <td>${statusBadge(p.status)}</td>
-      <td>${p.status === "paid" ? `<button class="mini" onclick="release('${esc(p.order_id)}')">Release to Seller</button>` : ""}</td>
+      <td>${["submitted", "paid"].includes(p.status) ? `<button class="mini" onclick="release('${esc(p.order_id)}')">Verify &amp; Release</button>` : ""}</td>
     </tr>`).join("");
 }
 
 async function release(order_id) {
-  if (!confirm(`Release escrow for order ${order_id} to seller?`)) return;
+  if (!confirm(`Verify UTR in your UPI app first. Confirm & release escrow for order ${order_id} to seller?`)) return;
   const { ok } = await api("wallet/pay/release", { method: "POST", body: JSON.stringify({ order_id }) });
-  toast(ok ? "Released to seller" : "Release failed", ok ? "ok" : "err"); loadPayments(); loadOverview();
+  toast(ok ? "Payment confirmed & released to seller" : "Release failed", ok ? "ok" : "err"); loadPayments(); loadOverview();
 }
 
 function exportPayments() {

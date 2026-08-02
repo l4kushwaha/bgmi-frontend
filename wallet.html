@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Wallet | BGMI Market</title>
   <link rel="stylesheet" href="assets/webfonts/poppins.css">
+  <link rel="stylesheet" href="assets/effects.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body {
@@ -100,15 +101,23 @@
 
   <div class="wrap">
     <header>
-      <h1>💳 My Wallet</h1>
+      <h1><span class="wiggle">💳</span> <span class="anim-gradient under-bar">My Wallet</span></h1>
       <a href="index.html">← Back</a>
     </header>
 
-    <div class="grid">
-      <div class="stat green"><small>Available Balance</small><div class="val" id="availableBalance">₹0</div></div>
-      <div class="stat orange"><small>Escrow Held</small><div class="val" id="escrowHeld">₹0</div></div>
-      <div class="stat violet"><small>Total Withdrawn</small><div class="val" id="totalWithdrawn">₹0</div></div>
+    <div class="marquee-wrap" style="margin-bottom:.8rem">
+      <div class="marquee-inner">
+        <span>💰 <b>SECURE</b> Escrow Wallet</span>
+        <span>⚡ <b>INSTANT</b> UPI Withdrawals</span>
+        <span>🛡️ Protected by <b>BGMI Market</b></span>
+        <span>📊 Live <b>BALANCE</b> Tracking</span>
+      </div>
     </div>
+
+    <div class="grid">
+      <div class="stat green card-in price-pulse" data-i="1"><small>Available Balance</small><div class="val" id="availableBalance">₹0</div></div>
+      <div class="stat orange card-in price-pulse" data-i="2"><small>Escrow Held</small><div class="val" id="escrowHeld">₹0</div></div>
+      <div class="stat violet card-in price-pulse" data-i="3"><small>Total Withdrawn</small><div class="val" id="totalWithdrawn">₹0</div></div>    </div>
 
     <div class="panel">
       <h2>Withdraw Earnings</h2>
@@ -127,5 +136,6 @@
 
   <div id="toast"></div>
   <script src="js/wallet.js"></script>
+  <script src="assets/effects.js" defer></script>
 </body>
 </html>

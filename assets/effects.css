@@ -192,3 +192,260 @@
   0%,19%,21%,23%,25%,54%,56%,100% { opacity: 1; text-shadow: 0 0 6px currentColor; }
   20%,22%,24%,55% { opacity: .4; text-shadow: none; }
 }
+
+/* ============================================================
+   ANIMATION MEGA-PACK — apply anywhere for extra juice
+   ============================================================ */
+
+/* ---- Scrolling marquee ticker ---- */
+.marquee-wrap { position:relative; width:100%; overflow:hidden; padding:.55rem 0; z-index:50;
+  background:linear-gradient(90deg, rgba(255,136,0,.15), rgba(255,0,255,.15), rgba(0,255,198,.15));
+  border-top:1px solid rgba(255,255,255,.08); border-bottom:1px solid rgba(255,255,255,.08); }
+.marquee-inner { display:flex; gap:3rem; width:max-content; animation:marqueeSlide 22s linear infinite; white-space:nowrap; }
+.marquee-wrap:hover .marquee-inner { animation-play-state:paused; }
+.marquee-inner span { font-size:.85rem; font-weight:600; color:#fff; text-shadow:0 0 10px rgba(0,255,198,.5); }
+.marquee-inner b { color:#0ff; }
+@keyframes marqueeSlide { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+/* ---- Typewriter hero text ---- */
+.typing { display:inline-block; overflow:hidden; white-space:nowrap;
+  border-right:2px solid #0ff; animation:typingBlink .8s step-end infinite; }
+@keyframes typingBlink { 50% { border-color:transparent; } }
+
+/* ---- Nav link underline slide ---- */
+.nav-slide { position:relative; }
+.nav-slide::after { content:""; position:absolute; left:0; bottom:-4px; width:100%; height:2px;
+  background:linear-gradient(90deg,#ff8800,#ff00ff,#00ffc6); transform:scaleX(0); transform-origin:left;
+  transition:transform .3s cubic-bezier(.22,1,.36,1); }
+.nav-slide:hover::after { transform:scaleX(1); }
+
+/* ---- Icon wiggle ---- */
+.wiggle { animation:wiggle .9s ease-in-out infinite; display:inline-block; }
+@keyframes wiggle { 0%,100% { transform:rotate(-8deg); } 50% { transform:rotate(8deg); } }
+
+/* ---- Gentle float bob ---- */
+.bob { animation:bob 3s ease-in-out infinite; }
+@keyframes bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+
+/* ---- Wobble text ---- */
+.wobble { display:inline-block; animation:wobble 2.4s ease-in-out infinite; }
+@keyframes wobble { 0%,100% { transform:rotate(-2deg) translateY(0); } 50% { transform:rotate(2deg) translateY(-4px); } }
+
+/* ---- Flip-in entry ---- */
+.flip-in { animation:flipIn .7s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes flipIn { 0% { transform:perspective(600px) rotateX(90deg); opacity:0; } 100% { transform:perspective(600px) rotateX(0); opacity:1; } }
+
+/* ---- Spin-in entry ---- */
+.spin-in { animation:spinIn .6s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes spinIn { 0% { transform:rotate(-180deg) scale(.5); opacity:0; } 100% { transform:rotate(0) scale(1); opacity:1; } }
+
+/* ---- Zoom-pulse (ring blast) ---- */
+.blast { animation:blast 1.6s infinite; }
+@keyframes blast {
+  0% { box-shadow:0 0 0 0 rgba(0,255,198,.5); }
+  70% { box-shadow:0 0 0 16px rgba(0,255,198,0); }
+  100% { box-shadow:0 0 0 0 rgba(0,255,198,0); }
+}
+
+/* ---- Heart-beat scale ---- */
+.heartbeat { animation:heartbeat 1.6s infinite; }
+@keyframes heartbeat { 0%,100% { transform:scale(1); } 14% { transform:scale(1.15); } 28% { transform:scale(1); } 42% { transform:scale(1.12); } }
+
+/* ---- Neon price badge pulse ---- */
+.price-pulse { animation:pricePulse 2s infinite; }
+@keyframes pricePulse {
+  0%,100% { box-shadow:0 0 10px rgba(0,255,198,.35); }
+  50% { box-shadow:0 0 24px rgba(255,0,255,.55); }
+}
+
+/* ---- Animated flowing gradient background (panels) ---- */
+.bg-flow { background-size:300% 300%; animation:bgFlow 8s ease infinite; }
+@keyframes bgFlow {
+  0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; }
+}
+
+/* ---- Scanline / grid overlay (page texture) ---- */
+.fx-scanlines { position:fixed; inset:0; z-index:3; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(0deg, rgba(0,255,198,.05) 0 1px, transparent 1px 4px);
+  mix-blend-mode:overlay; }
+.fx-grid { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.25;
+  background-image:linear-gradient(rgba(0,255,198,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,0,255,.12) 1px, transparent 1px);
+  background-size:44px 44px; animation:gridDrift 14s linear infinite; }
+@keyframes gridDrift { from { background-position:0 0, 0 0; } to { background-position:44px 44px, 44px 44px; } }
+
+/* ---- Floating emoji particles ---- */
+.fx-emoji { position:fixed; z-index:1; pointer-events:none; font-size:1.6rem; opacity:.55;
+  animation:emojiFloat 7s linear infinite; }
+@keyframes emojiFloat { 0% { transform:translateY(110vh) rotate(0deg); opacity:0; } 10% { opacity:.6; } 90% { opacity:.6; } 100% { transform:translateY(-12vh) rotate(360deg); opacity:0; } }
+
+/* ---- Animated underline bar ---- */
+.under-bar { position:relative; display:inline-block; }
+.under-bar::after { content:""; position:absolute; left:50%; bottom:-6px; width:0; height:3px; border-radius:99px;
+  background:linear-gradient(90deg,#ff8800,#ff00ff,#00ffc6); transform:translateX(-50%);
+  animation:barExpand 2.4s ease-in-out infinite; }
+@keyframes barExpand { 0%,100% { width:30%; opacity:.6; } 50% { width:100%; opacity:1; } }
+
+/* ---- Staggered card entrance (needs .card-in) ---- */
+.card-in { animation:cardIn .55s cubic-bezier(.22,1,.36,1) both; }
+.card-in[data-i="1"] { animation-delay:.06s; } .card-in[data-i="2"] { animation-delay:.12s; }
+.card-in[data-i="3"] { animation-delay:.18s; } .card-in[data-i="4"] { animation-delay:.24s; }
+.card-in[data-i="5"] { animation-delay:.3s; } .card-in[data-i="6"] { animation-delay:.36s; }
+.card-in[data-i="7"] { animation-delay:.42s; } .card-in[data-i="8"] { animation-delay:.48s; }
+@keyframes cardIn { 0% { opacity:0; transform:translateY(26px) scale(.92); } 100% { opacity:1; transform:none; } }
+
+/* ---- Glow ring spinner (decor) ---- */
+.ring-spin { position:relative; border-radius:50%;
+  background:conic-gradient(#ff8800,#ff00ff,#00ffc6,#ff8800);
+  animation:spin 3s linear infinite; }
+
+/* ---- Rotating coin / badge ---- */
+.coin-spin { animation:coinSpin 2.4s ease-in-out infinite; }
+@keyframes coinSpin { 0%,100% { transform:rotateY(0); } 50% { transform:rotateY(180deg); } }
+
+/* ---- Color cycling text ---- */
+.color-cycle { animation:colorCycle 3s linear infinite; }
+@keyframes colorCycle { 0% { color:#ff8800; } 33% { color:#ff00ff; } 66% { color:#00ffc6; } 100% { color:#ff8800; } }
+
+/* ---- Soft bounce icon ---- */
+.jump { animation:jump 1.4s ease-in-out infinite; display:inline-block; }
+@keyframes jump { 0%,100% { transform:translateY(0); } 40% { transform:translateY(-10px); } 60% { transform:translateY(-4px); } }
+
+/* ---- Shimmer sweep on any element ---- */
+.sweep { position:relative; overflow:hidden; }
+.sweep::after { content:""; position:absolute; top:0; left:-80%; width:50%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.22), transparent);
+  animation:sweep 3.4s infinite; }
+@keyframes sweep { 0% { left:-80%; } 60%,100% { left:130%; } }
+
+/* ---- Neon border breathing ---- */
+.neon-breathe { border:1px solid rgba(0,255,198,.55); animation:neonBreathe 2.4s ease-in-out infinite; }
+@keyframes neonBreathe { 0%,100% { box-shadow:0 0 8px rgba(0,255,198,.25); } 50% { box-shadow:0 0 26px rgba(255,0,255,.5); } }
+
+/* ---- Success pop (checkmark) ---- */
+.pop-check { animation:popCheck .8s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes popCheck { 0% { transform:scale(0); } 60% { transform:scale(1.2); } 100% { transform:scale(1); } }
+
+/* ============================================================
+   CHAT MESSAGE EFFECTS (rainbow / glitch / fire / sparkle / neon)
+   ============================================================ */
+.fx-rainbow {
+  background: linear-gradient(90deg, #ff8800, #ff00ff, #00ffc6, #ff8800);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradShift 3s linear infinite;
+}
+.fx-glitch { position: relative; }
+.fx-glitch::after {
+  content: attr(data-text);
+  position: absolute; inset: 0;
+  color: #ff00ff; opacity: .8;
+  clip-path: inset(20% 0 40% 0);
+  animation: glitchA 1.6s infinite linear alternate-reverse;
+}
+.fx-fire {
+  color: #ffd27d;
+  text-shadow: 0 0 6px #ff8800, 0 0 14px #ff5500, 0 0 26px #ff2200;
+  animation: fireFlicker 1.4s infinite;
+}
+@keyframes fireFlicker {
+  0%,100% { text-shadow: 0 0 6px #ff8800, 0 0 14px #ff5500, 0 0 26px #ff2200; }
+  50% { text-shadow: 0 0 10px #ffcc00, 0 0 22px #ff8800, 0 0 34px #ff3300; }
+}
+.fx-sparkle { position: relative; }
+.fx-sparkle::before, .fx-sparkle::after {
+  content: "✨";
+  position: absolute; font-size: .9em; animation: sparkBounce 1s infinite alternate;
+}
+.fx-sparkle::before { left: -1.1em; top: -0.4em; }
+.fx-sparkle::after { right: -1.1em; bottom: -0.4em; animation-delay: .4s; }
+@keyframes sparkBounce { from { transform: translateY(2px) scale(.9); } to { transform: translateY(-3px) scale(1.15); } }
+.fx-neon {
+  color: #9ff;
+  text-shadow: 0 0 4px #0ff, 0 0 12px #0ff, 0 0 24px #08f, 0 0 40px #08f;
+  animation: flicker 3.2s infinite;
+}
+
+/* ============================================================
+   CHAT UI (voice pill, channel tabs)
+   ============================================================ */
+.voice-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: #7df; cursor: pointer; font-weight: 700;
+}
+.voice-pill .wave { width: 8px; height: 8px; border-radius: 50%; background: #0ff; animation: voiceWave 1s infinite; }
+.voice-pill .wave:nth-child(2) { animation-delay: .2s; }
+.voice-pill .wave:nth-child(3) { animation-delay: .4s; }
+@keyframes voiceWave { 0%,100% { transform: scale(.6); opacity:.5; } 50% { transform: scale(1.2); opacity:1; } }
+
+.rec-indicator {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: #ff5e5e; font-weight: 700; font-size: .9rem;
+}
+.rec-indicator::before {
+  content: ""; width: 10px; height: 10px; border-radius: 50%;
+  background: #ff2d2d; box-shadow: 0 0 10px #ff2d2d;
+  animation: pulse 1s infinite;
+}
+
+.ch-tabs { display: flex; gap: .4rem; }
+.ch-tab {
+  flex: 1; text-align: center; padding: .55rem .3rem;
+  border-radius: 10px; cursor: pointer; font-weight: 700; font-size: .82rem;
+  color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04); transition: .25s;
+}
+.ch-tab:hover { border-color:#0ff; color:#fff; }
+.ch-tab.active {
+  background: linear-gradient(90deg, rgba(0,255,198,.25), rgba(255,0,255,.25));
+  border-color:#0ff; color:#fff; box-shadow: 0 0 14px rgba(0,255,198,.35);
+}
+
+.ch-pills { display:flex; gap:.4rem; padding:.5rem .5rem 0; flex-wrap:wrap; }
+.ch-pill {
+  font-size:.75rem; padding:.28rem .7rem; border-radius:999px; cursor:pointer;
+  border:1px solid rgba(255,255,255,.14); color:rgba(255,255,255,.75); transition:.25s; background:rgba(255,255,255,.05);
+}
+.ch-pill:hover { color:#fff; border-color:#0ff; }
+.ch-pill.active { background:rgba(0,255,198,.18); border-color:#0ff; color:#fff; box-shadow:0 0 12px rgba(0,255,198,.4); }
+
+.g-msg { display:flex; gap:.6rem; margin-bottom:.7rem; }
+.g-avatar {
+  width:34px; height:34px; flex:none; border-radius:50%;
+  display:grid; place-items:center; font-weight:800; font-size:.85rem;
+  background: linear-gradient(135deg,#ff8800,#ff00ff);
+  color:#fff; text-transform:uppercase;
+}
+.g-body { min-width:0; }
+.g-name { font-size:.75rem; font-weight:700; color:#0ff; }
+.g-time { font-size:.68rem; color:rgba(255,255,255,.45); margin-left:.4rem; }
+.g-text {
+  display:inline-block; max-width:100%; margin-top:2px; word-break:break-word;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  border-radius:0 12px 12px 12px; padding:.45rem .7rem; font-size:.92rem;
+}
+.g-msg.mine { flex-direction:row-reverse; }
+.g-msg.mine .g-body { text-align:right; }
+.g-msg.mine .g-text { background:rgba(0,255,198,.12); border-color:rgba(0,255,198,.25); border-radius:12px 0 12px 12px; }
+
+/* Effects picker */
+.effects-pop {
+  position:absolute; bottom:100%; left:8px; right:8px; margin-bottom:6px;
+  display:none; flex-wrap:wrap; gap:.35rem;
+  background:#14141f; border:1px solid rgba(255,255,255,.15); border-radius:12px;
+  padding:.5rem; z-index:20; box-shadow:0 -8px 30px rgba(0,0,0,.5);
+}
+.effects-pop.open { display:flex; }
+.eff-chip {
+  font-size:.78rem; padding:.3rem .6rem; border-radius:999px; cursor:pointer;
+  border:1px solid rgba(255,255,255,.16); color:#fff; background:rgba(255,255,255,.06); transition:.2s;
+}
+.eff-chip:hover { transform:translateY(-2px); }
+.eff-chip.sel { border-color:#ff00ff; background:rgba(255,0,255,.22); box-shadow:0 0 12px rgba(255,0,255,.4); }
+.eff-chip[data-e="rainbow"] { color:#ffd27d; }
+.eff-chip[data-e="glitch"] { color:#ff5ef4; }
+.eff-chip[data-e="fire"] { color:#ff8844; }
+.eff-chip[data-e="sparkle"] { color:#ffe96e; }
+.eff-chip[data-e="neon"] { color:#7df; }
+

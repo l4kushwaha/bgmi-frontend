@@ -149,38 +149,17 @@ async function startBuy(order_id, seller_user_id, amount) {
     const walletData = await resWallet.json();
     if (!resWallet.ok) return alert(walletData.error || "Payment failed");
 
-    // Open Razorpay checkout
-    if (window.Razorpay) {
-      const opts = {
-        key: walletData.razorpay_key,
-        amount: walletData.admin_fee * 100,
-        currency: "INR",
-        name: "BGMI Marketplace",
-        description: "10% Service Charge",
-        order_id: walletData.razorpay_order_id,
-        handler: async function (res) {
-          const vr = await fetch(
-            "https://bgmi-marketplace.bgmi-gateway.workers.dev/pay/verify",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-              body: JSON.stringify({
-                razorpay_payment_id: res.razorpay_payment_id,
-                razorpay_order_id: res.razorpay_order_id,
-                razorpay_signature: res.razorpay_signature
-              })
-            }
-          );
-          const v = await vr.json();
-          if (!vr.ok) return alert(v.error || "Payment verification failed");
-          await startChatOrBuy(order_id, seller_user_id, "buy");
-        },
-        theme: { color: "#22c55e" }
-      };
-      new Razorpay(opts).open();
-    } else {
-      alert(`Service charge of ₹${walletData.admin_fee} created. Add Razorpay checkout JS to complete.`);
-    }
+    // 3️⃣ Direct UPI payment modal (no gateway / no KYC)
+    const payResult = await openUpiPay({
+      upi_id: walletData.upi_id,
+      upi_name: walletData.upi_name,
+      amount: walletData.upi_amount,
+      order_id
+    });
+    if (!payResult.ok) return; // cancelled
+
+    // 4️⃣ Payment submitted → open chat with seller
+    await startChatOrBuy(order_id, seller_user_id, "buy");
   } catch (err) {
     console.error("Buy flow error", err);
     alert("Something went wrong");
@@ -226,13 +205,14 @@ function renderList() {
 function renderCard(item) {
   const images = safeArray(item.images);
   const card = document.createElement("div");
-  card.className = "item-card reveal";
+  card.className = "item-card reveal card-in";
   card.dataset.delay = String((item.id || 0) % 4);
+  card.dataset.i = String(((item.id || 0) % 8) + 1);
 
   const upgraded = escArray(item.upgraded_guns).join(", ");
   const mythic = escArray(item.mythic_items).join(", ");
   const legendary = escArray(item.legendary_items).join(", ");
-  const gifts = escArray(item.gift_items).join(", ");
+  const gifts = escArray(item.honor_gift ?? item.gift_items).join(", ");
   const titles = escArray(item.titles).join(", ");
   const xSuit = escArray(item.x_suit).join(", ");
   const supercar = escArray(item.supercar).join(", ");
@@ -261,14 +241,14 @@ function renderCard(item) {
       ${upgraded ? `<b>Upgraded:</b> ${upgraded}<br>` : ""}
       ${mythic ? `<b>Mythic:</b> ${mythic}<br>` : ""}
       ${legendary ? `<b>Legendary:</b> ${legendary}<br>` : ""}
-      ${gifts ? `<b>Gifts:</b> ${gifts}<br>` : ""}
+      ${gifts ? `<b>Honor Gifts:</b> ${gifts}<br>` : ""}
       ${titles ? `<b>Titles:</b> ${titles}<br>` : ""}
       ${xSuit ? `<b>X Suit:</b> ${xSuit}<br>` : ""}
       ${supercar ? `<b>Supercar:</b> ${supercar}<br>` : ""}
       ${ultimate ? `<b>Ultimate:</b> ${ultimate}<br>` : ""}
       ${item.account_highlights ? `<b>Highlights:</b> ${esc(item.account_highlights)}` : ""}
 
-      <div class="price">₹${esc(item.price)}</div>
+      <div class="price price-pulse">₹${esc(item.price)}</div>
     </div>
 
     <div class="card-actions">
@@ -541,16 +521,40 @@ window.openSellerProfile = async sellerId => {
   bg.classList.add("active");
   c.innerHTML = "Loading...";
 
-  const res = await fetch(`${API_URL}/seller/${sellerId}`);
-  const s = await res.json();
+  // seller stats (market service)
+  let s = { name: "Seller #" + sellerId, seller_verified: false, badge: "new", avg_rating: 0, review_count: 0, total_sales: 0 };
+  try {
+    const res = await fetch(`${API_URL}/seller/${sellerId}`);
+    s = await res.json();
+  } catch { /* fallback to defaults */ }
+
+  // profile bio + socials (verification service)
+  let bio = "", instagram = "", facebook = "";
+  try {
+    const token = localStorage.getItem("token") || "";
+    const r = await fetch(
+      "https://verification_service.bgmi-gateway.workers.dev/profile/" + sellerId,
+      { headers: token ? { Authorization: "Bearer " + token } : {} }
+    );
+    const p = (await r.json()).profile || {};
+    bio = p.bio || "";
+    instagram = p.instagram || "";
+    facebook = p.facebook || "";
+  } catch { /* optional */ }
+
+  const social = [];
+  if (instagram) social.push(`<a href="${/^https?:/.test(instagram) ? esc(instagram) : "https://instagram.com/" + esc(instagram)}" target="_blank" rel="noopener" class="seller-social ig">📸 Instagram</a>`);
+  if (facebook) social.push(`<a href="${/^https?:/.test(facebook) ? esc(facebook) : "https://facebook.com/" + esc(facebook)}" target="_blank" rel="noopener" class="seller-social fb">👍 Facebook</a>`);
 
   c.innerHTML = `
-    <h3>${esc(s.name)}</h3>
-    <p><b>Status:</b> ${s.seller_verified ? "Verified" : "Pending"}</p>
+    <h3>${esc(s.name || ("Seller #" + sellerId))}</h3>
+    <p><b>Status:</b> ${s.seller_verified ? "✅ Verified" : "Pending"}</p>
     <p><b>Badge:</b> ${esc(s.badge || "None")}</p>
     <p><b>Rating:</b> ${stars(s.avg_rating)}</p>
     <p><b>Reviews:</b> ${s.review_count || 0}</p>
     <p><b>Total Sales:</b> ${s.total_sales || 0}</p>
+    ${bio ? `<p class="seller-bio">“${esc(bio)}”</p>` : ""}
+    ${social.length ? `<p class="seller-socials">${social.join(" ")}</p>` : ""}
   `;
 };
 
@@ -574,7 +578,7 @@ function openEdit(id) {
     <label>Upgraded Guns</label><textarea id="e-upgraded">${esc(safeArray(editItem.upgraded_guns).join(","))}</textarea>
     <label>Mythic Items</label><textarea id="e-mythic">${esc(safeArray(editItem.mythic_items).join(","))}</textarea>
     <label>Legendary Items</label><textarea id="e-legendary">${esc(safeArray(editItem.legendary_items).join(","))}</textarea>
-    <label>Gift Items</label><textarea id="e-gifts">${esc(safeArray(editItem.gift_items).join(","))}</textarea>
+    <label>Honor Gifts</label><textarea id="e-honor">${esc(safeArray(editItem.honor_gift ?? editItem.gift_items).join(","))}</textarea>
     <label>Titles</label><textarea id="e-titles">${esc(safeArray(editItem.titles).join(","))}</textarea>
     <label>X Suit</label><textarea id="e-x_suit">${esc(safeArray(editItem.x_suit).join(","))}</textarea>
     <label>Supercar</label><textarea id="e-supercar">${esc(safeArray(editItem.supercar).join(","))}</textarea>
@@ -636,7 +640,7 @@ document.getElementById("save-edit").onclick = async () => {
       upgraded_guns:e("e-upgraded").split(","),
       mythic_items:e("e-mythic").split(","),
       legendary_items:e("e-legendary").split(","),
-      gift_items:e("e-gifts").split(","),
+      honor_gift:e("e-honor").split(","),
       titles:e("e-titles").split(","),
       x_suit:e("e-x_suit").split(","),
       supercar:e("e-supercar").split(","),

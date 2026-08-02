@@ -441,13 +441,21 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 
 <header>
 
-  <h1>BGMI Marketplace</h1>
+  <h1 class="anim-gradient wobble">BGMI Marketplace</h1>
 
   <button id="dark-toggle">Dark / Light</button>
 
 </header>
 
-
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span>🔥 <b>LIVE</b> Verified IDs Available Now</span>
+    <span>⚡ <b>INSTANT</b> UPI Payments</span>
+    <span>🛡️ <b>SECURE</b> Escrow Protected</span>
+    <span>🏆 Top Sellers <b>RANKED</b> Daily</span>
+    <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
+  </div>
+</div>
 
 <div id="top-bar">
 
@@ -499,6 +507,22 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 
 </div>
 
+<style>
+  #seller-content .seller-bio {
+    margin-top: .7rem; padding: .6rem .8rem;
+    background: rgba(255,255,255,.06); border-left: 3px solid #00ffc6;
+    border-radius: 8px; font-style: italic; color: rgba(255,255,255,.9);
+  }
+  #seller-content .seller-socials { margin-top: .8rem; display: flex; gap: .6rem; flex-wrap: wrap; }
+  #seller-content .seller-social {
+    display: inline-block; padding: .4rem .8rem; border-radius: 999px;
+    text-decoration: none; font-weight: 600; font-size: .85rem; color: #fff;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16); transition: .25s;
+  }
+  #seller-content .seller-social.ig:hover { border-color: #ff2d95; box-shadow: 0 0 12px rgba(255,45,149,.5); }
+  #seller-content .seller-social.fb:hover { border-color: #1877f2; box-shadow: 0 0 12px rgba(24,119,242,.5); }
+</style>
+
 
 
 <!-- EDIT -->
@@ -541,6 +565,7 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 
 
 
+<script src="js/upi.js"></script>
 <script src="js/marketplace.js"></script>
 
 <script src="assets/effects.js" defer></script>

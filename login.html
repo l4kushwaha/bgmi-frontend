@@ -13,9 +13,21 @@
     <!-- ✅ FONT AWESOME (CDN – WORKING) -->
     <link rel="stylesheet"
           href="assets/css/all.min.css">
+
+    <!-- ✅ SHARED NEON EFFECTS -->
+    <link rel="stylesheet" href="assets/effects.css">
 </head>
 
 <body>
+
+<div class="marquee-wrap">
+    <div class="marquee-inner">
+        <span>🚀 <b>WELCOME</b> to BGMI Market</span>
+        <span>🛡️ <b>SECURE</b> Login</span>
+        <span>⚡ <b>INSTANT</b> UPI Payments</span>
+        <span>💬 Live Global &amp; Private <b>CHAT</b></span>
+    </div>
+</div>
 
 <div class="auth-wrapper">
     <div class="background-shape"></div>
@@ -23,7 +35,7 @@
 
     <!-- ================= LOGIN ================= -->
     <div class="credentials-panel signin">
-        <h2 class="slide-element">Login</h2>
+        <h2 class="slide-element under-bar">Login</h2>
 
         <form onsubmit="event.preventDefault(); loginUser();">
 
@@ -66,7 +78,7 @@
 
     <!-- ================= REGISTER ================= -->
     <div class="credentials-panel signup">
-        <h2 class="slide-element">Register</h2>
+        <h2 class="slide-element under-bar">Register</h2>
 
         <form onsubmit="event.preventDefault(); registerUser();">
 
@@ -119,6 +131,7 @@
 <!-- ================= SCRIPTS ================= -->
 <script src="js/style.js"></script>
 <script src="js/auth.js"></script>
+<script src="assets/effects.js" defer></script>
 
 </body>
 </html>

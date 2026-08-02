@@ -4,41 +4,272 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Popularity - BGMI Market</title>
+  <link rel="stylesheet" href="assets/webfonts/poppins.css">
+  <link rel="stylesheet" href="assets/effects.css">
   <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
+      min-height:100vh;
+      background: radial-gradient(circle at top left, #12002b, #07070f, #160021);
+      background-size: 400% 400%;
+      animation: hueShift 16s infinite alternate;
+      color:#fff;
+      overflow-x:hidden;
     }
+    @keyframes hueShift { 0%{background-position:left top;} 100%{background-position:right bottom;} }
 
-    .message-box {
-      background: rgba(0,0,0,0.5);
-      padding: 2rem 3rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    header {
+      width:100%; padding:1.1rem 2rem;
+      backdrop-filter:blur(20px);
+      background: rgba(255,255,255,.07);
+      display:flex; justify-content:space-between; align-items:center;
+      position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:.6rem;
     }
+    header h1 { font-size:1.5rem; }
+    nav ul { list-style:none; display:flex; gap:1rem; flex-wrap:wrap; }
+    nav a { text-decoration:none; color:#fff; transition:.3s; font-size:.95rem; }
+    nav a:hover { color:#00ffc6; text-shadow:0 0 12px rgba(0,255,198,.8); }
 
-    h1 {
-      margin-bottom: 1rem;
-      font-size: 2rem;
-    }
+    main { padding:2rem 1.5rem 3rem; max-width:1150px; margin:0 auto; position:relative; z-index:1; }
 
-    p {
-      font-size: 1.2rem;
-      color: #ffcc00;
+    .hero { text-align:center; padding:1.4rem 0 2rem; }
+    .hero h2 { font-size:clamp(2rem,5vw,3.4rem); font-weight:800; }
+    .hero p { color:rgba(255,255,255,.75); margin-top:.5rem; }
+
+    /* Live stats */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin:2rem 0; }
+    .stat-card {
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:1.4rem; text-align:center;
+      transition:.3s;
     }
+    .stat-card:hover { transform:translateY(-6px); box-shadow:0 0 28px rgba(0,255,198,.25); border-color:#00ffc6; }
+    .stat-card .num { font-size:2rem; font-weight:800; }
+    .stat-card small { display:block; opacity:.65; margin-top:.3rem; text-transform:uppercase; letter-spacing:.08em; font-size:.72rem; }
+    .stat-card .num.c-green { color:#00ffc6; text-shadow:0 0 16px rgba(0,255,198,.6); }
+    .stat-card .num.c-violet { color:#c084fc; text-shadow:0 0 16px rgba(192,132,252,.6); }
+    .stat-card .num.c-orange { color:#ffb703; text-shadow:0 0 16px rgba(255,183,3,.6); }
+    .stat-card .num.c-pink { color:#ff5ec4; text-shadow:0 0 16px rgba(255,94,196,.6); }
+
+    /* Leaderboard */
+    .section-title { font-size:1.6rem; margin:2.2rem 0 1.2rem; text-align:center; }
+    .rank-list { display:flex; flex-direction:column; gap:.8rem; }
+    .rank-row {
+      display:flex; align-items:center; gap:1rem;
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:14px; padding:.9rem 1.1rem;
+      transition:.3s;
+    }
+    .rank-row:hover { border-color:#00ffc6; box-shadow:0 0 18px rgba(0,255,198,.2); transform:translateX(6px); }
+    .rank-badge {
+      width:44px; height:44px; flex:none;
+      display:grid; place-items:center;
+      border-radius:50%; font-weight:800;
+      background:#1a1a2e; border:2px solid #333;
+    }
+    .rank-row.top-1 .rank-badge { border-color:#ffd700; color:#ffd700; box-shadow:0 0 18px rgba(255,215,0,.5); }
+    .rank-row.top-2 .rank-badge { border-color:#c0c0c0; color:#e0e0e0; box-shadow:0 0 14px rgba(192,192,192,.4); }
+    .rank-row.top-3 .rank-badge { border-color:#cd7f32; color:#e8a05a; box-shadow:0 0 14px rgba(205,127,50,.4); }
+    .rank-info { flex:1; min-width:0; }
+    .rank-info .name { font-weight:700; }
+    .rank-info .meta { font-size:.8rem; color:rgba(255,255,255,.6); }
+    .rank-right { text-align:right; font-weight:700; }
+    .rank-right small { display:block; font-weight:400; opacity:.6; font-size:.75rem; }
+
+    /* Coming soon */
+    .soon-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin-top:1.2rem; }
+    .soon-card {
+      background: rgba(255,255,255,.04);
+      border:1px dashed rgba(255,255,255,.2);
+      border-radius:16px; padding:1.5rem; text-align:center;
+      transition:.3s;
+    }
+    .soon-card:hover { border-style:solid; border-color:#ff00ff; box-shadow:0 0 22px rgba(255,0,255,.3); }
+    .soon-card .emoji { font-size:2.2rem; display:block; margin-bottom:.6rem; }
+    .soon-card h4 { margin-bottom:.3rem; }
+    .soon-card p { font-size:.85rem; color:rgba(255,255,255,.65); }
+    .soon-tag { display:inline-block; margin-top:.7rem; font-size:.72rem; padding:.25rem .7rem; border-radius:999px; background:rgba(255,0,255,.15); color:#ff8ff0; letter-spacing:.06em; }
+
+    footer {
+      width:100%; padding:1.2rem; text-align:center;
+      backdrop-filter:blur(15px); background:rgba(255,255,255,.04); color:#ccc; font-size:.85rem;
+    }
+    .empty { text-align:center; color:rgba(255,255,255,.6); padding:1.5rem; }
+    @media (max-width:600px){ header{justify-content:center;} nav ul{justify-content:center;} }
   </style>
 </head>
 <body>
-  <div class="message-box">
-    <h1>Popularity Section</h1>
-    <p>🚀 Features Coming Soon!</p>
-    <button class="btn" onclick="window.location.href='index.html'">Back to Home</button>
+
+<header>
+  <h1><span class="wiggle">🎮</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
+  <nav>
+    <ul>
+      <li><a href="index.html" class="nav-slide">Home</a></li>
+      <li><a href="marketplace.html" class="nav-slide">Marketplace</a></li>
+      <li><a href="sell.html" class="nav-slide">Sell ID</a></li>
+      <li><a href="wallet.html" class="nav-slide">Wallet</a></li>
+      <li><a href="profile.html" class="nav-slide">Profile</a></li>
+      <li><a href="chat.html" class="nav-slide">Message</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span>🏆 <b>TOP SELLERS</b> Ranked Live</span>
+    <span>📈 Market Stats <b>UPDATED</b> Every Minute</span>
+    <span>🛡️ <b>SECURE</b> Escrow Protected Deals</span>
+    <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
   </div>
+</div>
+
+<main>
+  <div class="hero">
+    <h2 class="glitch anim-gradient" data-text="POPULARITY">POPULARITY</h2>
+    <p class="reveal visible">Top sellers &amp; live market stats <span class="pulse-dot"></span> updated live</p>
+  </div>
+
+  <!-- LIVE STATS -->
+  <div class="stats-grid">
+    <div class="stat-card reveal">
+      <div class="num c-green" id="stListings" data-count="0">0</div>
+      <small>Live Listings</small>
+    </div>
+    <div class="stat-card reveal" data-delay="1">
+      <div class="num c-violet" id="stSellers" data-count="0">0</div>
+      <small>Active Sellers</small>
+    </div>
+    <div class="stat-card reveal" data-delay="2">
+      <div class="num c-orange" id="stMythics" data-count="0">0</div>
+      <small>Mythic Items</small>
+    </div>
+    <div class="stat-card reveal" data-delay="3">
+      <div class="num c-pink" id="stHighest">₹0</div>
+      <small>Highest Asking Price</small>
+    </div>
+  </div>
+
+  <!-- TOP SELLERS -->
+  <h3 class="section-title anim-gradient reveal">🏆 Top Sellers</h3>
+  <div class="rank-list" id="rankList">
+    <p class="empty">Loading leaderboard…</p>
+  </div>
+
+  <!-- COMING SOON -->
+  <h3 class="section-title anim-gradient reveal">Coming Soon</h3>
+  <div class="soon-grid">
+    <div class="soon-card reveal" data-delay="1"><span class="emoji">🎁</span><h4>Giveaways</h4><p>Daily UC &amp; item giveaways for active users.</p><span class="soon-tag">SOON</span></div>
+    <div class="soon-card reveal" data-delay="2"><span class="emoji">🏆</span><h4>Tournaments</h4><p>Weekly BGMI squad tournaments with cash prizes.</p><span class="soon-tag">SOON</span></div>
+    <div class="soon-card reveal" data-delay="3"><span class="emoji">🎙️</span><h4>Live Events</h4><p>Live streaming, interviews &amp; top-clip highlights.</p><span class="soon-tag">SOON</span></div>
+    <div class="soon-card reveal" data-delay="4"><span class="emoji">🪙</span><h4>Refer &amp; Earn</h4><p>Invite friends, earn wallet cash rewards.</p><span class="soon-tag">SOON</span></div>
+  </div>
+</main>
+
+<footer>© 2026 BGMI Market | Popularity powered by live market data</footer>
+
+<script>
+  const MARKET_API = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  function setCount(el, val) {
+    el.setAttribute("data-count", val);
+    el.textContent = val;
+  }
+
+  async function loadStats() {
+    const rankList = document.getElementById("rankList");
+    try {
+      const res = await fetch(MARKET_API + "/listings");
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("bad payload");
+
+      const active = data.filter(l => String(l.status) === "available");
+
+      setCount(document.getElementById("stListings"), active.length);
+
+      const bySeller = {};
+      let mythicCount = 0;
+      let highest = 0;
+      for (const l of active) {
+        bySeller[l.seller_id] = (bySeller[l.seller_id] || 0) + 1;
+        try {
+          const myths = (typeof l.mythic_items === "string") ? JSON.parse(l.mythic_items || "[]") : (l.mythic_items || []);
+          mythicCount += Array.isArray(myths) ? myths.length : 0;
+        } catch { /* skip */ }
+        const price = Number(l.price || 0);
+        if (price > highest) highest = price;
+      }
+      setCount(document.getElementById("stSellers"), Object.keys(bySeller).length);
+      setCount(document.getElementById("stMythics"), mythicCount);
+      document.getElementById("stHighest").textContent = "₹" + (highest || 0).toLocaleString("en-IN");
+
+      const ranked = Object.entries(bySeller)
+        .map(([sid, count]) => ({ sid, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      if (!ranked.length) {
+        rankList.innerHTML = '<p class="empty">No sellers yet — be the first!</p>';
+        return;
+      }
+
+      const sellers = await Promise.all(ranked.map(async r => {
+        try {
+          const s = await (await fetch(MARKET_API + "/seller/" + r.sid)).json();
+          return { ...r, info: s };
+        } catch {
+          return { ...r, info: null };
+        }
+      }));
+
+      rankList.innerHTML = "";
+      sellers.forEach((s, i) => {
+        const top = i < 3 ? " top-" + (i + 1) : "";
+        const name = s.info?.name || ("Seller #" + s.sid);
+        const badge = s.info?.seller_verified ? "✔ Verified" : "New";
+        const rating = s.info ? (s.info.avg_rating + " ★ · " + s.info.review_count + " reviews") : "";
+        const sales = s.info?.total_sales || 0;
+        const div = document.createElement("div");
+        div.className = "rank-row reveal" + top;
+        div.innerHTML = `
+          <div class="rank-badge">${i + 1}</div>
+          <div class="rank-info">
+            <div class="name">${escapeHtml(name)} <span style="color:#00ffc6;font-size:.8rem">${escapeHtml(badge)}</span></div>
+            <div class="meta">${escapeHtml(rating)} · ${s.count} listing(s)</div>
+          </div>
+          <div class="rank-right">${sales} <small>sales</small></div>
+        `;
+        rankList.appendChild(div);
+      });
+      initRevealScan();
+    } catch (err) {
+      rankList.innerHTML = '<p class="empty">Leaderboard unavailable right now.</p>';
+    }
+  }
+
+  function initRevealScan() {
+    if (!("IntersectionObserver" in window)) {
+      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
+      return;
+    }
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) { en.target.classList.add("visible"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".rank-row:not(.visible)").forEach(el => io.observe(el));
+  }
+
+  loadStats();
+</script>
+<script src="assets/effects.js" defer></script>
+
 </body>
 </html>

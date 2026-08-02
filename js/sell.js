@@ -77,7 +77,7 @@
     const rank = document.getElementById("rank").value.trim().toLowerCase();
     const mythicArray = (document.getElementById("mythic")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
     const legendaryArray = (document.getElementById("legendary")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
-    const giftArray = (document.getElementById("gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
+    const giftArray = (document.getElementById("honor_gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
     const gunsArray = (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
     const titlesArray = (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
     const xSuitArray = (document.getElementById("x_suit")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
@@ -118,7 +118,7 @@
       highest_rank: document.getElementById("rank")?.value || "",
       mythic_items: (document.getElementById("mythic")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       legendary_items: (document.getElementById("legendary")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-      gift_items: (document.getElementById("gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
+      honor_gift: (document.getElementById("honor_gift")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       upgraded_guns: (document.getElementById("guns")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       titles: (document.getElementById("titles")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
       x_suit: (document.getElementById("x_suit")?.value || "").split(",").map(s => s.trim()).filter(Boolean),

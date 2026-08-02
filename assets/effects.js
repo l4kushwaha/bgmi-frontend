@@ -66,9 +66,16 @@
     els.forEach(el => io.observe(el));
   }
 
-  /* ---- 5. Auto-tag glow cards ---- */
+  /* ---- 5. Auto-tag glow cards (skip wrappers with own hover transforms) ---- */
   function initGlow() {
-    document.querySelectorAll(".item-card, .card-wrapper-1, .card-wrapper-2, .card-wrapper-3, .card-main-guest, .card").forEach(el => el.classList.add("card-glow"));
+    document.querySelectorAll(".item-card, .card").forEach(el => {
+      if (!el.classList.contains("card-wrapper-1") &&
+          !el.classList.contains("card-wrapper-2") &&
+          !el.classList.contains("card-wrapper-3") &&
+          !el.classList.contains("card-main-guest")) {
+        el.classList.add("card-glow");
+      }
+    });
   }
 
   /* ---- 6. 3D tilt on cards (desktop only) ---- */
@@ -182,6 +189,64 @@
     });
   }
 
+  /* ---- 12. Floating emoji background ---- */
+  function initEmojis(count = 10) {
+    const pool = ["💥","⚔️","🔫","🛡️","💰","🚀","💎","🏆","🔥","🎯","✨","🪖","🥇","⚡"];
+    const wrap = document.createElement("div");
+    wrap.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < count; i++) {
+      const e = document.createElement("span");
+      e.className = "fx-emoji";
+      e.textContent = pool[Math.floor(Math.random() * pool.length)];
+      const size = 1 + Math.random() * 1.6;
+      const dur = 9 + Math.random() * 14;
+      e.style.cssText = `
+        left:${Math.random() * 100}%;
+        font-size:${size}rem;
+        animation-duration:${dur}s;
+        animation-delay:${-Math.random() * dur}s;
+        opacity:${0.3 + Math.random() * 0.4};
+      `;
+      wrap.appendChild(e);
+    }
+    document.body.appendChild(wrap);
+  }
+
+  /* ---- 13. Staggered card entrance ---- */
+  function initCardStagger() {
+    document.querySelectorAll(".card-in:not([data-i])").forEach((el, i) => {
+      el.setAttribute("data-i", String((i % 8) + 1));
+    });
+  }
+
+  /* ---- 14. Seamless marquee (duplicate content) ---- */
+  function initMarquee() {
+    document.querySelectorAll(".marquee-wrap .marquee-inner").forEach(inner => {
+      if (inner.dataset.dup) return;
+      inner.dataset.dup = "1";
+      inner.innerHTML += inner.innerHTML;
+    });
+  }
+
+  /* ---- 15. Randomize decorative animation delays ---- */
+  function initDecoDelay() {
+    document.querySelectorAll(".wiggle, .bob, .wobble, .jump").forEach(el => {
+      if (el.dataset.deco) return;
+      el.dataset.deco = "1";
+      el.style.animationDelay = (Math.random() * 1.2).toFixed(2) + "s";
+      el.style.animationDuration = (el.style.animationDuration ||
+        ((2 + Math.random() * 1.5).toFixed(2) + "s"));
+    });
+  }
+
+  /* ---- 16. Subtle CRT scanlines texture ---- */
+  function initScanlines() {
+    const s = document.createElement("div");
+    s.className = "fx-scanlines";
+    s.setAttribute("aria-hidden", "true");
+    document.body.appendChild(s);
+  }
+
   const page = (location.pathname || "").split("/").pop();
   const skipLoader = ["login.html", "register.html", "forgot_password.html", "wallet.html"];
   if (!skipLoader.includes(page)) initLoader();
@@ -195,4 +260,9 @@
   initShake();
   initCounters();
   initClock();
+  initEmojis();
+  initCardStagger();
+  initMarquee();
+  initDecoDelay();
+  initScanlines();
 })();

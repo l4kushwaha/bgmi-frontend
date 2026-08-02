@@ -6,124 +6,172 @@
   <title>My Profile | BGMI Market</title>
   <link rel="stylesheet" href="styles/style.css" />
   <link rel="stylesheet" href="styles/responsive.css" />
+  <link rel="stylesheet" href="assets/webfonts/poppins.css">
   <link rel="stylesheet" href="assets/effects.css" />
   <style>
+    * { font-family: 'Poppins', sans-serif; }
     body {
-      font-family: "Poppins", sans-serif;
-      background: #0b0b0b;
+      background: radial-gradient(circle at top left, #150026, #08080f, #140023);
+      background-size: 400% 400%;
+      animation: hueShift 16s infinite alternate;
       color: #fff;
       margin: 0;
-      padding: 0;
+      min-height: 100vh;
     }
+    @keyframes hueShift { 0% { background-position: left top; } 100% { background-position: right bottom; } }
+
     header {
-      background: #111;
-      padding: 1em;
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(18px);
+      padding: 1em 2em;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap; gap: .5rem;
+      position: sticky; top: 0; z-index: 100;
     }
-    header h1 { font-size: 1.5rem; color: #0ff; }
+    header h1 { font-size: 1.5rem; margin: 0; }
     nav a { color: #fff; margin-left: 1rem; text-decoration: none; transition: 0.2s; }
-    nav a:hover { color: #0ff; }
+    nav a:hover { color: #0ff; text-shadow: 0 0 10px rgba(0,255,255,.8); }
 
-    main.profile-container { text-align: center; padding: 2rem; }
+    main.profile-container { text-align: center; padding: 2rem; position: relative; z-index: 1; }
     .profile-card {
-      background: #1a1a1a;
-      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
       padding: 2rem;
       width: 90%;
-      max-width: 420px;
-      margin: 2rem auto;
-      box-shadow: 0 0 12px #00ffff30;
-      transition: transform 0.2s ease;
+      max-width: 460px;
+      margin: 1.5rem auto;
+      box-shadow: 0 0 30px rgba(0,255,198,.12);
+      transition: transform .25s ease, box-shadow .25s ease;
     }
-    .profile-card:hover { transform: scale(1.02); }
+    .profile-card:hover { transform: scale(1.015); box-shadow: 0 0 34px rgba(0,255,198,.22); }
     .profile-card img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-      object-fit: cover;
-      border: 2px solid #0ff;
+      width: 104px; height: 104px; border-radius: 50%; margin-bottom: 1rem;
+      object-fit: cover; border: 2px solid #0ff; box-shadow: 0 0 18px rgba(0,255,255,.5);
     }
-    input, button, label {
-      display: block;
-      margin: 0.6rem auto;
-      padding: 0.6rem;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 320px;
-      border: none;
+
+    .field {
+      display: block; width: 90%; max-width: 340px; margin: .55rem auto;
+      padding: .6rem .8rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.3); color: #fff; font-size: .92rem; outline: none; transition: .25s;
     }
-    input[type="file"] { background: #2a2a2a; color: #ccc; }
-    button {
-      background: #00ffff;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+    .field:focus { border-color: #0ff; box-shadow: 0 0 12px rgba(0,255,255,.3); }
+    label { display: block; max-width: 340px; margin: .8rem auto .1rem; text-align: left; font-size: .82rem; color: rgba(255,255,255,.75); }
+    textarea.field { resize: vertical; min-height: 70px; }
+
+    .btn {
+      display: block; margin: .8rem auto;
+      padding: .75rem 1.4rem; border: none; border-radius: 12px; cursor: pointer;
+      font-weight: 700; font-size: .95rem; color: #061;
+      background: linear-gradient(90deg,#00ffc6,#22c55e);
+      transition: .25s;
     }
-    button:hover { background: #00ffffcc; }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background: #111;
-      font-size: 0.9rem;
-      margin-top: 2rem;
-      color: #ccc;
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,255,198,.5); }
+    .btn.grad2 { background: linear-gradient(90deg,#ff8800,#ff00ff); color: #fff; }
+    .btn.grad2:hover { box-shadow: 0 0 20px rgba(255,0,255,.5); }
+
+    .social-row { display: flex; justify-content: center; gap: .8rem; flex-wrap: wrap; margin-top: 1rem; }
+    .social-chip {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .45rem .9rem; border-radius: 999px; text-decoration: none;
+      font-size: .85rem; font-weight: 600; color: #fff;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16); transition: .25s;
     }
-    .success-msg { color: #0f0; margin-top: 0.5rem; }
-    .error-msg { color: #f00; margin-top: 0.5rem; }
+    .social-chip:hover { transform: translateY(-2px); }
+    .social-chip.ig:hover { border-color:#ff2d95; box-shadow: 0 0 14px rgba(255,45,149,.5); }
+    .social-chip.fb:hover { border-color:#1877f2; box-shadow: 0 0 14px rgba(24,119,242,.5); }
+
+    .msg { min-height: 1.2rem; font-size: .9rem; margin-top: .4rem; }
+    .msg.ok { color: #0f0; }
+    .msg.err { color: #ff5e5e; }
+    .stat-line { font-size: .92rem; margin: .35rem 0; color: rgba(255,255,255,.85); }
+    .stat-line b { color: #0ff; }
+
+    footer { text-align: center; padding: 1.2rem; background: rgba(255,255,255,.04); font-size: .88rem; color: #ccc; margin-top: 2rem; }
+    @media (max-width:600px){ header{justify-content:center;} nav a{margin:0 .5rem;} }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>🎮 BGMI Market</h1>
+    <h1><span class="wiggle">🎮</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
     <nav>
-      <a href="marketplace.html">Marketplace</a>
-      <a href="wallet.html">Wallet</a>
-      <a href="sell.html">Sell ID</a>
-      <a href="#" onclick="logout()">Logout</a>
+      <a href="index.html" class="nav-slide">Home</a>
+      <a href="marketplace.html" class="nav-slide">Marketplace</a>
+      <a href="wallet.html" class="nav-slide">Wallet</a>
+      <a href="sell.html" class="nav-slide">Sell ID</a>
+      <a href="popularity.html" class="nav-slide">Popularity</a>
+      <a href="chat.html" class="nav-slide">Message</a>
+      <a href="#" onclick="logout()" class="nav-slide">Logout</a>
     </nav>
   </header>
 
-  <main class="profile-container">
-    <h2>My Profile</h2>
+  <div class="marquee-wrap">
+    <div class="marquee-inner">
+      <span>🔥 <b>LIVE</b> Verified IDs Available Now</span>
+      <span>⚡ <b>INSTANT</b> UPI Payments</span>
+      <span>🛡️ <b>SECURE</b> Escrow Protected</span>
+      <span>🏆 Top Sellers <b>RANKED</b> Daily</span>
+      <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
+    </div>
+  </div>
 
-    <div class="profile-card">
+  <main class="profile-container">
+    <h2 class="anim-gradient reveal">My Profile</h2>
+
+    <div class="profile-card reveal">
       <img src="images/default_avatar.png" id="profile-img" alt="Profile Image" />
       <h3 id="profile-name">Loading...</h3>
-      <p id="profile-email">---</p>
-      <p><strong>KYC:</strong> <span id="kyc-status">Pending</span></p>
-      <p><strong>Seller Badge:</strong> <span id="seller-badge">None</span></p>
+      <p id="profile-email" style="opacity:.7">---</p>
 
+      <div class="stat-line"><strong>KYC:</strong> <b id="kyc-status">Pending</b></div>
+      <div class="stat-line"><strong>Seller:</strong> <b id="seller-badge">Standard</b></div>
+
+      <!-- BIO + SOCIALS -->
+      <label for="bio">Bio</label>
+      <textarea class="field" id="bio" maxlength="200" placeholder="Tell buyers about yourself… (max 200 chars)"></textarea>
+
+      <label for="instagram">Instagram</label>
+      <input class="field" id="instagram" type="text" maxlength="80" placeholder="username or https://instagram.com/…">
+
+      <label for="facebook">Facebook</label>
+      <input class="field" id="facebook" type="text" maxlength="80" placeholder="username or https://facebook.com/…">
+
+      <button class="btn" id="saveProfileBtn">Save Profile</button>
+      <p class="msg" id="profile-msg"></p>
+
+      <div class="social-row" id="socialRow" style="display:none">
+        <a class="social-chip ig" id="igLink" target="_blank" rel="noopener">📸 Instagram</a>
+        <a class="social-chip fb" id="fbLink" target="_blank" rel="noopener">👍 Facebook</a>
+      </div>
+
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:1.2rem 0">
+
+      <!-- KYC -->
       <form id="kyc-form" enctype="multipart/form-data">
+        <h3 style="font-size:1rem;margin-bottom:.6rem">Verify KYC (eKYC)</h3>
         <label for="kyc-name">Full Name</label>
-        <input type="text" id="kyc-name" name="name" placeholder="Enter your full name" title="Enter your full name" required />
-
-        <label for="kyc-id">Government ID Number</label>
-        <input type="text" id="kyc-id" name="id_number" placeholder="Enter ID number" title="Enter your ID number" required />
-
-        <label for="kyc-file">Upload ID Proof (JPG/PNG)</label>
-        <input type="file" id="kyc-file" name="id_image" accept="image/*" title="Upload ID proof image" required />
-
-        <button type="submit">Submit KYC for Verification</button>
-        <p id="kyc-msg" class="text-small"></p>
+        <input class="field" type="text" id="kyc-name" name="name" placeholder="Enter your full name" required />
+        <label for="kyc-share">Aadhaar Share Code</label>
+        <input class="field" type="text" id="kyc-share" name="share_code" maxlength="8" placeholder="4 or 8 digit share code" required />
+        <label for="kyc-file">Upload eKYC ZIP (offline XML)</label>
+        <input class="field" type="file" id="kyc-file" name="file" accept=".zip,application/zip" required />
+        <button class="btn grad2" type="submit">Submit KYC for Verification</button>
+        <p class="msg" id="kyc-msg"></p>
       </form>
-
-      <button id="update-btn" onclick="updateProfile()">Update Profile</button>
     </div>
   </main>
 
   <footer>
-    <p>© 2025 BGMI Market | Trusted Gamers Network</p>
+    <p>© 2026 BGMI Market | Trusted Gamers Network</p>
   </footer>
 
   <script>
-    const VERIFICATION_API = "https://verification_service.bgmi-gateway.workers.dev/api/verify";
+    const VERIFY_BASE = "https://verification_service.bgmi-gateway.workers.dev";
 
-    // Load User
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) window.location.href = "login.html";
 
@@ -131,70 +179,113 @@
     const profileEmail = document.getElementById("profile-email");
     const kycStatus = document.getElementById("kyc-status");
     const sellerBadge = document.getElementById("seller-badge");
-    const profileImg = document.getElementById("profile-img");
+    const profileMsg = document.getElementById("profile-msg");
 
-    profileName.textContent = user.name;
+    function authHeaders() {
+      return {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token")
+      };
+    }
+
+    profileName.textContent = user.name || user.email?.split("@")[0];
     profileEmail.textContent = user.email;
-    kycStatus.textContent = user.kyc_status || "Pending";
-    sellerBadge.textContent = user.is_verified ? "✔ Verified Seller" : "Standard";
 
-    // Preview Profile Image (Optional)
-    document.getElementById("kyc-file").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) profileImg.src = URL.createObjectURL(file);
-    });
+    // Load profile
+    async function loadProfile() {
+      try {
+        const r = await fetch(VERIFY_BASE + "/profile/" + user.id, { headers: authHeaders() });
+        const data = await r.json();
+        const p = data.profile || {};
+        document.getElementById("bio").value = p.bio || "";
+        document.getElementById("instagram").value = p.instagram || "";
+        document.getElementById("facebook").value = p.facebook || "";
 
-    // Logout
-    function logout() {
-      localStorage.removeItem("user");
-      window.location.href = "login.html";
+        kycStatus.textContent = data.kyc ? data.kyc.verification_status : "Not submitted";
+        sellerBadge.textContent = data.seller_stats?.badge || (data.kyc ? "Under Review" : "Standard");
+
+        renderSocials(p.instagram, p.facebook);
+      } catch {
+        kycStatus.textContent = "Not submitted";
+      }
     }
 
-    // Placeholder Profile Update
-    function updateProfile() {
-      alert("Profile update feature coming soon!");
+    function renderSocials(ig, fb) {
+      const row = document.getElementById("socialRow");
+      const igLink = document.getElementById("igLink");
+      const fbLink = document.getElementById("fbLink");
+      if (!ig && !fb) { row.style.display = "none"; return; }
+      row.style.display = "flex";
+      igLink.style.display = ig ? "inline-flex" : "none";
+      fbLink.style.display = fb ? "inline-flex" : "none";
+      if (ig) igLink.href = /^https?:/.test(ig) ? ig : "https://instagram.com/" + ig;
+      if (fb) fbLink.href = /^https?:/.test(fb) ? fb : "https://facebook.com/" + fb;
     }
 
-    // KYC Submission
+    // Save profile
+    document.getElementById("saveProfileBtn").onclick = async () => {
+      profileMsg.className = "msg";
+      profileMsg.textContent = "Saving…";
+      try {
+        const r = await fetch(VERIFY_BASE + "/profile/update", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            user_id: user.id,
+            name: user.name,
+            bio: document.getElementById("bio").value.trim(),
+            instagram: document.getElementById("instagram").value.trim(),
+            facebook: document.getElementById("facebook").value.trim()
+          })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || "Save failed");
+        profileMsg.className = "msg ok";
+        profileMsg.textContent = "✅ Profile saved!";
+        renderSocials(
+          document.getElementById("instagram").value.trim(),
+          document.getElementById("facebook").value.trim()
+        );
+      } catch (err) {
+        profileMsg.className = "msg err";
+        profileMsg.textContent = "❌ " + err.message;
+      }
+    };
+
+    // KYC
     document.getElementById("kyc-form").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const formData = new FormData();
       formData.append("user_id", user.id);
       formData.append("name", document.getElementById("kyc-name").value.trim());
-      formData.append("id_number", document.getElementById("kyc-id").value.trim());
-      formData.append("id_image", document.getElementById("kyc-file").files[0]);
+      formData.append("share_code", document.getElementById("kyc-share").value.trim());
+      formData.append("file", document.getElementById("kyc-file").files[0]);
 
-      const btn = e.target.querySelector("button");
       const msg = document.getElementById("kyc-msg");
-      btn.disabled = true;
-      btn.textContent = "Submitting...";
-      msg.textContent = "";
-
+      msg.className = "msg";
+      msg.textContent = "Submitting…";
       try {
-        const res = await fetch(VERIFICATION_API, { method: "POST", body: formData });
+        const res = await fetch(VERIFY_BASE + "/upload", { method: "POST", body: formData });
         const result = await res.json();
-
-        if (result.success) {
+        if (res.ok) {
           kycStatus.textContent = "Under Review";
-          alert("✅ KYC submitted successfully! Awaiting admin approval.");
+          msg.className = "msg ok";
+          msg.textContent = "✅ KYC submitted! Awaiting admin approval.";
         } else {
-          msg.textContent = result.error || "Submission failed";
-          msg.className = "error-msg";
+          throw new Error(result.error || "Submission failed");
         }
       } catch (err) {
-        console.error("⚠️ Verification Error:", err);
-        msg.textContent = "Error connecting to verification service";
-        msg.className = "error-msg";
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Submit KYC for Verification";
+        msg.className = "msg err";
+        msg.textContent = "❌ " + err.message;
       }
     });
 
-    // TODO: Admin Dashboard Integration Hooks
-    // GET pending KYCs: https://verification_service.bgmi-gateway.workers.dev/api/pending
-    // POST approve/reject KYC: https://verification_service.bgmi-gateway.workers.dev/api/update_status
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    loadProfile();
   </script>
   <script src="js/auth.js"></script>
   <script src="assets/effects.js" defer></script>
