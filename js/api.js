@@ -1,13 +1,15 @@
 // ===== api.js (Extended + IIFE + Debug-Friendly) =====
 (() => {
   // 🌍 Base URL auto-detect
+  const GATEWAY = "https://bgmi-gateway.bgmi-gateway.workers.dev";
   const BASE_URL = window.BASE_URL || (
     window.location.hostname.includes("localhost")
-      ? "http://127.0.0.1:5000/api" // local dev
-      : "https://bgmi_marketplace-service.bgmi-gateway.workers.dev/api" // production
+      ? "http://127.0.0.1:8787/api" // local dev (wrangler dev on gateway)
+      : `${GATEWAY}/api` // production — single gateway entry point
   );
 
   window.BASE_URL = BASE_URL; // global access
+  window.GATEWAY_URL = GATEWAY;
 
   // --- Service Endpoints ---
   const SERVICES = {

@@ -262,7 +262,7 @@ document.getElementById("halfPayBtn").onclick = async () => {
 
   // 🔥 Call Wallet Microservice
   const r = await fetch(
-    "https://bgmi-wallet-service.bgmi-gateway.workers.dev/pay/service-charge",
+    "https://bgmi-marketplace.bgmi-gateway.workers.dev/pay/service-charge",
     {
       method: "POST",
       headers,

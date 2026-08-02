@@ -4,244 +4,309 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin Dashboard | BGMI Store</title>
-
-<!-- ================= INTERNAL CSS ================= -->
+<link rel="stylesheet" href="assets/webfonts/poppins.css">
+<link rel="stylesheet" href="assets/effects.css">
 <style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    background: #0b0b0b;
-    color: white;
-  }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+  body { background:#0a0a12; color:#fff; min-height:100vh; }
+  .orb { position:fixed; border-radius:50%; filter:blur(100px); opacity:.3; z-index:0; animation:drift 20s infinite ease-in-out; }
+  .orb.a { width:440px; height:440px; background:#00ffc6; top:-140px; left:-140px; }
+  .orb.b { width:400px; height:400px; background:#8b5cf6; bottom:-120px; right:-120px; animation-delay:-8s; }
+  @keyframes drift { 0%,100%{transform:translate(0,0);} 50%{transform:translate(40px,-40px);} }
 
   header {
-    background: #111;
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #333;
+    position:sticky; top:0; z-index:10; backdrop-filter:blur(18px);
+    background:rgba(17,17,25,.75); border-bottom:1px solid #222;
+    padding:15px 25px; display:flex; justify-content:space-between; align-items:center;
   }
+  header h1 { font-size:22px; background:linear-gradient(90deg,#00ffc6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .logout-btn { background:crimson; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; transition:.3s; }
+  .logout-btn:hover { box-shadow:0 0 16px rgba(220,20,60,.5); }
 
-  header h1 {
-    font-size: 22px;
-    color: #00ffc6;
+  .wrap { position:relative; z-index:1; padding:22px; max-width:1200px; margin:0 auto; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+  .stat {
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
+    border-radius:16px; padding:16px; text-align:center; animation:pop .5s ease both;
   }
+  .stat:nth-child(2){animation-delay:.08s}.stat:nth-child(3){animation-delay:.16s}.stat:nth-child(4){animation-delay:.24s}
+  .stat small { opacity:.55; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; }
+  .stat .val { font-size:1.6rem; font-weight:700; margin-top:4px; color:#00ffc6; }
 
-  .logout-btn {
-    background: crimson;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    cursor: pointer;
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .tab {
+    padding:9px 16px; border-radius:12px; border:1px solid #2a2a3a; cursor:pointer;
+    background:rgba(255,255,255,.04); color:#ccc; font-weight:600; font-size:.85rem; transition:.3s;
   }
+  .tab:hover { border-color:#00ffc6; color:#00ffc6; }
+  .tab.active { background:linear-gradient(90deg,#00ffc6,#00b894); color:#062; border-color:transparent; }
 
-  main {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
-    padding: 25px;
-  }
-
-  section {
-    background: #1a1a1a;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
-  }
-
-  h2 {
-    border-bottom: 2px solid #00ffc6;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
-  }
-
-  .wallet-card {
-    background: #111;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-  }
-
-  .wallet-balance {
-    font-size: 30px;
-    color: #00ffc6;
-  }
-
-  .refresh-btn, .toggle-btn {
-    background: #00ffc6;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    color: black;
-    font-weight: 600;
-    margin-left: 5px;
-  }
-
-  .user-list li {
-    border-bottom: 1px solid #333;
-    padding: 6px 0;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  @media(max-width:900px){
-    main {
-      grid-template-columns: 1fr;
-    }
-  }
+  .panel { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:18px; display:none; }
+  .panel.active { display:block; animation:fade .4s ease both; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th { text-align:left; color:#00ffc6; opacity:.85; padding:10px 8px; border-bottom:1px solid #2a2a3a; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; }
+  td { padding:10px 8px; border-bottom:1px solid #1c1c28; }
+  tr { transition:.2s; } tr:hover { background:rgba(255,255,255,.04); }
+  .mini { background:#16a34a; color:#fff; border:none; padding:4px 10px; border-radius:8px; cursor:pointer; font-size:.72rem; font-weight:600; transition:.2s; }
+  .mini.danger { background:crimson; }
+  .mini.warn { background:#d97706; }
+  .mini:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.4); }
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:.68rem; font-weight:700; }
+  .badge.green{background:rgba(34,197,94,.15);color:#4ade80}.badge.red{background:rgba(239,68,68,.15);color:#f87171}
+  .badge.yellow{background:rgba(255,183,3,.15);color:#ffd166}.badge.gray{background:rgba(148,163,184,.15);color:#cbd5e1}
+  .empty { opacity:.55; padding:18px 0; text-align:center; }
+  @keyframes pop { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:none} }
+  @keyframes fade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+  @media (max-width:760px){ .stats{grid-template-columns:1fr 1fr} .wrap{padding:14px} }
+  @media (max-width:480px){ .stats{grid-template-columns:1fr} }
 </style>
 </head>
-
 <body>
+<div class="orb a"></div><div class="orb b"></div>
 
 <header>
   <h1>👑 Admin Dashboard</h1>
   <button class="logout-btn" onclick="logout()">Logout</button>
 </header>
 
-<main>
-  <!-- LEFT -->
-  <section>
-    <h2>Admin Wallet
-      <button class="refresh-btn" onclick="fetchWallet()">Refresh</button>
-    </h2>
-    <div class="wallet-card">
-      <p>💰 Total Balance</p>
-      <div class="wallet-balance" id="walletBalance">₹0.00</div>
-    </div>
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><small>Total Users</small><div class="val" id="stUsers">—</div></div>
+    <div class="stat"><small>Registered Today</small><div class="val" id="stToday">—</div></div>
+    <div class="stat"><small>Banned</small><div class="val" id="stBanned">—</div></div>
+    <div class="stat"><small>Admin Fees (₹)</small><div class="val" id="stEarnings">—</div></div>
+  </div>
 
-    <h2>Module Control
-      <button class="refresh-btn" onclick="fetchModules()">Refresh</button>
-    </h2>
-    <div id="modules">Loading...</div>
-  </section>
+  <div class="tabs">
+    <button class="tab active" data-tab="users">Users</button>
+    <button class="tab" data-tab="listings">Listings</button>
+    <button class="tab" data-tab="kyc">KYC Queue</button>
+    <button class="tab" data-tab="payments">Payments</button>
+    <button class="tab" data-tab="chats">Chats</button>
+  </div>
 
-  <!-- RIGHT -->
-  <section>
-    <h2>Registered Users
-      <button class="refresh-btn" onclick="fetchUsers()">Refresh</button>
-    </h2>
-    <ul id="userList" class="user-list">Loading...</ul>
-  </section>
-</main>
+  <div class="panel active" id="tab-users">
+    <table>
+      <thead><tr><th>ID</th><th>Email</th><th>Username</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+      <tbody id="usersBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
 
-<!-- ================= INTERNAL JS ================= -->
+  <div class="panel" id="tab-listings">
+    <table>
+      <thead><tr><th>ID</th><th>Title</th><th>UID</th><th>Seller</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="listingsBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="tab-kyc">
+    <table>
+      <thead><tr><th>Doc ID</th><th>User</th><th>Type</th><th>Status</th><th>Remarks</th><th>Actions</th></tr></thead>
+      <tbody id="kycBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="tab-payments">
+    <table>
+      <thead><tr><th>Order</th><th>Buyer</th><th>Seller</th><th>Total</th><th>Fee</th><th>Seller Gets</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="paymentsBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="tab-chats">
+    <table>
+      <thead><tr><th>Room</th><th>Order</th><th>Buyer</th><th>Seller</th><th>Intent</th><th>Status</th><th>Msgs</th><th>Actions</th></tr></thead>
+      <tbody id="chatsBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
 <script>
-/* ================= CONFIG ================= */
-const GATEWAY_URL = location.hostname.includes("localhost")
-  ? "http://127.0.0.1:5000"
-  : "https://bgmi-gateway.workers.dev";
-
-/* ================= AUTH CHECK ================= */
+const GATEWAY = "https://bgmi-gateway.bgmi-gateway.workers.dev";
 const token = localStorage.getItem("token");
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(localStorage.getItem("user") || "null");
 
 if (!token || !user || user.role !== "admin") {
-  alert("❌ Unauthorized access");
+  alert("Unauthorized access");
   location.href = "login.html";
 }
 
-/* ================= LOGOUT ================= */
-function logout() {
-  localStorage.clear();
-  location.href = "login.html";
+function logout() { localStorage.clear(); location.href = "login.html"; }
+
+async function api(path, opts = {}) {
+  const res = await fetch(`${GATEWAY}/api/${path}`, {
+    ...opts,
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + token, ...(opts.headers||{}) }
+  });
+  return { ok: res.ok, data: await res.json().catch(() => ({})) };
 }
 
-/* ================= FETCH WALLET ================= */
-async function fetchWallet() {
-  try {
-    const res = await fetch(`${GATEWAY_URL}/api/wallet/admin-balance`, {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+const fmt = n => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const statusBadge = s => {
+  const map = { available:"green", active:"green", approved:"green", paid:"green", released:"green", submitted:"yellow", pending:"yellow", requested:"yellow", half_paid:"yellow", hidden:"red", banned:"red", rejected:"red", closed:"red", sold:"gray" };
+  const c = map[s] || "gray";
+  return `<span class="badge ${c}">${s || "—"}</span>`;
+};
 
-    const data = await res.json();
-    document.getElementById("walletBalance").innerText =
-      res.ok ? `₹${data.balance.toFixed(2)}` : "Error";
-  } catch {
-    document.getElementById("walletBalance").innerText = "Server error";
+/* ---- TABS ---- */
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  document.getElementById("tab-" + t.dataset.tab).classList.add("active");
+});
+
+/* ---- OVERVIEW ---- */
+async function loadOverview() {
+  const [s, e] = await Promise.all([
+    api("auth/admin/stats"),
+    api("wallet/admin/earnings")
+  ]);
+  if (s.ok && s.data) {
+    document.getElementById("stUsers").textContent = s.data.total_users ?? "—";
+    document.getElementById("stToday").textContent = s.data.registered_today ?? "—";
+    document.getElementById("stBanned").textContent = s.data.banned_users ?? "—";
   }
+  if (e.ok && e.data) document.getElementById("stEarnings").textContent = fmt(e.data.total_admin_fees);
 }
 
-/* ================= FETCH MODULES ================= */
-async function fetchModules() {
-  try {
-    const res = await fetch(`${GATEWAY_URL}/health/modules`);
-    const data = await res.json();
-
-    const box = document.getElementById("modules");
-    box.innerHTML = "";
-
-    Object.entries(data).forEach(([name, status]) => {
-      const color = status === "running" ? "lime" : "crimson";
-
-      box.innerHTML += `
-        <div style="margin-bottom:8px;">
-          <b>${name}</b> —
-          <span style="color:${color}">${status}</span>
-          <button class="toggle-btn" onclick="toggleModule('${name}')">
-            ${status === "running" ? "Stop" : "Start"}
-          </button>
-        </div>`;
-    });
-  } catch {
-    document.getElementById("modules").innerHTML = "Failed to load modules";
-  }
+/* ---- USERS ---- */
+async function loadUsers() {
+  const { ok, data } = await api("auth/admin/users?limit=100");
+  const body = document.getElementById("usersBody");
+  if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No users</td></tr>`;
+  body.innerHTML = data.map(u => `
+    <tr>
+      <td>${u.id}</td>
+      <td>${esc(u.email)}</td>
+      <td>${esc(u.username || "")}</td>
+      <td>${u.role || "user"}</td>
+      <td>${statusBadge(u.status)}</td>
+      <td>${esc((u.created_at||"").slice(0,10))}</td>
+      <td>
+        ${u.role !== "admin" ? `<button class="mini" onclick="setRole(${u.id},'admin')">Make Admin</button>` : `<button class="mini warn" onclick="setRole(${u.id},'user')">Demote</button>`}
+        ${u.status !== "banned" ? `<button class="mini danger" onclick="setStatus(${u.id},'banned')">Ban</button>` : `<button class="mini" onclick="setStatus(${u.id},'active')">Unban</button>`}
+      </td>
+    </tr>`).join("");
 }
 
-/* ================= TOGGLE MODULE ================= */
-async function toggleModule(name) {
-  try {
-    const res = await fetch(`${GATEWAY_URL}/api/admin/module/${name}/toggle`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-    alert(data.message || "Updated");
-    fetchModules();
-  } catch {
-    alert("Module toggle failed");
-  }
+async function setRole(id, role) {
+  const { ok } = await api(`auth/admin/users/${id}`, { method: "PATCH", body: JSON.stringify({ role }) });
+  alert(ok ? "Updated" : "Failed"); loadUsers();
+}
+async function setStatus(id, status) {
+  const { ok } = await api(`auth/admin/users/${id}`, { method: "PATCH", body: JSON.stringify({ status }) });
+  alert(ok ? "Updated" : "Failed"); loadUsers();
 }
 
-/* ================= FETCH USERS ================= */
-async function fetchUsers() {
-  try {
-    const res = await fetch(`${GATEWAY_URL}/api/auth/all-users`, {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-
-    const users = await res.json();
-    const ul = document.getElementById("userList");
-    ul.innerHTML = "";
-
-    users.forEach(u => {
-      ul.innerHTML += `
-        <li>
-          <span>${u.full_name || "User"} (${u.email})</span>
-          <span>${u.phone || "N/A"}</span>
-        </li>`;
-    });
-  } catch {
-    document.getElementById("userList").innerHTML = "Failed to load users";
-  }
+/* ---- LISTINGS ---- */
+async function loadListings() {
+  const { ok, data } = await api("market/admin/listings");
+  const body = document.getElementById("listingsBody");
+  if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No listings</td></tr>`;
+  body.innerHTML = data.map(l => `
+    <tr>
+      <td>${l.id}</td>
+      <td>${esc(l.title)}</td>
+      <td>${esc(l.uid)}</td>
+      <td>${esc(l.seller_id)}</td>
+      <td>${fmt(l.price)}</td>
+      <td>${statusBadge(l.status)}</td>
+      <td>
+        <button class="mini" onclick="moderate(${l.id},'available')">Show</button>
+        <button class="mini warn" onclick="moderate(${l.id},'hidden')">Hide</button>
+        <button class="mini danger" onclick="moderate(${l.id},'sold')">Mark Sold</button>
+      </td>
+    </tr>`).join("");
 }
 
-/* ================= INIT ================= */
-fetchWallet();
-fetchModules();
-fetchUsers();
+async function moderate(id, status) {
+  const { ok } = await api(`market/admin/listings/${id}`, { method: "PATCH", body: JSON.stringify({ status }) });
+  alert(ok ? "Moderated" : "Failed"); loadListings();
+}
+
+/* ---- KYC ---- */
+async function loadKyc() {
+  const { ok, data } = await api("verify/admin/queue");
+  const body = document.getElementById("kycBody");
+  if (!ok) return body.innerHTML = `<tr><td colspan="6" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="6" class="empty">No pending KYC</td></tr>`;
+  body.innerHTML = data.map(k => `
+    <tr>
+      <td>${k.id}</td>
+      <td>${esc(k.name || k.user_id)} <small>(${esc(k.user_id)})</small></td>
+      <td>${esc(k.document_type || "")}</td>
+      <td>${statusBadge(k.verification_status)}</td>
+      <td>${esc(k.remarks || "")}</td>
+      <td>
+        <button class="mini" onclick="kycDecision(${k.id},'approved')">Approve</button>
+        <button class="mini danger" onclick="kycDecision(${k.id},'rejected')">Reject</button>
+      </td>
+    </tr>`).join("");
+}
+
+async function kycDecision(id, decision) {
+  const { ok } = await api("verify/admin/decision", { method: "POST", body: JSON.stringify({ doc_id: id, decision }) });
+  alert(ok ? "Done" : "Failed"); loadKyc();
+}
+
+/* ---- PAYMENTS ---- */
+async function loadPayments() {
+  const { ok, data } = await api("wallet/admin/payments");
+  const body = document.getElementById("paymentsBody");
+  if (!ok) return body.innerHTML = `<tr><td colspan="8" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No payments</td></tr>`;
+  body.innerHTML = data.map(p => `
+    <tr>
+      <td>${esc(p.order_id)}</td>
+      <td>${esc(p.buyer_id)}</td>
+      <td>${esc(p.seller_id)}</td>
+      <td>${fmt(p.total_amount)}</td>
+      <td>${fmt(p.admin_fee)}</td>
+      <td>${fmt(p.seller_amount)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td>${p.status === "paid" ? `<button class="mini" onclick="release('${esc(p.order_id)}')">Release to Seller</button>` : ""}</td>
+    </tr>`).join("");
+}
+
+async function release(order_id) {
+  const { ok } = await api("wallet/pay/release", { method: "POST", body: JSON.stringify({ order_id }) });
+  alert(ok ? "Released to seller" : "Failed"); loadPayments();
+}
+
+/* ---- CHATS ---- */
+async function loadChats() {
+  const { ok, data } = await api("chat/admin/rooms");
+  const body = document.getElementById("chatsBody");
+  if (!ok) return body.innerHTML = `<tr><td colspan="8" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No chat rooms</td></tr>`;
+  body.innerHTML = data.map(r => `
+    <tr>
+      <td>${esc(r.id)}</td>
+      <td>${esc(r.order_id || "")}</td>
+      <td>${esc(r.buyer_id)}</td>
+      <td>${esc(r.seller_user_id)}</td>
+      <td>${r.intent || "chat"}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>${r.message_count || 0}</td>
+      <td>${r.status !== "closed" ? `<button class="mini danger" onclick="closeRoom('${esc(r.id)}')">Close</button>` : ""}</td>
+    </tr>`).join("");
+}
+
+async function closeRoom(id) {
+  const { ok } = await api("chat/admin/close", { method: "POST", body: JSON.stringify({ room_id: id }) });
+  alert(ok ? "Closed" : "Failed"); loadChats();
+}
+
+/* ---- HELPERS ---- */
+function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+
+/* ---- INIT ---- */
+loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats();
+setInterval(() => { loadOverview(); }, 60000);
 </script>
-
+<script src="assets/effects.js" defer></script>
 </body>
 </html>

@@ -11,6 +11,9 @@ let editItem = null;
 let editImages = [];
 
 /* ================= HELPERS ================= */
+const esc = v => String(v ?? "").replace(/[&<>"']/g,
+  c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
 const safeArray = v => {
   try {
     if (Array.isArray(v)) return v;
@@ -18,6 +21,8 @@ const safeArray = v => {
     return [];
   } catch { return []; }
 };
+
+const escArray = v => safeArray(v).map(esc);
 
 const toast = msg => {
   const t = document.getElementById("toast");
@@ -110,7 +115,7 @@ function startChat(order_id, seller_user_id) {
 }
 
 // ✅ BUY BUTTON
-async function startBuy(order_id, seller_user_id) {
+async function startBuy(order_id, seller_user_id, amount) {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -120,36 +125,62 @@ async function startBuy(order_id, seller_user_id) {
   }
 
   try {
-    // 1️⃣ Call Wallet Service first (10% admin fee)
-    const amount = 1000; // replace with actual order amount from your data
-    const resWallet = await fetch(
-      "https://bgmi-wallet-service.bgmi-gateway.workers.dev/pay/service-charge",
+    // 1️⃣ Create purchase record (escrow tracking)
+    const resPurchase = await fetch(
+      "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/purchases",
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ order_id, seller_id: seller_user_id, amount })
+        body: JSON.stringify({ listing_id: order_id })
+      }
+    );
+    const purchaseData = await resPurchase.json();
+    if (!resPurchase.ok) return alert(purchaseData.error || "Unable to create purchase");
+
+    // 2️⃣ Call Wallet Service (10% admin fee)
+    const resWallet = await fetch(
+      "https://bgmi-marketplace.bgmi-gateway.workers.dev/pay/service-charge",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ order_id, seller_id: seller_user_id, amount: amount || 1000 })
       }
     );
     const walletData = await resWallet.json();
     if (!resWallet.ok) return alert(walletData.error || "Payment failed");
 
-    alert(`₹${walletData.admin_fee} service charge paid to admin`);
-
-    // 2️⃣ Create chat room with intent "buy"
-    const resChat = await fetch(
-      "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat/create",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ order_id, seller_user_id, intent: "buy" })
-      }
-    );
-    const chatData = await resChat.json();
-    if (!resChat.ok) return alert(chatData.error || "Unable to start chat");
-
-    // 3️⃣ Redirect to chat
-    location.href = `/chat.html?room_id=${chatData.room_id}`;
-
+    // Open Razorpay checkout
+    if (window.Razorpay) {
+      const opts = {
+        key: walletData.razorpay_key,
+        amount: walletData.admin_fee * 100,
+        currency: "INR",
+        name: "BGMI Marketplace",
+        description: "10% Service Charge",
+        order_id: walletData.razorpay_order_id,
+        handler: async function (res) {
+          const vr = await fetch(
+            "https://bgmi-marketplace.bgmi-gateway.workers.dev/pay/verify",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+              body: JSON.stringify({
+                razorpay_payment_id: res.razorpay_payment_id,
+                razorpay_order_id: res.razorpay_order_id,
+                razorpay_signature: res.razorpay_signature
+              })
+            }
+          );
+          const v = await vr.json();
+          if (!vr.ok) return alert(v.error || "Payment verification failed");
+          await startChatOrBuy(order_id, seller_user_id, "buy");
+        },
+        theme: { color: "#22c55e" }
+      };
+      new Razorpay(opts).open();
+    } else {
+      alert(`Service charge of ₹${walletData.admin_fee} created. Add Razorpay checkout JS to complete.`);
+    }
   } catch (err) {
     console.error("Buy flow error", err);
     alert("Something went wrong");
@@ -195,12 +226,19 @@ function renderList() {
 function renderCard(item) {
   const images = safeArray(item.images);
   const card = document.createElement("div");
-  card.className = "item-card";
+  card.className = "item-card reveal";
+  card.dataset.delay = String((item.id || 0) % 4);
+
+  const upgraded = escArray(item.upgraded_guns).join(", ");
+  const mythic = escArray(item.mythic_items).join(", ");
+  const legendary = escArray(item.legendary_items).join(", ");
+  const gifts = escArray(item.gift_items).join(", ");
+  const titles = escArray(item.titles).join(", ");
 
   card.innerHTML = `
     <div class="images-gallery">
       ${images.map((img,i)=>`
-        <img src="${img}" class="${i===0?"active":""}">
+        <img src="${esc(img)}" class="${i===0?"active":""}">
       `).join("")}
 
       ${images.length > 1 ? `
@@ -212,19 +250,19 @@ function renderCard(item) {
     </div>
 
     <div class="card-content">
-      <strong>${item.title}</strong><br>
-      UID: ${item.uid}<br>
-      Level: ${item.level}<br>
-      Rank: ${item.highest_rank || "-"}<br>
+      <strong>${esc(item.title)}</strong><br>
+      UID: ${esc(item.uid)}<br>
+      Level: ${esc(item.level)}<br>
+      Rank: ${esc(item.highest_rank || "-")}<br>
 
-      ${safeArray(item.upgraded_guns).length ? `<b>Upgraded:</b> ${safeArray(item.upgraded_guns).join(", ")}<br>` : ""}
-      ${safeArray(item.mythic_items).length ? `<b>Mythic:</b> ${safeArray(item.mythic_items).join(", ")}<br>` : ""}
-      ${safeArray(item.legendary_items).length ? `<b>Legendary:</b> ${safeArray(item.legendary_items).join(", ")}<br>` : ""}
-      ${safeArray(item.gift_items).length ? `<b>Gifts:</b> ${safeArray(item.gift_items).join(", ")}<br>` : ""}
-      ${safeArray(item.titles).length ? `<b>Titles:</b> ${safeArray(item.titles).join(", ")}<br>` : ""}
-      ${item.account_highlights ? `<b>Highlights:</b> ${item.account_highlights}` : ""}
+      ${upgraded ? `<b>Upgraded:</b> ${upgraded}<br>` : ""}
+      ${mythic ? `<b>Mythic:</b> ${mythic}<br>` : ""}
+      ${legendary ? `<b>Legendary:</b> ${legendary}<br>` : ""}
+      ${gifts ? `<b>Gifts:</b> ${gifts}<br>` : ""}
+      ${titles ? `<b>Titles:</b> ${titles}<br>` : ""}
+      ${item.account_highlights ? `<b>Highlights:</b> ${esc(item.account_highlights)}` : ""}
 
-      <div class="price">₹${item.price}</div>
+      <div class="price">₹${esc(item.price)}</div>
     </div>
 
     <div class="card-actions">
@@ -255,7 +293,7 @@ function renderCard(item) {
     startChat(item.id, item.seller_id); // CHAT
 
   card.querySelector(".buy-btn").onclick = () =>
-    startBuy(item.id, item.seller_id); // BUY
+    startBuy(item.id, item.seller_id, item.price); // BUY
 }
 
   
@@ -501,9 +539,9 @@ window.openSellerProfile = async sellerId => {
   const s = await res.json();
 
   c.innerHTML = `
-    <h3>${s.name}</h3>
+    <h3>${esc(s.name)}</h3>
     <p><b>Status:</b> ${s.seller_verified ? "Verified" : "Pending"}</p>
-    <p><b>Badge:</b> ${s.badge || "None"}</p>
+    <p><b>Badge:</b> ${esc(s.badge || "None")}</p>
     <p><b>Rating:</b> ${stars(s.avg_rating)}</p>
     <p><b>Reviews:</b> ${s.review_count || 0}</p>
     <p><b>Total Sales:</b> ${s.total_sales || 0}</p>
@@ -522,17 +560,17 @@ function openEdit(id) {
   document.getElementById("edit-modal-bg").classList.add("active");
 
   f.innerHTML = `
-    <label>Title</label><input id="e-title" value="${editItem.title}">
-    <label>Price</label><input id="e-price" value="${editItem.price}">
-    <label>Level</label><input id="e-level" value="${editItem.level}">
-    <label>Rank</label><input id="e-rank" value="${editItem.highest_rank || ""}">
+    <label>Title</label><input id="e-title" value="${esc(editItem.title)}">
+    <label>Price</label><input id="e-price" value="${esc(editItem.price)}">
+    <label>Level</label><input id="e-level" value="${esc(editItem.level)}">
+    <label>Rank</label><input id="e-rank" value="${esc(editItem.highest_rank || "")}">
 
-    <label>Upgraded Guns</label><textarea id="e-upgraded">${safeArray(editItem.upgraded_guns).join(",")}</textarea>
-    <label>Mythic Items</label><textarea id="e-mythic">${safeArray(editItem.mythic_items).join(",")}</textarea>
-    <label>Legendary Items</label><textarea id="e-legendary">${safeArray(editItem.legendary_items).join(",")}</textarea>
-    <label>Gift Items</label><textarea id="e-gifts">${safeArray(editItem.gift_items).join(",")}</textarea>
-    <label>Titles</label><textarea id="e-titles">${safeArray(editItem.titles).join(",")}</textarea>
-    <label>Highlights</label><textarea id="e-highlights">${editItem.account_highlights || ""}</textarea>
+    <label>Upgraded Guns</label><textarea id="e-upgraded">${esc(safeArray(editItem.upgraded_guns).join(","))}</textarea>
+    <label>Mythic Items</label><textarea id="e-mythic">${esc(safeArray(editItem.mythic_items).join(","))}</textarea>
+    <label>Legendary Items</label><textarea id="e-legendary">${esc(safeArray(editItem.legendary_items).join(","))}</textarea>
+    <label>Gift Items</label><textarea id="e-gifts">${esc(safeArray(editItem.gift_items).join(","))}</textarea>
+    <label>Titles</label><textarea id="e-titles">${esc(safeArray(editItem.titles).join(","))}</textarea>
+    <label>Highlights</label><textarea id="e-highlights">${esc(editItem.account_highlights || "")}</textarea>
 
     <label>Images</label>
     <div id="e-images" style="display:flex;gap:8px;flex-wrap:wrap"></div>

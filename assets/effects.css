@@ -1,0 +1,96 @@
+/* ============================================================
+   BGMI Market — Shared Animated Theme (effects.css)
+   ============================================================ */
+
+/* ---- Animated gradient text ---- */
+.anim-gradient {
+  background: linear-gradient(90deg, #ff8800, #ff00ff, #00ffc6, #ff8800);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradShift 6s linear infinite;
+}
+@keyframes gradShift { to { background-position: 300% 0; } }
+
+/* ---- Neon glow button ---- */
+.btn-neon {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(34,197,94,.6);
+  background: linear-gradient(90deg, rgba(34,197,94,.15), rgba(139,92,246,.15));
+  color: #fff;
+  transition: .3s;
+}
+.btn-neon::after {
+  content: "";
+  position: absolute; top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent);
+  transform: skewX(-20deg);
+  animation: shine 3.2s infinite;
+}
+.btn-neon:hover { box-shadow: 0 0 22px rgba(34,197,94,.55); transform: translateY(-2px); }
+@keyframes shine { 0%,60% { left: -120%; } 100% { left: 130%; } }
+
+/* ---- Float-in on scroll ---- */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal[data-delay="1"] { transition-delay: .1s; }
+.reveal[data-delay="2"] { transition-delay: .2s; }
+.reveal[data-delay="3"] { transition-delay: .3s; }
+
+/* ---- Floating particles ---- */
+.fx-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.fx-particles span {
+  position: absolute; bottom: -12px; border-radius: 50%;
+  background: rgba(255,255,255,.14);
+  animation: fxRise linear infinite;
+}
+@keyframes fxRise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-105vh) scale(.6); opacity: 0; }
+}
+
+/* ---- Animated card glow (hover) ---- */
+.card-glow { position: relative; transition: transform .3s ease, box-shadow .3s ease; }
+.card-glow:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 0 1px rgba(0,255,198,.35), 0 18px 40px rgba(0,255,198,.18), 0 8px 24px rgba(139,92,246,.15);
+}
+.card-glow::before {
+  content: "";
+  position: absolute; inset: -1px; border-radius: inherit; z-index: -1;
+  background: linear-gradient(120deg, rgba(0,255,198,.5), rgba(139,92,246,.5), rgba(255,140,0,.5));
+  opacity: 0; transition: opacity .3s; filter: blur(14px);
+}
+.card-glow:hover::before { opacity: .8; }
+
+/* ---- Pulsing live dot ---- */
+.pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; display: inline-block; animation: pulse 1.6s infinite; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
+  70% { box-shadow: 0 0 0 9px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
+/* ---- Page loader ---- */
+.fx-loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #08080f;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .5s ease, visibility .5s ease;
+}
+.fx-loader.hide { opacity: 0; visibility: hidden; }
+.fx-loader .ring {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 4px solid rgba(255,255,255,.1);
+  border-top-color: #00ffc6;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Shake for errors ---- */
+.shake { animation: shake .4s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }

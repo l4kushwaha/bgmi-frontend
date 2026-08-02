@@ -1,86 +1,96 @@
-const WALLET_API = "https://bgmi-wallet-service.bgmi-gateway.workers.dev";
-const CHAT_API   = "https://bgmi_chat_service.bgmi-gateway.workers.dev";
+const WALLET_API = "https://bgmi-marketplace.bgmi-gateway.workers.dev";
 
 const token = localStorage.getItem("token");
-const room  = JSON.parse(localStorage.getItem("activeRoom") || "null");
-
-if (!token || !room) {
-  alert("Session expired");
-  location.href = "/login";
-}
-
 const headers = {
   "Content-Type": "application/json",
   Authorization: "Bearer " + token
 };
 
-const infoText = document.getElementById("infoText");
-const payBtn = document.getElementById("payBtn");
+const fmt = n => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
-/* ================= INIT ================= */
-(async () => {
-  const r = await fetch(`${WALLET_API}/create-order`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      order_id: room.order_id,
-      amount: room.amount
-    })
-  });
+const esc = v => String(v ?? "").replace(/[&<>"']/g,
+  c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  const data = await r.json();
-  if (!r.ok) return alert(data.error);
-
-  window.razorpayData = data;
-
-  infoText.innerHTML = `
-    Total Amount: ₹${data.amount}<br>
-    Service Charge (10%): ₹${data.admin_fee}<br>
-    Seller Receives: ₹${data.seller_amount}
-  `;
-})();
-
-/* ================= PAY ================= */
-payBtn.onclick = () => {
-  const d = window.razorpayData;
-
-  const options = {
-    key: d.key,
-    amount: d.admin_fee * 100,
-    currency: "INR",
-    name: "BGMI Marketplace",
-    description: "Service Charge",
-    order_id: d.razorpay_order_id,
-    handler: async function (res) {
-
-      // VERIFY PAYMENT
-      const vr = await fetch(`${WALLET_API}/verify`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          razorpay_payment_id: res.razorpay_payment_id,
-          razorpay_order_id: res.razorpay_order_id,
-          razorpay_signature: res.razorpay_signature,
-          order_id: room.order_id,
-          seller_id: room.seller_user_id
-        })
-      });
-
-      const v = await vr.json();
-      if (!vr.ok) return alert(v.error);
-
-      // 🔔 Notify chat
-      await fetch(`${CHAT_API}/api/chat/half-payment`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ room_id: room.id })
-      });
-
-      alert("Service charge paid successfully");
-      location.href = "/chat.html";
-    },
-    theme: { color: "#22c55e" }
-  };
-
-  new Razorpay(options).open();
+const toast = msg => {
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
 };
+
+async function loadBalance() {
+  try {
+    const res = await fetch(`${WALLET_API}/balance`, { headers });
+    if (res.status === 401) {
+      toast("Session expired, please login");
+      return;
+    }
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || "Failed to load balance");
+
+    document.getElementById("availableBalance").textContent = fmt(d.available_balance);
+    document.getElementById("escrowHeld").textContent = fmt(d.escrow_held);
+    document.getElementById("totalWithdrawn").textContent = fmt(d.total_withdrawn);
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+async function loadWithdrawals() {
+  try {
+    const res = await fetch(`${WALLET_API}/withdrawals`, { headers });
+    const list = await res.json();
+    const box = document.getElementById("withdrawalsList");
+    box.innerHTML = "";
+
+    if (!Array.isArray(list) || !list.length) {
+      box.innerHTML = `<p style="opacity:.7">No withdrawals yet</p>`;
+      return;
+    }
+
+    list.forEach(w => {
+      const el = document.createElement("div");
+      el.className = "wd-item";
+      const colors = { pending: "#ffb703", processed: "#22c55e", rejected: "#ef4444" };
+      el.innerHTML = `
+        <div>
+          <strong>${fmt(w.amount)}</strong>
+          <small>→ ${esc(w.upi_id)} · ${esc(w.created_at || "")}</small>
+        </div>
+        <span class="wd-status" style="color:${colors[w.status] || "#fff"}">${esc(w.status)}</span>
+      `;
+      box.appendChild(el);
+    });
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+document.getElementById("withdrawBtn")?.addEventListener("click", async () => {
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  const upi_id = document.getElementById("upiId").value.trim();
+
+  if (!amount || amount <= 0) return toast("Enter a valid amount");
+  if (!upi_id) return toast("Enter your UPI ID");
+
+  try {
+    const res = await fetch(`${WALLET_API}/withdraw`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ amount, upi_id })
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || "Withdrawal failed");
+    toast("Withdrawal requested");
+    document.getElementById("withdrawAmount").value = "";
+    document.getElementById("upiId").value = "";
+    loadBalance();
+    loadWithdrawals();
+  } catch (err) {
+    toast(err.message);
+  }
+});
+
+loadBalance();
+loadWithdrawals();
