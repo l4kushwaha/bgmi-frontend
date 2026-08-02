@@ -462,7 +462,7 @@ async function loadPayments() {
     <tr>
       <td>${esc(p.order_id)}${p.utr ? `<br><small style="opacity:.55">UTR: ${esc(p.utr)}</small>` : ""}</td>
       <td>${esc(p.buyer_id)}</td>
-      <td>${esc(p.seller_id)}</td>
+      <td>${esc(p.seller_id)}${p.payee_upi ? `<br><small style="opacity:.55">→ ${esc(p.payee_upi)}</small>` : ""}</td>
       <td>${fmt(p.total_amount)}</td>
       <td>${fmt(p.admin_fee)}</td>
       <td>${fmt(p.seller_amount)}</td>
@@ -480,7 +480,7 @@ async function release(order_id) {
 function exportPayments() {
   api("wallet/admin/payments").then(({ data }) => downloadCSV("payments.csv",
     ["Order ID","Buyer","Seller","Total","Admin Fee","Seller Amount","Status","Paid At"],
-    (data||[]).map(p => [p.order_id, p.buyer_id, p.seller_id, p.total_amount, p.admin_fee, p.seller_amount, p.status, p.paid_at])));
+    (data||[]).map(p => [p.order_id, p.buyer_id, p.seller_id, p.payee_upi || "", p.total_amount, p.admin_fee, p.seller_amount, p.status, p.paid_at])));
 }
 
 /* ---- WITHDRAWALS ---- */

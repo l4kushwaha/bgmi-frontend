@@ -78,6 +78,7 @@
     const upi_name = opts.upi_name || "BGMI Market";
     const amount = Number(opts.amount || 0);
     const order_id = opts.order_id;
+    const note = opts.note || "UPI transfers are instant. After paying, submit your UTR number and the admin will confirm &amp; release the payment.";
 
     const uri = `upi://pay?pa=${encodeURIComponent(upi_id)}&pn=${encodeURIComponent(upi_name)}` +
       (amount ? `&am=${amount}` : "") +
@@ -85,8 +86,9 @@
 
     qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=" + encodeURIComponent(uri);
     document.querySelector("#upiMeta .upiId").textContent = upi_id;
-    document.querySelector("#upiMeta .upiName").textContent = upi_name + " (payee)";
+    document.querySelector("#upiMeta .upiName").textContent = upi_name + (opts.direct_to_seller ? " (Seller — direct)" : " (payee)");
     document.getElementById("upiAmount").textContent = "₹" + Number(amount).toLocaleString("en-IN");
+    document.getElementById("upiNote").textContent = note;
     document.getElementById("upiUtr").value = "";
     wrap.classList.add("show");
 

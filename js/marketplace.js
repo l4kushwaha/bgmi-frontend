@@ -154,7 +154,9 @@ async function startBuy(order_id, seller_user_id, amount) {
       upi_id: walletData.upi_id,
       upi_name: walletData.upi_name,
       amount: walletData.upi_amount,
-      order_id
+      order_id,
+      note: walletData.note,
+      direct_to_seller: walletData.direct_to_seller
     });
     if (!payResult.ok) return; // cancelled
 

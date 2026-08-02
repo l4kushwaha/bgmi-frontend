@@ -134,6 +134,9 @@
       <label for="bio">Bio</label>
       <textarea class="field" id="bio" maxlength="200" placeholder="Tell buyers about yourself… (max 200 chars)"></textarea>
 
+      <label for="upi_id">Your UPI ID <span style="opacity:.5;font-size:.75rem">(buyers pay you directly)</span></label>
+      <input class="field" id="upi_id" type="text" maxlength="60" placeholder="yourname@upi (e.g. name@okhdfcbank)">
+
       <label for="instagram">Instagram</label>
       <input class="field" id="instagram" type="text" maxlength="80" placeholder="username or https://instagram.com/…">
 
@@ -198,6 +201,7 @@
         const data = await r.json();
         const p = data.profile || {};
         document.getElementById("bio").value = p.bio || "";
+        document.getElementById("upi_id").value = p.upi_id || "";
         document.getElementById("instagram").value = p.instagram || "";
         document.getElementById("facebook").value = p.facebook || "";
 
@@ -234,6 +238,7 @@
             user_id: user.id,
             name: user.name,
             bio: document.getElementById("bio").value.trim(),
+            upi_id: document.getElementById("upi_id").value.trim(),
             instagram: document.getElementById("instagram").value.trim(),
             facebook: document.getElementById("facebook").value.trim()
           })
