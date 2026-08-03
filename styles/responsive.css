@@ -246,3 +246,34 @@ body { text-shadow: 0 1px 3px rgba(0,0,0,.35); }
 @media (prefers-reduced-motion: reduce) {
   .fx-aurora span, .fx-particles span, .fx-bubble, .fx-meteor, .fx-loot, .fx-zone, .fx-emoji, .fx-grid { animation: none !important; }
 }
+
+/* ---- Signup OTP verification panel (login page) ---- */
+.verify-panel {
+  position: fixed;
+  z-index: 999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, 92vw);
+  padding: 32px 28px;
+  border-radius: 22px;
+  background: rgba(18, 18, 34, .78);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 24px 60px rgba(0,0,0,.55), 0 0 40px rgba(0,255,198,.12);
+  text-align: center;
+}
+.verify-panel h2 { color: #fff; margin-bottom: 10px; }
+.verify-panel .verify-hint { color: rgba(255,255,255,.75); margin-bottom: 22px; line-height: 1.5; }
+.verify-panel .verify-hint b { color: #00ffc6; }
+.verify-panel .field-wrapper { margin-bottom: 16px; }
+.verify-panel input#verify-otp {
+  text-align: center;
+  letter-spacing: 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.verify-panel .switch-link { margin-top: 6px; }
+.verify-panel .switch-link a { color: #00ffc6; text-decoration: none; }
+.verify-panel .switch-link a:hover { text-decoration: underline; }

@@ -49,7 +49,9 @@
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      throw new Error(data.error || data.message || "Request failed");
+      const e = new Error(data.error || data.message || "Request failed");
+      e.code = data.code || "";
+      throw e;
     }
     return data;
   }
@@ -121,11 +123,14 @@
       }, 800);
 
     } catch (err) {
-      showToast(err.message, "error");
+      if (err.code === "EMAIL_NOT_VERIFIED") {
+        showVerifyPanel(email);
+        showToast("Email not verified. Enter the OTP sent to your email.", "info");
+      } else {
+        showToast(err.message, "error");
+      }
     }
   }
-
-  /* ===================== REGISTER ===================== */
   async function registerUser() {
     const username = document.getElementById("register-name")?.value.trim();
     const email = document.getElementById("register-email")?.value.trim();
@@ -137,10 +142,18 @@
     }
 
     try {
-      await apiFetch(`${AUTH_API}/register`, {
+      const data = await apiFetch(`${AUTH_API}/register`, {
         method: "POST",
         body: JSON.stringify({ username, email, password })
       });
+
+      if (data && data.verify_required) {
+        showToast("Check your email for OTP to activate your account", "success");
+        showVerifyPanel(email);
+        document.getElementById("register-name").value = "";
+        document.getElementById("register-password").value = "";
+        return;
+      }
 
       showToast("Registered successfully! Logging in...", "success");
 
@@ -152,6 +165,76 @@
 
     } catch (err) {
       showToast(err.message, "error");
+    }
+  }
+
+  /* ===================== EMAIL VERIFICATION (SIGNUP OTP) ===================== */
+  function showVerifyPanel(email) {
+    const panel = document.getElementById("verifyPanel");
+    if (!panel) return;
+    document.getElementById("verifyEmail").textContent = email;
+    document.getElementById("verify-email-store").value = email;
+    document.getElementById("verify-otp").value = "";
+    panel.style.display = "block";
+    document.getElementById("verify-otp").focus();
+  }
+
+  function closeVerify() {
+    const panel = document.getElementById("verifyPanel");
+    if (panel) panel.style.display = "none";
+  }
+
+  async function verifyEmail() {
+    const email = document.getElementById("verify-email-store")?.value.trim();
+    const otp = document.getElementById("verify-otp")?.value.trim();
+
+    if (!email || !otp) {
+      showToast("Enter the OTP sent to your email", "error");
+      return;
+    }
+
+    try {
+      await apiFetch(`${AUTH_API}/verify-email`, {
+        method: "POST",
+        body: JSON.stringify({ email, otp })
+      });
+
+      showToast("Email verified! Logging in...", "success");
+      closeVerify();
+      document.getElementById("login-email").value = email;
+      document.getElementById("login-password").value = "";
+      document.getElementById("login-password").focus();
+    } catch (err) {
+      showToast(err.message || "Verification failed", "error");
+    }
+  }
+
+  async function resendVerification() {
+    const email = document.getElementById("verify-email-store")?.value.trim();
+    if (!email) {
+      showToast("No email to resend to", "error");
+      return;
+    }
+
+    const link = document.getElementById("resendVerifyLink");
+    if (link) {
+      link.textContent = "Sending...";
+      link.style.pointerEvents = "none";
+    }
+
+    try {
+      await apiFetch(`${AUTH_API}/resend-verification`, {
+        method: "POST",
+        body: JSON.stringify({ email })
+      });
+      showToast("OTP resent to your email", "success");
+    } catch (err) {
+      showToast(err.message || "Failed to resend OTP", "error");
+    } finally {
+      if (link) {
+        link.textContent = "Resend OTP";
+        link.style.pointerEvents = "auto";
+      }
     }
   }
 
@@ -235,7 +318,16 @@ async function sendResetLink() {
       body: JSON.stringify({ email })
     });
 
-    showToast(data.message || "OTP sent to email", "success");
+    if (data && data.dev_otp) {
+      const otpInput = document.getElementById("resetToken");
+      if (otpInput) {
+        otpInput.value = data.dev_otp;
+        document.getElementById("newPassword")?.focus();
+      }
+      showToast("Backup code: " + data.dev_otp, "success");
+    } else {
+      showToast(data.message || "OTP sent to email", "success");
+    }
   } catch (err) {
     showToast(err.message || "Failed to send OTP", "error");
   } finally {
@@ -280,6 +372,10 @@ async function resetPassword() {
   window.sendResetLink = sendResetLink;
   window.resetPassword = resetPassword;
   window.refreshAccessToken = refreshAccessToken;
+  window.verifyEmail = verifyEmail;
+  window.resendVerification = resendVerification;
+  window.closeVerify = closeVerify;
+  window.showVerifyPanel = showVerifyPanel;
 
 
 })();

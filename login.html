@@ -120,6 +120,33 @@
     </div>
 </div>
 
+<!-- ================= EMAIL VERIFICATION (SIGNUP OTP) ================= -->
+<div id="verifyPanel" class="verify-panel" style="display:none">
+    <h2 class="under-bar">Verify Your Email</h2>
+    <p class="verify-hint">Enter the 6-digit OTP sent to<br><b id="verifyEmail"></b></p>
+
+    <input type="hidden" id="verify-email-store">
+
+    <div class="field-wrapper">
+        <input type="text" id="verify-otp" inputmode="numeric" maxlength="6" placeholder="Enter OTP">
+        <label for="verify-otp">OTP</label>
+    </div>
+
+    <div class="field-wrapper">
+        <button class="submit-button" type="button" onclick="verifyEmail()" style="width:100%;">
+            Verify &amp; Continue
+        </button>
+    </div>
+
+    <div class="switch-link">
+        <p>
+            <a href="#" id="resendVerifyLink" onclick="event.preventDefault(); resendVerification();">Resend OTP</a>
+            &nbsp;·&nbsp;
+            <a href="#" onclick="event.preventDefault(); closeVerify();">Back to Login</a>
+        </p>
+    </div>
+</div>
+
 <!-- ================= FOOTER ================= -->
 <div class="footer">
     <p>Made with ❤️ by <a href="#" target="_blank">Sillent_hunter</a></p>
