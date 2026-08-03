@@ -64,6 +64,9 @@
   .badge.green{background:rgba(34,197,94,.15);color:#4ade80}.badge.red{background:rgba(239,68,68,.15);color:#f87171}
   .badge.yellow{background:rgba(255,183,3,.15);color:#ffd166}.badge.gray{background:rgba(148,163,184,.15);color:#cbd5e1}
   .empty { opacity:.55; padding:18px 0; text-align:center; }
+  .ed-price { cursor:pointer; padding:2px 6px; border-radius:6px; transition:.2s; white-space:nowrap; }
+  .ed-price:hover { background:rgba(0,255,198,.12); box-shadow:0 0 0 1px rgba(0,255,198,.4); }
+  .price-edit { width:110px; padding:4px 8px; border-radius:7px; border:1px solid #00ffc6; background:#0a0a12; color:#fff; font-size:.82rem; outline:none; }
 
   .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
   .toolbar input, .toolbar select {
@@ -417,8 +420,8 @@ async function loadListings() {
       <td>${l.id}</td>
       <td>${esc(l.title)}</td>
       <td>${esc(l.uid)}</td>
-      <td>${esc(l.seller_id)}</td>
-      <td>${fmt(l.price)}</td>
+      <td>${esc(l.seller_name || l.seller_id)}</td>
+      <td><span class="ed-price" title="Click to edit price" onclick="editPrice(${l.id}, this)">✏️ ${fmt(l.price)}</span></td>
       <td>${statusBadge(l.status)}</td>
       <td style="white-space:nowrap">
         <button class="mini" onclick="moderate(${l.id},'available')">Show</button>
@@ -427,6 +430,23 @@ async function loadListings() {
         <button class="mini danger" onclick="delListing(${l.id})">Delete</button>
       </td>
     </tr>`).join("");
+}
+
+async function editPrice(id, el) {
+  const current = el.textContent.replace(/[^\d.]/g, "");
+  el.innerHTML = `<input class="price-edit" type="number" min="1" value="${current}" onkeydown="if(event.key==='Enter'){savePrice(${id}, this);}else if(event.key==='Escape'){location.reload();}">`;
+  const inp = el.querySelector("input");
+  inp.focus();
+  inp.select();
+  inp.onblur = () => savePrice(id, inp);
+}
+
+async function savePrice(id, input) {
+  const price = Number(input.value);
+  if (!price || price <= 0) { toast("Invalid price", "err"); loadListings(); return; }
+  const { ok, data } = await api(`market/admin/listings/${id}`, { method: "PATCH", body: JSON.stringify({ price }) });
+  toast(ok ? "Price updated" : (data.error || "Failed"), ok ? "ok" : "err");
+  loadListings();
 }
 
 async function moderate(id, status) {
