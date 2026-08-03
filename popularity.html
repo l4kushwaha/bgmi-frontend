@@ -121,6 +121,28 @@
     .boost-card .b-pop small { display:block; font-size:.68rem; font-weight:400; letter-spacing:.1em; opacity:.7; color:#fff; }
     .boost-legend { text-align:center; font-size:.8rem; color:rgba(255,255,255,.55); margin-top:1rem; line-height:1.7; }
 
+    /* Custom boost card */
+    .boost-card.custom-card { border-color:rgba(255,0,255,.4); }
+    .boost-card.custom-card:hover { border-color:#ff00ff; box-shadow:0 0 32px rgba(255,0,255,.35); }
+    .b-custom { position:relative; z-index:1; display:flex; flex-direction:column; gap:.5rem; margin-top:.8rem; }
+    .b-custom input {
+      width:100%; padding:.55rem .7rem; border-radius:10px;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(0,0,0,.35); color:#fff; font-size:.82rem; font-family:inherit;
+      outline:none; transition:border-color .25s, box-shadow .25s;
+    }
+    .b-custom input::placeholder { color:rgba(255,255,255,.4); }
+    .b-custom input:focus { border-color:#ff00ff; box-shadow:0 0 12px rgba(255,0,255,.25); }
+    .b-custom .b-go {
+      padding:.55rem .8rem; border:none; border-radius:10px; cursor:pointer;
+      font-weight:700; font-size:.82rem; font-family:inherit;
+      color:#fff; background:linear-gradient(135deg,#ff00b0,#ff6600);
+      box-shadow:0 0 18px rgba(255,0,176,.35);
+      transition:transform .2s, box-shadow .2s;
+    }
+    .b-custom .b-go:hover { transform:translateY(-2px); box-shadow:0 0 26px rgba(255,0,176,.55); }
+    .b-custom .b-go:active { transform:translateY(0); }
+
     footer {
       width:100%; padding:1.2rem; text-align:center;
       backdrop-filter:blur(15px); background:rgba(255,255,255,.04); color:#ccc; font-size:.85rem;
@@ -200,9 +222,21 @@
     <div class="boost-card reveal"><span class="b-emoji">🏍️</span><h4>Bike</h4><p>Basic in-game bike boost</p><span class="b-pop">200 <small>POPULARITY</small></span></div>
     <div class="boost-card reveal" data-delay="1"><span class="b-emoji">🚗</span><h4>Car</h4><p>Standard car boost drop</p><span class="b-pop">2,000 <small>POPULARITY</small></span></div>
     <div class="boost-card reveal" data-delay="2"><span class="b-emoji">🪂</span><h4>Drop</h4><p>Normal supply drop boost</p><span class="b-pop">200 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="3"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">1,500 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="4"><span class="b-emoji">🚁</span><h4>Helicopter</h4><p>Helicopter boost (rare)</p><span class="b-pop">1,25,000 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="5"><span class="b-emoji">🦁</span><h4>Lion</h4><p>Legendary lion boost (top)</p><span class="b-pop">3,00,000 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="3"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">400 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="4"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">600 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="5"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">1,500 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="6"><span class="b-emoji">🚁</span><h4>Helicopter</h4><p>Helicopter boost (rare)</p><span class="b-pop">1,25,000 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="7"><span class="b-emoji">🦁</span><h4>Lion</h4><p>Legendary lion boost (top)</p><span class="b-pop">3,00,000 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal custom-card" data-delay="8">
+      <span class="b-emoji">✏️</span>
+      <h4>Custom Boost</h4>
+      <p>Apna naam &amp; points khud likho</p>
+      <div class="b-custom">
+        <input id="customBoostName" maxlength="60" placeholder="Boost name (e.g. 🎯 Birthday Boost)" autocomplete="off">
+        <input id="customBoostPoints" type="number" min="1" placeholder="Points (e.g. 750)" autocomplete="off">
+        <button id="customBoostGo" type="button" class="b-go">🔥 Sell This</button>
+      </div>
+    </div>
   </div>
 
   <div style="text-align:center;margin-top:1.4rem">
@@ -350,6 +384,17 @@
 
   loadStats();
   loadPopLeaderboard();
+
+  const goBtn = document.getElementById("customBoostGo");
+  if (goBtn) {
+    goBtn.onclick = () => {
+      const name = document.getElementById("customBoostName").value.trim();
+      const pts = document.getElementById("customBoostPoints").value.trim();
+      if (!name) { alert("Pehle boost ka naam likho"); document.getElementById("customBoostName").focus(); return; }
+      if (!pts || Number(pts) < 1) { alert("Pehle valid points likho"); document.getElementById("customBoostPoints").focus(); return; }
+      location.href = "sell.html?cat=popularity&points=" + encodeURIComponent(pts) + "&title=" + encodeURIComponent(name);
+    };
+  }
 </script>
 <script src="assets/effects.js" defer></script>
 

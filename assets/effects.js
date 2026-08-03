@@ -6,6 +6,65 @@
 (() => {
   "use strict";
 
+  /* ---- 0. Per-page theme (distinct gaming background per page) ---- */
+  const THEMES = {
+    "index.html": {
+      bg: "radial-gradient(circle at 15% 15%, rgba(139,92,246,.4), transparent 42%), radial-gradient(circle at 85% 25%, rgba(255,0,128,.22), transparent 40%), radial-gradient(circle at 50% 95%, rgba(0,255,198,.18), transparent 45%), linear-gradient(160deg,#12002b,#07070f 55%,#160021)",
+      t1: "rgba(139,92,246,.6)", t2: "rgba(255,0,128,.5)", t3: "rgba(0,255,198,.45)"
+    },
+    "marketplace.html": {
+      bg: "radial-gradient(circle at 10% 20%, rgba(0,140,255,.35), transparent 45%), radial-gradient(circle at 90% 80%, rgba(0,255,198,.28), transparent 45%), radial-gradient(circle at 60% 0%, rgba(0,80,200,.3), transparent 40%), linear-gradient(160deg,#02101f,#040a18 55%,#020a18)",
+      t1: "rgba(0,150,255,.6)", t2: "rgba(0,255,198,.5)", t3: "rgba(30,60,255,.45)"
+    },
+    "sell.html": {
+      bg: "radial-gradient(circle at 80% 12%, rgba(255,120,0,.32), transparent 42%), radial-gradient(circle at 12% 85%, rgba(255,0,128,.26), transparent 42%), radial-gradient(circle at 50% 100%, rgba(255,60,0,.16), transparent 45%), linear-gradient(160deg,#190902,#12080f 55%,#1a0306)",
+      t1: "rgba(255,140,0,.6)", t2: "rgba(255,0,128,.5)", t3: "rgba(255,60,0,.42)"
+    },
+    "profile.html": {
+      bg: "radial-gradient(circle at 20% 15%, rgba(255,0,160,.32), transparent 42%), radial-gradient(circle at 85% 75%, rgba(139,92,246,.3), transparent 45%), radial-gradient(circle at 50% 0%, rgba(255,0,80,.2), transparent 40%), linear-gradient(160deg,#1a0318,#0f0518 55%,#12031a)",
+      t1: "rgba(255,0,160,.6)", t2: "rgba(139,92,246,.5)", t3: "rgba(255,80,200,.42)"
+    },
+    "wallet.html": {
+      bg: "radial-gradient(circle at 15% 25%, rgba(0,200,150,.3), transparent 42%), radial-gradient(circle at 85% 70%, rgba(0,255,198,.25), transparent 45%), radial-gradient(circle at 40% 100%, rgba(34,197,94,.18), transparent 45%), linear-gradient(160deg,#02170f,#04130d 55%,#02100c)",
+      t1: "rgba(0,220,160,.6)", t2: "rgba(0,255,198,.5)", t3: "rgba(34,197,94,.42)"
+    },
+    "popularity.html": {
+      bg: "radial-gradient(circle at 75% 10%, rgba(255,150,0,.35), transparent 42%), radial-gradient(circle at 15% 90%, rgba(255,0,100,.24), transparent 42%), radial-gradient(circle at 50% 60%, rgba(255,80,0,.14), transparent 40%), linear-gradient(160deg,#190902,#12050a 55%,#160202)",
+      t1: "rgba(255,150,0,.6)", t2: "rgba(255,0,100,.5)", t3: "rgba(255,120,0,.42)"
+    },
+    "meetups.html": {
+      bg: "radial-gradient(circle at 80% 20%, rgba(167,139,250,.32), transparent 42%), radial-gradient(circle at 10% 80%, rgba(255,0,255,.24), transparent 42%), radial-gradient(circle at 60% 100%, rgba(88,28,135,.3), transparent 45%), linear-gradient(160deg,#12002b,#0a0516 55%,#160021)",
+      t1: "rgba(167,139,250,.6)", t2: "rgba(255,0,255,.5)", t3: "rgba(139,92,246,.42)"
+    },
+    "chat.html": {
+      bg: "radial-gradient(circle at 15% 15%, rgba(59,91,219,.34), transparent 42%), radial-gradient(circle at 85% 85%, rgba(0,255,198,.2), transparent 45%), radial-gradient(circle at 70% 0%, rgba(99,102,241,.28), transparent 42%), linear-gradient(160deg,#030a1e,#050a18 55%,#030818)",
+      t1: "rgba(99,102,241,.6)", t2: "rgba(59,91,219,.5)", t3: "rgba(0,255,198,.42)"
+    },
+    "admin_dashboard.html": {
+      bg: "radial-gradient(circle at 10% 10%, rgba(139,92,246,.3), transparent 42%), radial-gradient(circle at 90% 90%, rgba(30,64,175,.32), transparent 45%), linear-gradient(160deg,#0b0817,#06060f 55%,#0a0a16)",
+      t1: "rgba(139,92,246,.55)", t2: "rgba(59,91,219,.5)", t3: "rgba(0,255,198,.32)"
+    },
+    "login.html": {
+      bg: "radial-gradient(circle at 20% 20%, rgba(0,200,255,.35), transparent 42%), radial-gradient(circle at 80% 80%, rgba(0,255,198,.28), transparent 42%), radial-gradient(circle at 50% 0%, rgba(0,120,220,.3), transparent 40%), linear-gradient(160deg,#02101c,#04121c 55%,#021018)",
+      t1: "rgba(0,200,255,.6)", t2: "rgba(0,255,198,.5)", t3: "rgba(0,120,220,.42)"
+    },
+    "forgot_password.html": {
+      bg: "radial-gradient(circle at 25% 20%, rgba(0,220,200,.3), transparent 42%), radial-gradient(circle at 80% 70%, rgba(59,130,246,.26), transparent 42%), radial-gradient(circle at 50% 110%, rgba(0,255,220,.16), transparent 45%), linear-gradient(160deg,#02141c,#042028 55%,#02141a)",
+      t1: "rgba(0,220,200,.55)", t2: "rgba(59,130,246,.5)", t3: "rgba(0,255,220,.42)"
+    }
+  };
+
+  const page = (location.pathname || "").split("/").pop();
+  const reducedMotion = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const smallScreen = typeof matchMedia !== "undefined" && matchMedia("(max-width: 640px)").matches;
+  const theme = THEMES[page] || THEMES["index.html"];
+  if (!document.body.dataset.nofx) {
+    document.body.style.background = theme.bg;
+    document.body.style.setProperty("--t1", theme.t1);
+    document.body.style.setProperty("--t2", theme.t2);
+    document.body.style.setProperty("--t3", theme.t3);
+  }
+
   /* ---- 1. Page loader ---- */
   function initLoader() {
     const l = document.createElement("div");
@@ -247,11 +306,132 @@
     document.body.appendChild(s);
   }
 
-  const page = (location.pathname || "").split("/").pop();
+  /* ---- 17. Neon grid floor ---- */
+  function initGrid() {
+    const g = document.createElement("div");
+    g.className = "fx-grid";
+    g.setAttribute("aria-hidden", "true");
+    document.body.appendChild(g);
+  }
+
+  /* ---- 18. Glassy water bubbles ---- */
+  function initBubbles(count = 12) {
+    const wrap = document.createElement("div");
+    wrap.className = "fx-bubbles";
+    wrap.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < count; i++) {
+      const size = 14 + Math.random() * 46;
+      const dur = 10 + Math.random() * 18;
+      const b = document.createElement("span");
+      b.className = "fx-bubble";
+      b.style.cssText = `
+        left:${Math.random() * 100}%;
+        width:${size}px; height:${size}px;
+        animation-duration:${dur}s;
+        animation-delay:${-Math.random() * dur}s;
+      `;
+      wrap.appendChild(b);
+    }
+    document.body.appendChild(wrap);
+  }
+
+  /* ---- 19. ☄️ Shooting meteors ---- */
+  function initMeteors(count = 3) {
+    for (let i = 0; i < count; i++) {
+      const m = document.createElement("span");
+      m.className = "fx-meteor";
+      const dur = 7 + Math.random() * 6;
+      m.style.cssText = `
+        left:${Math.random() * 80}%;
+        top:${Math.random() * 40}%;
+        --mx:${(40 + Math.random() * 70)}vw;
+        --my:${(50 + Math.random() * 70)}vh;
+        animation-duration:${dur}s;
+        animation-delay:${-Math.random() * dur}s;
+      `;
+      document.body.appendChild(m);
+    }
+  }
+
+  /* ---- 20. 🎁 Floating loot boxes ---- */
+  function initLoot(count = 4) {
+    const pool = ["🎁", "📦", "💎", "⚔️", "🏆", "🪙"];
+    for (let i = 0; i < count; i++) {
+      const l = document.createElement("span");
+      l.className = "fx-loot";
+      l.textContent = pool[Math.floor(Math.random() * pool.length)];
+      const dur = 15 + Math.random() * 9;
+      l.style.cssText = `
+        left:${Math.random() * 100}%;
+        font-size:${1 + Math.random() * 1.4}rem;
+        animation-duration:${dur}s;
+        animation-delay:${-Math.random() * dur}s;
+      `;
+      document.body.appendChild(l);
+    }
+  }
+
+  /* ---- 21. 💥 Battle-zone shrinking rings ---- */
+  function initZones(count = 2) {
+    for (let i = 0; i < count; i++) {
+      const z = document.createElement("span");
+      z.className = "fx-zone";
+      const size = 30 + Math.random() * 55;
+      z.style.cssText = `
+        width:${size}vmin; height:${size}vmin;
+        left:${Math.random() * 70}%;
+        top:${Math.random() * 70}%;
+        animation-duration:${6 + Math.random() * 6}s;
+        animation-delay:${-Math.random() * 8}s;
+      `;
+      document.body.appendChild(z);
+    }
+  }
+
+  /* ---- 22. 💧 Water ripple on interactive clicks ---- */
+  function initRipple() {
+    document.addEventListener("click", e => {
+      const t = e.target.closest("button, a, .item-card, .stat-card, .boost-card, .soon-card, .rank-row, .wd-item, .g-card, .mu-card, .panel .mini");
+      if (!t) return;
+      const r = t.getBoundingClientRect();
+      if (!r.width) return;
+      const s = document.createElement("span");
+      s.className = "fx-ripple";
+      s.style.left = (e.clientX - r.left) + "px";
+      s.style.top = (e.clientY - r.top) + "px";
+      t.appendChild(s);
+      setTimeout(() => s.remove(), 900);
+    });
+  }
+
+  /* ---- 23. Cinematic vignette ---- */
+  function initVignette() {
+    const v = document.createElement("div");
+    v.className = "fx-vignette";
+    v.setAttribute("aria-hidden", "true");
+    document.body.appendChild(v);
+  }
+
   const skipLoader = ["login.html", "register.html", "forgot_password.html", "wallet.html"];
-  if (!skipLoader.includes(page)) initLoader();
-  initAurora();
-  initParticles();
+  if (!reducedMotion && !document.body.dataset.nofx) {
+    if (!skipLoader.includes(page)) initLoader();
+    initAurora();
+    initGrid();
+    initScanlines();
+    initBubbles(smallScreen ? 8 : 12);
+    initVignette();
+    if (smallScreen) {
+      initParticles(12);
+      initZones(1);
+    } else {
+      initParticles(20);
+      initZones(2);
+      initMeteors(3);
+      initLoot(4);
+      initEmojis(8);
+    }
+    initRipple();
+  }
   initReveal();
   initGlow();
   initTilt();
@@ -260,9 +440,7 @@
   initShake();
   initCounters();
   initClock();
-  initEmojis();
   initCardStagger();
   initMarquee();
   initDecoDelay();
-  initScanlines();
 })();

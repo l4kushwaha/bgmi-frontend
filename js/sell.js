@@ -160,6 +160,18 @@
     if (!price.value) price.value = points; // ₹1 per point base
   };
 
+  // Quick-pick chips <-> select sync
+  const chips = document.getElementById("boostChips");
+  if (chips) {
+    chips.addEventListener("click", e => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      chips.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c === btn));
+      boostItem.value = btn.dataset.val;
+      boostItem.dispatchEvent(new Event("change"));
+    });
+  }
+
   // ===== MEETUP TOGGLE =====
   const meetupEnabled = document.getElementById("meetupEnabled");
   const meetupFields = document.getElementById("meetupFields");
@@ -262,4 +274,22 @@
       submitBtn.textContent = "List for Sale";
     }
   };
+
+  // Prefill from query params (?cat=popularity&points=750&title=...)
+  try {
+    const qp = new URLSearchParams(location.search);
+    if (qp.get("cat") === "popularity") {
+      setCategory("popularity");
+      const pts = qp.get("points");
+      const t = qp.get("title");
+      if (pts) {
+        document.getElementById("popPoints").value = pts;
+        boostItem.value = "custom";
+        if (!document.getElementById("price").value) document.getElementById("price").value = pts;
+      }
+      if (t) document.getElementById("popTitle").value = t;
+      const customChip = chips?.querySelector('.chip[data-val="custom"]');
+      if (customChip) customChip.classList.add("active");
+    }
+  } catch {}
 })();

@@ -212,6 +212,18 @@
   }
   #toast.show{opacity:1;visibility:visible;transform:translateX(-50%)}
   #toast.err{background:#c0392b}
+
+  /* ---------- BOOST QUICK-PICK CHIPS ---------- */
+  .boost-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
+  .boost-chips .chip{
+    padding:.5rem .85rem;border-radius:999px;cursor:pointer;
+    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
+    color:#fff;font-size:.78rem;font-family:inherit;transition:.25s;
+  }
+  .boost-chips .chip:hover{border-color:#ffb703;box-shadow:0 0 14px rgba(255,183,3,.25);transform:translateY(-2px)}
+  .boost-chips .chip.active{border-color:#ffb703;background:rgba(255,183,3,.15);color:#ffd369;box-shadow:0 0 16px rgba(255,183,3,.35)}
+  .boost-chips .chip.chip-custom{border-color:rgba(255,0,255,.45)}
+  .boost-chips .chip.chip-custom:hover{border-color:#ff00ff;box-shadow:0 0 14px rgba(255,0,255,.3)}
 </style>
 </head>
 
@@ -291,6 +303,18 @@
       <div class="sec hidden-sec" id="secPopularity">
         <div class="sec-head">🔥 Popularity Boost Details</div>
         <p style="font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:.7rem">Buyer apna target BGMI UID purchase ke time pe dega — aapko UID nahi mangna padta.</p>
+        <label>Quick Pick (exact BGMI values)</label>
+        <div class="boost-chips" id="boostChips">
+          <button type="button" class="chip" data-val="200|Bike">🏍️ Bike · 200</button>
+          <button type="button" class="chip" data-val="2000|Car">🚗 Car · 2,000</button>
+          <button type="button" class="chip" data-val="200|Drop">🪂 Drop · 200</button>
+          <button type="button" class="chip" data-val="400|Event Drop">🎯 Event Drop · 400</button>
+          <button type="button" class="chip" data-val="600|Event Drop">🎯 Event Drop · 600</button>
+          <button type="button" class="chip" data-val="1500|Event Drop">🎯 Event Drop · 1,500</button>
+          <button type="button" class="chip" data-val="125000|Helicopter">🚁 Heli · 1,25,000</button>
+          <button type="button" class="chip" data-val="300000|Lion">🦁 Lion · 3,00,000</button>
+          <button type="button" class="chip chip-custom" data-val="custom">✏️ Custom Name + Points</button>
+        </div>
         <label for="boostItem">Boost Item (exact BGMI values)</label>
         <select id="boostItem">
           <option value="">-- Select boost item (auto-fill) --</option>
@@ -304,10 +328,10 @@
           <option value="300000|Lion">🦁 Lion — 3,00,000 pop</option>
           <option value="custom">✏️ Custom points</option>
         </select>
+        <label for="popTitle">Boost Title — apna custom name <span class="req">*</span></label>
+        <input id="popTitle" placeholder="e.g. 🔥 Instant 1000 Popularity Boost" autocomplete="off">
         <label for="popPoints">Popularity Points <span class="req">*</span></label>
         <input id="popPoints" type="number" min="1" placeholder="e.g. 1000" autocomplete="off">
-        <label for="popTitle">Boost Title <span class="req">*</span></label>
-        <input id="popTitle" placeholder="e.g. 🔥 Instant 1000 Popularity Boost" autocomplete="off">
         <label for="deliveryTime">Delivery Time</label>
         <input id="deliveryTime" placeholder="e.g. 30 min se 2 hours" autocomplete="off">
         <p style="font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.3rem">Buyer ko full payment seedha aapke UPI pe milti hai. Popularity points khareedne waale player ko credit hote hain.</p>
