@@ -850,4 +850,14 @@
   setMode("global");
   loadGlobal();
   loadMyChats();
+
+  // Auto-open room passed via ?room_id= (from marketplace Chat / Buy)
+  try {
+    const qp = new URLSearchParams(location.search);
+    const roomIdParam = qp.get("room_id");
+    if (roomIdParam) {
+      setMode("chats");
+      openChat(roomIdParam);
+    }
+  } catch {}
 })();

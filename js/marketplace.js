@@ -125,8 +125,14 @@ async function startBuy(order_id, seller_user_id, amount) {
     return;
   }
 
-  // Popularity listing → buyer must give the target UID for the boost
   const item = allItems.find(i => String(i.id) === String(order_id));
+
+  // 0️⃣ Buyer picks: online delivery OR real meetup
+  const choice = await openBuyOptions(item);
+  if (!choice) return;            // cancelled
+  if (choice === "meetup") { openMeetup(order_id); return; }
+
+  // Popularity listing → buyer must give the target UID for the boost
   let target_uid = "";
   if (item && (item.category || "account") === "popularity") {
     const uid = await openTargetUid();
@@ -177,6 +183,26 @@ async function startBuy(order_id, seller_user_id, amount) {
     alert("Something went wrong");
   }
 }
+
+/* ================= BUY OPTIONS MODAL (online vs meetup) ================= */
+let buyOptsResolver = null;
+
+function openBuyOptions(item) {
+  const title = item ? (item.title || "Listing") : "Listing";
+  document.getElementById("buyopts-info").textContent =
+    `${title} — ₹${Number(item?.price || 0).toLocaleString("en-IN")}`;
+  document.getElementById("buyopts-modal-bg").classList.add("active");
+  return new Promise(resolve => { buyOptsResolver = resolve; });
+}
+
+function resolveBuyOptions(choice) {
+  document.getElementById("buyopts-modal-bg").classList.remove("active");
+  if (buyOptsResolver) { buyOptsResolver(choice); buyOptsResolver = null; }
+}
+
+document.getElementById("buyopts-online").onclick = () => resolveBuyOptions("online");
+document.getElementById("buyopts-meetup").onclick = () => resolveBuyOptions("meetup");
+document.getElementById("buyopts-cancel").onclick = () => resolveBuyOptions(null);
 
 /* ================= TARGET UID MODAL (popularity buy) ================= */
 let targetResolver = null;
