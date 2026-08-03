@@ -3,6 +3,7 @@
 const API_URL = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 const container = document.getElementById("items-container");
 const searchInput = document.getElementById("search");
+const cityInput = document.getElementById("city");
 const filterSelect = document.getElementById("filter");
 
 
@@ -124,6 +125,15 @@ async function startBuy(order_id, seller_user_id, amount) {
     return;
   }
 
+  // Popularity listing → buyer must give the target UID for the boost
+  const item = allItems.find(i => String(i.id) === String(order_id));
+  let target_uid = "";
+  if (item && (item.category || "account") === "popularity") {
+    const uid = await openTargetUid();
+    if (!uid) return; // cancelled
+    target_uid = uid;
+  }
+
   try {
     // 1️⃣ Create purchase record (escrow tracking)
     const resPurchase = await fetch(
@@ -131,7 +141,7 @@ async function startBuy(order_id, seller_user_id, amount) {
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ listing_id: order_id })
+        body: JSON.stringify({ listing_id: order_id, target_uid })
       }
     );
     const purchaseData = await resPurchase.json();
@@ -168,6 +178,92 @@ async function startBuy(order_id, seller_user_id, amount) {
   }
 }
 
+/* ================= TARGET UID MODAL (popularity buy) ================= */
+let targetResolver = null;
+
+function openTargetUid() {
+  document.getElementById("target-uid").value = "";
+  document.getElementById("target-msg").textContent = "";
+  document.getElementById("target-modal-bg").classList.add("active");
+  setTimeout(() => document.getElementById("target-uid").focus(), 50);
+  return new Promise(resolve => { targetResolver = resolve; });
+}
+
+function resolveTargetUid(uid) {
+  document.getElementById("target-modal-bg").classList.remove("active");
+  if (targetResolver) { targetResolver(uid); targetResolver = null; }
+}
+
+document.getElementById("target-submit").onclick = () => {
+  const uid = document.getElementById("target-uid").value.replace(/\D/g, "").slice(0, 12);
+  if (!uid) {
+    document.getElementById("target-msg").textContent = "UID required — apna BGMI UID dalo (sirf numbers).";
+    return;
+  }
+  resolveTargetUid(uid);
+};
+
+document.getElementById("target-cancel").onclick = () => resolveTargetUid(null);
+
+
+/* ================= MEETUP MODAL ================= */
+let meetupListing = null;
+
+window.openMeetup = itemId => {
+  const item = allItems.find(i => String(i.id) === String(itemId));
+  if (!item) return;
+  const s = session();
+  if (!s) { alert("Please login first"); return; }
+
+  meetupListing = item;
+  document.getElementById("meetup-listing-info").textContent =
+    `${item.title} — ₹${item.price}${item.seller_city || item.city ? "  ·  📍 " + (item.seller_city || item.city) : ""}`;
+  document.getElementById("mu-city").value = item.seller_city || item.city || "";
+  document.getElementById("mu-location").value = "";
+  document.getElementById("mu-date").value = "";
+  document.getElementById("mu-time").value = "";
+  document.getElementById("mu-note").value = "";
+  document.getElementById("mu-msg").textContent = "";
+  document.getElementById("meetup-modal-bg").classList.add("active");
+};
+
+window.closeMeetup = () =>
+  document.getElementById("meetup-modal-bg").classList.remove("active");
+
+document.getElementById("mu-submit").onclick = async () => {
+  const s = session();
+  if (!s) { alert("Please login first"); return; }
+  const msg = document.getElementById("mu-msg");
+  msg.style.color = "#e67e22";
+  msg.textContent = "";
+  const payload = {
+    listing_id: meetupListing.id,
+    city: document.getElementById("mu-city").value.trim(),
+    location: document.getElementById("mu-location").value.trim(),
+    meet_date: document.getElementById("mu-date").value,
+    meet_time: document.getElementById("mu-time").value,
+    note: document.getElementById("mu-note").value.trim()
+  };
+  if (!payload.city || !payload.location || !payload.meet_date || !payload.meet_time) {
+    msg.textContent = "City, location, date & time sab required hai.";
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/meetups`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.token },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Request failed");
+    msg.style.color = "#27ae60";
+    msg.textContent = "✅ Meetup request sent! Seller approve karega.";
+    setTimeout(closeMeetup, 1400);
+  } catch (err) {
+    msg.style.color = "#c0392b";
+    msg.textContent = "❌ " + err.message;
+  }
+};
 
 async function loadListings() {
   const s = session();
@@ -183,11 +279,17 @@ async function loadListings() {
 function renderList() {
   let items = [...allItems];
   const q = searchInput?.value?.toLowerCase() || "";
+  const c = cityInput?.value?.toLowerCase() || "";
   const f = filterSelect?.value || "";
 
   if (q)
     items = items.filter(i =>
       `${i.uid} ${i.title} ${i.highest_rank}`.toLowerCase().includes(q)
+    );
+
+  if (c)
+    items = items.filter(i =>
+      `${i.seller_city || ""} ${i.city || ""}`.toLowerCase().includes(c)
     );
 
   if (f === "own" && session())
@@ -197,6 +299,9 @@ function renderList() {
 
   if (f === "account" || f === "popularity")
     items = items.filter(i => (i.category || "account") === f);
+
+  if (f === "meetup")
+    items = items.filter(i => i.meetup_available || i.city);
 
   if (f === "price_low") items.sort((a,b)=>a.price-b.price);
   if (f === "price_high") items.sort((a,b)=>b.price-a.price);
@@ -244,10 +349,13 @@ function renderCard(item) {
       <strong>${esc(item.title)}</strong><br>
       ${isPopularity ? `
         <span class="pop-points">⚡ ${esc(item.points || 0)} Popularity Points</span><br>
-        UID: ${esc(item.uid)}<br>` : `
+        ${item.delivery_time ? `<span class="d-time">🚚 Delivery: ${esc(item.delivery_time)}</span><br>` : ""}` : `
         UID: ${esc(item.uid)}<br>
         Level: ${esc(item.level)}<br>
         Rank: ${esc(item.highest_rank || "-")}<br>`}
+
+      ${(item.seller_city || item.city) ? `<span class="city-badge">📍 ${esc(item.seller_city || item.city)}</span>` : ""}
+      ${item.meetup_available ? `<span class="meetup-badge">🤝 Meetup Available</span>` : ""}
 
       ${isPopularity ? "" : `
         ${upgraded ? `<b>Upgraded:</b> ${upgraded}<br>` : ""}
@@ -264,6 +372,7 @@ function renderCard(item) {
     </div>
 
     <div class="card-actions">
+      <button class="btn view-btn">👁️ View Details</button>
       <button class="btn outline seller-btn">Seller Profile</button>
       ${isOwner(item)
         ? `<button class="btn edit-btn">Edit</button>
@@ -271,6 +380,7 @@ function renderCard(item) {
         :
          `
          <button class="btn buy-btn">Buy</button>
+         ${(item.meetup_available || item.seller_city) ? `<button class="btn meetup-btn">🤝 Meetup</button>` : ""}
          <button class="btn outline chat-btn">Chat</button>
          `
         }
@@ -280,6 +390,8 @@ function renderCard(item) {
   /* seller */
   card.querySelector(".seller-btn").onclick =
     () => openSellerProfile(item.seller_id);
+  card.querySelector(".view-btn").onclick =
+    () => openDetails(item.id);
 
   if (isOwner(item)) {
     card.querySelector(".edit-btn").onclick = () => openEdit(item.id);
@@ -292,6 +404,9 @@ function renderCard(item) {
 
   card.querySelector(".buy-btn").onclick = () =>
     startBuy(item.id, item.seller_id, item.price); // BUY
+
+  const muBtn = card.querySelector(".meetup-btn");
+  if (muBtn) muBtn.onclick = () => openMeetup(item.id);
 }
 
   
@@ -565,6 +680,8 @@ window.openSellerProfile = async sellerId => {
     <p><b>Rating:</b> ${stars(s.avg_rating)}</p>
     <p><b>Reviews:</b> ${s.review_count || 0}</p>
     <p><b>Total Sales:</b> ${s.total_sales || 0}</p>
+    ${s.city ? `<p><b>📍 City:</b> ${esc(s.city)}</p>` : ""}
+    ${s.meetup_note ? `<p><b>🤝 Meetup:</b> ${esc(s.meetup_note)}</p>` : ""}
     ${bio ? `<p class="seller-bio">“${esc(bio)}”</p>` : ""}
     ${social.length ? `<p class="seller-socials">${social.join(" ")}</p>` : ""}
   `;
@@ -572,6 +689,89 @@ window.openSellerProfile = async sellerId => {
 
 window.closeSeller = () =>
   document.getElementById("seller-modal-bg").classList.remove("active");
+
+/* ================= VIEW DETAILS ================= */
+window.openDetails = itemId => {
+  const item = allItems.find(i => String(i.id) === String(itemId));
+  if (!item) return;
+  const bg = document.getElementById("details-modal-bg");
+  const c = document.getElementById("details-content");
+
+  const images = safeArray(item.images);
+  const isPop = (item.category || "account") === "popularity";
+
+  const chip = (label, val) =>
+    val ? `<div class="d-chip"><b>${esc(label)}</b>${esc(val)}</div>` : "";
+
+  const dGrid = [
+    chip("Gilt / Level", item.level),
+    chip("Highest Rank", item.highest_rank),
+    chip("Mythic Items", safeArray(item.mythic_items).join(", ") || ""),
+    chip("Legendary Items", safeArray(item.legendary_items).join(", ") || ""),
+    chip("Honor Gift", safeArray(item.honor_gift ?? item.gift_items).join(", ") || ""),
+    chip("Upgraded Guns", safeArray(item.upgraded_guns).join(", ") || ""),
+    chip("Titles", safeArray(item.titles).join(", ") || ""),
+    chip("X Suit", safeArray(item.x_suit).join(", ") || ""),
+    chip("Supercar", safeArray(item.supercar).join(", ") || ""),
+    chip("Ultimate", safeArray(item.ultimate).join(", ") || "")
+  ].join("");
+
+  const popChips = isPop ? [
+    `<div class="d-chip" style="border-color:rgba(255,120,0,.5)"><b style="color:#ff9d3c">⚡ Popularity Points</b>${esc(item.points || 0)}</div>`,
+    chip("Delivery Time", item.delivery_time)
+  ].join("") : "";
+
+  const cityChips = (item.seller_city || item.city) ? [
+    `<div class="d-chip" style="border-color:rgba(0,234,255,.5)"><b style="color:#00eaff">📍 City</b>${esc(item.seller_city || item.city)}</div>`,
+    ...(item.meetup_available ? [`<div class="d-chip" style="border-color:rgba(124,255,139,.5)"><b style="color:#7CFF8B">🤝 Real Meetup</b>Available — public place</div>`] : [])
+  ].join("") : "";
+
+  c.innerHTML = `
+    <div class="d-hero">
+      <div>
+        <span class="cat-chip ${isPop?"pop":"acc"}">${isPop?"🔥 POPULARITY":"🎮 ACCOUNT"}</span>
+        <h3 style="margin:.2rem 0">${esc(item.title)}</h3>
+        <div class="d-meta">UID: ${esc(item.uid)} · Listing #${esc(item.id)}</div>
+      </div>
+    </div>
+
+    <div class="d-imgs">
+      ${images.length ? images.map(img => `<img src="${esc(img)}" onclick="openDetailsFull(this.src)">`).join("")
+        : `<div class="d-chip">No images</div>`}
+    </div>
+
+    ${popChips}
+    ${cityChips}
+    <div class="d-grid">${dGrid}</div>
+
+    ${item.description || item.account_highlights ? `<div class="d-desc">📝 ${esc(item.description || item.account_highlights)}</div>` : ""}
+
+    <div class="d-price">₹${esc(item.price)}</div>
+
+    <div class="d-actions">
+      ${isOwner(item) ? `
+        <button class="btn edit-btn" onclick="closeDetails();openEdit(${item.id})">✏️ Edit</button>
+        <button class="btn delete-btn" onclick="closeDetails();deleteListing(${item.id})">🗑 Delete</button>`
+      : `
+        <button class="btn buy-btn" onclick="closeDetails();startBuy(${item.id}, ${JSON.stringify(item.seller_id)}, ${item.price})">🛒 Buy Now</button>
+        ${(item.meetup_available || item.seller_city) ? `<button class="btn meetup-btn" onclick="closeDetails();openMeetup(${item.id})">🤝 Meetup</button>` : ""}
+        <button class="btn outline chat-btn" onclick="closeDetails();startChat(${item.id}, ${JSON.stringify(item.seller_id)})">💬 Chat</button>`}
+    </div>
+  `;
+
+  bg.classList.add("active");
+};
+
+window.openDetailsFull = src => {
+  const img = document.createElement("img");
+  img.src = src;
+  img.style.cssText = "position:fixed;inset:0;margin:auto;max-width:92vw;max-height:92vh;border-radius:14px;z-index:10002;cursor:zoom-out;box-shadow:0 0 60px rgba(0,255,255,.4)";
+  img.onclick = () => img.remove();
+  document.body.appendChild(img);
+};
+
+window.closeDetails = () =>
+  document.getElementById("details-modal-bg").classList.remove("active");
 
 /* ================= EDIT ================= */
 function openEdit(id) {
@@ -684,6 +884,7 @@ async function deleteListing(id) {
 
 /* ================= EVENTS ================= */
 searchInput?.addEventListener("input", renderList);
+cityInput?.addEventListener("input", renderList);
 filterSelect?.addEventListener("change", renderList);
 
 loadListings();

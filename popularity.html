@@ -94,6 +94,33 @@
     .soon-card p { font-size:.85rem; color:rgba(255,255,255,.65); }
     .soon-tag { display:inline-block; margin-top:.7rem; font-size:.72rem; padding:.25rem .7rem; border-radius:999px; background:rgba(255,0,255,.15); color:#ff8ff0; letter-spacing:.06em; }
 
+    /* Boost price list */
+    .boost-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; margin-top:1.2rem; }
+    .boost-card {
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      border:1px solid rgba(255,120,0,.35);
+      border-radius:18px; padding:1.4rem; text-align:center;
+      transition:.3s; position:relative; overflow:hidden;
+    }
+    .boost-card::before {
+      content:""; position:absolute; inset:-40%;
+      background: conic-gradient(from 0deg, transparent 0 70%, rgba(255,150,0,.18) 78%, transparent 88%);
+      animation: boostSpin 6s linear infinite;
+    }
+    @keyframes boostSpin { to { transform: rotate(360deg); } }
+    .boost-card:hover { transform:translateY(-6px) scale(1.03); border-color:#ff9d3c; box-shadow:0 0 32px rgba(255,140,0,.4); }
+    .boost-card .b-emoji { font-size:2.6rem; display:block; position:relative; z-index:1; filter:drop-shadow(0 0 12px rgba(255,150,0,.6)); }
+    .boost-card h4 { margin:.5rem 0 .2rem; position:relative; z-index:1; font-size:1.05rem; }
+    .boost-card p { font-size:.78rem; color:rgba(255,255,255,.6); position:relative; z-index:1; }
+    .boost-card .b-pop {
+      display:inline-block; margin-top:.7rem; position:relative; z-index:1;
+      font-weight:800; font-size:1.35rem; color:#ffb703;
+      text-shadow:0 0 18px rgba(255,183,3,.7);
+    }
+    .boost-card .b-pop small { display:block; font-size:.68rem; font-weight:400; letter-spacing:.1em; opacity:.7; color:#fff; }
+    .boost-legend { text-align:center; font-size:.8rem; color:rgba(255,255,255,.55); margin-top:1rem; line-height:1.7; }
+
     footer {
       width:100%; padding:1.2rem; text-align:center;
       backdrop-filter:blur(15px); background:rgba(255,255,255,.04); color:#ccc; font-size:.85rem;
@@ -113,6 +140,7 @@
       <li><a href="sell.html" class="nav-slide">Sell ID</a></li>
       <li><a href="wallet.html" class="nav-slide">Wallet</a></li>
       <li><a href="profile.html" class="nav-slide">Profile</a></li>
+      <li><a href="meetups.html" class="nav-slide">Meetups</a></li>
       <li><a href="chat.html" class="nav-slide">Message</a></li>
     </ul>
   </nav>
@@ -164,6 +192,19 @@
   <div class="rank-list" id="popRankList">
     <p class="empty">Loading…</p>
   </div>
+
+  <!-- BOOST PRICE LIST -->
+  <h3 class="section-title anim-gradient reveal">⚡ Real Boost Items — Exact Popularity Values</h3>
+  <p class="boost-legend reveal">Ye actual BGMI in-game boost items hain. Jab bhi seller se popularity boost lete ho to <b>points isi table se match karo</b> — zyada/less points ka matlab scam ho sakta hai. 🛡️</p>
+  <div class="boost-grid">
+    <div class="boost-card reveal"><span class="b-emoji">🏍️</span><h4>Bike</h4><p>Basic in-game bike boost</p><span class="b-pop">200 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="1"><span class="b-emoji">🚗</span><h4>Car</h4><p>Standard car boost drop</p><span class="b-pop">2,000 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="2"><span class="b-emoji">🪂</span><h4>Drop</h4><p>Normal supply drop boost</p><span class="b-pop">200 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="3"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">1,500 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="4"><span class="b-emoji">🚁</span><h4>Helicopter</h4><p>Helicopter boost (rare)</p><span class="b-pop">1,25,000 <small>POPULARITY</small></span></div>
+    <div class="boost-card reveal" data-delay="5"><span class="b-emoji">🦁</span><h4>Lion</h4><p>Legendary lion boost (top)</p><span class="b-pop">3,00,000 <small>POPULARITY</small></span></div>
+  </div>
+
   <div style="text-align:center;margin-top:1.4rem">
     <a href="sell.html" class="nav-slide soon-tag" style="text-decoration:none;background:rgba(255,120,0,.15);color:#ff9d3c;padding:.6rem 1.4rem;border-radius:999px;font-weight:700">🔥 Sell Your Popularity →</a>
   </div>
@@ -312,5 +353,6 @@
 </script>
 <script src="assets/effects.js" defer></script>
 
+  <link rel="stylesheet" href="styles/responsive.css">
 </body>
 </html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meetups - BGMI Market</title>
+<link rel="stylesheet" href="assets/webfonts/poppins.css">
+<link rel="stylesheet" href="assets/effects.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+  body {
+    min-height:100vh;
+    background: radial-gradient(circle at top left, #12002b, #07070f, #160021);
+    background-size: 400% 400%;
+    animation: hueShift 16s infinite alternate;
+    color:#fff; overflow-x:hidden;
+  }
+  @keyframes hueShift { 0%{background-position:left top;} 100%{background-position:right bottom;} }
+
+  header {
+    width:100%; padding:1.1rem 2rem;
+    backdrop-filter:blur(20px);
+    background: rgba(255,255,255,.07);
+    display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:.6rem;
+  }
+  header h1 { font-size:1.5rem; }
+  nav ul { list-style:none; display:flex; gap:1rem; flex-wrap:wrap; }
+  nav a { text-decoration:none; color:#fff; transition:.3s; font-size:.95rem; }
+  nav a:hover { color:#00ffc6; text-shadow:0 0 12px rgba(0,255,198,.8); }
+
+  main { padding:2rem 1.5rem 3rem; max-width:900px; margin:0 auto; position:relative; z-index:1; }
+  .hero { text-align:center; padding:1rem 0 1.6rem; }
+  .hero h2 { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; }
+
+  .safety {
+    background: rgba(255,180,0,.08);
+    border:1px solid rgba(255,180,0,.35);
+    border-radius:14px; padding:.9rem 1.1rem; margin:1rem 0 1.4rem;
+    font-size:.85rem; color:#ffd27d; line-height:1.7;
+  }
+
+  .meetup-list { display:flex; flex-direction:column; gap:.9rem; }
+  .mu-card {
+    background: rgba(255,255,255,.05);
+    backdrop-filter: blur(14px);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:16px; padding:1.1rem 1.2rem;
+    transition:.3s;
+  }
+  .mu-card:hover { border-color:#00ffc6; box-shadow:0 0 20px rgba(0,255,198,.18); }
+  .mu-head { display:flex; justify-content:space-between; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.5rem; }
+  .mu-title { font-weight:700; font-size:1rem; }
+  .mu-title small { display:block; font-weight:400; color:rgba(255,255,255,.55); font-size:.78rem; }
+  .mu-tag { font-size:.68rem; font-weight:800; letter-spacing:.07em; padding:.22rem .6rem; border-radius:999px; }
+  .tag-pending { background:rgba(255,183,3,.15); color:#ffb703; border:1px solid rgba(255,183,3,.4); }
+  .tag-approved { background:rgba(0,255,198,.13); color:#00ffc6; border:1px solid rgba(0,255,198,.4); }
+  .tag-declined { background:rgba(255,94,94,.12); color:#ff5e5e; border:1px solid rgba(255,94,94,.4); }
+  .tag-completed { background:rgba(124,255,139,.12); color:#7CFF8B; border:1px solid rgba(124,255,139,.4); }
+  .tag-cancelled { background:rgba(255,255,255,.08); color:rgba(255,255,255,.6); border:1px solid rgba(255,255,255,.2); }
+
+  .mu-row { font-size:.85rem; color:rgba(255,255,255,.8); margin:.15rem 0; }
+  .mu-row b { color:#00eaff; font-weight:600; }
+
+  .mu-actions { display:flex; gap:.5rem; margin-top:.8rem; flex-wrap:wrap; }
+  .btn {
+    padding:.5rem .9rem; border:none; border-radius:10px; cursor:pointer;
+    font-weight:700; font-size:.82rem; font-family:inherit; transition:.25s; color:#fff;
+  }
+  .btn.approve { background:linear-gradient(90deg,#00ffc6,#00b894); color:#062; }
+  .btn.decline { background:rgba(255,94,94,.2); border:1px solid #ff5e5e; }
+  .btn.complete { background:linear-gradient(90deg,#8b5cf6,#00c6ff); }
+  .btn.chat { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); }
+  .btn:hover { transform:translateY(-2px); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+  .empty { text-align:center; color:rgba(255,255,255,.55); padding:2rem 0; }
+  footer {
+    width:100%; padding:1.2rem; text-align:center;
+    backdrop-filter:blur(15px); background:rgba(255,255,255,.04); color:#ccc; font-size:.85rem;
+  }
+  @media (max-width:600px){ header{justify-content:center;} nav ul{justify-content:center;} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="wiggle">🤝</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
+  <nav>
+    <ul>
+      <li><a href="index.html" class="nav-slide">Home</a></li>
+      <li><a href="marketplace.html" class="nav-slide">Marketplace</a></li>
+      <li><a href="sell.html" class="nav-slide">Sell ID</a></li>
+      <li><a href="popularity.html" class="nav-slide">Popularity</a></li>
+      <li><a href="wallet.html" class="nav-slide">Wallet</a></li>
+      <li><a href="profile.html" class="nav-slide">Profile</a></li>
+      <li><a href="chat.html" class="nav-slide">Message</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span>🤝 <b>REAL MEETUPS</b> For Trusted Deals</span>
+    <span>📍 <b>CITY-WISE</b> Seller Search</span>
+    <span>🛡️ Always Meet In <b>PUBLIC PLACES</b></span>
+    <span>⚡ <b>SECURE</b> Escrow Protected</span>
+  </div>
+</div>
+
+<main>
+  <div class="hero">
+    <h2 class="glitch anim-gradient" data-text="MEETUP REQUESTS">MEETUP REQUESTS</h2>
+    <p class="reveal visible">Real-world ID delivery — buyer aur seller dono ko trusted banata hai</p>
+  </div>
+
+  <div class="safety reveal visible">
+    ⚠️ <b>Safety rules:</b> Hamesha public place par milo (mall / metro station / police chowk). <b>Kabhi advance payment mat karo</b> — milne par hi payment + ID exchange. Apne paas ID proof rakho.
+  </div>
+
+  <div class="meetup-list" id="meetupList">
+    <p class="empty">Loading…</p>
+  </div>
+</main>
+
+<footer>© 2026 BGMI Market | Meetups = Trust 🤝</footer>
+
+<script src="js/meetups.js"></script>
+<script src="assets/effects.js" defer></script>
+
+  <link rel="stylesheet" href="styles/responsive.css">
+</body>
+</html>

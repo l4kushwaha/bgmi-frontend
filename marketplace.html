@@ -84,6 +84,8 @@ header{
 
 #search{width:260px}
 
+#city{width:230px}
+
 #filter{min-width:220px}
 
 
@@ -262,6 +264,25 @@ header{
   box-shadow:0 0 12px rgba(255,120,0,.25);
 }
 
+.d-time{
+  display:inline-block; margin-top:.15rem; font-size:.75rem;
+  color:#8b5cf6; background:rgba(139,92,246,.12); padding:.1rem .5rem; border-radius:8px;
+}
+
+.city-badge{
+  display:inline-block; margin:.15rem .25rem .1rem 0; font-size:.72rem;
+  color:#00eaff; background:rgba(0,234,255,.12); padding:.1rem .5rem; border-radius:8px;
+  border:1px solid rgba(0,234,255,.35);
+}
+
+.meetup-badge{
+  display:inline-block; margin:.15rem 0 .1rem; font-size:.72rem;
+  color:#7CFF8B; background:rgba(124,255,139,.12); padding:.1rem .5rem; border-radius:8px;
+  border:1px solid rgba(124,255,139,.4);
+}
+
+.meetup-btn{background:linear-gradient(90deg,#ff9d3c,#ff6a3c);color:#fff;box-shadow:0 0 12px rgba(255,120,60,.35)}
+
 .price{
 
   font-size:18px;
@@ -307,6 +328,8 @@ header{
 .delete-btn{background:#c0392b;color:#fff}
 
 .outline{background:#fff;color:#3498db;border:2px solid #3498db}
+
+.view-btn{background:linear-gradient(90deg,#8b5cf6,#00c6ff);color:#fff;box-shadow:0 0 14px rgba(0,198,255,.35)}
 
 
 
@@ -476,6 +499,8 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 
   <input id="search" placeholder="Search UID / Title / Rank">
 
+  <input id="city" placeholder="📍 Search by City (e.g. Mumbai)">
+
   <select id="filter">
 
     <option value="">All Listings</option>
@@ -483,6 +508,8 @@ body.dark .modal{background:#1e1e1e;color:#fff}
     <option value="account">🎮 Accounts</option>
 
     <option value="popularity">🔥 Popularity</option>
+
+    <option value="meetup">🤝 Meetup Available</option>
 
     <option value="own">My Listings</option>
 
@@ -562,6 +589,107 @@ body.dark .modal{background:#1e1e1e;color:#fff}
 
 </div>
 
+<!-- DETAILS -->
+
+<div id="details-modal-bg" class="modal-bg">
+
+  <div class="modal details-modal">
+
+    <div id="details-content">Loading…</div>
+
+    <button class="btn delete-btn" onclick="closeDetails()">Close</button>
+
+  </div>
+
+</div>
+
+<!-- MEETUP -->
+
+<div id="meetup-modal-bg" class="modal-bg">
+
+  <div class="modal">
+
+    <h3>🤝 Request Real Meetup</h3>
+
+    <p id="meetup-listing-info" style="opacity:.8;font-size:.85rem;margin:.3rem 0 .9rem"></p>
+
+    <p style="font-size:.75rem;color:#e67e22;margin-bottom:.7rem">⚠️ Public place par milo (mall / metro / police chowk). Kabhi bhi paise advance mein mat do.</p>
+
+    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Your City</label>
+
+    <input id="mu-city" placeholder="e.g. Mumbai" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff">
+
+    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Meeting Spot</label>
+
+    <input id="mu-location" placeholder="e.g. Phoenix Mall Gate 2" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff">
+
+    <div style="display:flex;gap:.5rem">
+
+      <div style="flex:1"><label style="display:block;font-size:.8rem;margin-bottom:.2rem">Date</label>
+
+      <input id="mu-date" type="date" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff"></div>
+
+      <div style="flex:1"><label style="display:block;font-size:.8rem;margin-bottom:.2rem">Time</label>
+
+      <input id="mu-time" type="time" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff"></div>
+
+    </div>
+
+    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Note (optional)</label>
+
+    <textarea id="mu-note" rows="2" placeholder="Phone number bhi de sakte ho milne ke liye" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff;resize:vertical"></textarea>
+
+    <p id="mu-msg" style="font-size:.85rem;min-height:1.1em;margin-bottom:.4rem"></p>
+
+    <button class="btn meetup-btn" id="mu-submit">Send Meetup Request</button>
+
+    <button class="btn delete-btn" onclick="closeMeetup()">Cancel</button>
+
+  </div>
+
+</div>
+
+<!-- TARGET UID (popularity) -->
+
+<div id="target-modal-bg" class="modal-bg">
+
+  <div class="modal">
+
+    <h3>🎯 Boost Kaunse UID pe?</h3>
+
+    <p style="opacity:.8;font-size:.85rem;margin:.3rem 0 .9rem">Popularity points jis BGMI player UID pe credit karne hain, woh dalo. Sirf numbers (max 12 digit).</p>
+
+    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Target BGMI UID <span style="color:#ff5e5e">*</span></label>
+
+    <input id="target-uid" placeholder="e.g. 5301234567" inputmode="numeric" maxlength="12" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff">
+
+    <p id="target-msg" style="font-size:.85rem;min-height:1.1em;margin-bottom:.4rem;color:#ff5e5e"></p>
+
+    <button class="btn buy-btn" id="target-submit">Confirm &amp; Continue</button>
+
+    <button class="btn delete-btn" id="target-cancel">Cancel</button>
+
+  </div>
+
+</div>
+
+<style>
+  .details-modal { max-width: 720px; }
+  #details-content .d-hero { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:.8rem; }
+  #details-content .d-imgs { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.9rem; }
+  #details-content .d-imgs img { width:110px; height:110px; border-radius:10px; object-fit:cover; cursor:zoom-in; border:1px solid rgba(0,255,255,.3); transition:.2s; }
+  #details-content .d-imgs img:hover { transform:scale(1.05); border-color:#0ff; }
+  #details-content .d-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.5rem; margin:.6rem 0; }
+  #details-content .d-chip { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:.5rem .7rem; font-size:.82rem; }
+  #details-content .d-chip b { display:block; color:#0ff; margin-bottom:.2rem; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; }
+  #details-content .d-desc { background:rgba(255,255,255,.05); border-left:3px solid #00ffc6; border-radius:8px; padding:.6rem .8rem; margin:.6rem 0; font-size:.88rem; }
+  #details-content .d-price { font-size:1.6rem; font-weight:800; color:#f39c12; text-shadow:0 0 18px rgba(243,156,18,.5); }
+  #details-content .d-actions { display:flex; gap:.6rem; margin-top:.8rem; flex-wrap:wrap; }
+  #details-content .d-actions .btn { flex:1; min-width:120px; }
+  #details-content .d-meta { font-size:.8rem; color:rgba(255,255,255,.65); }
+  body.dark #details-content .d-chip { background:rgba(0,0,0,.25); }
+</style>
+
 
 
 <!-- FULLSCREEN -->
@@ -629,6 +757,7 @@ document.addEventListener('mousemove',e=>{
 
 
 
+  <link rel="stylesheet" href="styles/responsive.css">
 </body>
 
 </html>

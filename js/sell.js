@@ -145,6 +145,31 @@
   catAccount.onclick = () => setCategory("account");
   catPopularity.onclick = () => setCategory("popularity");
 
+  // ===== BOOST ITEM PRESETS =====
+  const boostItem = document.getElementById("boostItem");
+  boostItem.onchange = () => {
+    const val = boostItem.value;
+    const popPoints = document.getElementById("popPoints");
+    const popTitle = document.getElementById("popTitle");
+    const price = document.getElementById("price");
+    if (val === "custom") { popPoints.value = ""; popPoints.focus(); return; }
+    if (!val) return;
+    const [points, name] = val.split("|");
+    popPoints.value = points;
+    popTitle.value = `🔥 Instant ${Number(points).toLocaleString("en-IN")} Popularity Boost (${name})`;
+    if (!price.value) price.value = points; // ₹1 per point base
+  };
+
+  // ===== MEETUP TOGGLE =====
+  const meetupEnabled = document.getElementById("meetupEnabled");
+  const meetupFields = document.getElementById("meetupFields");
+  meetupEnabled.onchange = () => {
+    meetupFields.style.display = meetupEnabled.checked ? "block" : "none";
+    if (meetupEnabled.checked && !document.getElementById("sellerCity").value.trim()) {
+      document.getElementById("sellerCity").focus();
+    }
+  };
+
   // ===== SUBMIT LISTING =====
   form.onsubmit = async e => {
     e.preventDefault();
@@ -154,10 +179,8 @@
 
     let payload;
     if (category === "popularity") {
-      const popUid = document.getElementById("popUid").value.trim();
       const points = Number(document.getElementById("popPoints").value);
       const popTitle = document.getElementById("popTitle").value.trim();
-      if (!/^\d{1,12}$/.test(popUid)) return showToast("Enter a valid player UID (digits only)", true);
       if (!Number.isFinite(points) || points < 1) return showToast("Enter valid popularity points", true);
       if (!popTitle) return showToast("Boost title is required", true);
 
@@ -168,9 +191,9 @@
       payload = {
         category: "popularity",
         points,
-        uid: popUid,
         title: popTitle,
         description: document.getElementById("highlights")?.value.trim() || "",
+        delivery_time: document.getElementById("deliveryTime")?.value.trim() || "",
         price,
         images
       };
@@ -198,8 +221,16 @@
         x_suit: (document.getElementById("x_suit")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
         supercar: (document.getElementById("supercar")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
         ultimate: (document.getElementById("ultimate")?.value || "").split(",").map(s => s.trim()).filter(Boolean),
-        images
+        images,
+        meetup_available: meetupEnabled.checked ? 1 : 0,
+        city: (meetupEnabled.checked ? document.getElementById("sellerCity").value.trim() : "") || null
       };
+    }
+
+    // optional meetup fields when enabled for popularity too
+    if (meetupEnabled.checked && !payload.meetup_available) {
+      payload.meetup_available = 1;
+      payload.city = document.getElementById("sellerCity").value.trim() || null;
     }
 
     submitBtn.disabled = true;
