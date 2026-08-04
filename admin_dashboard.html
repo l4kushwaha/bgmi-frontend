@@ -147,6 +147,7 @@
     <button class="tab" data-tab="withdrawals">Withdrawals</button>
     <button class="tab" data-tab="chats">Chats</button>
     <button class="tab" data-tab="activity">Activity</button>
+    <button class="tab" data-tab="settings">Settings</button>
   </div>
 
   <div class="panel active" id="tab-overview">
@@ -247,6 +248,29 @@
   <div class="panel" id="tab-activity">
     <ul class="feed" id="activityFeedFull"><li class="empty">Loading…</li></ul>
   </div>
+
+  <div class="panel" id="tab-settings">
+    <h3 style="margin-bottom:14px;font-size:.95rem;color:#8b5cf6;">Platform UPI (admin fallback payee)</h3>
+    <p style="font-size:.82rem;opacity:.7;margin-bottom:16px;max-width:640px;line-height:1.6">
+      Jab seller ne apna UPI set nahi kiya hota, tab buyers ko ye platform UPI ID pay karni hoti hai
+      (escrow / admin fee). Ye settings DB me save hoti hain aur turant effect me aati hain.
+    </p>
+    <div class="settings-form" style="max-width:460px;display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="display:block;font-size:.8rem;opacity:.75;margin-bottom:6px">Platform UPI ID</label>
+        <input id="setUpiId" type="text" placeholder="yourname@upi" style="background:rgba(255,255,255,.06);border:1px solid #2a2a3a;color:#fff;padding:11px 14px;border-radius:10px;font-size:.9rem;outline:none;width:100%;box-sizing:border-box" />
+      </div>
+      <div>
+        <label style="display:block;font-size:.8rem;opacity:.75;margin-bottom:6px">UPI Payee Name (as shown in UPI app)</label>
+        <input id="setUpiName" type="text" placeholder="BGMI Market" style="background:rgba(255,255,255,.06);border:1px solid #2a2a3a;color:#fff;padding:11px 14px;border-radius:10px;font-size:.9rem;outline:none;width:100%;box-sizing:border-box" />
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn ghost" style="flex:1;min-height:44px" onclick="saveSettings()">💾 Save Settings</button>
+        <button class="btn ghost" style="flex:1;min-height:44px" onclick="loadSettings()">↻ Reload</button>
+      </div>
+      <div id="settingsStatus" style="font-size:.8rem;opacity:.75"></div>
+    </div>
+  </div>
 </div>
 
 <div id="toasts"></div>
@@ -297,9 +321,45 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   if (t.dataset.tab === "activity") loadActivity(true);
   if (t.dataset.tab === "withdrawals") loadWithdrawals();
   if (t.dataset.tab === "sellers") loadSellerVerifications();
+  if (t.dataset.tab === "settings") loadSettings();
 });
 
 function refreshAll() { loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); loadSellerVerifications(); toast("Dashboard refreshed"); }
+
+/* ---- SETTINGS ---- */
+async function loadSettings() {
+  const status = document.getElementById("settingsStatus");
+  const { ok, data } = await api("wallet/admin/settings");
+  if (ok && data) {
+    document.getElementById("setUpiId").value = data.admin_upi_id || "";
+    document.getElementById("setUpiName").value = data.admin_upi_name || "";
+    if (status) status.textContent = "Loaded. Ye UPI buyers ke paas fallback ke roop me jayega.";
+  } else {
+    if (status) status.textContent = "Failed to load settings: " + ((data && data.error) || "unknown error");
+  }
+}
+
+async function saveSettings() {
+  const upi_id = document.getElementById("setUpiId").value.trim();
+  const upi_name = document.getElementById("setUpiName").value.trim();
+  if (!upi_id) return toast("Platform UPI ID required", "err");
+  if (!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi_id)) return toast("Invalid UPI ID (use name@bank)", "err");
+
+  const btn = document.querySelector('#tab-settings button.btn');
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const { ok, data } = await api("wallet/admin/settings", {
+      method: "PUT",
+      body: JSON.stringify({ admin_upi_id: upi_id, admin_upi_name: upi_name })
+    });
+    if (!ok) throw new Error((data && data.message) || (data && data.error) || "Save failed");
+    toast("Settings saved — " + (data.admin_upi_id || upi_id));
+  } catch (err) {
+    toast(err.message, "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "💾 Save Settings";
+  }
+}
 
 /* ---- OVERVIEW ---- */
 async function loadOverview() {

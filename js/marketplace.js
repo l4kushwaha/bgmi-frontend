@@ -153,13 +153,13 @@ async function startBuy(order_id, seller_user_id, amount) {
     const purchaseData = await resPurchase.json();
     if (!resPurchase.ok) return alert(purchaseData.error || "Unable to create purchase");
 
-    // 2️⃣ Call Wallet Service (10% admin fee)
+    // 2️⃣ Call Wallet Service (10% admin fee) — direct UPI, no gateway
     const resWallet = await fetch(
       "https://bgmi-marketplace.bgmi-gateway.workers.dev/pay/service-charge",
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ order_id, seller_id: seller_user_id, amount: amount || 1000 })
+        body: JSON.stringify({ order_id, seller_id: seller_user_id, amount, purpose: "full" })
       }
     );
     const walletData = await resWallet.json();

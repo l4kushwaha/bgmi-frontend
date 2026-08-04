@@ -277,3 +277,41 @@ body { text-shadow: 0 1px 3px rgba(0,0,0,.35); }
 .verify-panel .switch-link { margin-top: 6px; }
 .verify-panel .switch-link a { color: #00ffc6; text-decoration: none; }
 .verify-panel .switch-link a:hover { text-decoration: underline; }
+
+/* =========================================================
+   MOBILE POLISH — touch targets, safe-areas, small screens
+   ========================================================= */
+
+/* Comfortable tap targets everywhere on touch devices */
+@media (pointer: coarse), (max-width: 768px) {
+  button, .btn, .mini, .tab, .nav-slide, a.glass-badge, a, select, input[type="submit"] {
+    min-height: 44px;
+  }
+  a { display: inline-flex; align-items: center; }
+  .tab { min-height: 40px; }
+}
+
+/* iOS safe-area insets */
+@supports (padding: max(0px)) {
+  footer { padding-bottom: max(1.2rem, env(safe-area-inset-bottom)) !important; }
+  .chat-input, .app, #upiModalWrap { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+}
+
+/* Marquee must never cause horizontal scroll on phones */
+.marquee-wrap { max-width: 100%; overflow: hidden; }
+
+/* Index landing cards fit within viewport width on narrow phones */
+@media (max-width: 380px) {
+  .card-wrapper-1, .card-wrapper-2, .card-wrapper-3 { width: calc(100vw - 32px); }
+  .card-main-1, .card-main-2, .card-main-3 { height: 440px; }
+  .gallery-container { gap: 20px; }
+  .features .feature-pill { font-size: .82rem; padding: .7rem 1rem; }
+}
+
+/* Small screens: keep one usable column, never overflow */
+@media (max-width: 480px) {
+  main, .wrap, .page { padding-left: .7rem !important; padding-right: .7rem !important; }
+  table { font-size: .78rem; }
+  .grid2 { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.6rem; }
+}

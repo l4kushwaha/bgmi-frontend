@@ -470,10 +470,19 @@
     const room = chats.find(c => c.id === activeRoom);
     if (!room) return alert("Room not found");
 
+    // half of the listing price (never less than ₹1)
+    let amount = 1000;
+    try {
+      const lr = await fetch(`https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings/${String(room.order_id).replace(/[^0-9]/g, "").slice(0, 12)}`);
+      const listing = await lr.json();
+      const price = Number(listing.price);
+      if (lr.ok && Number.isFinite(price) && price > 0) amount = Math.max(1, Math.round(price / 2));
+    } catch {}
+
     const r = await fetch("https://bgmi-marketplace.bgmi-gateway.workers.dev/pay/service-charge", {
       method: "POST",
       headers,
-      body: JSON.stringify({ order_id: room.order_id, seller_id: room.seller_user_id, amount: 1000 })
+      body: JSON.stringify({ order_id: room.order_id, seller_id: room.seller_user_id, amount, purpose: "half" })
     });
     const data = await r.json();
     if (!r.ok) return alert(data.error || "Payment failed");

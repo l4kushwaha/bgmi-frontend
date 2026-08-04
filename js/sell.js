@@ -70,8 +70,21 @@
   dropArea.ondragover = e => e.preventDefault();
   fileElem.onchange = e => handleFiles(e.target.files);
 
-  // ===== PRICE ESTIMATOR =====
-  const rankValues = { gold: 10, platinum: 30, ace: 50, diamond: 40, conquer: 200 };
+  // ===== PRICE ESTIMATOR (server-driven via /api/price-config) =====
+  const PRICE = {
+    level_per: 8,          // ₹ per level
+    rank_gold: 10, rank_platinum: 30, rank_ace: 50, rank_diamond: 40, rank_conquer: 200,
+    mythic: 180, legendary: 100, gift: 1000, titles: 100, guns: 300,
+    x_suit: 400, supercar: 1500, ultimate: 250,
+    min_price: 999, round_to: 50, pop_per_point: 1
+  };
+  const rankKeys = { gold: "rank_gold", platinum: "rank_platinum", ace: "rank_ace", diamond: "rank_diamond", conquer: "rank_conquer" };
+
+  fetch("https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/price-config")
+    .then(r => (r.ok ? r.json() : null))
+    .then(cfg => { if (cfg && typeof cfg === "object") Object.assign(PRICE, cfg); })
+    .catch(() => {});
+
   function calcEstimate() {
     const level = +document.getElementById("level").value || 0;
     const rank = document.getElementById("rank").value.trim().toLowerCase();
@@ -85,17 +98,17 @@
     const ultimateArray = (document.getElementById("ultimate")?.value || "").split(",").map(s => s.trim()).filter(Boolean);
 
     let price = 0;
-    price += level * 8;
-    price += rankValues[rank] || 0;
-    price += mythicArray.length * 180;
-    price += legendaryArray.length * 100;
-    price += giftArray.length * 1000;
-    price += titlesArray.length * 100;
-    price += gunsArray.length * 300;
-    price += xSuitArray.length * 400;
-    price += supercarArray.length * 1500;
-    price += ultimateArray.length * 250;
-    price = Math.max(999, Math.round(price / 50) * 50);
+    price += level * PRICE.level_per;
+    price += PRICE[rankKeys[rank]] || 0;
+    price += mythicArray.length * PRICE.mythic;
+    price += legendaryArray.length * PRICE.legendary;
+    price += giftArray.length * PRICE.gift;
+    price += titlesArray.length * PRICE.titles;
+    price += gunsArray.length * PRICE.guns;
+    price += xSuitArray.length * PRICE.x_suit;
+    price += supercarArray.length * PRICE.supercar;
+    price += ultimateArray.length * PRICE.ultimate;
+    price = Math.max(PRICE.min_price || 0, Math.round(price / PRICE.round_to) * PRICE.round_to);
     return price;
   }
 
@@ -157,7 +170,7 @@
     const [points, name] = val.split("|");
     popPoints.value = points;
     popTitle.value = `🔥 Instant ${Number(points).toLocaleString("en-IN")} Popularity Boost (${name})`;
-    if (!price.value) price.value = points; // ₹1 per point base
+    if (!price.value) price.value = Number(points) * (PRICE.pop_per_point || 1); // auto price per point
   };
 
   // Quick-pick chips <-> select sync
@@ -197,7 +210,7 @@
       if (!popTitle) return showToast("Boost title is required", true);
 
       let price = Number(document.getElementById("price").value);
-      if (!price) price = points; // auto: ₹1 per point base
+      if (!price) price = Number(points) * (PRICE.pop_per_point || 1); // auto: per-point price
       if (!Number.isFinite(price) || price < 1) return showToast("Enter a valid price (₹)", true);
 
       payload = {
@@ -285,7 +298,7 @@
       if (pts) {
         document.getElementById("popPoints").value = pts;
         boostItem.value = "custom";
-        if (!document.getElementById("price").value) document.getElementById("price").value = pts;
+        if (!document.getElementById("price").value) document.getElementById("price").value = Number(pts) * (PRICE.pop_per_point || 1);
       }
       if (t) document.getElementById("popTitle").value = t;
       const customChip = chips?.querySelector('.chip[data-val="custom"]');
