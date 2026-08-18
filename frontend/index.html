@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGMI Market | Home</title>
+
+<!-- Fonts -->
+<link rel="stylesheet" href="assets/poppins.css">
+<!-- 3D Cards CSS -->
+<link rel="stylesheet" href="styles/index.css">
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at top left, #150026, #08080f, #140023);
+    animation: hueShift 15s infinite alternate;
+    background-size: 400% 400%;
+    color: #fff;
+    overflow-x: hidden;
+  }
+  @keyframes hueShift {
+    0% { background-position: left top; }
+    100% { background-position: right bottom; }
+  }
+
+  .bubble { position:absolute; border-radius:50%; background:rgba(255,255,255,0.08); backdrop-filter:blur(12px); animation:float 15s infinite ease-in-out; z-index:0; }
+  @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-30px);} }
+
+  header {
+    width:100%;
+    padding:1.2rem 2rem;
+    backdrop-filter:blur(20px);
+    background: rgba(255,255,255,0.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:100;
+  }
+  header h1 {
+    font-size:1.8rem;
+    background: linear-gradient(90deg,#ff8800,#ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  nav ul { list-style:none; display:flex; gap:1.2rem; flex-wrap:wrap; }
+  nav a { text-decoration:none; color:#fff; transition:0.3s; }
+  nav a:hover { color:#ffcc00; }
+
+  main { flex:1; width:100%; display:flex; justify-content:center; padding:2rem; z-index:1; }
+  section { width:90%; max-width:1200px; text-align:center; }
+
+  /* Horizontal gallery */
+  .gallery-container {
+    display:flex;
+    flex-direction: row;   /* horizontal */
+    gap:40px;
+    align-items:flex-start;
+    justify-content:center;
+    flex-wrap: wrap;       /* wrap if screen small */
+    perspective: 1000px;
+    padding: 40px 20px;
+  }
+
+  footer {
+    width:100%;
+    padding:1.2rem;
+    text-align:center;
+    backdrop-filter:blur(15px);
+    background:rgba(255,255,255,0.05);
+    color:#ccc;
+  }
+
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+
+    <svg class="svg-container">
+        <defs>
+            <filter id="turbulent-1" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="1" />
+                <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+                    <animate attributeName="dy" values="700; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="1" />
+                <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+                    <animate attributeName="dy" values="0; -700" dur="6s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise3" seed="2" />
+                <feOffset in="noise3" dx="0" dy="0" result="offsetNoise3">
+                    <animate attributeName="dx" values="490; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise4" seed="2" />
+                <feOffset in="noise4" dx="0" dy="0" result="offsetNoise4">
+                    <animate attributeName="dx" values="0; -490" dur="6s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
+                <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
+                <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
+                <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
+            </filter>
+
+            <filter id="turbulent-2" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="3" />
+                <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+                    <animate attributeName="dy" values="500; 0" dur="8s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="3" />
+                <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+                    <animate attributeName="dy" values="0; -500" dur="8s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise3" seed="4" />
+                <feOffset in="noise3" dx="0" dy="0" result="offsetNoise3">
+                    <animate attributeName="dx" values="350; 0" dur="8s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise4" seed="4" />
+                <feOffset in="noise4" dx="0" dy="0" result="offsetNoise4">
+                    <animate attributeName="dx" values="0; -350" dur="8s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
+                <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
+                <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
+                <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
+            </filter>
+
+            <filter id="turbulent-3" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="5" />
+                <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+                    <animate attributeName="dy" values="600; 0" dur="7s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="5" />
+                <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+                    <animate attributeName="dy" values="0; -600" dur="7s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise3" seed="6" />
+                <feOffset in="noise3" dx="0" dy="0" result="offsetNoise3">
+                    <animate attributeName="dx" values="420; 0" dur="7s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise4" seed="6" />
+                <feOffset in="noise4" dx="0" dy="0" result="offsetNoise4">
+                    <animate attributeName="dx" values="0; -420" dur="7s" repeatCount="indefinite" calcMode="linear" />
+                </feOffset>
+                <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
+                <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
+                <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
+                <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
+            </filter>
+            <filter id="turbulent-guest" color-interpolation-filters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="10" />
+  <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+    <animate attributeName="dy" values="700; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="10" />
+  <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+    <animate attributeName="dy" values="0; -700" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise3" seed="11" />
+  <feOffset in="noise3" dx="0" dy="0" result="offsetNoise3">
+    <animate attributeName="dx" values="490; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise4" seed="11" />
+  <feOffset in="noise4" dx="0" dy="0" result="offsetNoise4">
+    <animate attributeName="dx" values="0; -490" dur="6s" repeatCount="indefinite" calcMode="linear" />
+  </feOffset>
+  <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
+  <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
+  <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
+  <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
+</filter>
+
+        </defs>
+    </svg>
+
+<!-- Floating bubbles -->
+<script>
+  for(let i=0;i<20;i++){
+    const b=document.createElement("div");
+    b.className="bubble";
+    const s=Math.random()*80+20;
+    b.style.width=b.style.height=s+"px";
+    b.style.left=Math.random()*100+"vw";
+    b.style.top=Math.random()*100+"vh";
+    b.style.animationDelay=Math.random()*10+"s";
+    document.body.appendChild(b);
+  }
+</script>
+
+<header>
+  <h1>🎮 BGMI Market</h1>
+  <nav>
+    <ul>
+      <li><a href="marketplace.html">Marketplace</a></li>
+      <li><a href="sell.html">Sell ID</a></li>
+      <li><a href="wallet.html">Wallet</a></li>
+      <li><a href="profile.html">Profile</a></li>
+      <li><a href="popularity.html">Popularity</a></li>
+      <li><a href="chat.html">Message</a></li>
+      <li id="adminNav" class="hidden"><a href="admin_dashboard.html">Admin Dashboard</a></li>
+      <li><a href="#" id="logoutBtn" class="hidden">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+<section id="guest-view">
+  <div class="card-wrapper-guest">
+    <div class="card-main-guest"></div>
+    <div class="glow-guest-layer-1"></div>
+    <div class="glow-guest-layer-2"></div>
+    <div class="background-glow-guest"></div>
+    <div class="card-content-guest">
+      <h2>Welcome to BGMI Market 🎯</h2>
+      <p>Please login to explore marketplace & dashboard.</p>
+      <button onclick="window.location='login.html'">Login</button>
+    </div>
+  </div>
+</section>
+
+
+  <section id="user-dashboard" class="hidden">
+    <h2 id="greeting">Welcome 👋</h2>
+    <p>Manage your BGMI journey securely.</p>
+
+    <!-- 3D Cards -->
+    <div class="gallery-container">
+
+      <div class="card-wrapper-1">
+        <div class="inner-wrapper-1">
+          <div class="border-layer-1"><div class="card-main-1"></div></div>
+          <div class="glow-1-layer-1"></div>
+          <div class="glow-1-layer-2"></div>
+        </div>
+        <div class="overlay-1-1"></div>
+        <div class="background-glow-1"></div>
+        <div class="card-content">
+          <div class="content-header">
+            <a href="marketplace.html" class="glass-badge">Marketplace</a>
+            <p class="card-title">Explore & Buy</p>
+          </div>
+          <hr class="card-divider" />
+          <div class="content-footer">
+            <p class="card-description">Browse BGMI accounts & items securely.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-wrapper-2">
+        <div class="inner-wrapper-2">
+          <div class="border-layer-2"><div class="card-main-2"></div></div>
+          <div class="glow-2-layer-1"></div>
+          <div class="glow-2-layer-2"></div>
+        </div>
+        <div class="overlay-2-1"></div>
+        <div class="background-glow-2"></div>
+        <div class="card-content">
+          <div class="content-header">
+            <a href="popularity.html" class="glass-badge">Popularity</a>
+            <p class="card-title">Rank & Shine</p>
+          </div>
+          <hr class="card-divider" />
+          <div class="content-footer">
+            <p class="card-description">Check top players & trending accounts.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-wrapper-3">
+        <div class="inner-wrapper-3">
+          <div class="border-layer-3"><div class="card-main-3"></div></div>
+          <div class="glow-3-layer-1"></div>
+          <div class="glow-3-layer-2"></div>
+        </div>
+        <div class="overlay-3-1"></div>
+        <div class="background-glow-3"></div>
+        <div class="card-content">
+          <div class="content-header">
+            <a href="profile.html" class="glass-badge">Profile</a>
+            <p class="card-title">Your Space</p>
+          </div>
+          <hr class="card-divider" />
+          <div class="content-footer">
+            <p class="card-description">Manage account info, stats & settings.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  © 2025 BGMI Market | Built with ❤️ by @am_sillent_hunter
+</footer>
+
+<script src="js/auth.js"></script>
+<script>
+function getTimeGreeting() {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return "Good Morning";
+  if (hour >= 12 && hour < 17) return "Good Afternoon";
+  if (hour >= 17 && hour < 21) return "Good Evening";
+  return "Good Night";
+}
+
+function formatUsername(user) {
+  if (user?.name) return user.name;
+
+  if (user?.email) {
+    const base = user.email.split("@")[0].replace(/[._]/g, " ");
+    return base.charAt(0).toUpperCase() + base.slice(1);
+  }
+
+  return "Player";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const guest = document.getElementById("guest-view");
+  const userDash = document.getElementById("user-dashboard");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const adminNav = document.getElementById("adminNav");
+  const greeting = document.getElementById("greeting");
+
+  // 🛡️ safety check
+  if (!guest || !userDash) {
+    console.error("Guest/User view element missing");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (token && user) {
+    guest.classList.add("hidden");
+    userDash.classList.remove("hidden");
+    logoutBtn?.classList.remove("hidden");
+
+    greeting.textContent =
+      `${getTimeGreeting()}, ${formatUsername(user)} 👋`;
+
+    if (user.role === "admin") {
+      adminNav?.classList.remove("hidden");
+    } else {
+      adminNav?.classList.add("hidden");
+    }
+  } else {
+    // 👈 GUEST ALWAYS VISIBLE HERE
+    guest.classList.remove("hidden");
+    userDash.classList.add("hidden");
+    logoutBtn?.classList.add("hidden");
+    adminNav?.classList.add("hidden");
+  }
+});
+
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+  localStorage.clear();
+  location.reload();
+});
+</script>
+
+</body>
+</html>

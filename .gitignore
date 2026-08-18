@@ -1,0 +1,4 @@
+*.py
+venv/
+node_modules/
+.env
