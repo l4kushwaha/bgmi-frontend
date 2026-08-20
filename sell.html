@@ -1,416 +1,453 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sell BGMI Account | BGMI Market</title>
+<meta name="description" content="Sell your BGMI account securely. Direct UPI payments, verified buyers, instant payouts.">
 
-<link rel="stylesheet" href="assets/webfonts/poppins.css">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
 <link rel="stylesheet" href="assets/effects.css">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;font-family:"Poppins",sans-serif}
-  html,body{min-height:100%}
-  body{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    background: radial-gradient(circle at top left, #150026, #08080f, #140023);
-    animation: hueShift 15s infinite alternate;
-    background-size:400% 400%;
-    color:#fff;
-    overflow-x:hidden;
-  }
-  @keyframes hueShift {
-    0% { background-position: left top; }
-    100% { background-position: right bottom; }
-  }
+<link rel="stylesheet" href="styles/responsive.css">
 
-  /* ---------- HEADER ---------- */
-  header{
-    width:100%;
-    padding:1rem 1.6rem;
-    backdrop-filter:blur(20px);
-    background:rgba(255,255,255,.07);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:1rem;
-    position:sticky;top:0;z-index:100;
-  }
-  header h1{font-size:1.35rem;line-height:1.1}
-  header nav{display:flex;gap:.9rem;flex-wrap:wrap}
-  header nav a{
-    color:#fff;text-decoration:none;font-size:.85rem;font-weight:500;
-    transition:.3s;position:relative;
-  }
-  header nav a:hover{color:#00ffc6}
-  @media(max-width:720px){ header{flex-direction:column;align-items:flex-start} }
-
-  /* ---------- LAYOUT ---------- */
-  main{flex:1;width:100%;display:flex;justify-content:center;padding:2rem 1rem 3rem;z-index:1}
-  .page{width:100%;max-width:640px}
-
-  .sell-card{
-    position:relative;
-    padding:1.8rem;
-    border-radius:20px;
-    background:rgba(255,255,255,.055);
-    border:1px solid rgba(255,255,255,.13);
-    backdrop-filter:blur(14px);
-    box-shadow:0 0 0 1px rgba(0,255,198,.05), 0 20px 60px rgba(0,0,0,.45);
-  }
-  .sell-card .title{
-    font-size:1.35rem;
-    text-align:center;
-    margin-bottom:.25rem;
-  }
-  .sell-card .subtitle{
-    text-align:center;font-size:.82rem;color:rgba(255,255,255,.55);
-    margin-bottom:1.3rem;
-  }
-
-  /* ---------- SECTIONS ---------- */
-  .sec{margin-bottom:1.2rem}
-  .sec-head{
-    display:flex;align-items:center;gap:.5rem;
-    font-size:.78rem;font-weight:700;letter-spacing:1.5px;
-    text-transform:uppercase;color:#00ffc6;margin-bottom:.7rem;
-  }
-  .sec-head::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,198,.4),transparent)}
-
-  label{display:block;font-size:.78rem;color:rgba(255,255,255,.75);margin:0 0 .25rem .1rem}
-  .req{color:#ff5e5e}
-
-  input,textarea,select{
-    width:100%;padding:.7rem .85rem;
-    border-radius:11px;border:1px solid rgba(255,255,255,.14);
-    outline:none;margin:0 0 .7rem;
-    font-size:14px;color:#fff;
-    background:rgba(255,255,255,.07);
-    transition:border-color .2s, box-shadow .2s, background .2s;
-  }
-  select option{background:#16122a;color:#fff}
-  input:focus,textarea:focus,select:focus{
-    background:rgba(255,255,255,.11);
-    border-color:#00ffc6;
-    box-shadow:0 0 0 3px rgba(0,255,198,.14);
-  }
-  input::placeholder,textarea::placeholder{color:rgba(255,255,255,.4)}
-  textarea{resize:vertical;min-height:80px}
-
-  /* ---------- SWITCH TOGGLE ---------- */
-  .switch-wrap{display:flex;align-items:center;gap:.7rem;cursor:pointer;margin-bottom:.6rem;user-select:none}
-  .switch-wrap input{display:none}
-  .switch{
-    position:relative;width:48px;height:26px;flex:none;
-    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
-    border-radius:999px;transition:.3s;
-  }
-  .switch::after{
-    content:"";position:absolute;top:2px;left:3px;
-    width:20px;height:20px;border-radius:50%;
-    background:#fff;transition:.3s;
-    box-shadow:0 2px 6px rgba(0,0,0,.4);
-  }
-  .switch-wrap input:checked + .switch{background:linear-gradient(90deg,#00ffc6,#00b894);border-color:#00ffc6;box-shadow:0 0 14px rgba(0,255,198,.5)}
-  .switch-wrap input:checked + .switch::after{transform:translateX(21px)}
-
-  .row{display:flex;gap:.7rem}
-  .row > div{flex:1;min-width:0}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
-  @media(max-width:600px){ .grid{grid-template-columns:repeat(2,1fr)} }
-
-  /* ---------- PRICE ---------- */
-  .price-row{display:flex;gap:.7rem;align-items:flex-start}
-  .price-row .price-input{flex:1}
-  .price-box{font-size:1.1rem;font-weight:700}
-  .price-box .cur{color:#00ffc6}
-  #estimatedPrice{font-size:.8rem;color:#ffd27d;margin:.15rem 0 .7rem .1rem;min-height:1.1em}
-
-  /* ---------- BUTTONS ---------- */
-  button{
-    border:none;border-radius:11px;cursor:pointer;font-family:inherit;
-    font-size:.88rem;font-weight:700;transition:.25s;
-  }
-  .btn-primary{
-    width:100%;padding:.85rem;
-    background:linear-gradient(90deg,#00ffc6,#00b894);
-    color:#062;font-size:.95rem;letter-spacing:.4px;
-    box-shadow:0 0 18px rgba(0,255,198,.35);
-  }
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,255,198,.6)}
-  .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
-  .btn-ghost{
-    padding:.7rem .9rem;
-    background:rgba(255,255,255,.07);
-    border:1px solid rgba(255,255,255,.2);
-    color:#fff;
-  }
-  .btn-ghost:hover{border-color:#00ffc6;color:#00ffc6;box-shadow:0 0 14px rgba(0,255,198,.25)}
-
-  /* ---------- CATEGORY TOGGLE ---------- */
-  .cat-toggle {
-    display:flex; gap:.5rem; margin: 0 0 1.3rem;
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:14px; padding:.35rem;
-  }
-  .cat-toggle button {
-    flex:1; padding:.65rem .5rem;
-    border:none; border-radius:10px; cursor:pointer;
-    background:transparent; color:rgba(255,255,255,.7);
-    font-size:.85rem; font-weight:700; transition:.25s;
-  }
-  .cat-toggle button.active {
-    background:linear-gradient(90deg,#00ffc6,#00b894); color:#062;
-    box-shadow:0 0 16px rgba(0,255,198,.4);
-  }
-
-  /* ---------- POPULARITY SECTION (hidden by default) ---------- */
-  .hidden-sec{display:none !important}
-
-  /* ---------- DROP AREA ---------- */
-  #drop-area{
-    border:2px dashed rgba(0,255,198,.35);
-    padding:1.1rem;border-radius:12px;
-    text-align:center;color:#00ffc6;cursor:pointer;font-size:.86rem;
-    background:rgba(0,255,198,.04);
-    transition:background .2s,border-color .2s;
-  }
-  #drop-area.hover{background:rgba(0,255,198,.1);border-color:#fff}
-  #drop-area small{display:block;color:rgba(255,255,255,.45);font-size:.7rem;margin-top:3px}
-
-  #preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:.7rem}
-  .preview-img{
-    width:70px;height:70px;border-radius:9px;overflow:hidden;
-    position:relative;border:1px solid rgba(0,255,198,.3);
-    transition:transform .2s;
-  }
-  .preview-img:hover{transform:scale(1.05)}
-  .preview-img img{width:100%;height:100%;object-fit:cover}
-  .preview-img .remove{
-    position:absolute;top:3px;right:3px;
-    background:#ff4d4d;color:#fff;width:18px;height:18px;border-radius:50%;
-    font-size:12px;line-height:18px;text-align:center;cursor:pointer
-  }
-
-  /* ---------- FOOTER ---------- */
-  footer{
-    width:100%;padding:1.1rem;text-align:center;
-    backdrop-filter:blur(15px);background:rgba(255,255,255,.04);
-    color:#aaa;font-size:.8rem;
-  }
-
-  /* ---------- TOAST ---------- */
-  #toast{
-    position:fixed;bottom:24px;left:50%;
-    transform:translateX(-50%) translateY(20px);
-    padding:11px 20px;border-radius:22px;
-    background:#27ae60;color:#fff;font-size:.85rem;
-    display:block;opacity:0;visibility:hidden;z-index:9999;
-    transition:all .3s;box-shadow:0 8px 30px rgba(0,0,0,.4);
-  }
-  #toast.show{opacity:1;visibility:visible;transform:translateX(-50%)}
-  #toast.err{background:#c0392b}
-
-  /* ---------- BOOST QUICK-PICK CHIPS ---------- */
-  .boost-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
-  .boost-chips .chip{
-    padding:.5rem .85rem;border-radius:999px;cursor:pointer;
-    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
-    color:#fff;font-size:.78rem;font-family:inherit;transition:.25s;
-  }
-  .boost-chips .chip:hover{border-color:#ffb703;box-shadow:0 0 14px rgba(255,183,3,.25);transform:translateY(-2px)}
-  .boost-chips .chip.active{border-color:#ffb703;background:rgba(255,183,3,.15);color:#ffd369;box-shadow:0 0 16px rgba(255,183,3,.35)}
-  .boost-chips .chip.chip-custom{border-color:rgba(255,0,255,.45)}
-  .boost-chips .chip.chip-custom:hover{border-color:#ff00ff;box-shadow:0 0 14px rgba(255,0,255,.3)}
-</style>
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 </head>
-
 <body>
+<!-- Particle Background -->
+<div class="particles" id="particles" aria-hidden="true"></div>
 
-<header>
-  <h1><span class="wiggle" style="display:inline-block">💰</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
-  <nav>
-    <a href="index.html" class="nav-slide">Home</a>
-    <a href="marketplace.html" class="nav-slide">Marketplace</a>
-    <a href="wallet.html" class="nav-slide">Wallet</a>
-    <a href="profile.html" class="nav-slide">Profile</a>
-    <a href="popularity.html" class="nav-slide">Popularity</a>
-    <a href="meetups.html" class="nav-slide">Meetups</a>
-    <a href="chat.html" class="nav-slide">Message</a>
-    <a href="#" id="logoutLink" class="nav-slide">Logout</a>
-  </nav>
-</header>
-
-<div class="marquee-wrap">
-  <div class="marquee-inner">
-    <span>💰 <b>SELL</b> Your ID Fast</span>
-    <span>⚡ <b>INSTANT</b> UPI Payouts</span>
-    <span>🛡️ <b>SECURE</b> &amp; Verified Buyers</span>
-    <span>🎁 <b>HONOR GIFT</b> listings supported</span>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link active" data-page="sell">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 5v14M5 12h14"/>
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/>
+      </svg>
+      <span>Sell</span>
+    </a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link">Admin</a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
   </div>
-</div>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
 
-<main>
-  <div class="page">
-    <form id="sellForm" class="sell-card flip-in" novalidate>
-      <h2 class="title anim-gradient glitch" data-text="Sell Your BGMI Account">Sell Your BGMI Account</h2>
-      <p class="subtitle">List your account &amp; get paid directly via UPI 🚀</p>
+<main class="sell-page" role="main" style="flex: 1; padding: 2rem 1rem 4rem;">
+  <div class="page-container" style="width: 100%; max-width: 720px; margin: 0 auto;">
+    <!-- Header -->
+    <header class="page-header" style="text-align: center; margin-bottom: 2rem;">
+      <h1 class="page-title anim-gradient glitch" data-text="Sell Your BGMI Account" style="font-size: clamp(1.75rem, 4vw, 2.25rem); margin-bottom: 0.5rem;">Sell Your BGMI Account</h1>
+      <p class="page-subtitle text-secondary" style="font-size: 1rem;">List your account & get paid directly via UPI 🚀</p>
+    </header>
 
+    <!-- Form Card -->
+    <form id="sellForm" class="glass glass-strong" style="padding: 2rem;" novalidate>
+      
       <!-- CATEGORY TOGGLE -->
-      <div class="cat-toggle">
-        <button type="button" id="catAccount" class="active">🎮 Sell Account</button>
-        <button type="button" id="catPopularity">🔥 Sell Popularity</button>
+      <div class="cat-toggle" role="radiogroup" aria-label="Listing category">
+        <button type="button" id="catAccount" class="cat-btn active" role="radio" aria-checked="true" aria-label="Sell Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
+          <span>🎮 Sell Account</span>
+        </button>
+        <button type="button" id="catPopularity" class="cat-btn" role="radio" aria-checked="false" aria-label="Sell Popularity">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span>🔥 Sell Popularity</span>
+        </button>
       </div>
 
       <!-- ACCOUNT INFO -->
-      <div class="sec" id="secAccount">
-        <div class="sec-head">🏷️ Account Info</div>
-        <label for="uid">BGMI UID <span class="req">*</span></label>
-        <input id="uid" placeholder="e.g. 5301234567" required autocomplete="off">
-        <label for="title">Account Title <span class="req">*</span></label>
-        <input id="title" placeholder="e.g. Legendary Conqueror ID" required autocomplete="off">
-        <div class="row">
-          <div>
-            <label for="level">Account Level</label>
-            <input id="level" type="number" placeholder="e.g. 76">
+      <section class="form-section" id="secAccount" aria-labelledby="accountInfoTitle">
+        <h2 id="accountInfoTitle" class="section-title">🏷️ Account Info</h2>
+        
+        <div class="form-group">
+          <label class="label" for="uid">BGMI UID <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="uid" class="input" placeholder="e.g. 5301234567" required autocomplete="off" pattern="\d{1,12}" aria-describedby="uidHelp">
+          <small id="uidHelp" style="color: var(--text-muted); font-size: 0.75rem;">Numbers only, max 12 digits</small>
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="title">Account Title <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="title" class="input" placeholder="e.g. Legendary Conqueror ID" required autocomplete="off" maxlength="80">
+        </div>
+        
+        <div class="grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+          <div class="form-group">
+            <label class="label" for="level">Account Level</label>
+            <input type="number" id="level" class="input" placeholder="e.g. 76" min="0" max="1000" autocomplete="off">
           </div>
-          <div>
-            <label for="rank">Highest Rank</label>
-            <input id="rank" placeholder="e.g. Ace / Conqueror">
+          <div class="form-group">
+            <label class="label" for="rank">Highest Rank</label>
+            <input type="text" id="rank" class="input" placeholder="e.g. Ace / Conqueror" autocomplete="off" list="rankList">
+            <datalist id="rankList">
+              <option value="Bronze">Bronze</option>
+              <option value="Silver">Silver</option>
+              <option value="Gold">Gold</option>
+              <option value="Platinum">Platinum</option>
+              <option value="Diamond">Diamond</option>
+              <option value="Crown">Crown</option>
+              <option value="Ace">Ace</option>
+              <option value="Conqueror">Conqueror</option>
+            </datalist>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- ITEMS -->
-      <div class="sec" id="secItems">
-        <div class="sec-head">🎁 Items &amp; Rarities</div>
-        <div class="grid">
-          <input id="mythic" placeholder="Mythic Items">
-          <input id="legendary" placeholder="Legendary Items">
-          <input id="honor_gift" placeholder="Honor Gift">
-          <input id="guns" placeholder="Upgraded Guns">
-          <input id="titles" placeholder="Titles">
-          <input id="x_suit" placeholder="X Suit">
-          <input id="supercar" placeholder="Supercar">
-          <input id="ultimate" placeholder="Ultimate">
+      <section class="form-section" id="secItems" aria-labelledby="itemsTitle">
+        <h2 id="itemsTitle" class="section-title">🎁 Items & Rarities</h2>
+        
+        <div class="grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+          <div class="form-group">
+            <label class="label" for="mythic">Mythic Items</label>
+            <input type="text" id="mythic" class="input" placeholder="Mythic Items" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="label" for="legendary">Legendary Items</label>
+            <input type="text" id="legendary" class="input" placeholder="Legendary Items" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="label" for="honor_gift">Honor Gift</label>
+            <input type="text" id="honor_gift" class="input" placeholder="Honor Gift" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="label" for="guns">Upgraded Guns</label>
+            <input type="text" id="guns" class="input" placeholder="Upgraded Guns" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="label" for="titles">Titles</label>
+            <input type="text" id="titles" class="input" placeholder="Titles" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="label" for="x_suit">X Suit</label>
+            <input type="text" id="x_suit" class="input" placeholder="X Suit" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="label" for="supercar">Supercar</label>
+            <input type="text" id="supercar" class="input" placeholder="Supercar" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="label" for="ultimate">Ultimate</label>
+            <input type="text" id="ultimate" class="input" placeholder="Ultimate" autocomplete="off">
+          </div>
         </div>
-        <p style="font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.3rem">Comma-separated values (e.g. <i>Ice Flame, Glacier M4</i>)</p>
-      </div>
+        <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">Comma-separated values (e.g. <em>Ice Flame, Glacier M4</em>)</p>
+      </section>
 
       <!-- POPULARITY INFO (hidden by default) -->
-      <div class="sec hidden-sec" id="secPopularity">
-        <div class="sec-head">🔥 Popularity Boost Details</div>
-        <p style="font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:.7rem">Buyer apna target BGMI UID purchase ke time pe dega — aapko UID nahi mangna padta.</p>
-        <label>Quick Pick (exact BGMI values)</label>
-        <div class="boost-chips" id="boostChips">
-          <button type="button" class="chip" data-val="200|Bike">🏍️ Bike · 200</button>
-          <button type="button" class="chip" data-val="2000|Car">🚗 Car · 2,000</button>
-          <button type="button" class="chip" data-val="200|Drop">🪂 Drop · 200</button>
-          <button type="button" class="chip" data-val="400|Event Drop">🎯 Event Drop · 400</button>
-          <button type="button" class="chip" data-val="600|Event Drop">🎯 Event Drop · 600</button>
-          <button type="button" class="chip" data-val="1500|Event Drop">🎯 Event Drop · 1,500</button>
-          <button type="button" class="chip" data-val="125000|Helicopter">🚁 Heli · 1,25,000</button>
-          <button type="button" class="chip" data-val="300000|Lion">🦁 Lion · 3,00,000</button>
-          <button type="button" class="chip chip-custom" data-val="custom">✏️ Custom Name + Points</button>
+      <section class="form-section hidden-sec" id="secPopularity" aria-labelledby="popularityTitle" hidden>
+        <h2 id="popularityTitle" class="section-title">🔥 Popularity Boost Details</h2>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Buyer provides target BGMI UID at purchase — you don't need to ask for it.</p>
+        
+        <div class="form-group">
+          <label class="label">Quick Pick (exact BGMI values)</label>
+          <div class="boost-chips" id="boostChips" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;" role="listbox" aria-label="Popularity boost presets">
+            <button type="button" class="chip" data-val="200|Bike" role="option" aria-selected="false">🏍️ Bike · 200</button>
+            <button type="button" class="chip" data-val="2000|Car" role="option" aria-selected="false">🚗 Car · 2,000</button>
+            <button type="button" class="chip" data-val="200|Drop" role="option" aria-selected="false">🪂 Drop · 200</button>
+            <button type="button" class="chip" data-val="400|Event Drop" role="option" aria-selected="false">🎯 Event Drop · 400</button>
+            <button type="button" class="chip" data-val="600|Event Drop" role="option" aria-selected="false">🎯 Event Drop · 600</button>
+            <button type="button" class="chip" data-val="1500|Event Drop" role="option" aria-selected="false">🎯 Event Drop · 1,500</button>
+            <button type="button" class="chip" data-val="125000|Helicopter" role="option" aria-selected="false">🚁 Heli · 1,25,000</button>
+            <button type="button" class="chip" data-val="300000|Lion" role="option" aria-selected="false">🦁 Lion · 3,00,000</button>
+            <button type="button" class="chip chip-custom" data-val="custom" role="option" aria-selected="false">✏️ Custom Name + Points</button>
+          </div>
         </div>
-        <label for="boostItem">Boost Item (exact BGMI values)</label>
-        <select id="boostItem">
-          <option value="">-- Select boost item (auto-fill) --</option>
-          <option value="200|Bike">🏍️ Bike — 200 pop</option>
-          <option value="2000|Car">🚗 Car — 2,000 pop</option>
-          <option value="200|Drop">🪂 Drop — 200 pop</option>
-          <option value="400|Event Drop">🎯 Event Drop — 400 pop</option>
-          <option value="600|Event Drop">🎯 Event Drop — 600 pop</option>
-          <option value="1500|Event Drop">🎯 Event Drop — 1,500 pop</option>
-          <option value="125000|Helicopter">🚁 Helicopter — 1,25,000 pop</option>
-          <option value="300000|Lion">🦁 Lion — 3,00,000 pop</option>
-          <option value="custom">✏️ Custom points</option>
-        </select>
-        <label for="popTitle">Boost Title — apna custom name <span class="req">*</span></label>
-        <input id="popTitle" placeholder="e.g. 🔥 Instant 1000 Popularity Boost" autocomplete="off">
-        <label for="popPoints">Popularity Points <span class="req">*</span></label>
-        <input id="popPoints" type="number" min="1" placeholder="e.g. 1000" autocomplete="off">
-        <label for="deliveryTime">Delivery Time</label>
-        <input id="deliveryTime" placeholder="e.g. 30 min se 2 hours" autocomplete="off">
-        <p style="font-size:.68rem;color:rgba(255,255,255,.45);margin-top:.3rem">Buyer ko full payment seedha aapke UPI pe milti hai. Popularity points khareedne waale player ko credit hote hain.</p>
-      </div>
+        
+        <div class="form-group">
+          <label class="label" for="boostItem">Boost Item (exact BGMI values)</label>
+          <select id="boostItem" class="input select" aria-label="Select boost item">
+            <option value="">-- Select boost item (auto-fill) --</option>
+            <option value="200|Bike">🏍️ Bike — 200 pop</option>
+            <option value="2000|Car">🚗 Car — 2,000 pop</option>
+            <option value="200|Drop">🪂 Drop — 200 pop</option>
+            <option value="400|Event Drop">🎯 Event Drop — 400 pop</option>
+            <option value="600|Event Drop">🎯 Event Drop — 600 pop</option>
+            <option value="1500|Event Drop">🎯 Event Drop — 1,500 pop</option>
+            <option value="125000|Helicopter">🚁 Helicopter — 1,25,000 pop</option>
+            <option value="300000|Lion">🦁 Lion — 3,00,000 pop</option>
+            <option value="custom">✏️ Custom points</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="popTitle">Boost Title <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="popTitle" class="input" placeholder="e.g. 🔥 Instant 1000 Popularity Boost" required autocomplete="off" maxlength="80">
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="popPoints">Popularity Points <span class="req" aria-hidden="true">*</span></label>
+          <input type="number" id="popPoints" class="input" min="1" max="10000000" placeholder="e.g. 1000" required autocomplete="off">
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="deliveryTime">Delivery Time</label>
+          <input type="text" id="deliveryTime" class="input" placeholder="e.g. 30 min to 2 hours" autocomplete="off" maxlength="60">
+        </div>
+        
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Buyer pays full amount directly to your UPI. Popularity points credited to buyer's target UID.</p>
+      </section>
 
       <!-- DETAILS -->
-      <div class="sec">
-        <div class="sec-head">📝 Details</div>
-        <label for="highlights">Description</label>
-        <textarea id="highlights" placeholder="Mythic outfits, exclusive skins, special titles… (popularity boost ke liye delivery time likhein)"></textarea>
-      </div>
-
-      <!-- MEETUP (real-world safety) -->
-      <div class="sec" id="secMeetup">
-        <div class="sec-head">🤝 Real Meetup Option <span style="text-transform:none;letter-spacing:0;opacity:.6">(recommended)</span></div>
-        <label class="switch-wrap">
-          <input type="checkbox" id="meetupEnabled">
-          <span class="switch"></span>
-          <span style="font-size:.82rem;color:rgba(255,255,255,.8)">Buyers ko aapse real meetup par ID lene ka option do (safer, zyada trust)</span>
-        </label>
-        <div id="meetupFields" style="display:none">
-          <label for="sellerCity">Aapka City <span class="req">*</span></label>
-          <input id="sellerCity" placeholder="e.g. Mumbai, Delhi, Pune…" autocomplete="off" maxlength="40">
-          <label for="meetupNote">Meetup Safety Note</label>
-          <input id="meetupNote" value="Public place par milte hain — mall / metro station / police chowk" maxlength="120" autocomplete="off">
+      <section class="form-section" aria-labelledby="detailsTitle">
+        <h2 id="detailsTitle" class="section-title">📝 Description</h2>
+        <div class="form-group">
+          <label class="label" for="highlights">Description</label>
+          <textarea id="highlights" class="input textarea" placeholder="Mythic outfits, exclusive skins, special titles… (for popularity boost, write delivery time)" rows="4" maxlength="1000"></textarea>
         </div>
-      </div>
+      </section>
+
+      <!-- MEETUP -->
+      <section class="form-section" id="secMeetup" aria-labelledby="meetupTitle">
+        <h2 id="meetupTitle" class="section-title">🤝 Real Meetup Option <span style="text-transform: none; letter-spacing: 0; opacity: 0.6;">(recommended for trust)</span></h2>
+        
+        <label class="switch-wrap" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; margin-bottom: 1rem; user-select: none;">
+          <input type="checkbox" id="meetupEnabled" style="display: none;">
+          <span class="switch" aria-hidden="true"></span>
+          <span style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">Offer buyers real meetup option (safer, builds more trust)</span>
+        </label>
+        
+        <div id="meetupFields" hidden>
+          <div class="form-group">
+            <label class="label" for="sellerCity">Your City <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="sellerCity" class="input" placeholder="e.g. Mumbai, Delhi, Pune…" autocomplete="off" maxlength="40">
+          </div>
+          <div class="form-group">
+            <label class="label" for="meetupNote">Meetup Safety Note</label>
+            <input type="text" id="meetupNote" class="input" value="Public place — mall / metro station / police station" maxlength="120" autocomplete="off">
+          </div>
+        </div>
+      </section>
 
       <!-- PRICE -->
-      <div class="sec">
-        <div class="sec-head">💸 Price</div>
-        <div class="price-row">
-          <div class="price-input">
-            <label for="price">Your Price (₹) <span class="req">*</span></label>
-            <input class="price-box" id="price" type="number" min="1" placeholder="e.g. 5000" required autocomplete="off">
+      <section class="form-section" aria-labelledby="priceTitle">
+        <h2 id="priceTitle" class="section-title">💸 Price</h2>
+        
+        <div class="price-row" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+          <div class="form-group price-input" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+            <label class="label" for="price">Your Price (₹) <span class="req" aria-hidden="true">*</span></label>
+            <input type="number" id="price" class="input price-box" min="1" max="10000000" placeholder="e.g. 5000" required autocomplete="off" style="font-size: 1.25rem; font-weight: 700; text-align: center;">
           </div>
-          <button type="button" id="estimateBtn" class="btn-ghost" style="margin-top:1.55rem">⚡ Estimate</button>
+          <button type="button" id="estimateBtn" class="btn btn-outline btn-ripple" style="margin-top: 1.75rem; padding: 0.875rem 1.5rem; white-space: nowrap;">⚡ Estimate</button>
         </div>
-        <div id="estimatedPrice"></div>
-      </div>
+        
+        <div id="estimatedPrice" style="font-size: 0.9rem; color: var(--accent-secondary); margin-top: 0.5rem; min-height: 1.5rem;"></div>
+      </section>
 
       <!-- IMAGES -->
-      <div class="sec">
-        <div class="sec-head">🖼️ Images <span style="text-transform:none;letter-spacing:0;opacity:.6">(optional)</span></div>
-        <div id="drop-area">
-          Drag &amp; drop images here or <b>click to upload</b>
-          <small>JPG / PNG • max 5 images</small>
+      <section class="form-section" aria-labelledby="imagesTitle">
+        <h2 id="imagesTitle" class="section-title">🖼️ Images <span style="text-transform: none; letter-spacing: 0; opacity: 0.6;">(optional, max 5)</span></h2>
+        
+        <div class="drop-area" id="drop-area" role="button" tabindex="0" aria-label="Upload images" style="border: 2px dashed var(--border-primary); padding: 2rem; border-radius: var(--radius-lg); text-align: center; color: var(--accent-primary); cursor: pointer; font-size: 0.9rem; background: var(--bg-glass); transition: all var(--transition-fast);">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="margin-bottom: 1rem; opacity: 0.5;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <div>Drag & drop images here or <b>click to upload</b></div>
+          <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">JPG / PNG / WebP • max 5 images • max 5MB each</small>
         </div>
-        <input id="fileElem" type="file" multiple accept="image/*" hidden>
-        <div id="preview"></div>
-      </div>
+        <input id="fileElem" type="file" multiple accept="image/*" hidden aria-label="Image file input">
+        <div id="preview" style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;"></div>
+      </section>
 
-      <button type="submit" id="submitBtn" class="btn-primary">🚀 List for Sale</button>
+      <!-- SUBMIT -->
+      <button type="submit" id="submitBtn" class="btn btn-primary btn-lg btn-full btn-ripple" style="margin-top: 1rem;">
+        <span>🚀 List for Sale</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/>
+          <line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+      </button>
     </form>
   </div>
 </main>
 
-<footer>
-  <p>© 2026 BGMI Market | <span class="heartbeat" style="display:inline-block">❤️</span> Sell your ID with full security</p>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
 </footer>
 
-<div id="toast"></div>
+<!-- Scripts -->
+<script src="js/theme.js"></script>
 <script src="js/sell.js"></script>
 <script src="assets/effects.js" defer></script>
-<script>
-  // Logout
-  document.getElementById("logoutLink").addEventListener("click", e => {
-    e.preventDefault();
-    localStorage.clear();
-    location.href = "login.html";
-  });
 
-  // Drag hover effect
-  const dropArea = document.getElementById("drop-area");
-  dropArea.addEventListener("dragenter", e => { e.preventDefault(); dropArea.classList.add("hover"); });
-  dropArea.addEventListener("dragleave", e => { e.preventDefault(); dropArea.classList.remove("hover"); });
-  dropArea.addEventListener("dragover", e => e.preventDefault());
-  dropArea.addEventListener("drop", e => dropArea.classList.remove("hover"));
+<script>
+  // Initialize auth buttons in navbar
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        
+        // Dropdown toggle
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        
+        if (navLogoutBtn) {
+          navLogoutBtn.addEventListener('click', () => {
+            if (window.logout) window.logout();
+          });
+        }
+      } else {
+        authButtons.innerHTML = `
+          <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+          <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
+        `;
+      }
+      
+      // Mobile menu toggle
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+    
+    // Meetup toggle
+    const meetupEnabled = document.getElementById('meetupEnabled');
+    const meetupFields = document.getElementById('meetupFields');
+    if (meetupEnabled && meetupFields) {
+      meetupEnabled.addEventListener('change', () => {
+        meetupFields.hidden = !meetupEnabled.checked;
+        if (meetupEnabled.checked && !document.getElementById('sellerCity').value.trim()) {
+          document.getElementById('sellerCity').focus();
+        }
+      });
+    }
+  });
 </script>
-  <link rel="stylesheet" href="styles/responsive.css">
 </body>
 </html>

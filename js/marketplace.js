@@ -356,92 +356,180 @@ function renderCard(item) {
 
   const isPopularity = (item.category || "account") === "popularity";
 
-  card.innerHTML = `
-    <div class="images-gallery">
-      ${images.map((img,i)=>`
-        <img src="${esc(img)}" class="${i===0?"active":""}">
-      `).join("")}
+  // Build card using safe DOM methods instead of innerHTML (XSS prevention)
+  const gallery = document.createElement("div");
+  gallery.className = "images-gallery";
+  images.forEach((img, i) => {
+    const imgEl = document.createElement("img");
+    imgEl.src = esc(img);
+    imgEl.className = i === 0 ? "active" : "";
+    gallery.appendChild(imgEl);
+  });
 
-      ${images.length > 1 ? `
-        <button class="img-arrow left">‹</button>
-        <button class="img-arrow right">›</button>
-        <div class="img-dots">
-          ${images.map((_,i)=>`<span class="${i===0?"active":""}"></span>`).join("")}
-        </div>` : ""}
-    </div>
-
-    <div class="card-content">
-      <span class="cat-chip ${isPopularity?"pop":"acc"}">${isPopularity?"🔥 POPULARITY":"🎮 ACCOUNT"}</span>
-      <strong>${esc(item.title)}</strong><br>
-      ${isPopularity ? `
-        <span class="pop-points">⚡ ${esc(item.points || 0)} Popularity Points</span><br>
-        ${item.delivery_time ? `<span class="d-time">🚚 Delivery: ${esc(item.delivery_time)}</span><br>` : ""}` : `
-        UID: ${esc(item.uid)}<br>
-        Level: ${esc(item.level)}<br>
-        Rank: ${esc(item.highest_rank || "-")}<br>`}
-
-      ${(item.seller_city || item.city) ? `<span class="city-badge">📍 ${esc(item.seller_city || item.city)}</span>` : ""}
-      ${item.meetup_available ? `<span class="meetup-badge">🤝 Meetup Available</span>` : ""}
-
-      ${isPopularity ? "" : `
-        ${upgraded ? `<b>Upgraded:</b> ${upgraded}<br>` : ""}
-        ${mythic ? `<b>Mythic:</b> ${mythic}<br>` : ""}
-        ${legendary ? `<b>Legendary:</b> ${legendary}<br>` : ""}
-        ${gifts ? `<b>Honor Gifts:</b> ${gifts}<br>` : ""}
-        ${titles ? `<b>Titles:</b> ${titles}<br>` : ""}
-        ${xSuit ? `<b>X Suit:</b> ${xSuit}<br>` : ""}
-        ${supercar ? `<b>Supercar:</b> ${supercar}<br>` : ""}
-        ${ultimate ? `<b>Ultimate:</b> ${ultimate}<br>` : ""}
-        ${item.account_highlights ? `<b>Highlights:</b> ${esc(item.account_highlights)}` : ""}`}
-
-      <div class="price price-pulse">₹${esc(item.price)}</div>
-    </div>
-
-    <div class="card-actions">
-      <button class="btn view-btn">👁️ View Details</button>
-      <button class="btn outline seller-btn">Seller Profile</button>
-      ${isOwner(item)
-        ? `<button class="btn edit-btn">Edit</button>
-           <button class="btn delete-btn">Delete</button>`
-        :
-         `
-         <button class="btn buy-btn">Buy</button>
-         ${(item.meetup_available || item.seller_city) ? `<button class="btn meetup-btn">🤝 Meetup</button>` : ""}
-         <button class="btn outline chat-btn">Chat</button>
-         `
-        }
-    </div>
-  `;
-
-  /* seller */
-  card.querySelector(".seller-btn").onclick =
-    () => openSellerProfile(item.seller_id);
-  card.querySelector(".view-btn").onclick =
-    () => openDetails(item.id);
-
-  if (isOwner(item)) {
-    card.querySelector(".edit-btn").onclick = () => openEdit(item.id);
-    card.querySelector(".delete-btn").onclick = () => deleteListing(item.id);
+  if (images.length > 1) {
+    const leftBtn = document.createElement("button");
+    leftBtn.className = "img-arrow left";
+    leftBtn.textContent = "‹";
+    const rightBtn = document.createElement("button");
+    rightBtn.className = "img-arrow right";
+    rightBtn.textContent = "›";
+    const dotsWrap = document.createElement("div");
+    dotsWrap.className = "img-dots";
+    images.forEach((_, i) => {
+      const dot = document.createElement("span");
+      dot.className = i === 0 ? "active" : "";
+      dotsWrap.appendChild(dot);
+    });
+    gallery.appendChild(leftBtn);
+    gallery.appendChild(rightBtn);
+    gallery.appendChild(dotsWrap);
   }
 
- if (!isOwner(item)) {
-  card.querySelector(".chat-btn").onclick = () =>
-    startChat(item.id, item.seller_id); // CHAT
+  const cardContent = document.createElement("div");
+  cardContent.className = "card-content";
 
-  card.querySelector(".buy-btn").onclick = () =>
-    startBuy(item.id, item.seller_id, item.price); // BUY
+  const catChip = document.createElement("span");
+  catChip.className = `cat-chip ${isPopularity ? "pop" : "acc"}`;
+  catChip.textContent = isPopularity ? "🔥 POPULARITY" : "🎮 ACCOUNT";
+  cardContent.appendChild(catChip);
 
-  const muBtn = card.querySelector(".meetup-btn");
-  if (muBtn) muBtn.onclick = () => openMeetup(item.id);
-}
+  const titleEl = document.createElement("strong");
+  titleEl.textContent = esc(item.title);
+  cardContent.appendChild(titleEl);
+  cardContent.appendChild(document.createElement("br"));
 
-  
+  if (isPopularity) {
+    const popPoints = document.createElement("span");
+    popPoints.className = "pop-points";
+    popPoints.textContent = `⚡ ${esc(item.points || 0)} Popularity Points`;
+    cardContent.appendChild(popPoints);
+    cardContent.appendChild(document.createElement("br"));
+    if (item.delivery_time) {
+      const dTime = document.createElement("span");
+      dTime.className = "d-time";
+      dTime.textContent = `🚚 Delivery: ${esc(item.delivery_time)}`;
+      cardContent.appendChild(dTime);
+      cardContent.appendChild(document.createElement("br"));
+    }
+  } else {
+    const uidEl = document.createElement("span");
+    uidEl.textContent = `UID: ${esc(item.uid)}`;
+    cardContent.appendChild(uidEl);
+    cardContent.appendChild(document.createElement("br"));
+    const levelEl = document.createElement("span");
+    levelEl.textContent = `Level: ${esc(item.level)}`;
+    cardContent.appendChild(levelEl);
+    cardContent.appendChild(document.createElement("br"));
+    const rankEl = document.createElement("span");
+    rankEl.textContent = `Rank: ${esc(item.highest_rank || "-")}`;
+    cardContent.appendChild(rankEl);
+    cardContent.appendChild(document.createElement("br"));
+  }
+
+  if (item.seller_city || item.city) {
+    const cityBadge = document.createElement("span");
+    cityBadge.className = "city-badge";
+    cityBadge.textContent = `📍 ${esc(item.seller_city || item.city)}`;
+    cardContent.appendChild(cityBadge);
+  }
+
+  if (item.meetup_available) {
+    const meetupBadge = document.createElement("span");
+    meetupBadge.className = "meetup-badge";
+    meetupBadge.textContent = "🤝 Meetup Available";
+    cardContent.appendChild(meetupBadge);
+  }
+
+  if (!isPopularity) {
+    const details = [
+      { label: "Upgraded:", value: upgraded },
+      { label: "Mythic:", value: mythic },
+      { label: "Legendary:", value: legendary },
+      { label: "Honor Gifts:", value: gifts },
+      { label: "Titles:", value: titles },
+      { label: "X Suit:", value: xSuit },
+      { label: "Supercar:", value: supercar },
+      { label: "Ultimate:", value: ultimate },
+      { label: "Highlights:", value: esc(item.account_highlights || "") }
+    ];
+    details.forEach(d => {
+      if (d.value) {
+        const strong = document.createElement("b");
+        strong.textContent = d.label;
+        const span = document.createElement("span");
+        span.textContent = ` ${d.value}`;
+        cardContent.appendChild(strong);
+        cardContent.appendChild(span);
+        cardContent.appendChild(document.createElement("br"));
+      }
+    });
+  }
+
+  const priceEl = document.createElement("div");
+  priceEl.className = "price price-pulse";
+  priceEl.textContent = `₹${esc(item.price)}`;
+  cardContent.appendChild(priceEl);
+
+  card.appendChild(gallery);
+  card.appendChild(cardContent);
+
+  /* card actions */
+  const cardActions = document.createElement("div");
+  cardActions.className = "card-actions";
+
+  const viewBtn = document.createElement("button");
+  viewBtn.className = "btn view-btn";
+  viewBtn.textContent = "👁️ View Details";
+  viewBtn.onclick = () => openDetails(item.id);
+  cardActions.appendChild(viewBtn);
+
+  const sellerBtn = document.createElement("button");
+  sellerBtn.className = "btn outline seller-btn";
+  sellerBtn.textContent = "Seller Profile";
+  sellerBtn.onclick = () => openSellerProfile(item.seller_id);
+  cardActions.appendChild(sellerBtn);
+
+  if (isOwner(item)) {
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn edit-btn";
+    editBtn.textContent = "Edit";
+    editBtn.onclick = () => openEdit(item.id);
+    cardActions.appendChild(editBtn);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn delete-btn";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.onclick = () => deleteListing(item.id);
+    cardActions.appendChild(deleteBtn);
+  } else {
+    const buyBtn = document.createElement("button");
+    buyBtn.className = "btn buy-btn";
+    buyBtn.textContent = "Buy";
+    buyBtn.onclick = () => startBuy(item.id, item.seller_id, item.price);
+    cardActions.appendChild(buyBtn);
+
+    if (item.meetup_available || item.seller_city) {
+      const muBtn = document.createElement("button");
+      muBtn.className = "btn meetup-btn";
+      muBtn.textContent = "🤝 Meetup";
+      muBtn.onclick = () => openMeetup(item.id);
+      cardActions.appendChild(muBtn);
+    }
+
+    const chatBtn = document.createElement("button");
+    chatBtn.className = "btn outline chat-btn";
+    chatBtn.textContent = "Chat";
+    chatBtn.onclick = () => startChat(item.id, item.seller_id);
+    cardActions.appendChild(chatBtn);
+  }
+
+  card.appendChild(cardActions);
+
   initFullscreen(card);
 
   container.appendChild(card);
-    setTimeout(() =>{
-      initSlider(card);},0);
-    }
+  setTimeout(() => { initSlider(card); }, 0);
+}
 
 
 /* ================= CARD SLIDER ================= */

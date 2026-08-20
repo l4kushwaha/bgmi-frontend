@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Error | BGMI Market</title>
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+
+<!-- Theme Script -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  .error-illustration svg { width: 100%; height: 100%; }
+  .error-path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: drawPath 2s ease forwards; }
+  .error-path:nth-child(2) { animation-delay: 0.3s; }
+  .error-path:nth-child(3) { animation-delay: 0.6s; }
+  @keyframes drawPath { to { stroke-dashoffset: 0; } }
+  
+  .error-glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .error-glitch::before,
+  .error-glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .error-glitch::before {
+    color: var(--accent-primary);
+    animation: glitch-1 2s infinite linear alternate-reverse;
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  }
+  .error-glitch::after {
+    color: var(--accent-secondary);
+    animation: glitch-2 3s infinite linear alternate-reverse;
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  }
+  @keyframes glitch-1 {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 1px); }
+    40% { transform: translate(2px, -1px); }
+    60% { transform: translate(-1px, 2px); }
+    80% { transform: translate(1px, -2px); }
+  }
+  @keyframes glitch-2 {
+    0%, 100% { transform: translate(0); }
+    15% { transform: translate(1px, -1px); }
+    35% { transform: translate(-1px, 2px); }
+    55% { transform: translate(2px, 1px); }
+    75% { transform: translate(-2px, -1px); }
+  }
+</style>
+</head>
+<body>
+<div class="particles" id="particles" aria-hidden="true"></div>
+
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  <div class="nav-links">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+  </div>
+</nav>
+
+<main class="error-page" role="main">
+  <div class="error-container">
+    <!-- Animated Error Illustration -->
+    <div class="error-illustration" aria-hidden="true">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Shield -->
+        <path class="error-path" d="M100 20 L180 50 L180 120 C180 160 100 190 100 190 C100 190 20 160 20 120 L20 50 L100 20 Z" 
+              stroke="url(#shieldGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Crack -->
+        <path class="error-path" d="M100 60 L120 100 L90 140" 
+              stroke="url(#crackGradient)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Exclamation -->
+        <circle class="error-path" cx="100" cy="100" r="15" 
+                stroke="url(#exclGradient)" stroke-width="3"/>
+        <line class="error-path" x1="100" y1="80" x2="100" y2="105" 
+              stroke="url(#exclGradient)" stroke-width="3" stroke-linecap="round"/>
+        <circle class="error-path" cx="100" cy="130" r="3" 
+                stroke="url(#exclGradient)" stroke-width="3"/>
+        
+        <defs>
+          <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00eaff"/>
+            <stop offset="100%" stop-color="#a855f7"/>
+          </linearGradient>
+          <linearGradient id="crackGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff7800"/>
+            <stop offset="100%" stop-color="#ec4899"/>
+          </linearGradient>
+          <linearGradient id="exclGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7cff8b"/>
+            <stop offset="100%" stop-color="#00eaff"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <h1 class="error-code error-glitch" data-text="404">404</h1>
+    <h2 class="error-title">Page Not Found</h2>
+    <p class="error-message">
+      The page you're looking for doesn't exist or has been moved. 
+      Don't worry, our marketplace is still running smoothly!
+    </p>
+    
+    <div class="error-actions">
+      <a href="index.html" class="btn btn-primary btn-lg btn-ripple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M10 19l-7-7 7-7M14 19l7-7-7-7"/>
+        </svg>
+        Go Home
+      </a>
+      <a href="marketplace.html" class="btn btn-outline btn-lg btn-ripple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+        Browse Marketplace
+      </a>
+      <button onclick="history.back()" class="btn btn-ghost btn-lg btn-ripple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Go Back
+      </button>
+    </div>
+
+    <!-- Error Details (expandable) -->
+    <details style="margin-top: 3rem; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;">
+      <summary style="cursor: pointer; color: var(--text-secondary); font-size: 0.875rem; padding: 0.5rem;">
+        Technical Details
+      </summary>
+      <pre id="errorDetails" style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius-md); font-size: 0.75rem; overflow-x: auto; color: var(--text-secondary);"></pre>
+    </details>
+  </div>
+</main>
+
+<footer style="padding: 2rem; border-top: 1px solid var(--border-subtle); background: var(--bg-secondary); text-align: center;">
+  <p class="text-muted" style="font-size: 0.875rem;">© 2025 BGMI Market. <a href="index.html" class="hover:text-primary">Return Home</a></p>
+</footer>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script src="js/theme.js"></script>
+<script>
+  // Capture error info from URL params
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const errorCode = params.get('code') || '404';
+    const errorMsg = params.get('msg') || 'Page not found';
+    const errorStack = params.get('stack') || '';
+    
+    // Update error code display
+    const codeEl = document.querySelector('.error-code');
+    if (codeEl) {
+      codeEl.textContent = errorCode;
+      codeEl.setAttribute('data-text', errorCode);
+    }
+    
+    // Update message
+    const msgEl = document.querySelector('.error-message');
+    if (msgEl && errorMsg !== 'Page not found') {
+      msgEl.textContent = errorMsg;
+    }
+    
+    // Populate error details
+    const detailsEl = document.getElementById('errorDetails');
+    if (detailsEl) {
+      const details = {
+        code: errorCode,
+        message: errorMsg,
+        url: document.referrer || window.location.href,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+        stack: errorStack
+      };
+      detailsEl.textContent = JSON.stringify(details, null, 2);
+    }
+    
+    // Show toast for non-404 errors
+    if (errorCode !== '404' && window.showToast) {
+      window.showToast(`Error ${errorCode}: ${errorMsg}`, 'error');
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,775 +1,519 @@
 <!DOCTYPE html>
-
-<html lang="en">
-
+<html lang="en" data-theme="dark">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace | BGMI Market</title>
+<meta name="description" content="Browse and buy verified BGMI accounts. Secure escrow, direct UPI payments, trusted sellers.">
 
-<meta charset="UTF-8" />
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<title>BGMI Marketplace</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" href="assets/webfonts/poppins.css">
-
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
 <link rel="stylesheet" href="assets/effects.css">
-
-
-
-<style>
-
-/* ===== BASE ===== */
-
-body{
-
-  margin:0;
-
-  font-family:'Poppins',sans-serif;
-
-  background:linear-gradient(135deg,#141e30,#243b55);
-
-  color:#fff;
-
-}
-
-body.dark{background:linear-gradient(135deg,#0d0d0d,#1c1c1c)}
-
-#particle-canvas{position:fixed;inset:0;z-index:0}
-
-
-
-/* ===== HEADER ===== */
-
-header{
-
-  position:relative;z-index:5;
-
-  display:flex;justify-content:space-between;align-items:center;
-
-  padding:15px 20px;
-
-  backdrop-filter:blur(14px);
-
-  background:rgba(255,255,255,.05);
-
-  border-bottom:1px solid rgba(0,255,255,.25);
-
-}
-
-
-
-/* ===== SEARCH ===== */
-
-#top-bar{
-
-  position:relative;z-index:5;
-
-  display:flex;gap:12px;flex-wrap:wrap;
-
-  justify-content:center;
-
-  padding:14px;
-
-}
-
-#search,#filter{
-
-  padding:10px 16px;
-
-  border:none;border-radius:22px;
-
-  outline:none;font-family:'Poppins';
-
-}
-
-#search{width:260px}
-
-#city{width:230px}
-
-#filter{min-width:220px}
-
-
-
-/* ===== GRID ===== */
-
-#items-container{
-
-  position:relative;z-index:3;
-
-  display:grid;
-
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-
-  gap:22px;
-
-  padding:22px;
-
-  max-width:1450px;
-
-  margin:auto;
-
-}
-
-
-
-/* ===== CARD ===== */
-
-.item-card{
-
-  background:rgba(255,255,255,.06);
-
-  backdrop-filter:blur(16px);
-
-  border-radius:20px;
-
-  overflow:hidden;
-
-  transition:.35s;
-
-  box-shadow:
-
-    0 0 0 1px rgba(0,255,255,.35),
-
-    0 0 28px rgba(0,255,255,.35),
-
-    inset 0 0 30px rgba(0,255,255,.15);
-
-}
-
-.item-card:hover{
-
-  box-shadow:
-
-    0 0 0 1px rgba(0,255,255,1),
-
-    0 0 55px rgba(0,255,255,.9),
-
-    0 0 120px rgba(255,0,255,.6);
-
-}
-
-
-
-/* ===== IMAGE SLIDER ===== */
-
-.images-gallery{
-
-  position:relative;
-
-  height:190px;
-
-  overflow:hidden;
-
-}
-
-.images-gallery img{
-  width:100%;height:100%;
-  filter: none;
-  object-fit: cover;
-  display: none;
-}
-.images-gallery img.active{
-  display: block;
-}
-
-
-
-
-/* arrows */
-
-.img-arrow{
-
-  position:absolute;top:50%;
-
-  transform:translateY(-50%);
-
-  width:34px;height:34px;
-
-  border-radius:50%;
-
-  border:none;
-
-  cursor:pointer;
-
-  font-size:20px;
-
-  background:rgba(0,255,255,.9);
-
-  color:#000;
-
-  box-shadow:0 0 14px cyan;
-
-}
-
-.img-arrow.left{left:10px}
-
-.img-arrow.right{right:10px}
-
-
-
-/* dots */
-
-.img-dots{
-
-  position:absolute;bottom:8px;width:100%;
-
-  text-align:center;
-
-}
-
-.img-dots span{
-
-  width:8px;height:8px;
-
-  display:inline-block;
-
-  margin:0 4px;
-
-  border-radius:50%;
-
-  background:rgba(255,255,255,.4);
-
-}
-
-.img-dots span.active{background:cyan}
-
-
-
-/* ===== CONTENT ===== */
-
-.card-content{
-
-  padding:14px;
-
-  font-size:14px;
-
-  line-height:1.55;
-
-}
-
-.card-content strong{font-size:16px}
-
-.cat-chip{
-  display:inline-block; padding:.2rem .55rem; border-radius:999px;
-  font-size:.62rem; font-weight:800; letter-spacing:.08em;
-  margin-bottom:.4rem;
-}
-.cat-chip.acc{background:rgba(0,255,255,.15); color:#00eaff; border:1px solid rgba(0,255,255,.4)}
-.cat-chip.pop{background:rgba(255,120,0,.18); color:#ff9d3c; border:1px solid rgba(255,120,0,.5)}
-
-.pop-points{
-  display:inline-block; margin-top:.15rem;
-  font-weight:700; color:#ff9d3c;
-  background:rgba(255,120,0,.12); padding:.15rem .5rem; border-radius:8px;
-  box-shadow:0 0 12px rgba(255,120,0,.25);
-}
-
-.d-time{
-  display:inline-block; margin-top:.15rem; font-size:.75rem;
-  color:#8b5cf6; background:rgba(139,92,246,.12); padding:.1rem .5rem; border-radius:8px;
-}
-
-.city-badge{
-  display:inline-block; margin:.15rem .25rem .1rem 0; font-size:.72rem;
-  color:#00eaff; background:rgba(0,234,255,.12); padding:.1rem .5rem; border-radius:8px;
-  border:1px solid rgba(0,234,255,.35);
-}
-
-.meetup-badge{
-  display:inline-block; margin:.15rem 0 .1rem; font-size:.72rem;
-  color:#7CFF8B; background:rgba(124,255,139,.12); padding:.1rem .5rem; border-radius:8px;
-  border:1px solid rgba(124,255,139,.4);
-}
-
-.meetup-btn{background:linear-gradient(90deg,#ff9d3c,#ff6a3c);color:#fff;box-shadow:0 0 12px rgba(255,120,60,.35)}
-
-.price{
-
-  font-size:18px;
-
-  font-weight:600;
-
-  color:#f39c12;
-
-  margin-top:6px;
-
-}
-
-
-
-/* ===== BUTTONS ===== */
-
-.card-actions{
-
-  padding:14px;
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:8px;
-
-}
-
-.btn{
-
-  padding:10px;
-
-  border:none;border-radius:10px;
-
-  font-weight:600;cursor:pointer;
-
-}
-
-.buy-btn{background:#27ae60;color:#fff}
-
-.edit-btn{background:#3498db;color:#fff}
-
-.delete-btn{background:#c0392b;color:#fff}
-
-.outline{background:#fff;color:#3498db;border:2px solid #3498db}
-
-.view-btn{background:linear-gradient(90deg,#8b5cf6,#00c6ff);color:#fff;box-shadow:0 0 14px rgba(0,198,255,.35)}
-
-
-
-/* ===== MODALS ===== */
-
-.modal-bg{
-
-  display:none;
-
-  position:fixed;inset:0;
-
-  background:rgba(0,0,0,.8);
-
-  align-items:center;justify-content:center;
-
-  z-index:9999;
-
-}
-
-.modal-bg.active{display:flex}
-
-.modal{
-
-  background:#fff;color:#333;
-
-  padding:22px;border-radius:18px;
-
-  width:440px;max-height:85vh;
-
-  overflow-y:auto;
-
-}
-
-body.dark .modal{background:#1e1e1e;color:#fff}
-
-
-
-/* ===== FULLSCREEN VIEWER ===== */
-
-#fs-viewer{
-
-  position:fixed;inset:0;
-
-  background:rgba(0,0,0,.95);
-
-  display:none;
-
-  align-items:center;justify-content:center;
-
-  z-index:10000;
-
-}
-
-#fs-viewer.active{display:flex}
-
-#fs-viewer img{
-
-  max-width:90%;max-height:90%;
-
-  border-radius:16px;
-
-  transition:.3s;
-
-  cursor:zoom-in;
-
-}
-
-#fs-viewer img.zoomed{
-
-  transform:scale(1.6);
-
-  cursor:zoom-out;
-
-}
-
-.fs-close{
-
-  position:absolute;top:20px;right:30px;
-
-  font-size:32px;color:#fff;cursor:pointer;
-
-}
-
-.fs-arrow{
-
-  position:absolute;top:50%;
-
-  transform:translateY(-50%);
-
-  font-size:40px;color:#fff;cursor:pointer;
-
-}
-
-.fs-arrow.left{left:30px}
-
-.fs-arrow.right{right:30px}
-
-
-
-/* ===== SKELETON ===== */
-
-.skeleton-card{
-
-  height:360px;
-
-  border-radius:20px;
-
-  background:linear-gradient(
-
-    90deg,
-
-    rgba(255,255,255,.05),
-
-    rgba(0,255,255,.35),
-
-    rgba(255,255,255,.05)
-
-  );
-
-  background-size:200% 100%;
-
-  animation:shimmer 1.3s infinite;
-
-}
-
-@keyframes shimmer{
-
-  from{background-position:200% 0}
-
-  to{background-position:-200% 0}
-
-}
-
-</style>
-
+<link rel="stylesheet" href="styles/responsive.css">
+
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 </head>
-
-
-
 <body>
+<!-- Particle Background -->
+<div class="particles" id="particles" aria-hidden="true"></div>
 
-
-
-<canvas id="particle-canvas"></canvas>
-
-
-
-<header>
-
-  <h1 class="anim-gradient wobble">BGMI Marketplace</h1>
-
-  <button id="dark-toggle">Dark / Light</button>
-
-</header>
-
-<div class="marquee-wrap">
-  <div class="marquee-inner">
-    <span>🔥 <b>LIVE</b> Verified IDs Available Now</span>
-    <span>⚡ <b>INSTANT</b> UPI Payments</span>
-    <span>🛡️ <b>SECURE</b> Escrow Protected</span>
-    <span>🏆 Top Sellers <b>RANKED</b> Daily</span>
-    <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link active" data-page="marketplace">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 9h16v11H4V9z"/>
+        <path d="M4 5h16a2 2 0 0 1 2 2v3"/>
+      </svg>
+      <span>Marketplace</span>
+    </a>
+    <a href="sell.html" class="nav-link" data-page="sell">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 5v14M5 12h14"/>
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/>
+      </svg>
+      <span>Sell</span>
+    </a>
+    <a href="popularity.html" class="nav-link" data-page="popularity">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      <span>Popularity</span>
+    </a>
+    <a href="meetups.html" class="nav-link" data-page="meetups">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span>Meetups</span>
+    </a>
+    <a href="wallet.html" class="nav-link" data-page="wallet">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+      </svg>
+      <span>Wallet</span>
+    </a>
+    <a href="chat.html" class="nav-link" data-page="chat">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span>Chats</span>
+    </a>
+    <a href="profile.html" class="nav-link" data-page="profile">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>Profile</span>
+    </a>
+    <a href="admin_dashboard.html" class="nav-link" data-page="admin">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span>Admin</span>
+    </a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
   </div>
-</div>
-
-<div id="top-bar">
-
-  <input id="search" placeholder="Search UID / Title / Rank">
-
-  <input id="city" placeholder="📍 Search by City (e.g. Mumbai)">
-
-  <select id="filter">
-
-    <option value="">All Listings</option>
-
-    <option value="account">🎮 Accounts</option>
-
-    <option value="popularity">🔥 Popularity</option>
-
-    <option value="meetup">🤝 Meetup Available</option>
-
-    <option value="own">My Listings</option>
-
-    <option value="price_low">Price: Low → High</option>
-
-    <option value="price_high">Price: High → Low</option>
-
-    <option value="new">Newest First</option>
-
-  </select>
-
-</div>
-
-
-
-<div id="items-container">
-
-  <!-- skeletons -->
-
-  <div class="skeleton-card"></div>
-
-  <div class="skeleton-card"></div>
-
-  <div class="skeleton-card"></div>
-
-</div>
-
-
-
-<!-- SELLER -->
-
-<div id="seller-modal-bg" class="modal-bg">
-
-  <div class="modal">
-
-    <div id="seller-content">Loading...</div>
-
-    <button class="btn delete-btn" onclick="closeSeller()">Close</button>
-
-  </div>
-
-</div>
-
-<style>
-  #seller-content .seller-bio {
-    margin-top: .7rem; padding: .6rem .8rem;
-    background: rgba(255,255,255,.06); border-left: 3px solid #00ffc6;
-    border-radius: 8px; font-style: italic; color: rgba(255,255,255,.9);
-  }
-  #seller-content .seller-socials { margin-top: .8rem; display: flex; gap: .6rem; flex-wrap: wrap; }
-  #seller-content .seller-social {
-    display: inline-block; padding: .4rem .8rem; border-radius: 999px;
-    text-decoration: none; font-weight: 600; font-size: .85rem; color: #fff;
-    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16); transition: .25s;
-  }
-  #seller-content .seller-social.ig:hover { border-color: #ff2d95; box-shadow: 0 0 12px rgba(255,45,149,.5); }
-  #seller-content .seller-social.fb:hover { border-color: #1877f2; box-shadow: 0 0 12px rgba(24,119,242,.5); }
-</style>
-
-
-
-<!-- EDIT -->
-
-<div id="edit-modal-bg" class="modal-bg">
-
-  <div class="modal">
-
-    <h3>Edit Listing</h3>
-
-    <div id="edit-form"></div>
-
-    <button class="btn buy-btn" id="save-edit">Save</button>
-
-    <button class="btn delete-btn" onclick="closeEdit()">Cancel</button>
-
-  </div>
-
-</div>
-
-<!-- DETAILS -->
-
-<div id="details-modal-bg" class="modal-bg">
-
-  <div class="modal details-modal">
-
-    <div id="details-content">Loading…</div>
-
-    <button class="btn delete-btn" onclick="closeDetails()">Close</button>
-
-  </div>
-
-</div>
-
-<!-- MEETUP -->
-
-<div id="meetup-modal-bg" class="modal-bg">
-
-  <div class="modal">
-
-    <h3>🤝 Request Real Meetup</h3>
-
-    <p id="meetup-listing-info" style="opacity:.8;font-size:.85rem;margin:.3rem 0 .9rem"></p>
-
-    <p style="font-size:.75rem;color:#e67e22;margin-bottom:.7rem">⚠️ Public place par milo (mall / metro / police chowk). Kabhi bhi paise advance mein mat do.</p>
-
-    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Your City</label>
-
-    <input id="mu-city" placeholder="e.g. Mumbai" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff">
-
-    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Meeting Spot</label>
-
-    <input id="mu-location" placeholder="e.g. Phoenix Mall Gate 2" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff">
-
-    <div style="display:flex;gap:.5rem">
-
-      <div style="flex:1"><label style="display:block;font-size:.8rem;margin-bottom:.2rem">Date</label>
-
-      <input id="mu-date" type="date" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff"></div>
-
-      <div style="flex:1"><label style="display:block;font-size:.8rem;margin-bottom:.2rem">Time</label>
-
-      <input id="mu-time" type="time" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff"></div>
-
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<main id="mainContent" role="main">
+  <!-- Hero Section -->
+  <section class="hero" style="min-height: 50vh; padding: 3rem 2rem;" aria-labelledby="marketplace-title">
+    <div class="hero-content">
+      <div class="hero-badge animate-fade-in">
+        <span aria-hidden="true">🔥</span>
+        <span>Verified Sellers · Secure Escrow · Direct UPI</span>
+      </div>
+      
+      <h1 id="marketplace-title" class="animate-slide-up stagger-1">
+        Marketplace <br><span class="text-gradient">BGMI Accounts</span>
+      </h1>
+      
+      <p class="hero-subtitle animate-slide-up stagger-2">
+        Browse thousands of verified BGMI accounts. Buy securely with direct UPI payments and escrow protection.
+      </p>
+      
+      <div class="hero-actions animate-slide-up stagger-3">
+        <a href="sell.html" class="btn btn-primary btn-lg btn-ripple">
+          <span>Sell Your Account</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </a>
+      </div>
     </div>
+  </section>
 
-    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Note (optional)</label>
+  <!-- Search & Filter Section -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="glass" style="padding: 1.5rem; border-radius: var(--radius-xl);">
+        <form id="searchForm" class="flex flex-wrap gap-2" style="gap: 1rem; align-items: flex-end;" role="search" aria-label="Marketplace search and filters">
+          <div class="form-group" style="flex: 1; min-width: 250px; margin-bottom: 0;">
+            <label class="label" for="search">Search</label>
+            <input type="search" id="search" class="input" placeholder="Search UID, title, rank..." aria-label="Search listings">
+          </div>
+          
+          <div class="form-group" style="min-width: 200px; margin-bottom: 0;">
+            <label class="label" for="city">City</label>
+            <input type="search" id="city" class="input" placeholder="Search by city (e.g. Mumbai)" aria-label="Filter by city">
+          </div>
+          
+          <div class="form-group" style="min-width: 220px; margin-bottom: 0;">
+            <label class="label" for="filter">Filter</label>
+            <select id="filter" class="input select" aria-label="Filter listings">
+              <option value="">All Listings</option>
+              <option value="account">🎮 Accounts</option>
+              <option value="popularity">🔥 Popularity</option>
+              <option value="meetup">🤝 Meetup Available</option>
+              <option value="own">My Listings</option>
+              <option value="price_low">Price: Low → High</option>
+              <option value="price_high">Price: High → Low</option>
+              <option value="new">Newest First</option>
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
 
-    <textarea id="mu-note" rows="2" placeholder="Phone number bhi de sakte ho milne ke liye" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff;resize:vertical"></textarea>
+  <!-- Listings Grid -->
+  <section class="section" style="padding-bottom: 4rem;">
+    <div class="container">
+      <div id="items-container" class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;" role="list" aria-label="BGMI account listings">
+        <!-- Skeleton loaders -->
+        <div class="skeleton" style="height: 420px; border-radius: var(--radius-xl); grid-column: 1 / -1;"></div>
+        <div class="skeleton" style="height: 420px; border-radius: var(--radius-xl);"></div>
+        <div class="skeleton" style="height: 420px; border-radius: var(--radius-xl);"></div>
+        <div class="skeleton" style="height: 420px; border-radius: var(--radius-xl);"></div>
+      </div>
+      
+      <!-- Load more -->
+      <div style="text-align: center; margin-top: 2rem;">
+        <button id="loadMoreBtn" class="btn btn-outline btn-lg" style="display: none;">
+          Load More
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
 
-    <p id="mu-msg" style="font-size:.85rem;min-height:1.1em;margin-bottom:.4rem"></p>
-
-    <button class="btn meetup-btn" id="mu-submit">Send Meetup Request</button>
-
-    <button class="btn delete-btn" onclick="closeMeetup()">Cancel</button>
-
+<!-- Modals (from original marketplace.js) -->
+<!-- SELLER MODAL -->
+<div id="seller-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="sellerModalTitle" aria-modal="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="sellerModalTitle" class="modal-title">Seller Profile</h3>
+      <button class="modal-close" onclick="closeSeller()" aria-label="Close seller profile">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="seller-content">Loading...</div>
   </div>
-
 </div>
 
-<!-- BUY OPTIONS -->
-<div id="buyopts-modal-bg" class="modal-bg">
-  <div class="modal">
-    <h3>🛒 Kaise kharidna hai?</h3>
-    <p id="buyopts-info" style="opacity:.8;font-size:.85rem;margin:.3rem 0 .9rem"></p>
-    <button class="btn buy-btn" id="buyopts-online" style="width:100%;margin-bottom:.5rem">🛒 Buy Now — Online Delivery</button>
-    <button class="btn meetup-btn" id="buyopts-meetup" style="width:100%;margin-bottom:.5rem">🤝 Buy with Meetup — Real Meeting (safer)</button>
-    <p id="buyopts-hint" style="font-size:.72rem;opacity:.6;margin-bottom:.6rem">Agar seller ne meetup enable kiya hai to real meeting se ID dena zyada trusted hai. Online me aap direct UPI se pay karte ho.</p>
-    <button class="btn delete-btn" id="buyopts-cancel">Cancel</button>
+<!-- EDIT MODAL -->
+<div id="edit-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="editModalTitle" aria-modal="true">
+  <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-header">
+      <h3 id="editModalTitle" class="modal-title">Edit Listing</h3>
+      <button class="modal-close" onclick="closeEdit()" aria-label="Close edit modal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="edit-form" class="flex flex-col gap-3"></form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-ghost" onclick="closeEdit()">Cancel</button>
+      <button type="button" class="btn btn-primary btn-ripple" id="save-edit">Save Changes</button>
+    </div>
   </div>
 </div>
 
-<!-- TARGET UID (popularity) -->
-
-<div id="target-modal-bg" class="modal-bg">
-
-  <div class="modal">
-
-    <h3>🎯 Boost Kaunse UID pe?</h3>
-
-    <p style="opacity:.8;font-size:.85rem;margin:.3rem 0 .9rem">Popularity points jis BGMI player UID pe credit karne hain, woh dalo. Sirf numbers (max 12 digit).</p>
-
-    <label style="display:block;font-size:.8rem;margin-bottom:.2rem">Target BGMI UID <span style="color:#ff5e5e">*</span></label>
-
-    <input id="target-uid" placeholder="e.g. 5301234567" inputmode="numeric" maxlength="12" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:9px;border:1px solid rgba(0,255,255,.3);background:rgba(255,255,255,.06);color:#fff">
-
-    <p id="target-msg" style="font-size:.85rem;min-height:1.1em;margin-bottom:.4rem;color:#ff5e5e"></p>
-
-    <button class="btn buy-btn" id="target-submit">Confirm &amp; Continue</button>
-
-    <button class="btn delete-btn" id="target-cancel">Cancel</button>
-
+<!-- DETAILS MODAL -->
+<div id="details-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="detailsModalTitle" aria-modal="true">
+  <div class="modal-content details-modal" style="max-width: 720px;">
+    <div class="modal-header">
+      <h3 id="detailsModalTitle" class="modal-title">Listing Details</h3>
+      <button class="modal-close" onclick="closeDetails()" aria-label="Close details">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="details-content">Loading…</div>
   </div>
-
 </div>
 
-<style>
-  .details-modal { max-width: 720px; }
-  #details-content .d-hero { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:.8rem; }
-  #details-content .d-imgs { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.9rem; }
-  #details-content .d-imgs img { width:110px; height:110px; border-radius:10px; object-fit:cover; cursor:zoom-in; border:1px solid rgba(0,255,255,.3); transition:.2s; }
-  #details-content .d-imgs img:hover { transform:scale(1.05); border-color:#0ff; }
-  #details-content .d-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.5rem; margin:.6rem 0; }
-  #details-content .d-chip { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:.5rem .7rem; font-size:.82rem; }
-  #details-content .d-chip b { display:block; color:#0ff; margin-bottom:.2rem; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; }
-  #details-content .d-desc { background:rgba(255,255,255,.05); border-left:3px solid #00ffc6; border-radius:8px; padding:.6rem .8rem; margin:.6rem 0; font-size:.88rem; }
-  #details-content .d-price { font-size:1.6rem; font-weight:800; color:#f39c12; text-shadow:0 0 18px rgba(243,156,18,.5); }
-  #details-content .d-actions { display:flex; gap:.6rem; margin-top:.8rem; flex-wrap:wrap; }
-  #details-content .d-actions .btn { flex:1; min-width:120px; }
-  #details-content .d-meta { font-size:.8rem; color:rgba(255,255,255,.65); }
-  body.dark #details-content .d-chip { background:rgba(0,0,0,.25); }
-</style>
-
-
-
-<!-- FULLSCREEN -->
-
-<div id="fs-viewer">
-
-  <span class="fs-close">×</span>
-
-  <span class="fs-arrow left">‹</span>
-
-  <img id="fs-img">
-
-  <span class="fs-arrow right">›</span>
-
+<!-- MEETUP MODAL -->
+<div id="meetup-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="meetupModalTitle" aria-modal="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="meetupModalTitle" class="modal-title">🤝 Request Real Meetup</h3>
+      <button class="modal-close" onclick="closeMeetup()" aria-label="Close meetup modal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p id="meetup-listing-info" style="opacity: 0.8; font-size: 0.875rem; margin-bottom: 1rem;"></p>
+      <p style="font-size: 0.75rem; color: var(--accent-secondary); margin-bottom: 1rem;">⚠️ Meet in public places (mall, metro, police station). Never send money in advance.</p>
+      
+      <div class="form-group">
+        <label class="label" for="mu-city">Your City</label>
+        <input type="text" id="mu-city" class="input" placeholder="e.g. Mumbai" aria-label="City for meetup">
+      </div>
+      
+      <div class="form-group">
+        <label class="label" for="mu-location">Meeting Spot</label>
+        <input type="text" id="mu-location" class="input" placeholder="e.g. Phoenix Mall Gate 2" aria-label="Meeting location">
+      </div>
+      
+      <div class="flex gap-2" style="flex-wrap: wrap;">
+        <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+          <label class="label" for="mu-date">Date</label>
+          <input type="date" id="mu-date" class="input" aria-label="Meetup date">
+        </div>
+        <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+          <label class="label" for="mu-time">Time</label>
+          <input type="time" id="mu-time" class="input" aria-label="Meetup time">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="label" for="mu-note">Note (optional)</label>
+        <textarea id="mu-note" class="input textarea" rows="2" placeholder="Phone number for coordination" aria-label="Additional notes"></textarea>
+      </div>
+      
+      <p id="mu-msg" style="font-size: 0.875rem; min-height: 1.5rem;"></p>
+      
+      <div class="flex gap-2">
+        <button class="btn btn-primary btn-ripple flex-1" id="mu-submit">Send Meetup Request</button>
+        <button class="btn btn-ghost flex-1" onclick="closeMeetup()">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- BUY OPTIONS MODAL -->
+<div id="buyopts-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="buyoptsTitle" aria-modal="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="buyoptsTitle" class="modal-title">🛒 How to Buy?</h3>
+      <button class="modal-close" onclick="resolveBuyOptions(null)" aria-label="Close buy options">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p id="buyopts-info" style="opacity: 0.8; font-size: 0.875rem; margin-bottom: 1rem;"></p>
+      <button class="btn btn-primary btn-ripple w-full mb-2" id="buyopts-online">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+        </svg>
+        Online Delivery — Direct UPI Payment
+      </button>
+      <button class="btn btn-secondary btn-ripple w-full mb-2" id="buyopts-meetup">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        </svg>
+        Meetup — Real Meeting (Safer)
+      </button>
+      <p id="buyopts-hint" style="font-size: 0.75rem; opacity: 0.6; margin-bottom: 1rem;">If seller has meetup enabled, real meeting is more trusted. Online = direct UPI payment.</p>
+      <button class="btn btn-ghost w-full" id="buyopts-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
 
+<!-- TARGET UID MODAL (Popularity) -->
+<div id="target-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="targetTitle" aria-modal="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="targetTitle" class="modal-title">🎯 Target BGMI UID</h3>
+      <button class="modal-close" onclick="resolveTargetUid(null)" aria-label="Close target UID">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="opacity: 0.8; font-size: 0.875rem; margin-bottom: 1rem;">Enter the BGMI UID where popularity points should be credited. Numbers only (max 12 digits).</p>
+      
+      <div class="form-group">
+        <label class="label" for="target-uid">Target BGMI UID <span style="color: var(--accent-secondary)">*</span></label>
+        <input type="text" id="target-uid" class="input" inputmode="numeric" maxlength="12" placeholder="e.g. 5301234567" pattern="\d{1,12}" aria-label="Target BGMI UID" required>
+      </div>
+      
+      <p id="target-msg" style="font-size: 0.875rem; min-height: 1.5rem; color: var(--accent-secondary)"></p>
+      
+      <div class="flex gap-2">
+        <button class="btn btn-primary btn-ripple flex-1" id="target-submit">Confirm & Continue</button>
+        <button class="btn btn-ghost flex-1" id="target-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<div id="toast"></div>
+<!-- Fullscreen Image Viewer -->
+<div id="fs-viewer" class="modal-overlay" style="z-index: 10000;" role="dialog" aria-modal="true">
+  <button class="modal-close" style="top: 20px; right: 30px; font-size: 34px;" aria-label="Close fullscreen">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+  <button id="fs-left" class="fs-arrow left" aria-label="Previous image">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
+  <img id="fs-img" alt="" style="max-width: 90%; max-height: 90%; border-radius: 14px;">
+  <button id="fs-right" class="fs-arrow right" aria-label="Next image">
+    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </button>
+</div>
 
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
 
-<script src="js/upi.js"></script>
+<!-- Scripts -->
+<script src="js/theme.js"></script>
 <script src="js/marketplace.js"></script>
-
+<script src="js/upi.js"></script>
 <script src="assets/effects.js" defer></script>
 
-
-
 <script>
-
-document.getElementById('dark-toggle')
-
-  .onclick=()=>document.body.classList.toggle('dark');
-
-
-
-/* 3D tilt */
-
-document.addEventListener('mousemove',e=>{
-
-  document.querySelectorAll('.item-card').forEach(card=>{
-
-    const r=card.getBoundingClientRect();
-
-    if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){
-
-      card.style.transform='';
-
-      return;
-
+  // Initialize auth buttons in navbar
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        
+        // Dropdown toggle
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        
+        if (navLogoutBtn) {
+          navLogoutBtn.addEventListener('click', () => {
+            if (window.logout) window.logout();
+          });
+        }
+      } else {
+        authButtons.innerHTML = `
+          <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+          <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
+        `;
+      }
     }
-
-    const x=(e.clientX-r.left)/r.width-.5;
-
-    const y=(e.clientY-r.top)/r.height-.5;
-
-    card.style.transform=`rotate(${-y*8}deg) rotate(${x*8}deg) translate(-6px)`;
-
+    
+    // Mobile menu toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (navToggle && navLinks) {
+      navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
   });
-
-});
-
 </script>
-
-
-
-  <link rel="stylesheet" href="styles/responsive.css">
 </body>
-
 </html>

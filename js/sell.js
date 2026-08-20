@@ -71,19 +71,56 @@
   fileElem.onchange = e => handleFiles(e.target.files);
 
   // ===== PRICE ESTIMATOR (server-driven via /api/price-config) =====
-  const PRICE = {
-    level_per: 8,          // ₹ per level
+  // Default prices (MUST match server defaults in marketplace_service/index.js PRICE_DEFAULTS)
+  const PRICE_DEFAULTS = {
+    level_per: 8,
     rank_gold: 10, rank_platinum: 30, rank_ace: 50, rank_diamond: 40, rank_conquer: 200,
     mythic: 180, legendary: 100, gift: 1000, titles: 100, guns: 300,
     x_suit: 400, supercar: 1500, ultimate: 250,
     min_price: 999, round_to: 50, pop_per_point: 1
   };
+  const PRICE = { ...PRICE_DEFAULTS };
   const rankKeys = { gold: "rank_gold", platinum: "rank_platinum", ace: "rank_ace", diamond: "rank_diamond", conquer: "rank_conquer" };
 
-  fetch("https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/price-config")
-    .then(r => (r.ok ? r.json() : null))
-    .then(cfg => { if (cfg && typeof cfg === "object") Object.assign(PRICE, cfg); })
-    .catch(() => {});
+  let priceConfigLoaded = false;
+  let priceConfigSyncInterval = null;
+
+  async function loadPriceConfig() {
+    try {
+      const res = await fetch("https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/price-config");
+      if (res.ok) {
+        const cfg = await res.json();
+        if (cfg && typeof cfg === "object") {
+          Object.assign(PRICE, cfg);
+          priceConfigLoaded = true;
+          console.log("[Price Config] Loaded from server:", cfg);
+        }
+      } else {
+        throw new Error(`Server returned ${res.status}`);
+      }
+    } catch (err) {
+      console.warn("[Price Config] Failed to load from server, using defaults:", err.message);
+      Object.assign(PRICE, PRICE_DEFAULTS);
+      priceConfigLoaded = true;
+      // Show subtle warning to user
+      const out = document.getElementById("estimatedPrice");
+      if (out && !out.textContent) {
+        out.textContent = "⚠️ Using cached prices (offline mode)";
+        out.style.color = "var(--accent-secondary)";
+      }
+    }
+  }
+
+  // Initial load
+  await loadPriceConfig();
+
+  // Periodic sync every 5 minutes to keep prices in sync with server
+  priceConfigSyncInterval = setInterval(loadPriceConfig, 5 * 60 * 1000);
+
+  // Cleanup on page unload
+  window.addEventListener("beforeunload", () => {
+    if (priceConfigSyncInterval) clearInterval(priceConfigSyncInterval);
+  });
 
   function calcEstimate() {
     const level = +document.getElementById("level").value || 0;
