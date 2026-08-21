@@ -352,8 +352,8 @@ function authHeaders() {
   };
 }
 
-profileName.textContent = user.name || user.email?.split("@")[0];
-profileEmail.textContent = user.email;
+profileName.textContent = user?.name || user?.email?.split("@")[0] || "Player";
+profileEmail.textContent = user?.email || "";
 
 /* PROFILE PICTURE (compress → save) */
 function compressImage(file, size) {
