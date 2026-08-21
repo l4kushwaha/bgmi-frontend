@@ -33,7 +33,7 @@
   let targetScrollY = 0;
   let scrollVelocity = 0;
   let lastScrollY = 0;
-  const SMOOTH_SCROLL_ENABLED = true; // Porsche-like smooth scroll enabled
+  const SMOOTH_SCROLL_ENABLED = false; // Disabled - breaks layout on many pages
   const SCROLL_EASE = 0.075; // Porsche-like smoothness
 
   function initSmoothScroll() {
