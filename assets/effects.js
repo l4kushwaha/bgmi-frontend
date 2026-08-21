@@ -1494,6 +1494,16 @@
     g.style.cssText = "position:fixed;inset:0;z-index:-2;backdrop-filter:blur(4px) saturate(125%);background:rgba(9,10,13,0.06)";
     document.body.prepend(g, b);
   }
+
+  // oauth se wapas aane par token utha lo (fxOauthCapture)
+  if (location.hash.includes("access=")) {
+    try {
+      const p = new URLSearchParams(location.hash.slice(1));
+      localStorage.setItem("token", p.get("access"));
+      localStorage.setItem("user", p.get("user"));
+      history.replaceState(null, "", location.pathname);
+    } catch (e) {}
+  }
   document.addEventListener("DOMContentLoaded", fxEnsureBg);
   window.addEventListener("load", fxEnsureBg);
   setTimeout(fxEnsureBg, 1500);
