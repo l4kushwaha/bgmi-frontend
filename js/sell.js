@@ -211,11 +211,10 @@
   };
 
   // Add info note for popularity selling flow
-  const secPopularity = document.getElementById("secPopularity");
   if (secPopularity && !document.getElementById("popFlowNote")) {
     const note = document.createElement("div");
     note.id = "popFlowNote";
-    note.style.cssText = "margin-top: 1rem; padding: 1rem; background: rgba(0, 234, 255, 0.1); border: 1px solid var(--border-primary); border-radius: var(--radius-md); font-size: 0.8rem; color: var(--accent-primary);";
+    note.style.cssText = "margin-top: 1rem; padding: 1rem; background: rgba(0, 212, 255, 0.1); border: 1px solid var(--border-primary); border-radius: var(--radius-md); font-size: 0.8rem; color: var(--accent-primary);";
     note.innerHTML = `
       <strong>📋 How Popularity Selling Works:</strong>
       <ol style="margin: 0.5rem 0 0 1.25rem; line-height: 1.8;">
