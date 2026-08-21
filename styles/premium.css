@@ -2014,3 +2014,15 @@ img{filter:saturate(1.04) contrast(1.02)}
 /* LOGIN SLIDER: active form always above overlay */
 .fx-auth-slider:not(.right-panel-active) .fx-signin{z-index:200}
 .fx-auth-slider.right-panel-active .fx-signup{z-index:200}
+
+/* ================= V6 — RESTORE GLASS, SOCIAL LOGIN, FIXES ================= */
+/* Restore frosted-glass cards (undo v4 flattening) */
+.card,.glass,.stat-card,.feature-card,.boost-card{border-radius:22px!important;border:1px solid rgba(255,255,255,.14)!important;background:rgba(15,17,23,.58)!important;backdrop-filter:blur(26px) saturate(160%)!important;-webkit-backdrop-filter:blur(26px) saturate(160%)!important}
+.glass-layer{background:rgba(9,10,13,.38)!important}
+/* Sell section toggle insurance */
+.fx-sec:not(.hidden-sec){display:block!important}
+.fx-sec.hidden-sec{display:none!important}
+/* Social buttons */
+.social-row{display:flex;gap:.7rem;margin-top:1rem}
+.btn-social{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:.55rem;padding:.75rem .5rem;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-weight:600;font-size:.85rem;cursor:pointer;transition:background .25s,transform .25s,border-color .25s}
+.btn-social:hover{background:rgba(255,255,255,.13);transform:translateY(-2px);border-color:rgba(255,255,255,.3)}

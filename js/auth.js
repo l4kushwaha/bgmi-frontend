@@ -378,4 +378,18 @@ async function resetPassword() {
   window.showVerifyPanel = showVerifyPanel;
 
 
+
+  /* ==== SOCIAL LOGIN (OAuth scaffold) ==== */
+  async function socialLogin(provider) {
+    try {
+      showToast(`${provider === "google" ? "Google" : "Facebook"} login setup in progress — email/password use karein`, "info");
+      const r = await fetch(`${AUTH_API}/oauth/${provider}`);
+      if (r.ok) {
+        const j = await r.json().catch(() => null);
+        if (j && j.authorize_url) location.href = j.authorize_url;
+      }
+    } catch (e) { console.warn("social login:", e); }
+  }
+  window.socialLogin = socialLogin;
+
 })();
