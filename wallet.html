@@ -1,111 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wallet | BGMI Market</title>
-  <link rel="stylesheet" href="assets/webfonts/poppins.css">
-  <link rel="stylesheet" href="assets/effects.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-    body {
-      min-height: 100vh;
-      background: radial-gradient(circle at top left, #0b1026, #070810, #0d0a1f);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
-      overflow-x: hidden;
-    }
-    .orb { position: fixed; border-radius: 50%; filter: blur(90px); opacity: .35; z-index: 0; animation: drift 18s infinite ease-in-out; }
-    .orb.a { width: 420px; height: 420px; background: #22c55e; top: -120px; left: -120px; }
-    .orb.b { width: 380px; height: 380px; background: #8b5cf6; bottom: -100px; right: -100px; animation-delay: -6s; }
-    .orb.c { width: 300px; height: 300px; background: #f59e0b; top: 40%; right: 10%; animation-delay: -12s; }
-    @keyframes drift { 0%,100% { transform: translate(0,0); } 50% { transform: translate(30px,-30px); } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet | BGMI Market</title>
+<meta name="description" content="Manage your wallet, withdraw earnings, and track escrow on BGMI Market. Direct UPI withdrawals.">
 
-    .wrap { position: relative; z-index: 1; width: 100%; max-width: 720px; }
-    header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 2rem; animation: drop .6s ease both;
-    }
-    header h1 {
-      font-size: 1.6rem;
-      background: linear-gradient(90deg, #22c55e, #8b5cf6);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    header a { color: #aaa; text-decoration: none; border: 1px solid #333; padding: .4rem .8rem; border-radius: 8px; transition: .3s; }
-    header a:hover { color: #22c55e; border-color: #22c55e; box-shadow: 0 0 14px rgba(34,197,94,.35); }
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-    .stat {
-      background: rgba(255,255,255,.05); backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,.1); border-radius: 16px;
-      padding: 1.2rem; text-align: center;
-      animation: pop .5s ease both;
-    }
-    .stat:nth-child(2) { animation-delay: .1s; } .stat:nth-child(3) { animation-delay: .2s; }
-    .stat small { opacity: .6; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; }
-    .stat .val { font-size: 1.5rem; font-weight: 700; margin-top: .3rem; }
-    .stat.green .val { color: #22c55e; }
-    .stat.orange .val { color: #ffb703; }
-    .stat.violet .val { color: #a78bfa; }
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
 
-    .panel {
-      background: rgba(255,255,255,.05); backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,.1); border-radius: 18px;
-      padding: 1.5rem; margin-bottom: 1.5rem;
-      animation: rise .5s ease both;
-    }
-    .panel h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #ffb703; }
-
-    input {
-      width: 100%; background: rgba(0,0,0,.35); border: 1px solid #333;
-      color: #fff; padding: .7rem .9rem; border-radius: 10px; margin-bottom: .8rem;
-      font-size: .95rem; transition: .3s;
-    }
-    input:focus { outline: none; border-color: #22c55e; box-shadow: 0 0 12px rgba(34,197,94,.3); }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
-
-    .btn {
-      width: 100%; padding: .8rem; border: none; border-radius: 12px; cursor: pointer;
-      font-weight: 700; font-size: 1rem; color: #062; background: linear-gradient(90deg,#22c55e,#16a34a);
-      transition: .3s;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,.4); }
-
-    .wd-item {
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(0,0,0,.25); border: 1px solid #222; border-radius: 12px;
-      padding: .8rem 1rem; margin-bottom: .6rem;
-    }
-    .wd-item small { display: block; opacity: .55; font-size: .72rem; }
-    .wd-status { text-transform: uppercase; font-size: .72rem; font-weight: 700; letter-spacing: .05em; }
-
-    #toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: #111; border: 1px solid #22c55e; color: #fff; padding: .7rem 1.3rem;
-      border-radius: 12px; opacity: 0; pointer-events: none; transition: .3s; z-index: 99;
-    }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    @keyframes drop { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: none; } }
-    @keyframes pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
-    @keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
-
-    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } }
-  </style>
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
-  <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link active" data-magnetic="0.15">Wallet</a>
+    <a href="chat.html" class="nav-link" data-magnetic="0.15">Chats</a>
+    <a href="profile.html" class="nav-link" data-magnetic="0.15">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" data-magnetic="0.15">Admin</a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
+  </div>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
 
-  <div class="wrap">
-    <header>
-      <h1><span class="wiggle">💳</span> <span class="anim-gradient under-bar">My Wallet</span></h1>
-      <a href="index.html">← Back</a>
+<main class="wallet-page" role="main" style="flex: 1; padding: 2rem 1rem 4rem;">
+  <div class="wrap" style="position: relative; z-index: 1; width: 100%; max-width: 720px; margin: 0 auto;">
+    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;" data-reveal="slide-up">
+      <h1 style="font-size: 1.6rem; background: linear-gradient(90deg, var(--accent-tertiary), var(--accent-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" data-text-reveal="words" data-stagger="0.03">
+        <span class="wiggle">💳</span> <span class="anim-gradient">My Wallet</span>
+      </h1>
+      <a href="index.html" class="btn btn-ghost btn-sm" data-magnetic="0.2">← Back</a>
     </header>
 
-    <div class="marquee-wrap" style="margin-bottom:.8rem">
+    <div class="marquee-wrap" style="margin-bottom: 1.5rem" data-reveal="fade" data-reveal-delay="200">
       <div class="marquee-inner">
         <span>💰 <b>SECURE</b> Escrow Wallet</span>
         <span>⚡ <b>INSTANT</b> UPI Withdrawals</span>
@@ -114,29 +83,178 @@
       </div>
     </div>
 
-    <div class="grid">
-      <div class="stat green card-in price-pulse" data-i="1"><small>Available Balance</small><div class="val" id="availableBalance">₹0</div></div>
-      <div class="stat orange card-in price-pulse" data-i="2"><small>Escrow Held</small><div class="val" id="escrowHeld">₹0</div></div>
-      <div class="stat violet card-in price-pulse" data-i="3"><small>Total Withdrawn</small><div class="val" id="totalWithdrawn">₹0</div></div>    </div>
-
-    <div class="panel">
-      <h2>Withdraw Earnings</h2>
-      <div class="row">
-        <input id="withdrawAmount" type="number" min="1" placeholder="Amount (₹)">
-        <input id="upiId" type="text" placeholder="UPI ID (name@upi)">
+    <div class="glass glass-strong" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;" data-stagger data-stagger-delay="80" data-reveal="slide-up">
+      <div class="stat-card" style="text-align: center; padding: 1.5rem;" data-stagger-item data-tilt="6" data-magnetic="0.1">
+        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.5rem;">Available Balance</div>
+        <div class="val price-pulse" id="availableBalance" data-count="0" data-formatter="currency" data-prefix="₹" style="font-size: 2rem; font-weight: 800; color: var(--accent-tertiary);">₹0</div>
       </div>
-      <button class="btn" id="withdrawBtn">Request Withdrawal</button>
+      <div class="stat-card" style="text-align: center; padding: 1.5rem;" data-stagger-item data-tilt="6" data-magnetic="0.1">
+        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.5rem;">Escrow Held</div>
+        <div class="val price-pulse" id="escrowHeld" data-count="0" data-formatter="currency" data-prefix="₹" style="font-size: 2rem; font-weight: 800; color: var(--accent-secondary);">₹0</div>
+      </div>
+      <div class="stat-card" style="text-align: center; padding: 1.5rem;" data-stagger-item data-tilt="6" data-magnetic="0.1">
+        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.5rem;">Total Withdrawn</div>
+        <div class="val price-pulse" id="totalWithdrawn" data-count="0" data-formatter="currency" data-prefix="₹" style="font-size: 2rem; font-weight: 800; color: var(--accent-purple);">₹0</div>
+      </div>
     </div>
 
-    <div class="panel">
-      <h2>Withdrawal History</h2>
-      <div id="withdrawalsList"><p style="opacity:.6">Loading…</p></div>
+    <div class="glass" style="padding: 1.5rem; margin-bottom: 1.5rem;" data-reveal="slide-up" data-reveal-delay="200">
+      <h2 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent-secondary);">Withdraw Earnings</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" data-stagger data-stagger-delay="50">
+        <div class="form-group" data-stagger-item data-reveal="slide-up" data-reveal-delay="250">
+          <label class="label" for="withdrawAmount">Amount (₹)</label>
+          <input type="number" id="withdrawAmount" class="input" min="1" placeholder="Amount (₹)" required>
+        </div>
+        <div class="form-group" data-stagger-item data-reveal="slide-up" data-reveal-delay="300">
+          <label class="label" for="upiId">UPI ID</label>
+          <input type="text" id="upiId" class="input" placeholder="UPI ID (name@upi)" required>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary btn-lg btn-full btn-ripple" id="withdrawBtn" style="margin-top: 1rem;" data-magnetic="0.25">Request Withdrawal</button>
+    </div>
+
+    <div class="glass" style="padding: 1.5rem;" data-reveal="slide-up" data-reveal-delay="200">
+      <h2 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent-gold);">Withdrawal History</h2>
+      <div id="withdrawalsList"><p style="opacity: 0.6;">Loading…</p></div>
     </div>
   </div>
+</main>
 
-  <div id="toast"></div>
-  <script src="js/wallet.js"></script>
-  <script src="assets/effects.js" defer></script>
-  <link rel="stylesheet" href="styles/responsive.css">
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/theme.js"></script>
+<script src="js/wallet.js"></script>
+<script src="assets/effects.js" defer></script>
+
+<script>
+  // Initialize auth buttons in navbar
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        
+        // Dropdown toggle
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        
+        if (navLogoutBtn) {
+          navLogoutBtn.addEventListener('click', () => {
+            if (window.logout) window.logout();
+          });
+        }
+      } else {
+        authButtons.innerHTML = `
+          <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+          <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
+        `;
+      }
+      
+      // Mobile menu toggle
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+  });
+</script>
 </body>
 </html>

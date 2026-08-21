@@ -1,229 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chat | BGMI Market</title>
-<link rel="stylesheet" href="assets/webfonts/poppins.css">
+<meta name="description" content="Real-time chat with buyers and sellers on BGMI Market. Voice messages, effects, and secure communication.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
 <link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
 
-<style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-body { background:#0b141a; color:#fff; overflow:hidden; }
-.app { display:flex; height:100vh; }
-
-/* ========== SIDEBAR ========== */
-.sidebar {
-  width:340px; background:#111b21; display:flex; flex-direction:column;
-  border-right:1px solid rgba(255,255,255,.08);
-}
-.sidebar-header {
-  padding:10px 10px 8px; border-bottom:1px solid rgba(255,255,255,.08);
-}
-.sidebar-header .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.sidebar-header .top .logo { font-weight:800; font-size:1.05rem; }
-.sidebar-header input {
-  width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.05); color:#fff; outline:none; font-size:.9rem;
-}
-.sidebar-header input:focus { border-color:#0ff; box-shadow:0 0 10px rgba(0,255,198,.3); }
-#onlineStatus { margin-top:6px; font-size:12px; color:#25d366; }
-
-#chatList { flex:1; overflow-y:auto; }
-.chat-item { padding:12px; border-bottom:1px solid rgba(255,255,255,.05); cursor:pointer; transition:.2s; }
-.chat-item:hover, .chat-item.active { background:#202c33; }
-.chat-title { font-weight:700; color:#fff; font-size:.92rem; }
-.chat-preview { font-size:13px; color:#aaa; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.chat-meta { font-size:11px; color:#25d366; margin-top:2px; }
-
-/* ========== CHAT PANEL ========== */
-.chat-panel { flex:1; display:flex; flex-direction:column; background:#0b141a; min-width:0; }
-.chat-header {
-  padding:10px 14px; background:#202c33; display:flex; justify-content:space-between;
-  align-items:center; gap:.6rem; border-bottom:1px solid rgba(255,255,255,.08);
-}
-#chatStatus { font-weight:700; font-size:.95rem; }
-.chat-header .exit { font-size:.75rem; color:#aaa; cursor:pointer; border:1px solid rgba(255,255,255,.15); padding:.25rem .6rem; border-radius:8px; transition:.2s; }
-.chat-header .exit:hover { color:#ff5e5e; border-color:#ff5e5e; }
-
-#chatBox { flex:1; padding:12px; overflow-y:auto; }
-
-/* Messages */
-.message { max-width:70%; padding:8px 12px; margin-bottom:8px; border-radius:12px; font-size:14px; word-break:break-word; }
-.sent { background:#005c4b; color:#fff; margin-left:auto; border-bottom-right-radius:4px; }
-.received { background:#202c33; color:#fff; border-bottom-left-radius:4px; }
-.message.system { background:transparent; color:#ffcc00; text-align:center; font-size:.8rem; max-width:100%; }
-img.chat-image { max-width:220px; border-radius:8px; display:block; }
-.message audio { max-width:220px; height:34px; display:block; }
-.g-time-inline { display:block; font-size:.65rem; opacity:.55; margin-top:3px; text-align:right; }
-
-/* ========== WAITING / BUY ========== */
-#waitingBox { padding:10px; text-align:center; color:#ffcc00; font-size:14px; }
-#buyBox { display:none; padding:10px; background:#111b21; border-top:1px solid #222; text-align:center; }
-#buyBox button { padding:10px 16px; border-radius:8px; border:none; background:linear-gradient(90deg,#ffcc00,#ff8800); cursor:pointer; font-weight:700; color:#221; }
-
-/* ========== GLOBAL ========== */
-.g-box { flex:1; overflow-y:auto; padding:12px; display:none; }
-.g-box.open { display:block; }
-.g-empty { text-align:center; color:rgba(255,255,255,.5); padding:2.5rem 1rem; }
-
-/* ========== INPUT BAR ========== */
-.chat-input { position:relative; display:flex; align-items:center; gap:.4rem; padding:8px; background:#202c33; }
-.chat-input input[type="text"] {
-  flex:1; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.12);
-  background:#111b21; color:#fff; outline:none; font-size:.92rem;
-}
-.chat-input input:focus { border-color:#0ff; }
-.icon-btn {
-  width:38px; height:38px; flex:none; border:none; border-radius:10px; cursor:pointer;
-  font-size:1.05rem; background:rgba(255,255,255,.07); color:#fff; transition:.2s;
-}
-.icon-btn:hover { background:rgba(255,255,255,.16); }
-.icon-btn.rec { background:#ff2d2d; box-shadow:0 0 14px rgba(255,45,45,.7); animation:pulse 1.2s infinite; }
-#sendBtn {
-  flex:none; padding:10px 18px; border:none; border-radius:10px; cursor:pointer; font-weight:800;
-  color:#061; background:linear-gradient(90deg,#00ffc6,#22c55e); transition:.2s;
-}
-#sendBtn:hover { transform:translateY(-1px); box-shadow:0 0 16px rgba(0,255,198,.5); }
-#sendBtn:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
-
-/* ========== CALLING ========== */
-.call-btn {
-  flex:none; width:38px; height:38px; border:none; border-radius:50%;
-  cursor:pointer; font-size:1.05rem; background:rgba(255,255,255,.08); color:#fff; transition:.2s;
-  display:none;
-}
-.call-btn:hover { transform:translateY(-1px); }
-#callAudioBtn:hover { background:#25d366; box-shadow:0 0 14px rgba(37,211,102,.6); }
-#callVideoBtn:hover { background:#00c6ff; box-shadow:0 0 14px rgba(0,198,255,.6); }
-
-.call-overlay {
-  position:fixed; inset:0; z-index:999; display:none;
-  align-items:center; justify-content:center; flex-direction:column; gap:.6rem;
-  background:rgba(5,10,15,.94); backdrop-filter:blur(10px);
-}
-.call-overlay.open { display:flex; }
-.call-avatar {
-  width:96px; height:96px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-  font-size:2.4rem; font-weight:800; color:#062;
-  background:linear-gradient(90deg,#00ffc6,#22c55e);
-  box-shadow:0 0 30px rgba(0,255,198,.45);
-}
-.call-name { font-size:1.15rem; font-weight:700; }
-.call-state { font-size:.85rem; color:#aaa; }
-.call-actions { display:flex; gap:.9rem; margin-top:.6rem; }
-.call-action {
-  width:56px; height:56px; border:none; border-radius:50%; cursor:pointer;
-  font-size:1.4rem; color:#fff; transition:.2s;
-}
-.call-action.accept { background:linear-gradient(90deg,#00ffc6,#22c55e); box-shadow:0 0 18px rgba(0,255,198,.5); }
-.call-action.decline, .call-action.end { background:#ff2d2d; box-shadow:0 0 18px rgba(255,45,45,.5); }
-.call-action:hover { transform:scale(1.08); }
-.call-ring { animation:pulse 1.2s infinite; }
-
-#callVideoLocal, #callVideoRemote {
-  position:fixed; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,.25);
-}
-#callVideoLocal { width:26vw; max-width:280px; aspect-ratio:3/4; right:14px; bottom:14px; z-index:1001; background:#000; }
-#callVideoRemote { inset:0; width:100%; height:100%; z-index:998; background:#000; }
-
-/* scrollbar */
-::-webkit-scrollbar { width:6px; }
-::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); border-radius:3px; }
-@media (max-width:640px){ .sidebar{width:100%;} .app{flex-direction:column;} }
-</style>
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link active" data-magnetic="0.15">Chats</a>
+    <a href="profile.html" class="nav-link" data-magnetic="0.15">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" data-magnetic="0.15">Admin</a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
+  </div>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
 
-<div class="app">
-
-  <!-- ===== SIDEBAR ===== -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="top">
-        <span class="logo anim-gradient"><span class="wiggle">💬</span> BGMI Chat</span>
-        <span id="onlineStatus"></span>
-      </div>
-      <div class="ch-tabs">
-        <div class="ch-tab active" id="tabGlobal">🌍 Global</div>
-        <div class="ch-tab" id="tabChats">🎮 My Chats</div>
-      </div>
-      <div id="pillsBox"></div>
-      <input id="searchChats" placeholder="Search chats" style="display:none">
+<div class="app" role="main">
+  <div class="marquee-wrap" data-reveal="fade">
+    <div class="marquee-inner">
+      <span>💬 <b>REAL-TIME CHAT</b> With Buyers & Sellers</span>
+      <span>🎭 <b>EFFECTS</b> Rainbow, Glitch, Fire, Sparkle</span>
+      <span>🎤 <b>VOICE MESSAGES</b> Instant Audio</span>
+      <span>📞 <b>CALLS</b> Voice & Video Calls</span>
     </div>
-    <div id="chatList" class="chat-list"></div>
   </div>
 
-  <!-- ===== MAIN PANEL ===== -->
-  <div class="chat-panel">
-
-    <!-- GLOBAL CHAT -->
-    <div class="g-box open" id="globalBox">
-      <div class="g-empty" id="gEmpty">🌍 Global chat — abhi tak koi message nahi. Pehla bano!<br><span style="font-size:.8rem;opacity:.7">3 sec gap ke saath message bhejo</span></div>
+  <div class="app" role="application">
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" data-reveal="slide-left" data-reveal-delay="100">
+      <div class="sidebar-header">
+        <div class="top">
+          <span class="logo anim-gradient"><span class="wiggle">💬</span> BGMI Chat</span>
+          <span id="onlineStatus"></span>
+        </div>
+        <div class="ch-tabs">
+          <div class="ch-tab active" id="tabGlobal" data-magnetic="0.2">🌍 Global</div>
+          <div class="ch-tab" id="tabChats" data-magnetic="0.2">🎮 My Chats</div>
+        </div>
+        <div id="pillsBox"></div>
+        <input id="searchChats" placeholder="Search chats" style="display:none">
+      </div>
+      <div id="chatList" class="chat-list"></div>
     </div>
 
-    <!-- PRIVATE CHAT -->
-    <div id="privateBox" style="display:none;flex:1;flex-direction:column;min-height:0;">
-      <div class="chat-header">
-        <div id="chatStatus">Select a chat</div>
-        <div style="display:flex;gap:.5rem;align-items:center">
-          <button class="call-btn" id="callAudioBtn" title="Voice call">📞</button>
-          <button class="call-btn" id="callVideoBtn" title="Video call">📹</button>
-          <span class="exit" id="exitPrivate" style="display:none">✕ Close</span>
+    <!-- ===== MAIN PANEL ===== -->
+    <div class="chat-panel" data-reveal="slide-right" data-reveal-delay="150">
+      <!-- GLOBAL CHAT -->
+      <div class="g-box open" id="globalBox">
+        <div class="g-empty" id="gEmpty">🌍 Global chat — abhi tak koi message nahi. Pehla bano!<br><span style="font-size:.8rem;opacity:.7">3 sec gap ke saath message bhejo</span></div>
+      </div>
+
+      <!-- PRIVATE CHAT -->
+      <div id="privateBox" style="display:none;flex:1;flex-direction:column;min-height:0;">
+        <div class="chat-header">
+          <div id="chatStatus">Select a chat</div>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="call-btn" id="callAudioBtn" title="Voice call" data-magnetic="0.3">📞</button>
+            <button class="call-btn" id="callVideoBtn" title="Video call" data-magnetic="0.3">📹</button>
+            <span class="exit" id="exitPrivate" style="display:none">✕ Close</span>
+          </div>
+        </div>
+        <div id="waitingBox"></div>
+        <div id="chatBox"></div>
+        <div id="buyBox">
+          <button id="halfPayBtn" class="btn btn-primary btn-ripple" data-magnetic="0.2">Pay 50% Advance</button>
         </div>
       </div>
-      <div id="waitingBox"></div>
-      <div id="chatBox"></div>
-      <div id="buyBox">
-        <button id="halfPayBtn">Pay 50% Advance</button>
+
+      <!-- INPUT BAR -->
+      <div class="chat-input" data-reveal="slide-up" data-reveal-delay="200">
+        <div class="effects-pop" id="effectsPop">
+          <span class="eff-chip sel" data-e="">✨ None</span>
+          <span class="eff-chip" data-e="rainbow">🌈 Rainbow</span>
+          <span class="eff-chip" data-e="glitch">⚡ Glitch</span>
+          <span class="eff-chip" data-e="fire">🔥 Fire</span>
+          <span class="eff-chip" data-e="sparkle">🎇 Sparkle</span>
+          <span class="eff-chip" data-e="neon">🔮 Neon</span>
+        </div>
+        <button class="icon-btn" id="effBtn" title="Effects" data-magnetic="0.3">✨</button>
+        <button class="icon-btn" id="micBtn" title="Voice message" data-magnetic="0.3">🎤</button>
+        <button class="icon-btn" id="imgBtn" title="Send image" style="display:none" data-magnetic="0.3">📷</button>
+        <input type="text" id="messageInput" placeholder="Type a message… (Enter to send)">
+        <input type="file" id="imageInput" hidden>
+        <button id="sendBtn" class="btn btn-primary btn-ripple" data-magnetic="0.25">Send</button>
       </div>
     </div>
+  </div>
+</main>
 
-    <!-- INPUT BAR -->
-    <div class="chat-input">
-      <div class="effects-pop" id="effectsPop">
-        <span class="eff-chip sel" data-e="">✨ None</span>
-        <span class="eff-chip" data-e="rainbow">🌈 Rainbow</span>
-        <span class="eff-chip" data-e="glitch">⚡ Glitch</span>
-        <span class="eff-chip" data-e="fire">🔥 Fire</span>
-        <span class="eff-chip" data-e="sparkle">🎇 Sparkle</span>
-        <span class="eff-chip" data-e="neon">🔮 Neon</span>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
       </div>
-      <button class="icon-btn" id="effBtn" title="Effects">✨</button>
-      <button class="icon-btn" id="micBtn" title="Voice message">🎤</button>
-      <button class="icon-btn" id="imgBtn" title="Send image" style="display:none">📷</button>
-      <input type="text" id="messageInput" placeholder="Type a message… (Enter to send)">
-      <input type="file" id="imageInput" hidden>
-      <button id="sendBtn">Send</button>
     </div>
-
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
   </div>
-</div>
-
-<!-- notification sound -->
-<audio id="notifySound">
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-message-pop-alert-2354.mp3">
-</audio>
-
-<!-- ===== CALL OVERLAY ===== -->
-<video id="callVideoRemote" playsinline autoplay muted style="display:none"></video>
-<video id="callVideoLocal" playsinline autoplay muted style="display:none"></video>
-<div class="call-overlay" id="callOverlay">
-  <div class="call-avatar" id="callAvatar">?</div>
-  <div class="call-name" id="callName">Calling…</div>
-  <div class="call-state" id="callState">Ringing…</div>
-  <div class="call-actions">
-    <button class="call-action accept" id="callAcceptBtn" style="display:none" title="Accept">📞</button>
-    <button class="call-action decline" id="callDeclineBtn" title="Decline">✖</button>
-    <button class="call-action end" id="callEndBtn" style="display:none" title="End call">🛑</button>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
   </div>
-</div>
+</footer>
 
-<!-- MAIN CHAT SCRIPT -->
+<!-- Scripts -->
+<script src="js/theme.js"></script>
 <script src="js/upi.js"></script>
 <script src="js/chat.js"></script>
 <script src="assets/effects.js" defer></script>
 
-  <link rel="stylesheet" href="styles/responsive.css">
+<script>
+  // Initialize auth buttons in navbar
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        
+        // Dropdown toggle
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        
+        if (navLogoutBtn) {
+          navLogoutBtn.addEventListener('click', () => {
+            if (window.logout) window.logout();
+          });
+        }
+      } else {
+        authButtons.innerHTML = `
+          <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+          <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
+        `;
+      }
+      
+      // Mobile menu toggle
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+  });
+</script>
 </body>
 </html>

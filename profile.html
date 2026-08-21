@@ -1,708 +1,713 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Profile | BGMI Market</title>
-  <link rel="stylesheet" href="styles/style.css" />
-  <link rel="stylesheet" href="assets/webfonts/poppins.css">
-  <link rel="stylesheet" href="assets/effects.css" />
-  <style>
-    * { font-family: 'Poppins', sans-serif; }
-    body {
-      background: radial-gradient(circle at top left, #150026, #08080f, #140023);
-      background-size: 400% 400%;
-      animation: hueShift 16s infinite alternate;
-      color: #fff;
-      margin: 0;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    @keyframes hueShift { 0% { background-position: left top; } 100% { background-position: right bottom; } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile | BGMI Market</title>
+<meta name="description" content="Manage your BGMI Market profile, KYC verification, seller settings, and wallet">
 
-    header {
-      background: rgba(255,255,255,.06);
-      backdrop-filter: blur(18px);
-      padding: 1em 2em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap; gap: .5rem;
-      position: sticky; top: 0; z-index: 100;
-    }
-    header h1 { font-size: 1.5rem; margin: 0; }
-    nav a { color: #fff; margin-left: 1rem; text-decoration: none; transition: 0.2s; }
-    nav a:hover { color: #0ff; text-shadow: 0 0 10px rgba(0,255,255,.8); }
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    main.gamer-wrap { position: relative; z-index: 2; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
 
-    /* ============ GAMER PROFILE CARD ============ */
-    .gamer-card {
-      position: relative;
-      background: linear-gradient(160deg, rgba(20,24,46,.92), rgba(10,12,26,.96));
-      border: 1px solid rgba(0,255,198,.25);
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 0 40px rgba(0,255,198,.14), 0 0 90px rgba(255,0,255,.08);
-      animation: cardGlow 4s ease-in-out infinite;
-    }
-    @keyframes cardGlow {
-      0%,100% { box-shadow: 0 0 40px rgba(0,255,198,.14), 0 0 90px rgba(255,0,255,.08); }
-      50% { box-shadow: 0 0 55px rgba(0,255,198,.26), 0 0 110px rgba(255,0,255,.16); }
-    }
-
-    /* banner strip */
-    .g-banner {
-      position: relative; height: 118px;
-      background:
-        repeating-linear-gradient(115deg, rgba(0,255,198,.12) 0 18px, rgba(255,0,255,.10) 18px 36px),
-        linear-gradient(135deg,#0f2d5c,#5b0d6b 55%,#0f5c48);
-      background-size: 160% 160%;
-      animation: bannerMove 9s linear infinite;
-      border-bottom: 1px solid rgba(255,255,255,.12);
-      overflow: hidden;
-    }
-    @keyframes bannerMove { to { background-position: -160% 0; } }
-    .g-banner::after {
-      content: ""; position: absolute; inset: 0;
-      background: radial-gradient(circle at 80% 20%, rgba(255,200,0,.35), transparent 55%);
-    }
-    .g-banner .g-banner-tag {
-      position: absolute; left: 18px; bottom: 12px; z-index: 2;
-      display: inline-flex; align-items: center; gap: .45rem;
-      padding: .28rem .8rem; border-radius: 999px;
-      background: rgba(0,0,0,.55); border: 1px solid rgba(0,255,198,.5);
-      color: #00ffc6; font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
-      box-shadow: 0 0 14px rgba(0,255,198,.35);
-      animation: blinkTag 1.6s steps(2,start) infinite;
-    }
-    @keyframes blinkTag { 50% { opacity: .55; } }
-
-    /* avatar + level ring */
-    .g-avatar-wrap {
-      position: relative; width: 128px; height: 128px;
-      margin: -58px auto 0; z-index: 5;
-    }
-    .g-ring {
-      position: absolute; inset: -6px; border-radius: 50%;
-      background: conic-gradient(#00ffc6, #ff00ff, #ff9d3c, #00ffc6);
-      animation: spin 3.2s linear infinite;
-      box-shadow: 0 0 24px rgba(0,255,198,.55);
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .g-avatar-wrap img {
-      position: relative; width: 100%; height: 100%;
-      border-radius: 50%; object-fit: cover;
-      border: 4px solid #0a0c1a; background: #14182e;
-    }
-    .g-cam {
-      position: absolute; right: 2px; bottom: 2px; z-index: 6;
-      width: 36px; height: 36px; border-radius: 50%;
-      display: grid; place-items: center; cursor: pointer;
-      background: linear-gradient(135deg,#ff8800,#ff00ff);
-      border: 2px solid #0a0c1a; font-size: 1rem;
-      transition: .25s; box-shadow: 0 0 14px rgba(255,100,0,.6);
-    }
-    .g-cam:hover { transform: scale(1.15); box-shadow: 0 0 22px rgba(255,100,0,.9); }
-    .g-level {
-      position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%);
-      padding: .14rem .7rem; border-radius: 999px;
-      background: linear-gradient(90deg,#ff9d3c,#ff00ff);
-      font-size: .7rem; font-weight: 800; letter-spacing: .1em;
-      box-shadow: 0 0 14px rgba(255,120,0,.6); white-space: nowrap;
-    }
-
-    .g-card-body { padding: 1.4rem 1.6rem 2rem; text-align: center; }
-    .g-name { margin: .8rem 0 .1rem; font-size: 1.7rem; font-weight: 800; }
-    .g-email { opacity: .65; font-size: .85rem; margin: 0 0 .9rem; }
-
-    .g-tags { display: flex; justify-content: center; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
-    .g-tag {
-      padding: .3rem .8rem; border-radius: 999px; font-size: .72rem; font-weight: 700;
-      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); color: #ddd;
-    }
-    .g-tag.ok { color: #00ffc6; border-color: rgba(0,255,198,.45); }
-    .g-tag.warn { color: #ffd166; border-color: rgba(255,209,102,.45); }
-    .g-tag.bad { color: #ff5e5e; border-color: rgba(255,94,94,.45); }
-    .g-tag.gold { color: #ffd76e; border-color: rgba(255,180,0,.55); background: rgba(255,180,0,.12); }
-
-    /* XP bar */
-    .g-xp { max-width: 400px; margin: 0 auto 1.2rem; }
-    .g-xp .xp-head {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: .78rem; color: rgba(255,255,255,.8); margin-bottom: .35rem;
-    }
-    .g-xp .xp-head b { color: #00ffc6; }
-
-    /* stats grid */
-    .g-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem;
-      max-width: 440px; margin: 0 auto 1.2rem;
-    }
-    .g-stat {
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px; padding: .8rem .4rem;
-      transition: .25s;
-    }
-    .g-stat:hover { border-color: rgba(0,255,198,.4); box-shadow: 0 0 16px rgba(0,255,198,.18); transform: translateY(-2px); }
-    .g-stat .ic { font-size: 1.3rem; display: block; margin-bottom: .25rem; }
-    .g-stat b { display: block; font-size: 1.05rem; color: #fff; }
-    .g-stat small { font-size: .64rem; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .08em; }
-
-    /* verify box */
-    .g-verify {
-      max-width: 440px; margin: 0 auto 1.3rem;
-      padding: .9rem 1rem; border-radius: 14px;
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14);
-      display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap;
-    }
-    .g-verify b { font-size: .9rem; }
-    .g-verify p { flex-basis: 100%; margin: .3rem 0 0; font-size: .74rem; color: rgba(255,255,255,.6); min-height: 1rem; }
-
-    /* section divider */
-    .g-sec { margin-top: 1.6rem; }
-    .g-sec-head {
-      display: flex; align-items: center; gap: .5rem;
-      font-size: .82rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
-      color: rgba(255,255,255,.6); margin-bottom: .8rem;
-    }
-    .g-sec-head::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,.25), transparent); }
-
-    .field {
-      display: block; width: 90%; max-width: 380px; margin: .5rem auto;
-      padding: .6rem .9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.35); color: #fff; font-size: .92rem; outline: none; transition: .25s;
-    }
-    .field:focus { border-color: #0ff; box-shadow: 0 0 12px rgba(0,255,255,.3); }
-    .g-field-label { display: block; max-width: 380px; margin: .75rem auto .1rem; text-align: left; font-size: .78rem; color: rgba(255,255,255,.7); }
-    textarea.field { resize: vertical; min-height: 64px; }
-
-    .btn {
-      display: block; margin: .8rem auto;
-      padding: .75rem 1.4rem; border: none; border-radius: 12px; cursor: pointer;
-      font-weight: 700; font-size: .95rem; color: #061;
-      background: linear-gradient(90deg,#00ffc6,#22c55e);
-      transition: .25s;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,255,198,.5); }
-    .btn.grad2 { background: linear-gradient(90deg,#ff8800,#ff00ff); color: #fff; }
-    .btn.grad2:hover { box-shadow: 0 0 20px rgba(255,0,255,.5); }
-
-    .social-row { display: flex; justify-content: center; gap: .8rem; flex-wrap: wrap; margin-top: 1rem; }
-    .social-chip {
-      display: inline-flex; align-items: center; gap: .4rem;
-      padding: .45rem .9rem; border-radius: 999px; text-decoration: none;
-      font-size: .85rem; font-weight: 600; color: #fff;
-      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16); transition: .25s;
-    }
-    .social-chip:hover { transform: translateY(-2px); }
-    .social-chip.ig:hover { border-color:#ff2d95; box-shadow: 0 0 14px rgba(255,45,149,.5); }
-    .social-chip.fb:hover { border-color:#1877f2; box-shadow: 0 0 14px rgba(24,119,242,.5); }
-
-    .msg { min-height: 1.2rem; font-size: .9rem; margin-top: .4rem; }
-    .msg.ok { color: #0f0; }
-    .msg.err { color: #ff5e5e; }
-
-    footer { text-align: center; padding: 1.2rem; background: rgba(255,255,255,.04); font-size: .88rem; color: #ccc; margin-top: 2rem; }
-    @media (max-width:600px){ header{justify-content:center;} nav a{margin:0 .5rem;} .g-stats{grid-template-columns:repeat(3,1fr);} }
-  </style>
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 </head>
-
 <body>
-  <header>
-    <h1><span class="wiggle">🎮</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
-    <nav>
-      <a href="index.html" class="nav-slide">Home</a>
-      <a href="marketplace.html" class="nav-slide">Marketplace</a>
-      <a href="wallet.html" class="nav-slide">Wallet</a>
-      <a href="sell.html" class="nav-slide">Sell</a>
-      <a href="popularity.html" class="nav-slide">Popularity</a>
-      <a href="meetups.html" class="nav-slide">Meetups</a>
-      <a href="chat.html" class="nav-slide">Message</a>
-      <a href="#" onclick="logout()" class="nav-slide">Logout</a>
-    </nav>
-  </header>
+<!-- Particle Background -->
+<div class="particles" id="particles" aria-hidden="true"></div>
 
-  <div class="marquee-wrap">
-    <div class="marquee-inner">
-      <span>🔥 <b>LIVE</b> Verified IDs Available Now</span>
-      <span>⚡ <b>INSTANT</b> UPI Payments</span>
-      <span>🛡️ <b>SECURE</b> Escrow Protected</span>
-      <span>🏆 Top Sellers <b>RANKED</b> Daily</span>
-      <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
-    </div>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link active">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link">Admin</a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
   </div>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
 
-  <main class="gamer-wrap">
-    <div class="gamer-card reveal">
-      <div class="g-banner">
-        <span class="g-banner-tag">⚔️ Player Profile</span>
-      </div>
-
-      <div class="g-avatar-wrap">
-        <div class="g-ring"></div>
-        <img src="data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><defs><linearGradient id=&quot;g&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;1&quot; y2=&quot;1&quot;><stop offset=&quot;0&quot; stop-color=&quot;%2300ffff&quot;/><stop offset=&quot;1&quot; stop-color=&quot;%237b2ff7&quot;/></linearGradient></defs><rect width=&quot;200&quot; height=&quot;200&quot; fill=&quot;url(%23g)&quot;/><circle cx=&quot;100&quot; cy=&quot;72&quot; r=&quot;34&quot; fill=&quot;rgba(255,255,255,.85)&quot;/><path d=&quot;M28 186 Q28 116 100 116 Q172 116 172 186 Z&quot; fill=&quot;rgba(255,255,255,.85)&quot;/></svg>" id="profile-img" alt="Profile Image" />
-        <label class="g-cam" for="avatar-input" title="Change profile picture">📷</label>
-        <input type="file" id="avatar-input" accept="image/*" hidden>
-        <div class="g-level" id="g-level">LVL 1</div>
-      </div>
-
-      <div class="g-card-body">
-        <h2 class="g-name anim-gradient" id="profile-name">Loading...</h2>
-        <p class="g-email" id="profile-email">---</p>
-
-        <div class="g-tags">
-          <span class="g-tag warn" id="kyc-tag">🪪 KYC: Pending</span>
-          <span class="g-tag" id="seller-tag">🎮 Seller: Standard</span>
-          <span class="g-tag" id="verify-tag">🛡️ Not Verified</span>
-        </div>
-
-        <div class="g-xp">
-          <div class="xp-head"><span>⚡ POPULARITY POWER</span><b id="pop-points">0</b></div>
-          <div class="xp-bar"><i id="pop-bar" style="width:0%"></i></div>
-        </div>
-
-        <div class="g-stats">
-          <div class="g-stat"><span class="ic">🏷️</span><b id="g-sales">0</b><small>IDs Sold</small></div>
-          <div class="g-stat"><span class="ic">💰</span><b id="g-earned">₹0</b><small>Earned</small></div>
-          <div class="g-stat"><span class="ic">⭐</span><b id="g-rating">--</b><small>Rating</small></div>
-        </div>
-
-        <!-- VERIFY -->
-        <div class="g-verify">
-          <b id="verify-badge-status">🛡️ Not Verified</b>
-          <button id="getVerifiedBtn" class="btn grad2" style="margin:0;padding:.45rem .9rem;font-size:.8rem">Get Verified</button>
-          <p id="verify-msg"></p>
-        </div>
-
-        <!-- EDIT SECTION -->
-        <div class="g-sec">
-          <div class="g-sec-head">✏️ Edit Profile</div>
-          <label class="g-field-label" for="bio">Bio</label>
-          <textarea class="field" id="bio" maxlength="200" placeholder="Tell buyers about yourself… (max 200 chars)"></textarea>
-
-          <label class="g-field-label" for="city">City <span style="opacity:.5;font-size:.7rem">(city-wise search + meetup ke liye)</span></label>
-          <input class="field" id="city" type="text" maxlength="40" placeholder="e.g. Mumbai, Delhi, Pune…">
-
-          <label class="g-field-label" for="meetup_note">Meetup Safety Note</label>
-          <input class="field" id="meetup_note" type="text" maxlength="120" placeholder="e.g. Public place — mall / metro station">
-
-          <label class="g-field-label" for="upi_id">Your UPI ID <span style="opacity:.5;font-size:.7rem">(buyers pay you directly)</span></label>
-          <input class="field" id="upi_id" type="text" maxlength="60" placeholder="yourname@upi (e.g. name@okhdfcbank)">
-
-          <label class="g-field-label" for="instagram">Instagram</label>
-          <input class="field" id="instagram" type="text" maxlength="80" placeholder="username or https://instagram.com/…">
-
-          <label class="g-field-label" for="facebook">Facebook</label>
-          <input class="field" id="facebook" type="text" maxlength="80" placeholder="username or https://facebook.com/…">
-
-          <button class="btn" id="saveProfileBtn">💾 Save Profile</button>
-          <p class="msg" id="profile-msg"></p>
-
-          <div class="social-row" id="socialRow" style="display:none">
-            <a class="social-chip ig" id="igLink" target="_blank" rel="noopener">📸 Instagram</a>
-            <a class="social-chip fb" id="fbLink" target="_blank" rel="noopener">👍 Facebook</a>
+<main class="profile-page" role="main" style="flex: 1; padding: 2rem 1rem 4rem;">
+  <div class="page-container" style="width: 100%; max-width: 800px; margin: 0 auto;">
+    
+    <!-- Profile Header Card -->
+    <div class="glass glass-strong" style="padding: 2.5rem; margin-bottom: 2rem; text-align: center; position: relative; overflow: hidden;">
+      <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0, 234, 255, 0.05), rgba(255, 120, 0, 0.05)); z-index: -1;"></div>
+      
+      <!-- Avatar Section -->
+      <div class="avatar-section" style="margin-bottom: 1.5rem;">
+        <div class="avatar-ring" style="width: 120px; height: 120px; margin: 0 auto 1rem; border-radius: 50%; background: conic-gradient(from 0deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary), var(--accent-purple), var(--accent-primary)); animation: spin 4s linear infinite; padding: 4px; position: relative;">
+          <div style="width: 100%; height: 100%; border-radius: 50%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+            <img id="profile-img" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%2300ffff'/><stop offset='1' stop-color='%237b2ff7'/></linearGradient></defs><rect width='200' height='200' fill='url(%23g)'/><circle cx='100' cy='72' r='34' fill='rgba(255,255,255,.85)'/><path d='M28 186 Q28 116 100 116 Q172 116 172 186 Z' fill='rgba(255,255,255,.85)'/></svg>" alt="Profile Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+            <label for="avatar-input" class="avatar-edit-btn" style="position: absolute; bottom: 4px; right: 4px; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary)); border: 3px solid var(--bg-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; transition: all var(--transition-fast);" title="Change profile picture">
+              📷
+            </label>
+            <input type="file" id="avatar-input" accept="image/*" hidden>
           </div>
         </div>
-
-        <!-- KYC -->
-        <div class="g-sec">
-          <div class="g-sec-head">🛂 Verify KYC (eKYC)</div>
-          <form id="kyc-form" enctype="multipart/form-data">
-            <label class="g-field-label" for="kyc-name">Full Name</label>
-            <input class="field" type="text" id="kyc-name" name="name" placeholder="Enter your full name" required />
-            <label class="g-field-label" for="kyc-share">Aadhaar Share Code</label>
-            <input class="field" type="text" id="kyc-share" name="share_code" maxlength="8" placeholder="4 or 8 digit share code" required />
-            <label class="g-field-label" for="kyc-file">Upload eKYC ZIP (offline XML)</label>
-            <input class="field" type="file" id="kyc-file" name="file" accept=".zip,application/zip" required />
-            <button class="btn grad2" type="submit">Submit KYC for Verification</button>
-            <p class="msg" id="kyc-msg"></p>
-          </form>
+        
+        <style>
+          @keyframes spin { to { transform: rotate(360deg); } }
+          .avatar-edit-btn:hover { transform: scale(1.15); box-shadow: var(--shadow-glow-warm); }
+        </style>
+      </div>
+      
+      <!-- Name & Email -->
+      <h1 class="anim-gradient glitch" id="profile-name" data-text="Loading..." style="font-size: clamp(1.75rem, 4vw, 2.25rem); margin-bottom: 0.5rem;">Loading...</h1>
+      <p class="text-secondary" id="profile-email" style="font-size: 1rem;">---</p>
+      
+      <!-- Status Tags -->
+      <div class="status-tags" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+        <span class="badge" id="kyc-tag" style="background: rgba(255, 183, 3, 0.15); color: #ffd166; border: 1px solid rgba(255, 183, 3, 0.4);">🪪 KYC: Pending</span>
+        <span class="badge" id="seller-tag" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3);">🎮 Seller: Standard</span>
+        <span class="badge" id="verify-tag" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3);">🛡️ Not Verified</span>
+      </div>
+      
+      <!-- XP / Level Bar -->
+      <div class="xp-section" style="max-width: 400px; margin: 1.5rem auto 0; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+          <span>⚡ Popularity Power</span>
+          <strong id="pop-points" style="color: var(--accent-tertiary);">0</strong>
         </div>
-
-        <!-- COMMISSION -->
-        <div class="g-sec" id="comm-sec" style="display:none">
-          <div class="g-sec-head">💸 Commission Pay</div>
-          <p style="font-size:.85rem;color:rgba(255,255,255,.85);margin-bottom:.6rem">Pending Commission: <b id="comm-balance" style="color:#ff9d3c">₹0</b></p>
-          <p style="font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:.8rem">Har sale par 2.5% commission accrues hota hai. UPI se pay karke UTR number dalo — admin verify karke balance clear kar dega.</p>
-          <label class="g-field-label" for="comm-amount">Amount (₹)</label>
-          <input class="field" id="comm-amount" type="number" min="1" placeholder="Pending commission amount">
-          <label class="g-field-label" for="comm-utr">UTR Number</label>
-          <input class="field" id="comm-utr" type="text" maxlength="40" placeholder="Payment UTR (transaction reference)">
-          <button class="btn grad2" id="comm-pay-btn">💸 Submit Commission Payment</button>
-          <p class="msg" id="comm-msg"></p>
-          <div id="comm-history" style="margin-top:.6rem"></div>
+        <div style="height: 8px; background: var(--bg-tertiary); border-radius: var(--radius-full); overflow: hidden;">
+          <div id="pop-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-tertiary), var(--accent-primary)); border-radius: var(--radius-full); transition: width 0.8s ease; box-shadow: 0 0 12px rgba(124, 255, 139, 0.5);"></div>
         </div>
+        <div id="level-display" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">LVL 1</div>
       </div>
     </div>
-  </main>
+    
+    <!-- Stats Grid -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+      <div class="glass stat-card" style="padding: 1.5rem; text-align: center; transition: all var(--transition-base);">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏷️</div>
+        <div class="val" id="g-sales" style="font-size: 1.75rem; font-weight: 800; color: var(--accent-primary);">0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">IDs Sold</div>
+      </div>
+      <div class="glass stat-card" style="padding: 1.5rem; text-align: center; transition: all var(--transition-base);">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💰</div>
+        <div class="val" id="g-earned" style="font-size: 1.75rem; font-weight: 800; color: var(--accent-tertiary);">₹0</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Earned</div>
+      </div>
+      <div class="glass stat-card" style="padding: 1.5rem; text-align: center; transition: all var(--transition-base);">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⭐</div>
+        <div class="val" id="g-rating" style="font-size: 1.75rem; font-weight: 800; color: var(--accent-gold);">--</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Rating</div>
+      </div>
+    </div>
+    
+    <style>
+      .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg), var(--shadow-glow); border-color: var(--border-primary); }
+    </style>
+    
+    <!-- Section: Seller Verification -->
+    <section class="glass glass-strong profile-section" style="padding: 2rem; margin-bottom: 1.5rem;" aria-labelledby="verify-title">
+      <h2 id="verify-title" class="section-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.5rem;">🛡️</span> Seller Verification
+      </h2>
+      
+      <div class="verify-status" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 1.5rem; background: var(--bg-glass); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); margin-bottom: 1rem;">
+        <div>
+          <div id="verify-badge-status" style="font-size: 1.1rem; font-weight: 600;">🛡️ Not Verified</div>
+          <div id="verify-msg" style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; min-height: 1.25rem;"></div>
+        </div>
+        <button id="getVerifiedBtn" class="btn btn-purple btn-ripple" style="white-space: nowrap;">Get Verified</button>
+      </div>
+    </section>
+    
+    <!-- Section: Edit Profile -->
+    <section class="glass glass-strong profile-section" style="padding: 2rem; margin-bottom: 1.5rem;" aria-labelledby="edit-title">
+      <h2 id="edit-title" class="section-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.5rem;">✏️</span> Edit Profile
+      </h2>
+      
+      <form id="profileForm" novalidate>
+        <div class="form-group">
+          <label class="label" for="bio">Bio</label>
+          <textarea id="bio" class="input textarea" maxlength="200" placeholder="Tell buyers about yourself… (max 200 chars)" rows="3"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="city">City <span style="opacity: 0.5; font-size: 0.7rem;">(for city-wise search & meetup)</span></label>
+          <input class="input" id="city" type="text" maxlength="40" placeholder="e.g. Mumbai, Delhi, Pune…">
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="meetup_note">Meetup Safety Note</label>
+          <input class="input" id="meetup_note" type="text" maxlength="120" placeholder="e.g. Public place — mall / metro station">
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="upi_id">Your UPI ID <span style="opacity: 0.5; font-size: 0.7rem;">(buyers pay you directly)</span></label>
+          <input class="input" id="upi_id" type="text" maxlength="60" placeholder="yourname@upi (e.g. name@okhdfcbank)">
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="instagram">Instagram</label>
+          <input class="input" id="instagram" type="text" maxlength="80" placeholder="username or https://instagram.com/…">
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="facebook">Facebook</label>
+          <input class="input" id="facebook" type="text" maxlength="80" placeholder="username or https://facebook.com/…">
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-lg btn-full btn-ripple" style="margin-top: 1rem;">
+          <span>💾 Save Profile</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+        </button>
+        <p class="msg" id="profile-msg" style="min-height: 1.5rem; margin-top: 0.75rem; text-align: center;"></p>
+      </form>
+      
+      <!-- Social Links Display -->
+      <div class="social-row" id="socialRow" style="display: none; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+        <a class="social-link ig" id="igLink" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.25rem; border-radius: var(--radius-full); text-decoration: none; font-size: 0.875rem; font-weight: 600; color: #fff; background: rgba(255, 45, 149, 0.15); border: 1px solid rgba(255, 45, 149, 0.3); transition: all var(--transition-base);">📸 Instagram</a>
+        <a class="social-link fb" id="fbLink" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.25rem; border-radius: var(--radius-full); text-decoration: none; font-size: 0.875rem; font-weight: 600; color: #fff; background: rgba(24, 119, 242, 0.15); border: 1px solid rgba(24, 119, 242, 0.3); transition: all var(--transition-base);">👍 Facebook</a>
+      </div>
+      
+      <style>
+        .social-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .social-link.ig:hover { border-color: #ff2d95; box-shadow: 0 0 20px rgba(255, 45, 149, 0.4); }
+        .social-link.fb:hover { border-color: #1877f2; box-shadow: 0 0 20px rgba(24, 119, 242, 0.4); }
+      </style>
+    </section>
+    
+    <!-- Section: KYC Verification -->
+    <section class="glass glass-strong profile-section" style="padding: 2rem; margin-bottom: 1.5rem;" aria-labelledby="kyc-title">
+      <h2 id="kyc-title" class="section-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.5rem;">🛂</span> Verify KYC (eKYC)
+      </h2>
+      
+      <form id="kyc-form" enctype="multipart/form-data" novalidate>
+        <div class="form-group">
+          <label class="label" for="kyc-name">Full Name</label>
+          <input class="input" type="text" id="kyc-name" name="name" placeholder="Enter your full name" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="kyc-share">Aadhaar Share Code</label>
+          <input class="input" type="text" id="kyc-share" name="share_code" maxlength="8" placeholder="4 or 8 digit share code" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="label" for="kyc-file">Upload eKYC ZIP (offline XML)</label>
+          <input class="input" type="file" id="kyc-file" name="file" accept=".zip,application/zip" required>
+        </div>
+        
+        <button type="submit" class="btn btn-purple btn-lg btn-full btn-ripple" style="margin-top: 1rem;">Submit KYC for Verification</button>
+        <p class="msg" id="kyc-msg" style="min-height: 1.5rem; margin-top: 0.75rem; text-align: center;"></p>
+      </form>
+    </section>
+    
+    <!-- Section: Commission Payments -->
+    <section class="glass glass-strong profile-section" id="comm-sec" style="padding: 2rem; display: none;" aria-labelledby="comm-title">
+      <h2 id="comm-title" class="section-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-size: 1.5rem;">💸</span> Commission Payments
+      </h2>
+      
+      <div style="font-size: 0.95rem; color: rgba(255, 255, 255, 0.85); margin-bottom: 0.6rem; max-width: 640px; line-height: 1.6;">
+        Pending Commission: <strong id="comm-balance" style="color: var(--accent-secondary);">₹0</strong>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; max-width: 640px; line-height: 1.7;">Each sale accrues 2.5% commission. Pay via UPI and submit UTR — admin verifies and clears balance.</p>
+      
+      <div class="form-group">
+        <label class="label" for="comm-amount">Amount (₹)</label>
+        <input class="input" id="comm-amount" type="number" min="1" placeholder="Pending commission amount">
+      </div>
+      
+      <div class="form-group">
+        <label class="label" for="comm-utr">UTR Number</label>
+        <input class="input" id="comm-utr" type="text" maxlength="40" placeholder="Payment UTR (transaction reference)">
+      </div>
+      
+      <button type="button" id="comm-pay-btn" class="btn btn-purple btn-lg btn-full btn-ripple" style="margin-top: 1rem;">💸 Submit Commission Payment</button>
+      <p class="msg" id="comm-msg" style="min-height: 1.5rem; margin-top: 0.75rem; text-align: center;"></p>
+      
+      <div id="comm-history" style="margin-top: 1.5rem;"></div>
+    </section>
+    
+  </div>
+</main>
 
-  <footer>
-    <p>© 2026 BGMI Market | Trusted Gamers Network</p>
-  </footer>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
-  <script>
-    const VERIFY_BASE = "https://verification_service.bgmi-gateway.workers.dev";
-    const MARKET_BASE = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) window.location.href = "login.html";
+<!-- Scripts -->
+<script src="js/theme.js"></script>
+<script src="js/auth.js"></script>
+<script src="assets/effects.js" defer></script>
 
-    const profileName = document.getElementById("profile-name");
-    const profileEmail = document.getElementById("profile-email");
-    const profileMsg = document.getElementById("profile-msg");
-    const profileImg = document.getElementById("profile-img");
+<script>
+const VERIFY_BASE = "https://verification_service.bgmi-gateway.workers.dev";
+const MARKET_BASE = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 
-    let avatarData = null;
+const user = JSON.parse(localStorage.getItem("user"));
+if (!user) window.location.href = "login.html";
 
-    function authHeaders() {
-      return {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token")
-      };
-    }
+const profileName = document.getElementById("profile-name");
+const profileEmail = document.getElementById("profile-email");
+const profileMsg = document.getElementById("profile-msg");
+const profileImg = document.getElementById("profile-img");
 
-    profileName.textContent = user.name || user.email?.split("@")[0];
-    profileEmail.textContent = user.email;
+let avatarData = null;
 
-    /* ============ PROFILE PICTURE (compress → save) ============ */
-    function compressImage(file, size) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          let w = img.width, h = img.height;
-          const s = Math.min(1, size / Math.max(w, h));
-          w = Math.max(1, Math.round(w * s));
-          h = Math.max(1, Math.round(h * s));
-          canvas.width = w; canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL("image/webp", 0.82));
-        };
-        img.onerror = reject;
-        img.src = URL.createObjectURL(file);
-      });
-    }
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + localStorage.getItem("token")
+  };
+}
 
-    document.getElementById("avatar-input").onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      try {
-        const dataUrl = await compressImage(file, 256);
-        if (dataUrl.length > 300000) {
-          profileMsg.className = "msg err";
-          profileMsg.textContent = "❌ Photo bahut bada hai — chhota karke try karo";
-          return;
-        }
-        avatarData = dataUrl;
-        profileImg.src = dataUrl;
-        profileMsg.className = "msg ok";
-        profileMsg.textContent = "📷 Picture selected — Save Profile dabao";
-      } catch {
-        profileMsg.className = "msg err";
-        profileMsg.textContent = "❌ Image load nahi hui";
-      }
+profileName.textContent = user.name || user.email?.split("@")[0];
+profileEmail.textContent = user.email;
+
+/* PROFILE PICTURE (compress → save) */
+function compressImage(file, size) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let w = img.width, h = img.height;
+      const s = Math.min(1, size / Math.max(w, h));
+      w = Math.max(1, Math.round(w * s));
+      h = Math.max(1, Math.round(h * s));
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/webp", 0.82));
     };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
 
-    /* ============ LEVEL + XP ============ */
-    function renderLevel(pop, sales) {
-      const lvl = Math.min(100, Math.max(1, 1 + Math.floor((pop + (sales || 0) * 1500) / 1500)));
-      document.getElementById("g-level").textContent = "LVL " + lvl;
-      const fill = Math.min(100, ((pop + (sales || 0) * 1500) % 1500) / 15);
-      document.getElementById("pop-bar").style.width = fill + "%";
+document.getElementById("avatar-input").onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const dataUrl = await compressImage(file, 256);
+    if (dataUrl.length > 300000) {
+      profileMsg.className = "msg err";
+      profileMsg.textContent = "❌ Photo too large — try a smaller image";
+      return;
     }
+    avatarData = dataUrl;
+    profileImg.src = dataUrl;
+    profileMsg.className = "msg ok";
+    profileMsg.textContent = "📷 Picture selected — click Save Profile";
+  } catch {
+    profileMsg.className = "msg err";
+    profileMsg.textContent = "❌ Failed to load image";
+  }
+};
 
-    /* ============ LOAD PROFILE ============ */
-    async function loadProfile() {
-      try {
-        const r = await fetch(VERIFY_BASE + "/profile/" + user.id, { headers: authHeaders() });
-        const data = await r.json();
-        const p = data.profile || {};
-        document.getElementById("bio").value = p.bio || "";
-        document.getElementById("upi_id").value = p.upi_id || "";
-        document.getElementById("instagram").value = p.instagram || "";
-        document.getElementById("facebook").value = p.facebook || "";
-        if (p.photo_url) profileImg.src = p.photo_url;
+/* LEVEL + XP */
+function renderLevel(pop, sales) {
+  const lvl = Math.min(100, Math.max(1, 1 + Math.floor((pop + (sales || 0) * 1500) / 1500)));
+  document.getElementById("g-level")?.textContent = "LVL " + lvl;
+  document.getElementById("level-display").textContent = "LVL " + lvl;
+  const fill = Math.min(100, ((pop + (sales || 0) * 1500) % 1500) / 15);
+  document.getElementById("pop-bar").style.width = fill + "%";
+}
 
-        const kycTxt = data.kyc ? data.kyc.verification_status : "Not submitted";
-        const kycTag = document.getElementById("kyc-tag");
-        kycTag.textContent = "🪪 KYC: " + kycTxt;
-        kycTag.className = "g-tag " + (data.kyc && data.kyc.verification_status === "approved" ? "ok" : data.kyc ? "warn" : "bad");
+/* LOAD PROFILE */
+async function loadProfile() {
+  try {
+    const r = await fetch(VERIFY_BASE + "/profile/" + user.id, { headers: authHeaders() });
+    const data = await r.json();
+    const p = data.profile || {};
+    document.getElementById("bio").value = p.bio || "";
+    document.getElementById("upi_id").value = p.upi_id || "";
+    document.getElementById("instagram").value = p.instagram || "";
+    document.getElementById("facebook").value = p.facebook || "";
+    if (p.photo_url) profileImg.src = p.photo_url;
 
-        renderSocials(p.instagram, p.facebook);
-      } catch {
-        document.getElementById("kyc-tag").textContent = "🪪 KYC: Not submitted";
+    const kycTxt = data.kyc ? data.kyc.verification_status : "Not submitted";
+    const kycTag = document.getElementById("kyc-tag");
+    kycTag.textContent = "🪪 KYC: " + kycTxt;
+    kycTag.className = "badge " + (data.kyc && data.kyc.verification_status === "approved" ? "ok" : data.kyc ? "warn" : "bad");
+    kycTag.style.cssText = data.kyc && data.kyc.verification_status === "approved" 
+      ? "background: rgba(124, 255, 139, 0.15); color: #7cff8b; border-color: rgba(124, 255, 139, 0.4);"
+      : data.kyc 
+        ? "background: rgba(255, 183, 3, 0.15); color: #ffd166; border-color: rgba(255, 183, 3, 0.4);"
+        : "background: rgba(255, 94, 94, 0.15); color: #ff5e5e; border-color: rgba(255, 94, 94, 0.4);";
+
+    renderSocials(p.instagram, p.facebook);
+  } catch {
+    document.getElementById("kyc-tag").textContent = "🪪 KYC: Not submitted";
+  }
+
+  // Seller info (marketplace)
+  try {
+    const r = await fetch(MARKET_BASE + "/seller/" + user.id, { headers: authHeaders() });
+    const s = await r.json();
+    document.getElementById("city").value = s.city || "";
+    document.getElementById("meetup_note").value = s.meetup_note || "";
+    document.getElementById("g-sales").textContent = s.total_sales ?? 0;
+    document.getElementById("g-earned").textContent = "₹" + Number(s.total_revenue || 0).toLocaleString("en-IN");
+    document.getElementById("g-rating").textContent = s.avg_rating || "0.0";
+
+    const sTag = document.getElementById("seller-tag");
+    sTag.textContent = "🎮 Seller: " + ((s.badge === "new" ? "Standard" : (s.badge || "Standard")));
+    sTag.style.cssText = s.badge !== "new" 
+      ? "background: rgba(255, 215, 0, 0.15); color: #ffd700; border-color: rgba(255, 215, 0, 0.4);"
+      : "background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-color: rgba(148, 163, 184, 0.3);";
+
+    if (s.pending_commission !== undefined) {
+      const pc = Number(s.pending_commission || 0);
+      const pcEl = document.createElement("span");
+      pcEl.id = "comm-tag";
+      pcEl.className = "badge";
+      pcEl.style.cssText = pc > 0 
+        ? "background: rgba(255, 183, 3, 0.15); color: #ffd166; border-color: rgba(255, 183, 3, 0.4);"
+        : "background: rgba(124, 255, 139, 0.15); color: #7cff8b; border-color: rgba(124, 255, 139, 0.4);";
+      pcEl.textContent = pc > 0 ? "💸 Pending Commission: ₹" + pc.toLocaleString("en-IN") : "💸 Commission Clear";
+      document.querySelector(".status-tags").appendChild(pcEl);
+      if (s.hidden === 1) {
+        const hEl = document.createElement("span");
+        hEl.className = "badge";
+        hEl.style.cssText = "background: rgba(255, 94, 94, 0.15); color: #ff5e5e; border-color: rgba(255, 94, 94, 0.4);";
+        hEl.textContent = "🚫 Account Hidden (commission due)";
+        document.querySelector(".status-tags").appendChild(hEl);
       }
-
-      // Seller info (marketplace)
-      try {
-        const r = await fetch(MARKET_BASE + "/seller/" + user.id, { headers: authHeaders() });
-        const s = await r.json();
-        document.getElementById("city").value = s.city || "";
-        document.getElementById("meetup_note").value = s.meetup_note || "";
-        document.getElementById("g-sales").textContent = s.total_sales ?? 0;
-        document.getElementById("g-earned").textContent = "₹" + Number(s.total_revenue || 0).toLocaleString("en-IN");
-        document.getElementById("g-rating").textContent = s.avg_rating || "0.0";
-
-        const sTag = document.getElementById("seller-tag");
-        sTag.textContent = "🎮 Seller: " + ((s.badge === "new" ? "Standard" : (s.badge || "Standard")));
-        sTag.className = "g-tag " + (s.badge !== "new" ? "gold" : "");
-
-        if (s.pending_commission !== undefined) {
-          const pc = Number(s.pending_commission || 0);
-          const pcEl = document.createElement("span");
-          pcEl.id = "comm-tag";
-          pcEl.className = "g-tag " + (pc > 0 ? "warn" : "ok");
-          pcEl.textContent = pc > 0 ? "💸 Pending Commission: ₹" + pc.toLocaleString("en-IN") : "💸 Commission Clear";
-          document.querySelector(".g-tags").appendChild(pcEl);
-          if (s.hidden === 1) {
-            const hEl = document.createElement("span");
-            hEl.className = "g-tag bad";
-            hEl.textContent = "🚫 Account Hidden (commission baki)";
-            document.querySelector(".g-tags").appendChild(hEl);
-          }
-        }
-      } catch {}
-
-      loadPopularity();
-      loadVerifyStatus();
-      loadCommission();
     }
+  } catch {}
 
-    // ===== POPULARITY POINTS =====
-    async function loadPopularity() {
-      try {
-        const r = await fetch(MARKET_BASE + "/popularity/me", { headers: authHeaders() });
-        const data = await r.json();
-        const pop = data.total ?? data.points ?? 0;
-        document.getElementById("pop-points").textContent = Number(pop).toLocaleString("en-IN");
-        const sales = Number(document.getElementById("g-sales").textContent || 0);
-        renderLevel(Number(pop) || 0, sales);
-      } catch {}
+  loadPopularity();
+  loadVerifyStatus();
+  loadCommission();
+}
+
+async function loadPopularity() {
+  try {
+    const r = await fetch(MARKET_BASE + "/popularity/me", { headers: authHeaders() });
+    const data = await r.json();
+    const pop = data.total ?? data.points ?? 0;
+    document.getElementById("pop-points").textContent = Number(pop).toLocaleString("en-IN");
+    const sales = Number(document.getElementById("g-sales").textContent || 0);
+    renderLevel(Number(pop) || 0, sales);
+  } catch {}
+}
+
+const badgeMap = {
+  pending: "⏳ Pending Review",
+  approved: "✅ Verified Seller",
+  rejected: "❌ Rejected",
+  none: "🛡️ Not Verified"
+};
+
+async function loadVerifyStatus() {
+  try {
+    const r = await fetch(MARKET_BASE + "/seller/verify-status", { headers: authHeaders() });
+    const data = await r.json();
+    const badgeEl = document.getElementById("verify-badge-status");
+    const tag = document.getElementById("verify-tag");
+    const btn = document.getElementById("getVerifiedBtn");
+    const msg = document.getElementById("verify-msg");
+    const status = data.request?.status || "none";
+
+    if (status === "approved") {
+      badgeEl.textContent = `🏅 ${badgeMap.approved} (${data.badge || "trusted"})`;
+      badgeEl.style.color = "#7cff8b";
+      tag.textContent = "🛡️ Verified Seller";
+      tag.className = "badge ok";
+      tag.style.cssText = "background: rgba(124, 255, 139, 0.15); color: #7cff8b; border-color: rgba(124, 255, 139, 0.4);";
+      btn.style.display = "none";
+      msg.textContent = "Admin verified you as a trusted seller! 🎉";
+      msg.className = "msg ok";
+    } else if (status === "pending") {
+      badgeEl.textContent = badgeMap.pending;
+      tag.textContent = "🛡️ " + badgeMap.pending;
+      tag.className = "badge warn";
+      tag.style.cssText = "background: rgba(255, 183, 3, 0.15); color: #ffd166; border-color: rgba(255, 183, 3, 0.4);";
+      btn.disabled = true;
+      btn.textContent = "⏳ Under Review";
+      msg.textContent = "Request submitted. Admin will review soon.";
+      msg.className = "msg warn";
+    } else if (status === "rejected") {
+      badgeEl.textContent = badgeMap.rejected;
+      tag.textContent = "🛡️ Rejected";
+      tag.className = "badge bad";
+      tag.style.cssText = "background: rgba(255, 94, 94, 0.15); color: #ff5e5e; border-color: rgba(255, 94, 94, 0.4);";
+      msg.textContent = (data.request?.reason || "Try again later.") + " You can request again.";
+      msg.className = "msg err";
+    } else {
+      badgeEl.textContent = badgeMap.none;
+      tag.textContent = "🛡️ Not Verified";
+      tag.className = "badge";
+      tag.style.cssText = "background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-color: rgba(148, 163, 184, 0.3);";
+      btn.textContent = "Get Verified";
     }
+  } catch {}
+}
 
-    // ===== SELLER VERIFICATION =====
-    const badgeMap = {
-      pending: "⏳ Pending Review",
-      approved: "✅ Verified Seller",
-      rejected: "❌ Rejected",
-      none: "🛡️ Not Verified"
-    };
+const esc = v => String(v ?? "").replace(/[&<>"']/g,
+  c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
 
-    async function loadVerifyStatus() {
-      try {
-        const r = await fetch(MARKET_BASE + "/seller/verify-status", { headers: authHeaders() });
-        const data = await r.json();
-        const badgeEl = document.getElementById("verify-badge-status");
-        const tag = document.getElementById("verify-tag");
-        const btn = document.getElementById("getVerifiedBtn");
-        const msg = document.getElementById("verify-msg");
-        const status = data.request?.status || "none";
-
-        if (status === "approved") {
-          badgeEl.textContent = `🏅 ${badgeMap.approved} (${data.badge || "trusted"})`;
-          badgeEl.style.color = "#00ffc6";
-          tag.textContent = "🛡️ Verified Seller";
-          tag.className = "g-tag ok";
-          btn.style.display = "none";
-          msg.textContent = "Admin ne aapko verified seller ka badge de diya hai. 🎉";
-        } else if (status === "pending") {
-          badgeEl.textContent = badgeMap.pending;
-          tag.textContent = "🛡️ " + badgeMap.pending;
-          tag.className = "g-tag warn";
-          btn.disabled = true;
-          btn.textContent = "⏳ Under Review";
-          msg.textContent = "Request submitted hai. Admin approve karega tabhi badge milega.";
-        } else if (status === "rejected") {
-          badgeEl.textContent = badgeMap.rejected;
-          tag.textContent = "🛡️ Rejected";
-          tag.className = "g-tag bad";
-          msg.textContent = (data.request?.reason || "Try again later.") + " Dobaara request kar sakte ho.";
-        } else {
-          badgeEl.textContent = badgeMap.none;
-          tag.textContent = "🛡️ Not Verified";
-          tag.className = "g-tag";
-          btn.textContent = "Get Verified";
-        }
-      } catch {}
+// COMMISSION
+async function loadCommission() {
+  try {
+    const r = await fetch(MARKET_BASE + "/commission/me", { headers: authHeaders() });
+    const data = await r.json();
+    const sec = document.getElementById("comm-sec");
+    if (!r.ok || !data || data.error) { sec.style.display = "none"; return; }
+    const bal = Number(data.pending_commission || 0);
+    document.getElementById("comm-balance").textContent = "₹" + bal.toLocaleString("en-IN");
+    document.getElementById("comm-amount").value = bal > 0 ? bal : "";
+    sec.style.display = (bal > 0 || (data.payments || []).length) ? "block" : "none";
+    const hist = document.getElementById("comm-history");
+    const payments = data.payments || [];
+    if (payments.length) {
+      hist.innerHTML = '<h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">Payment History</h3>' +
+        payments.map(p => `
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.6rem .9rem;margin-bottom:.6rem;font-size:.85rem">
+            <span>₹${Number(p.amount).toLocaleString("en-IN")} <small style="opacity:.6">${esc(p.status || "")}</small></span>
+            <small style="opacity:.55">${esc((p.created_at || "").slice(0, 16).replace("T", " "))}</small>
+          </div>`).join("");
+    } else {
+      hist.innerHTML = "";
     }
+  } catch { /* ignore */ }
+}
 
-    const esc = v => String(v ?? "").replace(/[&<>"']/g,
-      c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-    // ===== COMMISSION =====
-    async function loadCommission() {
-      try {
-        const r = await fetch(MARKET_BASE + "/commission/me", { headers: authHeaders() });
-        const data = await r.json();
-        const sec = document.getElementById("comm-sec");
-        if (!r.ok || !data || data.error) { sec.style.display = "none"; return; }
-        const bal = Number(data.pending_commission || 0);
-        document.getElementById("comm-balance").textContent = "₹" + bal.toLocaleString("en-IN");
-        document.getElementById("comm-amount").value = bal > 0 ? bal : "";
-        sec.style.display = (bal > 0 || (data.payments || []).length) ? "block" : "none";
-        const hist = document.getElementById("comm-history");
-        const payments = data.payments || [];
-        if (payments.length) {
-          hist.innerHTML = '<div class="g-sec-head" style="font-size:.7rem;margin-top:1rem">Payment History</div>' +
-            payments.map(p => `
-              <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:.45rem .7rem;margin-bottom:.45rem;font-size:.8rem">
-                <span>₹${Number(p.amount).toLocaleString("en-IN")} <small style="opacity:.6">${esc(p.status || "")}</small></span>
-                <small style="opacity:.55">${esc((p.created_at || "").slice(0, 16).replace("T", " "))}</small>
-              </div>`).join("");
-        } else {
-          hist.innerHTML = "";
-        }
-      } catch { /* ignore */ }
-    }
-
-    document.getElementById("comm-pay-btn").onclick = async () => {
-      const msg = document.getElementById("comm-msg");
-      const amount = Number(document.getElementById("comm-amount").value);
-      const utr = document.getElementById("comm-utr").value.trim();
-      msg.className = "msg";
-      if (!Number.isFinite(amount) || amount < 1) { msg.className = "msg err"; msg.textContent = "Amount sahi dalo."; return; }
-      if (!utr) { msg.className = "msg err"; msg.textContent = "UTR number required hai."; return; }
-      try {
-        const r = await fetch(MARKET_BASE + "/commission/pay", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({ amount, utr })
-        });
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error || "Submission failed");
-        msg.className = "msg ok";
-        msg.textContent = "✅ Commission payment submitted! Admin verify karke balance clear karega.";
-        document.getElementById("comm-utr").value = "";
-        loadCommission();
-      } catch (err) {
-        msg.className = "msg err";
-        msg.textContent = "❌ " + err.message;
-      }
-    };
-
-    document.getElementById("getVerifiedBtn").onclick = async () => {
-      const msg = document.getElementById("verify-msg");
-      msg.className = "msg";
-      msg.textContent = "Submitting request…";
-      try {
-        const r = await fetch(MARKET_BASE + "/seller/verify-request", {
-          method: "POST",
-          headers: authHeaders()
-        });
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error || "Request failed");
-        msg.className = "msg ok";
-        msg.textContent = "✅ Request sent! Admin review karega. 📩";
-        loadVerifyStatus();
-      } catch (err) {
-        msg.className = "msg err";
-        msg.textContent = "❌ " + err.message;
-      }
-    };
-
-    function renderSocials(ig, fb) {
-      const row = document.getElementById("socialRow");
-      const igLink = document.getElementById("igLink");
-      const fbLink = document.getElementById("fbLink");
-      if (!ig && !fb) { row.style.display = "none"; return; }
-      row.style.display = "flex";
-      igLink.style.display = ig ? "inline-flex" : "none";
-      fbLink.style.display = fb ? "inline-flex" : "none";
-      if (ig) igLink.href = /^https?:/.test(ig) ? ig : "https://instagram.com/" + ig;
-      if (fb) fbLink.href = /^https?:/.test(fb) ? fb : "https://facebook.com/" + fb;
-    }
-
-    // Save profile
-    document.getElementById("saveProfileBtn").onclick = async () => {
-      profileMsg.className = "msg";
-      profileMsg.textContent = "Saving…";
-      try {
-        const payload = {
-          user_id: user.id,
-          name: user.name,
-          bio: document.getElementById("bio").value.trim(),
-          upi_id: document.getElementById("upi_id").value.trim(),
-          instagram: document.getElementById("instagram").value.trim(),
-          facebook: document.getElementById("facebook").value.trim()
-        };
-        if (avatarData) payload.photo_url = avatarData;
-
-        const r = await fetch(VERIFY_BASE + "/profile/update", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify(payload)
-        });
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error || "Save failed");
-        profileMsg.className = "msg ok";
-        profileMsg.textContent = "✅ Profile saved!";
-        avatarData = null;
-        renderSocials(
-          document.getElementById("instagram").value.trim(),
-          document.getElementById("facebook").value.trim()
-        );
-
-        // Also save city + meetup note to marketplace seller profile
-        try {
-          await fetch(MARKET_BASE + "/seller/profile", {
-            method: "PUT",
-            headers: authHeaders(),
-            body: JSON.stringify({
-              city: document.getElementById("city").value.trim(),
-              meetup_note: document.getElementById("meetup_note").value.trim()
-            })
-          });
-        } catch {}
-      } catch (err) {
-        profileMsg.className = "msg err";
-        profileMsg.textContent = "❌ " + err.message;
-      }
-    };
-
-    // KYC
-    document.getElementById("kyc-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData();
-      formData.append("user_id", user.id);
-      formData.append("name", document.getElementById("kyc-name").value.trim());
-      formData.append("share_code", document.getElementById("kyc-share").value.trim());
-      formData.append("file", document.getElementById("kyc-file").files[0]);
-
-      const msg = document.getElementById("kyc-msg");
-      msg.className = "msg";
-      msg.textContent = "Submitting…";
-      try {
-        const res = await fetch(VERIFY_BASE + "/upload", {
-          method: "POST",
-          headers: { Authorization: "Bearer " + localStorage.getItem("token") },
-          body: formData
-        });
-        const result = await res.json();
-        if (res.ok) {
-          const tag = document.getElementById("kyc-tag");
-          tag.textContent = "🪪 KYC: Under Review";
-          tag.className = "g-tag warn";
-          msg.className = "msg ok";
-          msg.textContent = "✅ KYC submitted! Awaiting admin approval.";
-        } else {
-          throw new Error(result.error || "Submission failed");
-        }
-      } catch (err) {
-        msg.className = "msg err";
-        msg.textContent = "❌ " + err.message;
-      }
+document.getElementById("comm-pay-btn").onclick = async () => {
+  const msg = document.getElementById("comm-msg");
+  const amount = Number(document.getElementById("comm-amount").value);
+  const utr = document.getElementById("comm-utr").value.trim();
+  msg.className = "msg";
+  if (!Number.isFinite(amount) || amount < 1) { msg.className = "msg err"; msg.textContent = "Enter valid amount"; return; }
+  if (!utr) { msg.className = "msg err"; msg.textContent = "UTR number required"; return; }
+  try {
+    const r = await fetch(MARKET_BASE + "/commission/pay", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ amount, utr })
     });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Submission failed");
+    msg.className = "msg ok";
+    msg.textContent = "✅ Commission payment submitted! Admin will verify.";
+    document.getElementById("comm-utr").value = "";
+    loadCommission();
+  } catch (err) {
+    msg.className = "msg err";
+    msg.textContent = "❌ " + err.message;
+  }
+};
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "login.html";
+document.getElementById("getVerifiedBtn").onclick = async () => {
+  const msg = document.getElementById("verify-msg");
+  msg.className = "msg";
+  msg.textContent = "Submitting request…";
+  try {
+    const r = await fetch(MARKET_BASE + "/seller/verify-request", {
+      method: "POST",
+      headers: authHeaders()
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Request failed");
+    msg.className = "msg ok";
+    msg.textContent = "✅ Request sent! Admin will review. 📩";
+    loadVerifyStatus();
+  } catch (err) {
+    msg.className = "msg err";
+    msg.textContent = "❌ " + err.message;
+  }
+};
+
+function renderSocials(ig, fb) {
+  const row = document.getElementById("socialRow");
+  const igLink = document.getElementById("igLink");
+  const fbLink = document.getElementById("fbLink");
+  if (!ig && !fb) { row.style.display = "none"; return; }
+  row.style.display = "flex";
+  igLink.style.display = ig ? "inline-flex" : "none";
+  fbLink.style.display = fb ? "inline-flex" : "none";
+  if (ig) igLink.href = /^https?:/.test(ig) ? ig : "https://instagram.com/" + ig;
+  if (fb) fbLink.href = /^https?:/.test(fb) ? fb : "https://facebook.com/" + fb;
+}
+
+// Save profile
+document.getElementById("profileForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  profileMsg.className = "msg";
+  profileMsg.textContent = "Saving…";
+  try {
+    const payload = {
+      user_id: user.id,
+      name: user.name,
+      bio: document.getElementById("bio").value.trim(),
+      upi_id: document.getElementById("upi_id").value.trim(),
+      instagram: document.getElementById("instagram").value.trim(),
+      facebook: document.getElementById("facebook").value.trim()
+    };
+    if (avatarData) payload.photo_url = avatarData;
+
+    const r = await fetch(VERIFY_BASE + "/profile/update", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload)
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Save failed");
+    profileMsg.className = "msg ok";
+    profileMsg.textContent = "✅ Profile saved!";
+    avatarData = null;
+    renderSocials(
+      document.getElementById("instagram").value.trim(),
+      document.getElementById("facebook").value.trim()
+    );
+
+    // Also save city + meetup note to marketplace seller profile
+    try {
+      await fetch(MARKET_BASE + "/seller/profile", {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          city: document.getElementById("city").value.trim(),
+          meetup_note: document.getElementById("meetup_note").value.trim()
+        })
+      });
+    } catch {}
+  } catch (err) {
+    profileMsg.className = "msg err";
+    profileMsg.textContent = "❌ " + err.message;
+  }
+});
+
+// KYC
+document.getElementById("kyc-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
+  formData.append("user_id", user.id);
+  formData.append("name", document.getElementById("kyc-name").value.trim());
+  formData.append("share_code", document.getElementById("kyc-share").value.trim());
+  formData.append("file", document.getElementById("kyc-file").files[0]);
+
+  const msg = document.getElementById("kyc-msg");
+  msg.className = "msg";
+  msg.textContent = "Submitting…";
+  try {
+    const res = await fetch(VERIFY_BASE + "/upload", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      body: formData
+    });
+    const result = await res.json();
+    if (res.ok) {
+      const tag = document.getElementById("kyc-tag");
+      tag.textContent = "🪪 KYC: Under Review";
+      tag.style.cssText = "background: rgba(255, 183, 3, 0.15); color: #ffd166; border-color: rgba(255, 183, 3, 0.4);";
+      msg.className = "msg ok";
+      msg.textContent = "✅ KYC submitted! Awaiting admin approval.";
+    } else {
+      throw new Error(result.error || "Submission failed");
     }
+  } catch (err) {
+    msg.className = "msg err";
+    msg.textContent = "❌ " + err.message;
+  }
+});
 
-    loadProfile();
-  </script>
-  <script src="js/auth.js"></script>
-  <script src="assets/effects.js" defer></script>
-  <link rel="stylesheet" href="styles/responsive.css">
+function logout() {
+  localStorage.clear();
+  window.location.href = "login.html";
+}
+
+loadProfile();
+</script>
 </body>
 </html>

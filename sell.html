@@ -27,12 +27,9 @@
 </script>
 </head>
 <body>
-<!-- Particle Background -->
-<div class="particles" id="particles" aria-hidden="true"></div>
-
 <!-- Navigation -->
 <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
-  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
     <span class="nav-brand-icon" aria-hidden="true">🎮</span>
     <span>BGMI Market</span>
   </a>
@@ -40,22 +37,22 @@
   <div class="nav-links" id="navLinks">
     <a href="index.html" class="nav-link">Home</a>
     <a href="marketplace.html" class="nav-link">Marketplace</a>
-    <a href="sell.html" class="nav-link active" data-page="sell">
+    <a href="sell.html" class="nav-link active" data-page="sell" data-magnetic="0.15">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path d="M12 5v14M5 12h14"/>
         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2z"/>
       </svg>
       <span>Sell</span>
     </a>
-    <a href="popularity.html" class="nav-link">Popularity</a>
-    <a href="meetups.html" class="nav-link">Meetups</a>
-    <a href="wallet.html" class="nav-link">Wallet</a>
-    <a href="chat.html" class="nav-link">Chats</a>
-    <a href="profile.html" class="nav-link">Profile</a>
-    <a href="admin_dashboard.html" class="nav-link">Admin</a>
+    <a href="popularity.html" class="nav-link" data-magnetic="0.15">Popularity</a>
+    <a href="meetups.html" class="nav-link" data-magnetic="0.15">Meetups</a>
+    <a href="wallet.html" class="nav-link" data-magnetic="0.15">Wallet</a>
+    <a href="chat.html" class="nav-link" data-magnetic="0.15">Chats</a>
+    <a href="profile.html" class="nav-link" data-magnetic="0.15">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" data-magnetic="0.15">Admin</a>
     
     <!-- Theme Toggle -->
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
       <span class="toggle-track" aria-hidden="true"></span>
       <span class="toggle-thumb" aria-hidden="true"></span>
     </button>
@@ -77,24 +74,24 @@
 <main class="sell-page" role="main" style="flex: 1; padding: 2rem 1rem 4rem;">
   <div class="page-container" style="width: 100%; max-width: 720px; margin: 0 auto;">
     <!-- Header -->
-    <header class="page-header" style="text-align: center; margin-bottom: 2rem;">
-      <h1 class="page-title anim-gradient glitch" data-text="Sell Your BGMI Account" style="font-size: clamp(1.75rem, 4vw, 2.25rem); margin-bottom: 0.5rem;">Sell Your BGMI Account</h1>
-      <p class="page-subtitle text-secondary" style="font-size: 1rem;">List your account & get paid directly via UPI 🚀</p>
+    <header class="page-header" style="text-align: center; margin-bottom: 2rem;" data-reveal="slide-up">
+      <h1 class="page-title anim-gradient glitch" data-text="Sell Your BGMI Account" style="font-size: clamp(1.75rem, 4vw, 2.25rem); margin-bottom: 0.5rem;" data-text-reveal="words" data-stagger="0.03">Sell Your BGMI Account</h1>
+      <p class="page-subtitle text-secondary" style="font-size: 1rem;" data-reveal="fade" data-reveal-delay="200">List your account & get paid directly via UPI 🚀</p>
     </header>
 
     <!-- Form Card -->
     <form id="sellForm" class="glass glass-strong" style="padding: 2rem;" novalidate>
       
       <!-- CATEGORY TOGGLE -->
-      <div class="cat-toggle" role="radiogroup" aria-label="Listing category">
-        <button type="button" id="catAccount" class="cat-btn active" role="radio" aria-checked="true" aria-label="Sell Account">
+      <div class="cat-toggle" role="radiogroup" aria-label="Listing category" data-reveal="slide-up" data-reveal-delay="100">
+        <button type="button" id="catAccount" class="cat-btn active" role="radio" aria-checked="true" aria-label="Sell Account" data-magnetic="0.2">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <rect x="2" y="3" width="20" height="14" rx="2"/>
             <path d="M8 21h8M12 17v4"/>
           </svg>
           <span>🎮 Sell Account</span>
         </button>
-        <button type="button" id="catPopularity" class="cat-btn" role="radio" aria-checked="false" aria-label="Sell Popularity">
+        <button type="button" id="catPopularity" class="cat-btn" role="radio" aria-checked="false" aria-label="Sell Popularity" data-magnetic="0.2">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
@@ -103,26 +100,26 @@
       </div>
 
       <!-- ACCOUNT INFO -->
-      <section class="form-section" id="secAccount" aria-labelledby="accountInfoTitle">
+      <section class="form-section" id="secAccount" aria-labelledby="accountInfoTitle" data-reveal="slide-up" data-reveal-delay="150">
         <h2 id="accountInfoTitle" class="section-title">🏷️ Account Info</h2>
         
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="200">
           <label class="label" for="uid">BGMI UID <span class="req" aria-hidden="true">*</span></label>
           <input type="text" id="uid" class="input" placeholder="e.g. 5301234567" required autocomplete="off" pattern="\d{1,12}" aria-describedby="uidHelp">
           <small id="uidHelp" style="color: var(--text-muted); font-size: 0.75rem;">Numbers only, max 12 digits</small>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="250">
           <label class="label" for="title">Account Title <span class="req" aria-hidden="true">*</span></label>
           <input type="text" id="title" class="input" placeholder="e.g. Legendary Conqueror ID" required autocomplete="off" maxlength="80">
         </div>
         
         <div class="grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-          <div class="form-group">
+          <div class="form-group" data-reveal="slide-up" data-reveal-delay="300">
             <label class="label" for="level">Account Level</label>
             <input type="number" id="level" class="input" placeholder="e.g. 76" min="0" max="1000" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-reveal="slide-up" data-reveal-delay="350">
             <label class="label" for="rank">Highest Rank</label>
             <input type="text" id="rank" class="input" placeholder="e.g. Ace / Conqueror" autocomplete="off" list="rankList">
             <datalist id="rankList">
@@ -140,39 +137,39 @@
       </section>
 
       <!-- ITEMS -->
-      <section class="form-section" id="secItems" aria-labelledby="itemsTitle">
+      <section class="form-section" id="secItems" aria-labelledby="itemsTitle" data-reveal="slide-up" data-reveal-delay="150">
         <h2 id="itemsTitle" class="section-title">🎁 Items & Rarities</h2>
         
-        <div class="grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
-          <div class="form-group">
+        <div class="grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;" data-stagger data-stagger-delay="50">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="mythic">Mythic Items</label>
             <input type="text" id="mythic" class="input" placeholder="Mythic Items" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="legendary">Legendary Items</label>
             <input type="text" id="legendary" class="input" placeholder="Legendary Items" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="honor_gift">Honor Gift</label>
             <input type="text" id="honor_gift" class="input" placeholder="Honor Gift" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="guns">Upgraded Guns</label>
             <input type="text" id="guns" class="input" placeholder="Upgraded Guns" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="titles">Titles</label>
             <input type="text" id="titles" class="input" placeholder="Titles" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="x_suit">X Suit</label>
             <input type="text" id="x_suit" class="input" placeholder="X Suit" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="supercar">Supercar</label>
             <input type="text" id="supercar" class="input" placeholder="Supercar" autocomplete="off">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-stagger-item>
             <label class="label" for="ultimate">Ultimate</label>
             <input type="text" id="ultimate" class="input" placeholder="Ultimate" autocomplete="off">
           </div>
@@ -181,28 +178,28 @@
       </section>
 
       <!-- POPULARITY INFO (hidden by default) -->
-      <section class="form-section hidden-sec" id="secPopularity" aria-labelledby="popularityTitle" hidden>
+      <section class="form-section hidden-sec" id="secPopularity" aria-labelledby="popularityTitle" hidden data-reveal="slide-up" data-reveal-delay="150">
         <h2 id="popularityTitle" class="section-title">🔥 Popularity Boost Details</h2>
         <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Buyer provides target BGMI UID at purchase — you don't need to ask for it.</p>
         
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="200">
           <label class="label">Quick Pick (exact BGMI values)</label>
-          <div class="boost-chips" id="boostChips" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;" role="listbox" aria-label="Popularity boost presets">
-            <button type="button" class="chip" data-val="200|Bike" role="option" aria-selected="false">🏍️ Bike · 200</button>
-            <button type="button" class="chip" data-val="2000|Car" role="option" aria-selected="false">🚗 Car · 2,000</button>
-            <button type="button" class="chip" data-val="200|Drop" role="option" aria-selected="false">🪂 Drop · 200</button>
-            <button type="button" class="chip" data-val="400|Event Drop" role="option" aria-selected="false">🎯 Event Drop · 400</button>
-            <button type="button" class="chip" data-val="600|Event Drop" role="option" aria-selected="false">🎯 Event Drop · 600</button>
-            <button type="button" class="chip" data-val="1500|Event Drop" role="option" aria-selected="false">🎯 Event Drop · 1,500</button>
-            <button type="button" class="chip" data-val="125000|Helicopter" role="option" aria-selected="false">🚁 Heli · 1,25,000</button>
-            <button type="button" class="chip" data-val="300000|Lion" role="option" aria-selected="false">🦁 Lion · 3,00,000</button>
-            <button type="button" class="chip chip-custom" data-val="custom" role="option" aria-selected="false">✏️ Custom Name + Points</button>
+          <div class="boost-chips" id="boostChips" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;" role="listbox" aria-label="Popularity boost presets" data-stagger data-stagger-delay="50">
+            <button type="button" class="chip" data-val="200|Bike" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🏍️ Bike · 200</button>
+            <button type="button" class="chip" data-val="2000|Car" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🚗 Car · 2,000</button>
+            <button type="button" class="chip" data-val="200|Drop" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🪂 Drop · 200</button>
+            <button type="button" class="chip" data-val="400|Event Drop" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🎯 Event Drop · 400</button>
+            <button type="button" class="chip" data-val="600|Event Drop" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🎯 Event Drop · 600</button>
+            <button type="button" class="chip" data-val="1500|Event Drop" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🎯 Event Drop · 1,500</button>
+            <button type="button" class="chip" data-val="125000|Helicopter" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🚁 Heli · 1,25,000</button>
+            <button type="button" class="chip" data-val="300000|Lion" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">🦁 Lion · 3,00,000</button>
+            <button type="button" class="chip chip-custom" data-val="custom" role="option" aria-selected="false" data-stagger-item data-magnetic="0.15">✏️ Custom Name + Points</button>
           </div>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="250">
           <label class="label" for="boostItem">Boost Item (exact BGMI values)</label>
-          <select id="boostItem" class="input select" aria-label="Select boost item">
+          <select id="boostItem" class="input select" aria-label="Select boost item" data-magnetic="0.15">
             <option value="">-- Select boost item (auto-fill) --</option>
             <option value="200|Bike">🏍️ Bike — 200 pop</option>
             <option value="2000|Car">🚗 Car — 2,000 pop</option>
@@ -216,17 +213,17 @@
           </select>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="300">
           <label class="label" for="popTitle">Boost Title <span class="req" aria-hidden="true">*</span></label>
           <input type="text" id="popTitle" class="input" placeholder="e.g. 🔥 Instant 1000 Popularity Boost" required autocomplete="off" maxlength="80">
         </div>
         
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="350">
           <label class="label" for="popPoints">Popularity Points <span class="req" aria-hidden="true">*</span></label>
           <input type="number" id="popPoints" class="input" min="1" max="10000000" placeholder="e.g. 1000" required autocomplete="off">
         </div>
         
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="400">
           <label class="label" for="deliveryTime">Delivery Time</label>
           <input type="text" id="deliveryTime" class="input" placeholder="e.g. 30 min to 2 hours" autocomplete="off" maxlength="60">
         </div>
@@ -235,30 +232,30 @@
       </section>
 
       <!-- DETAILS -->
-      <section class="form-section" aria-labelledby="detailsTitle">
+      <section class="form-section" aria-labelledby="detailsTitle" data-reveal="slide-up" data-reveal-delay="150">
         <h2 id="detailsTitle" class="section-title">📝 Description</h2>
-        <div class="form-group">
+        <div class="form-group" data-reveal="slide-up" data-reveal-delay="200">
           <label class="label" for="highlights">Description</label>
           <textarea id="highlights" class="input textarea" placeholder="Mythic outfits, exclusive skins, special titles… (for popularity boost, write delivery time)" rows="4" maxlength="1000"></textarea>
         </div>
       </section>
 
       <!-- MEETUP -->
-      <section class="form-section" id="secMeetup" aria-labelledby="meetupTitle">
+      <section class="form-section" id="secMeetup" aria-labelledby="meetupTitle" data-reveal="slide-up" data-reveal-delay="150">
         <h2 id="meetupTitle" class="section-title">🤝 Real Meetup Option <span style="text-transform: none; letter-spacing: 0; opacity: 0.6;">(recommended for trust)</span></h2>
         
-        <label class="switch-wrap" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; margin-bottom: 1rem; user-select: none;">
+        <label class="switch-wrap" style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; margin-bottom: 1rem; user-select: none;" data-magnetic="0.15">
           <input type="checkbox" id="meetupEnabled" style="display: none;">
           <span class="switch" aria-hidden="true"></span>
           <span style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">Offer buyers real meetup option (safer, builds more trust)</span>
         </label>
         
-        <div id="meetupFields" hidden>
-          <div class="form-group">
+        <div id="meetupFields" hidden data-reveal="slide-up" data-reveal-delay="200">
+          <div class="form-group" data-reveal="slide-up" data-reveal-delay="250">
             <label class="label" for="sellerCity">Your City <span class="req" aria-hidden="true">*</span></label>
             <input type="text" id="sellerCity" class="input" placeholder="e.g. Mumbai, Delhi, Pune…" autocomplete="off" maxlength="40">
           </div>
-          <div class="form-group">
+          <div class="form-group" data-reveal="slide-up" data-reveal-delay="300">
             <label class="label" for="meetupNote">Meetup Safety Note</label>
             <input type="text" id="meetupNote" class="input" value="Public place — mall / metro station / police station" maxlength="120" autocomplete="off">
           </div>
@@ -266,25 +263,25 @@
       </section>
 
       <!-- PRICE -->
-      <section class="form-section" aria-labelledby="priceTitle">
+      <section class="form-section" aria-labelledby="priceTitle" data-reveal="slide-up" data-reveal-delay="150">
         <h2 id="priceTitle" class="section-title">💸 Price</h2>
         
         <div class="price-row" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-          <div class="form-group price-input" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+          <div class="form-group price-input" style="flex: 1; min-width: 200px; margin-bottom: 0;" data-reveal="slide-up" data-reveal-delay="200">
             <label class="label" for="price">Your Price (₹) <span class="req" aria-hidden="true">*</span></label>
             <input type="number" id="price" class="input price-box" min="1" max="10000000" placeholder="e.g. 5000" required autocomplete="off" style="font-size: 1.25rem; font-weight: 700; text-align: center;">
           </div>
-          <button type="button" id="estimateBtn" class="btn btn-outline btn-ripple" style="margin-top: 1.75rem; padding: 0.875rem 1.5rem; white-space: nowrap;">⚡ Estimate</button>
+          <button type="button" id="estimateBtn" class="btn btn-outline btn-ripple" style="margin-top: 1.75rem; padding: 0.875rem 1.5rem; white-space: nowrap;" data-magnetic="0.2">⚡ Estimate</button>
         </div>
         
         <div id="estimatedPrice" style="font-size: 0.9rem; color: var(--accent-secondary); margin-top: 0.5rem; min-height: 1.5rem;"></div>
       </section>
 
       <!-- IMAGES -->
-      <section class="form-section" aria-labelledby="imagesTitle">
+      <section class="form-section" aria-labelledby="imagesTitle" data-reveal="slide-up" data-reveal-delay="150">
         <h2 id="imagesTitle" class="section-title">🖼️ Images <span style="text-transform: none; letter-spacing: 0; opacity: 0.6;">(optional, max 5)</span></h2>
         
-        <div class="drop-area" id="drop-area" role="button" tabindex="0" aria-label="Upload images" style="border: 2px dashed var(--border-primary); padding: 2rem; border-radius: var(--radius-lg); text-align: center; color: var(--accent-primary); cursor: pointer; font-size: 0.9rem; background: var(--bg-glass); transition: all var(--transition-fast);">
+        <div class="drop-area" id="drop-area" role="button" tabindex="0" aria-label="Upload images" style="border: 2px dashed var(--border-primary); padding: 2rem; border-radius: var(--radius-lg); text-align: center; color: var(--accent-primary); cursor: pointer; font-size: 0.9rem; background: var(--bg-glass); transition: all var(--transition-fast);" data-magnetic="0.1">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" style="margin-bottom: 1rem; opacity: 0.5;">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="17 8 12 3 7 8"/>
@@ -298,7 +295,7 @@
       </section>
 
       <!-- SUBMIT -->
-      <button type="submit" id="submitBtn" class="btn btn-primary btn-lg btn-full btn-ripple" style="margin-top: 1rem;">
+      <button type="submit" id="submitBtn" class="btn btn-primary btn-lg btn-full btn-ripple" style="margin-top: 1rem;" data-magnetic="0.25">
         <span>🚀 List for Sale</span>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -318,11 +315,21 @@
 <footer class="footer" role="contentinfo">
   <div class="footer-grid">
     <div class="footer-brand">
-      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
         <span class="footer-logo-icon" aria-hidden="true">🎮</span>
         <span>BGMI Market</span>
       </a>
       <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
     </div>
     <nav class="footer-section" aria-label="Quick Links">
       <h4>Quick Links</h4>

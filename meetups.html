@@ -1,133 +1,284 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meetups - BGMI Market</title>
-<link rel="stylesheet" href="assets/webfonts/poppins.css">
+<title>Meetups | BGMI Market</title>
+<meta name="description" content="Real meetup requests for trusted BGMI account deals. City-wise seller search, public meetup locations, escrow protected.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
 <link rel="stylesheet" href="assets/effects.css">
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-  body {
-    min-height:100vh;
-    background: radial-gradient(circle at top left, #12002b, #07070f, #160021);
-    background-size: 400% 400%;
-    animation: hueShift 16s infinite alternate;
-    color:#fff; overflow-x:hidden;
-  }
-  @keyframes hueShift { 0%{background-position:left top;} 100%{background-position:right bottom;} }
+<link rel="stylesheet" href="styles/responsive.css">
 
-  header {
-    width:100%; padding:1.1rem 2rem;
-    backdrop-filter:blur(20px);
-    background: rgba(255,255,255,.07);
-    display:flex; justify-content:space-between; align-items:center;
-    position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:.6rem;
-  }
-  header h1 { font-size:1.5rem; }
-  nav ul { list-style:none; display:flex; gap:1rem; flex-wrap:wrap; }
-  nav a { text-decoration:none; color:#fff; transition:.3s; font-size:.95rem; }
-  nav a:hover { color:#00ffc6; text-shadow:0 0 12px rgba(0,255,198,.8); }
-
-  main { padding:2rem 1.5rem 3rem; max-width:900px; margin:0 auto; position:relative; z-index:1; }
-  .hero { text-align:center; padding:1rem 0 1.6rem; }
-  .hero h2 { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; }
-
-  .safety {
-    background: rgba(255,180,0,.08);
-    border:1px solid rgba(255,180,0,.35);
-    border-radius:14px; padding:.9rem 1.1rem; margin:1rem 0 1.4rem;
-    font-size:.85rem; color:#ffd27d; line-height:1.7;
-  }
-
-  .meetup-list { display:flex; flex-direction:column; gap:.9rem; }
-  .mu-card {
-    background: rgba(255,255,255,.05);
-    backdrop-filter: blur(14px);
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:16px; padding:1.1rem 1.2rem;
-    transition:.3s;
-  }
-  .mu-card:hover { border-color:#00ffc6; box-shadow:0 0 20px rgba(0,255,198,.18); }
-  .mu-head { display:flex; justify-content:space-between; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.5rem; }
-  .mu-title { font-weight:700; font-size:1rem; }
-  .mu-title small { display:block; font-weight:400; color:rgba(255,255,255,.55); font-size:.78rem; }
-  .mu-tag { font-size:.68rem; font-weight:800; letter-spacing:.07em; padding:.22rem .6rem; border-radius:999px; }
-  .tag-pending { background:rgba(255,183,3,.15); color:#ffb703; border:1px solid rgba(255,183,3,.4); }
-  .tag-approved { background:rgba(0,255,198,.13); color:#00ffc6; border:1px solid rgba(0,255,198,.4); }
-  .tag-declined { background:rgba(255,94,94,.12); color:#ff5e5e; border:1px solid rgba(255,94,94,.4); }
-  .tag-completed { background:rgba(124,255,139,.12); color:#7CFF8B; border:1px solid rgba(124,255,139,.4); }
-  .tag-cancelled { background:rgba(255,255,255,.08); color:rgba(255,255,255,.6); border:1px solid rgba(255,255,255,.2); }
-
-  .mu-row { font-size:.85rem; color:rgba(255,255,255,.8); margin:.15rem 0; }
-  .mu-row b { color:#00eaff; font-weight:600; }
-
-  .mu-actions { display:flex; gap:.5rem; margin-top:.8rem; flex-wrap:wrap; }
-  .btn {
-    padding:.5rem .9rem; border:none; border-radius:10px; cursor:pointer;
-    font-weight:700; font-size:.82rem; font-family:inherit; transition:.25s; color:#fff;
-  }
-  .btn.approve { background:linear-gradient(90deg,#00ffc6,#00b894); color:#062; }
-  .btn.decline { background:rgba(255,94,94,.2); border:1px solid #ff5e5e; }
-  .btn.complete { background:linear-gradient(90deg,#8b5cf6,#00c6ff); }
-  .btn.chat { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); }
-  .btn:hover { transform:translateY(-2px); }
-  .btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
-
-  .empty { text-align:center; color:rgba(255,255,255,.55); padding:2rem 0; }
-  footer {
-    width:100%; padding:1.2rem; text-align:center;
-    backdrop-filter:blur(15px); background:rgba(255,255,255,.04); color:#ccc; font-size:.85rem;
-  }
-  @media (max-width:600px){ header{justify-content:center;} nav ul{justify-content:center;} }
-</style>
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
+<!-- Particle Background -->
+<div class="particles" id="particles" aria-hidden="true"></div>
 
-<header>
-  <h1><span class="wiggle">🤝</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
-  <nav>
-    <ul>
-      <li><a href="index.html" class="nav-slide">Home</a></li>
-      <li><a href="marketplace.html" class="nav-slide">Marketplace</a></li>
-      <li><a href="sell.html" class="nav-slide">Sell</a></li>
-      <li><a href="popularity.html" class="nav-slide">Popularity</a></li>
-      <li><a href="wallet.html" class="nav-slide">Wallet</a></li>
-      <li><a href="profile.html" class="nav-slide">Profile</a></li>
-      <li><a href="chat.html" class="nav-slide">Message</a></li>
-    </ul>
-  </nav>
-</header>
-
-<div class="marquee-wrap">
-  <div class="marquee-inner">
-    <span>🤝 <b>REAL MEETUPS</b> For Trusted Deals</span>
-    <span>📍 <b>CITY-WISE</b> Seller Search</span>
-    <span>🛡️ Always Meet In <b>PUBLIC PLACES</b></span>
-    <span>⚡ <b>SECURE</b> Escrow Protected</span>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link active">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link">Admin</a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
   </div>
-</div>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
 
-<main>
-  <div class="hero">
-    <h2 class="glitch anim-gradient" data-text="MEETUP REQUESTS">MEETUP REQUESTS</h2>
-    <p class="reveal visible">Real-world ID delivery — buyer aur seller dono ko trusted banata hai</p>
-  </div>
+<main class="meetups-page" role="main" style="flex: 1; padding: 2rem 1rem 4rem;">
+  <div class="page-container" style="width: 100%; max-width: 900px; margin: 0 auto;">
+    
+    <!-- Hero Section -->
+    <section class="hero" style="min-height: 40vh; padding: 3rem 2rem;" aria-labelledby="meetups-title">
+      <div class="hero-content">
+        <div class="hero-badge animate-fade-in">
+          <span aria-hidden="true">🤝</span>
+          <span>Real Meetups for Trusted Deals</span>
+        </div>
+        
+        <h1 id="meetups-title" class="animate-slide-up stagger-1 glitch text-gradient" data-text="MEETUP REQUESTS">
+          Meetup Requests
+        </h1>
+        
+        <p class="hero-subtitle animate-slide-up stagger-2">
+          Real-world ID delivery — buyer aur seller dono ko trusted banata hai
+        </p>
+      </div>
+    </section>
 
-  <div class="safety reveal visible">
-    ⚠️ <b>Safety rules:</b> Hamesha public place par milo (mall / metro station / police chowk). <b>Kabhi advance payment mat karo</b> — milne par hi payment + ID exchange. Apne paas ID proof rakho.
-  </div>
+    <!-- Marquee -->
+    <div class="marquee-wrap" style="margin-bottom: 2rem;">
+      <div class="marquee-inner">
+        <span>🤝 <b>REAL MEETUPS</b> For Trusted Deals</span>
+        <span>📍 <b>CITY-WISE</b> Seller Search</span>
+        <span>🛡️ Always Meet In <b>PUBLIC PLACES</b></span>
+        <span>⚡ <b>SECURE</b> Escrow Protected</span>
+      </div>
+    </div>
 
-  <div class="meetup-list" id="meetupList">
-    <p class="empty">Loading…</p>
+    <!-- Safety Notice -->
+    <section class="section" style="padding-top: 0; padding-bottom: 1.5rem;">
+      <div class="container">
+        <div class="glass glass-strong" style="padding: 1.5rem; border-radius: var(--radius-xl); background: linear-gradient(135deg, rgba(255, 180, 0, 0.08), rgba(255, 120, 0, 0.05)); border-color: rgba(255, 180, 0, 0.3);">
+          <div style="display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+            <div style="font-size: 2rem; flex-shrink: 0; margin-top: 0.25rem;">⚠️</div>
+            <div style="flex: 1; min-width: 250px;">
+              <strong style="color: var(--accent-secondary); font-size: 1rem;">Safety Rules:</strong>
+              <p style="margin: 0.5rem 0 0; color: var(--text-secondary); line-height: 1.7; font-size: 0.95rem;">
+                Hamesha <strong>public place</strong> par milo (mall / metro station / police chowk). 
+                <strong style="color: var(--accent-secondary);">Kabhi advance payment mat karo</strong> — milne par hi payment + ID exchange. 
+                Apne paas ID proof rakho. Seller verify karega buyer ka UID before handover.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meetup List -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+          <h2 class="section-title anim-gradient" style="font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem;">📋 Your Meetup Requests</h2>
+          <p class="text-secondary">Track and manage all your meetup requests</p>
+        </header>
+        
+        <div class="glass glass-strong" style="border-radius: var(--radius-xl); overflow: hidden;">
+          <div id="meetupList" class="meetup-list" style="padding: 0.5rem;">
+            <div class="glass" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</div>
+          </div>
+        </div>
+        
+        <!-- Empty State CTA -->
+        <div id="emptyMeetupCta" style="display: none; text-align: center; margin-top: 2rem;">
+          <p class="text-secondary" style="margin-bottom: 1.5rem;">No meetup requests yet. Start by listing an account with meetup enabled!</p>
+          <a href="sell.html" class="btn btn-primary btn-lg btn-ripple">🔥 Create Listing with Meetup</a>
+        </div>
+      </div>
+    </section>
+
   </div>
 </main>
 
-<footer>© 2026 BGMI Market | Meetups = Trust 🤝</footer>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/theme.js"></script>
 <script src="js/meetups.js"></script>
 <script src="assets/effects.js" defer></script>
 
-  <link rel="stylesheet" href="styles/responsive.css">
+<script>
+// Initialize auth buttons in navbar
+document.addEventListener('DOMContentLoaded', () => {
+  const authButtons = document.getElementById('authButtons');
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  
+  if (authButtons) {
+    if (token && user) {
+      authButtons.innerHTML = `
+        <div class="nav-dropdown" id="userDropdown">
+          <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span id="navUserName">${user.name || user.email}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+            <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+            <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+            <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+            <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+            <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+            <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+          </div>
+        </div>
+      `;
+      
+      // Dropdown toggle
+      const userMenuBtn = document.getElementById('userMenuBtn');
+      const userDropdownMenu = document.getElementById('userDropdownMenu');
+      const navLogoutBtn = document.getElementById('navLogoutBtn');
+      
+      if (userMenuBtn && userDropdownMenu) {
+        userMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = userDropdownMenu.style.opacity === '1';
+          userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+          userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+          userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+          userMenuBtn.setAttribute('aria-expanded', !isOpen);
+        });
+        
+        document.addEventListener('click', () => {
+          userDropdownMenu.style.opacity = '0';
+          userDropdownMenu.style.visibility = 'hidden';
+          userDropdownMenu.style.transform = 'translateY(-10px)';
+          userMenuBtn.setAttribute('aria-expanded', 'false');
+        });
+      }
+      
+      if (navLogoutBtn) {
+        navLogoutBtn.addEventListener('click', () => {
+          if (window.logout) window.logout();
+        });
+      }
+    } else {
+      authButtons.innerHTML = `
+        <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+        <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
+      `;
+    }
+    
+    // Mobile menu toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (navToggle && navLinks) {
+      navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  }
+});
+</script>
 </body>
 </html>

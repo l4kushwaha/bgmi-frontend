@@ -1,403 +1,581 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Popularity - BGMI Market</title>
-  <link rel="stylesheet" href="assets/webfonts/poppins.css">
-  <link rel="stylesheet" href="assets/effects.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-    body {
-      min-height:100vh;
-      background: radial-gradient(circle at top left, #12002b, #07070f, #160021);
-      background-size: 400% 400%;
-      animation: hueShift 16s infinite alternate;
-      color:#fff;
-      overflow-x:hidden;
-    }
-    @keyframes hueShift { 0%{background-position:left top;} 100%{background-position:right bottom;} }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Popularity | BGMI Market</title>
+<meta name="description" content="BGMI Popularity Leaderboard, live market stats, and exact boost price list. Track top sellers and popularity points.">
 
-    header {
-      width:100%; padding:1.1rem 2rem;
-      backdrop-filter:blur(20px);
-      background: rgba(255,255,255,.07);
-      display:flex; justify-content:space-between; align-items:center;
-      position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:.6rem;
-    }
-    header h1 { font-size:1.5rem; }
-    nav ul { list-style:none; display:flex; gap:1rem; flex-wrap:wrap; }
-    nav a { text-decoration:none; color:#fff; transition:.3s; font-size:.95rem; }
-    nav a:hover { color:#00ffc6; text-shadow:0 0 12px rgba(0,255,198,.8); }
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    main { padding:2rem 1.5rem 3rem; max-width:1150px; margin:0 auto; position:relative; z-index:1; }
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
 
-    .hero { text-align:center; padding:1.4rem 0 2rem; }
-    .hero h2 { font-size:clamp(2rem,5vw,3.4rem); font-weight:800; }
-    .hero p { color:rgba(255,255,255,.75); margin-top:.5rem; }
-
-    /* Live stats */
-    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin:2rem 0; }
-    .stat-card {
-      background: rgba(255,255,255,.05);
-      backdrop-filter: blur(14px);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:18px;
-      padding:1.4rem; text-align:center;
-      transition:.3s;
-    }
-    .stat-card:hover { transform:translateY(-6px); box-shadow:0 0 28px rgba(0,255,198,.25); border-color:#00ffc6; }
-    .stat-card .num { font-size:2rem; font-weight:800; }
-    .stat-card small { display:block; opacity:.65; margin-top:.3rem; text-transform:uppercase; letter-spacing:.08em; font-size:.72rem; }
-    .stat-card .num.c-green { color:#00ffc6; text-shadow:0 0 16px rgba(0,255,198,.6); }
-    .stat-card .num.c-violet { color:#c084fc; text-shadow:0 0 16px rgba(192,132,252,.6); }
-    .stat-card .num.c-orange { color:#ffb703; text-shadow:0 0 16px rgba(255,183,3,.6); }
-    .stat-card .num.c-pink { color:#ff5ec4; text-shadow:0 0 16px rgba(255,94,196,.6); }
-
-    /* Leaderboard */
-    .section-title { font-size:1.6rem; margin:2.2rem 0 1.2rem; text-align:center; }
-    .rank-list { display:flex; flex-direction:column; gap:.8rem; }
-    .rank-row {
-      display:flex; align-items:center; gap:1rem;
-      background: rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:14px; padding:.9rem 1.1rem;
-      transition:.3s;
-    }
-    .rank-row:hover { border-color:#00ffc6; box-shadow:0 0 18px rgba(0,255,198,.2); transform:translateX(6px); }
-    .rank-badge {
-      width:44px; height:44px; flex:none;
-      display:grid; place-items:center;
-      border-radius:50%; font-weight:800;
-      background:#1a1a2e; border:2px solid #333;
-    }
-    .rank-row.top-1 .rank-badge { border-color:#ffd700; color:#ffd700; box-shadow:0 0 18px rgba(255,215,0,.5); }
-    .rank-row.top-2 .rank-badge { border-color:#c0c0c0; color:#e0e0e0; box-shadow:0 0 14px rgba(192,192,192,.4); }
-    .rank-row.top-3 .rank-badge { border-color:#cd7f32; color:#e8a05a; box-shadow:0 0 14px rgba(205,127,50,.4); }
-    .rank-info { flex:1; min-width:0; }
-    .rank-info .name { font-weight:700; }
-    .rank-info .meta { font-size:.8rem; color:rgba(255,255,255,.6); }
-    .rank-right { text-align:right; font-weight:700; }
-    .rank-right small { display:block; font-weight:400; opacity:.6; font-size:.75rem; }
-
-    /* Coming soon */
-    .soon-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin-top:1.2rem; }
-    .soon-card {
-      background: rgba(255,255,255,.04);
-      border:1px dashed rgba(255,255,255,.2);
-      border-radius:16px; padding:1.5rem; text-align:center;
-      transition:.3s;
-    }
-    .soon-card:hover { border-style:solid; border-color:#ff00ff; box-shadow:0 0 22px rgba(255,0,255,.3); }
-    .soon-card .emoji { font-size:2.2rem; display:block; margin-bottom:.6rem; }
-    .soon-card h4 { margin-bottom:.3rem; }
-    .soon-card p { font-size:.85rem; color:rgba(255,255,255,.65); }
-    .soon-tag { display:inline-block; margin-top:.7rem; font-size:.72rem; padding:.25rem .7rem; border-radius:999px; background:rgba(255,0,255,.15); color:#ff8ff0; letter-spacing:.06em; }
-
-    /* Boost price list */
-    .boost-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; margin-top:1.2rem; }
-    .boost-card {
-      background: rgba(255,255,255,.05);
-      backdrop-filter: blur(14px);
-      border:1px solid rgba(255,120,0,.35);
-      border-radius:18px; padding:1.4rem; text-align:center;
-      transition:.3s; position:relative; overflow:hidden;
-    }
-    .boost-card::before {
-      content:""; position:absolute; inset:-40%;
-      background: conic-gradient(from 0deg, transparent 0 70%, rgba(255,150,0,.18) 78%, transparent 88%);
-      animation: boostSpin 6s linear infinite;
-    }
-    @keyframes boostSpin { to { transform: rotate(360deg); } }
-    .boost-card:hover { transform:translateY(-6px) scale(1.03); border-color:#ff9d3c; box-shadow:0 0 32px rgba(255,140,0,.4); }
-    .boost-card .b-emoji { font-size:2.6rem; display:block; position:relative; z-index:1; filter:drop-shadow(0 0 12px rgba(255,150,0,.6)); }
-    .boost-card h4 { margin:.5rem 0 .2rem; position:relative; z-index:1; font-size:1.05rem; }
-    .boost-card p { font-size:.78rem; color:rgba(255,255,255,.6); position:relative; z-index:1; }
-    .boost-card .b-pop {
-      display:inline-block; margin-top:.7rem; position:relative; z-index:1;
-      font-weight:800; font-size:1.35rem; color:#ffb703;
-      text-shadow:0 0 18px rgba(255,183,3,.7);
-    }
-    .boost-card .b-pop small { display:block; font-size:.68rem; font-weight:400; letter-spacing:.1em; opacity:.7; color:#fff; }
-    .boost-legend { text-align:center; font-size:.8rem; color:rgba(255,255,255,.55); margin-top:1rem; line-height:1.7; }
-
-    /* Custom boost card */
-    .boost-card.custom-card { border-color:rgba(255,0,255,.4); }
-    .boost-card.custom-card:hover { border-color:#ff00ff; box-shadow:0 0 32px rgba(255,0,255,.35); }
-    .b-custom { position:relative; z-index:1; display:flex; flex-direction:column; gap:.5rem; margin-top:.8rem; }
-    .b-custom input {
-      width:100%; padding:.55rem .7rem; border-radius:10px;
-      border:1px solid rgba(255,255,255,.2);
-      background:rgba(0,0,0,.35); color:#fff; font-size:.82rem; font-family:inherit;
-      outline:none; transition:border-color .25s, box-shadow .25s;
-    }
-    .b-custom input::placeholder { color:rgba(255,255,255,.4); }
-    .b-custom input:focus { border-color:#ff00ff; box-shadow:0 0 12px rgba(255,0,255,.25); }
-    .b-custom .b-go {
-      padding:.55rem .8rem; border:none; border-radius:10px; cursor:pointer;
-      font-weight:700; font-size:.82rem; font-family:inherit;
-      color:#fff; background:linear-gradient(135deg,#ff00b0,#ff6600);
-      box-shadow:0 0 18px rgba(255,0,176,.35);
-      transition:transform .2s, box-shadow .2s;
-    }
-    .b-custom .b-go:hover { transform:translateY(-2px); box-shadow:0 0 26px rgba(255,0,176,.55); }
-    .b-custom .b-go:active { transform:translateY(0); }
-
-    footer {
-      width:100%; padding:1.2rem; text-align:center;
-      backdrop-filter:blur(15px); background:rgba(255,255,255,.04); color:#ccc; font-size:.85rem;
-    }
-    .empty { text-align:center; color:rgba(255,255,255,.6); padding:1.5rem; }
-    @media (max-width:600px){ header{justify-content:center;} nav ul{justify-content:center;} }
-  </style>
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
+<!-- Particle Background -->
+<div class="particles" id="particles" aria-hidden="true"></div>
 
-<header>
-  <h1><span class="wiggle">🎮</span> <span class="anim-gradient glitch" data-text="BGMI Market">BGMI Market</span></h1>
-  <nav>
-    <ul>
-      <li><a href="index.html" class="nav-slide">Home</a></li>
-      <li><a href="marketplace.html" class="nav-slide">Marketplace</a></li>
-      <li><a href="sell.html" class="nav-slide">Sell</a></li>
-      <li><a href="wallet.html" class="nav-slide">Wallet</a></li>
-      <li><a href="profile.html" class="nav-slide">Profile</a></li>
-      <li><a href="meetups.html" class="nav-slide">Meetups</a></li>
-      <li><a href="chat.html" class="nav-slide">Message</a></li>
-    </ul>
-  </nav>
-</header>
-
-<div class="marquee-wrap">
-  <div class="marquee-inner">
-    <span>🏆 <b>TOP SELLERS</b> Ranked Live</span>
-    <span>📈 Market Stats <b>UPDATED</b> Every Minute</span>
-    <span>🛡️ <b>SECURE</b> Escrow Protected Deals</span>
-    <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link active">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link">Admin</a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
   </div>
-</div>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
 
-<main>
-  <div class="hero">
-    <h2 class="glitch anim-gradient" data-text="POPULARITY">POPULARITY</h2>
-    <p class="reveal visible">Top sellers &amp; live market stats <span class="pulse-dot"></span> updated live</p>
-  </div>
+<main class="popularity-page" role="main" style="flex: 1; padding: 2rem 1rem 4rem;">
+  <div class="page-container" style="width: 100%; max-width: 1200px; margin: 0 auto;">
+    
+    <!-- Hero Section -->
+    <section class="hero" style="min-height: 50vh; padding: 3rem 2rem;" aria-labelledby="popularity-title">
+      <div class="hero-content">
+        <div class="hero-badge animate-fade-in">
+          <span aria-hidden="true">🏆</span>
+          <span>Live Leaderboard · Real In-Game Values · Verified Sellers</span>
+        </div>
+        
+        <h1 id="popularity-title" class="animate-slide-up stagger-1 glitch text-gradient" data-text="POPULARITY">
+          Popularity
+        </h1>
+        
+        <p class="hero-subtitle animate-slide-up stagger-2">
+          Top sellers ranked live, exact BGMI boost values, and real-time market stats.
+        </p>
+        
+        <div class="hero-actions animate-slide-up stagger-3">
+          <a href="sell.html?cat=popularity" class="btn btn-primary btn-lg btn-ripple">
+            <span>🔥 Sell Popularity</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
 
-  <!-- LIVE STATS -->
-  <div class="stats-grid">
-    <div class="stat-card reveal">
-      <div class="num c-green" id="stListings" data-count="0">0</div>
-      <small>Live Listings</small>
-    </div>
-    <div class="stat-card reveal" data-delay="1">
-      <div class="num c-violet" id="stSellers" data-count="0">0</div>
-      <small>Active Sellers</small>
-    </div>
-    <div class="stat-card reveal" data-delay="2">
-      <div class="num c-orange" id="stMythics" data-count="0">0</div>
-      <small>Mythic Items</small>
-    </div>
-    <div class="stat-card reveal" data-delay="3">
-      <div class="num c-pink" id="stHighest">₹0</div>
-      <small>Highest Asking Price</small>
-    </div>
-  </div>
-
-  <!-- TOP SELLERS -->
-  <h3 class="section-title anim-gradient reveal">🏆 Top Sellers</h3>
-  <div class="rank-list" id="rankList">
-    <p class="empty">Loading leaderboard…</p>
-  </div>
-
-  <!-- POPULARITY LEADERBOARD -->
-  <h3 class="section-title anim-gradient reveal">🔥 Popularity Leaderboard</h3>
-  <div class="rank-list" id="popRankList">
-    <p class="empty">Loading…</p>
-  </div>
-
-  <!-- BOOST PRICE LIST -->
-  <h3 class="section-title anim-gradient reveal">⚡ Real Boost Items — Exact Popularity Values</h3>
-  <p class="boost-legend reveal">Ye actual BGMI in-game boost items hain. Jab bhi seller se popularity boost lete ho to <b>points isi table se match karo</b> — zyada/less points ka matlab scam ho sakta hai. 🛡️</p>
-  <div class="boost-grid">
-    <div class="boost-card reveal"><span class="b-emoji">🏍️</span><h4>Bike</h4><p>Basic in-game bike boost</p><span class="b-pop">200 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="1"><span class="b-emoji">🚗</span><h4>Car</h4><p>Standard car boost drop</p><span class="b-pop">2,000 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="2"><span class="b-emoji">🪂</span><h4>Drop</h4><p>Normal supply drop boost</p><span class="b-pop">200 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="3"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">400 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="4"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">600 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="5"><span class="b-emoji">🎯</span><h4>Event Drop</h4><p>Special event supply drop</p><span class="b-pop">1,500 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="6"><span class="b-emoji">🚁</span><h4>Helicopter</h4><p>Helicopter boost (rare)</p><span class="b-pop">1,25,000 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal" data-delay="7"><span class="b-emoji">🦁</span><h4>Lion</h4><p>Legendary lion boost (top)</p><span class="b-pop">3,00,000 <small>POPULARITY</small></span></div>
-    <div class="boost-card reveal custom-card" data-delay="8">
-      <span class="b-emoji">✏️</span>
-      <h4>Custom Boost</h4>
-      <p>Apna naam &amp; points khud likho</p>
-      <div class="b-custom">
-        <input id="customBoostName" maxlength="60" placeholder="Boost name (e.g. 🎯 Birthday Boost)" autocomplete="off">
-        <input id="customBoostPoints" type="number" min="1" placeholder="Points (e.g. 750)" autocomplete="off">
-        <button id="customBoostGo" type="button" class="b-go">🔥 Sell This</button>
+    <!-- Marquee -->
+    <div class="marquee-wrap" style="margin-bottom: 2rem;">
+      <div class="marquee-inner">
+        <span>🏆 <b>TOP SELLERS</b> Ranked Live</span>
+        <span>📈 Market Stats <b>UPDATED</b> Every Minute</span>
+        <span>🛡️ <b>SECURE</b> Escrow Protected Deals</span>
+        <span>🎁 <b>HONOR GIFTS</b> For Top Players</span>
       </div>
     </div>
-  </div>
 
-  <div style="text-align:center;margin-top:1.4rem">
-    <a href="sell.html" class="nav-slide soon-tag" style="text-decoration:none;background:rgba(255,120,0,.15);color:#ff9d3c;padding:.6rem 1.4rem;border-radius:999px;font-weight:700">🔥 Sell Your Popularity →</a>
-  </div>
+    <!-- Live Stats Grid -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+          <div class="glass glass-strong stat-card" style="padding: 2rem; text-align: center; transition: all var(--transition-base);">
+            <div class="val price-pulse" id="stListings" style="font-size: 2.5rem; font-weight: 800; color: var(--accent-primary);">0</div>
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 0.5rem;">Live Listings</div>
+          </div>
+          <div class="glass glass-strong stat-card" style="padding: 2rem; text-align: center; transition: all var(--transition-base);">
+            <div class="val price-pulse" id="stSellers" style="font-size: 2.5rem; font-weight: 800; color: var(--accent-purple);">0</div>
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 0.5rem;">Active Sellers</div>
+          </div>
+          <div class="glass glass-strong stat-card" style="padding: 2rem; text-align: center; transition: all var(--transition-base);">
+            <div class="val price-pulse" id="stMythics" style="font-size: 2.5rem; font-weight: 800; color: var(--accent-secondary);">0</div>
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 0.5rem;">Mythic Items</div>
+          </div>
+          <div class="glass glass-strong stat-card" style="padding: 2rem; text-align: center; transition: all var(--transition-base);">
+            <div class="val price-pulse" id="stHighest" style="font-size: 2.5rem; font-weight: 800; color: var(--accent-gold);">₹0</div>
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 0.5rem;">Highest Asking Price</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <!-- COMING SOON -->
-  <h3 class="section-title anim-gradient reveal">Coming Soon</h3>
-  <div class="soon-grid">
-    <div class="soon-card reveal" data-delay="1"><span class="emoji">🎁</span><h4>Giveaways</h4><p>Daily UC &amp; item giveaways for active users.</p><span class="soon-tag">SOON</span></div>
-    <div class="soon-card reveal" data-delay="2"><span class="emoji">🏆</span><h4>Tournaments</h4><p>Weekly BGMI squad tournaments with cash prizes.</p><span class="soon-tag">SOON</span></div>
-    <div class="soon-card reveal" data-delay="3"><span class="emoji">🎙️</span><h4>Live Events</h4><p>Live streaming, interviews &amp; top-clip highlights.</p><span class="soon-tag">SOON</span></div>
-    <div class="soon-card reveal" data-delay="4"><span class="emoji">🪙</span><h4>Refer &amp; Earn</h4><p>Invite friends, earn wallet cash rewards.</p><span class="soon-tag">SOON</span></div>
+    <!-- Top Sellers Leaderboard -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+          <h2 class="section-title anim-gradient" style="font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem;">🏆 Top Sellers</h2>
+          <p class="text-secondary">Ranked by active listings and sales volume</p>
+        </header>
+        
+        <div class="glass glass-strong" style="border-radius: var(--radius-xl); overflow: hidden;">
+          <div id="rankList" class="rank-list" style="padding: 0.5rem;">
+            <div class="glass" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading leaderboard…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Popularity Leaderboard -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+          <h2 class="section-title anim-gradient" style="font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem;">🔥 Popularity Leaderboard</h2>
+          <p class="text-secondary">Players with highest total popularity points boosted</p>
+        </header>
+        
+        <div class="glass glass-strong" style="border-radius: var(--radius-xl); overflow: hidden;">
+          <div id="popRankList" class="rank-list" style="padding: 0.5rem;">
+            <div class="glass" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Boost Price List (Real BGMI Values) -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+          <h2 class="section-title anim-gradient" style="font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem;">⚡ Real Boost Items — Exact Popularity Values</h2>
+          <p class="boost-legend" style="max-width: 800px; margin: 1rem auto 0; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.7; text-align: center;">
+            These are actual BGMI in-game boost items. When buying popularity boost, <strong>verify points match this table</strong> — more/less points could indicate a scam. 🛡️
+          </p>
+        </header>
+        
+        <div class="boost-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(72, 221, 132, 0.6));">🏍️</div>
+            <h3 style="margin-bottom: 0.5rem;">Bike</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Basic in-game bike boost</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-tertiary); text-shadow: 0 0 16px rgba(124, 255, 139, 0.5);">200 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(255, 183, 3, 0.6));">🚗</div>
+            <h3 style="margin-bottom: 0.5rem;">Car</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Standard car boost drop</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-gold); text-shadow: 0 0 16px rgba(255, 183, 3, 0.5);">2,000 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(0, 234, 255, 0.6));">🪂</div>
+            <h3 style="margin-bottom: 0.5rem;">Drop</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Normal supply drop boost</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-primary); text-shadow: 0 0 16px rgba(0, 234, 255, 0.5);">200 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(255, 120, 0, 0.6));">🎯</div>
+            <h3 style="margin-bottom: 0.5rem;">Event Drop</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Special event supply drop</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-secondary); text-shadow: 0 0 16px rgba(255, 120, 0, 0.5);">400 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(255, 120, 0, 0.6));">🎯</div>
+            <h3 style="margin-bottom: 0.5rem;">Event Drop</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Special event supply drop</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-secondary); text-shadow: 0 0 16px rgba(255, 120, 0, 0.5);">600 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(255, 120, 0, 0.6));">🎯</div>
+            <h3 style="margin-bottom: 0.5rem;">Event Drop</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Special event supply drop</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-secondary); text-shadow: 0 0 16px rgba(255, 120, 0, 0.5);">1,500 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(168, 85, 247, 0.6));">🚁</div>
+            <h3 style="margin-bottom: 0.5rem;">Helicopter</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Helicopter boost (rare)</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-purple); text-shadow: 0 0 16px rgba(168, 85, 247, 0.5);">1,25,000 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <article class="glass glass-strong boost-card" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.6));">🦁</div>
+            <h3 style="margin-bottom: 0.5rem;">Lion</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Legendary lion boost (top)</p>
+            <div class="b-pop" style="font-weight: 800; font-size: 1.5rem; color: var(--accent-pink); text-shadow: 0 0 16px rgba(236, 72, 153, 0.5);">3,00,000 <small style="font-size: 0.7rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 0.25rem;">POPULARITY</small></div>
+          </article>
+          
+          <!-- Custom Boost Card -->
+          <article class="glass glass-strong boost-card gradient-border" style="padding: 2rem; text-align: center; position: relative; overflow: hidden; transition: all var(--transition-base);">
+            <div class="b-emoji" style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 16px rgba(255, 0, 255, 0.6));">✏️</div>
+            <h3 style="margin-bottom: 0.5rem;">Custom Boost</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Create your own boost name & points</p>
+            <div class="b-custom" style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 280px; margin: 0 auto;">
+              <input id="customBoostName" class="input" maxlength="60" placeholder="Boost name (e.g. 🎯 Birthday Boost)" autocomplete="off" style="text-align: center;">
+              <input id="customBoostPoints" class="input" type="number" min="1" placeholder="Points (e.g. 750)" autocomplete="off" style="text-align: center;">
+              <button id="customBoostGo" type="button" class="btn btn-purple btn-lg btn-ripple" style="width: 100%;">
+                🔥 Sell This Custom Boost
+              </button>
+            </div>
+          </article>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+          <a href="sell.html" class="btn btn-secondary btn-lg btn-ripple" style="min-width: 280px;">
+            🔥 Sell Your Popularity →
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coming Soon -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+          <h2 class="section-title anim-gradient" style="font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.5rem;">Coming Soon</h2>
+          <p class="text-secondary">Exciting features in development</p>
+        </header>
+        
+        <div class="soon-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+          <article class="glass glass-strong" style="padding: 2rem; text-align: center; border: 1px dashed var(--border-subtle); transition: all var(--transition-base);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎁</div>
+            <h3 style="margin-bottom: 0.5rem;">Giveaways</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Daily UC & item giveaways for active users.</p>
+            <span class="badge" style="background: rgba(255, 0, 255, 0.15); color: #ff8ff0; border-color: rgba(255, 0, 255, 0.3);">SOON</span>
+          </article>
+          <article class="glass glass-strong" style="padding: 2rem; text-align: center; border: 1px dashed var(--border-subtle); transition: all var(--transition-base);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div>
+            <h3 style="margin-bottom: 0.5rem;">Tournaments</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Weekly BGMI squad tournaments with cash prizes.</p>
+            <span class="badge" style="background: rgba(255, 0, 255, 0.15); color: #ff8ff0; border-color: rgba(255, 0, 255, 0.3);">SOON</span>
+          </article>
+          <article class="glass glass-strong" style="padding: 2rem; text-align: center; border: 1px dashed var(--border-subtle); transition: all var(--transition-base);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎙️</div>
+            <h3 style="margin-bottom: 0.5rem;">Live Events</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Live streaming, interviews & top-clip highlights.</p>
+            <span class="badge" style="background: rgba(255, 0, 255, 0.15); color: #ff8ff0; border-color: rgba(255, 0, 255, 0.3);">SOON</span>
+          </article>
+          <article class="glass glass-strong" style="padding: 2rem; text-align: center; border: 1px dashed var(--border-subtle); transition: all var(--transition-base);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🪙</div>
+            <h3 style="margin-bottom: 0.5rem;">Refer & Earn</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Invite friends, earn wallet cash rewards.</p>
+            <span class="badge" style="background: rgba(255, 0, 255, 0.15); color: #ff8ff0; border-color: rgba(255, 0, 255, 0.3);">SOON</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
   </div>
 </main>
 
-<footer>© 2026 BGMI Market | Popularity powered by live market data</footer>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
-<script>
-  const MARKET_API = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
 
-  function escapeHtml(s) {
-    return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-  }
-
-  function setCount(el, val) {
-    el.setAttribute("data-count", val);
-    el.textContent = val;
-  }
-
-  async function loadStats() {
-    const rankList = document.getElementById("rankList");
-    try {
-      const res = await fetch(MARKET_API + "/listings");
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error("bad payload");
-
-      const active = data.filter(l => String(l.status) === "available");
-
-      setCount(document.getElementById("stListings"), active.length);
-
-      const bySeller = {};
-      let mythicCount = 0;
-      let highest = 0;
-      for (const l of active) {
-        bySeller[l.seller_id] = (bySeller[l.seller_id] || 0) + 1;
-        try {
-          const myths = (typeof l.mythic_items === "string") ? JSON.parse(l.mythic_items || "[]") : (l.mythic_items || []);
-          mythicCount += Array.isArray(myths) ? myths.length : 0;
-        } catch { /* skip */ }
-        const price = Number(l.price || 0);
-        if (price > highest) highest = price;
-      }
-      setCount(document.getElementById("stSellers"), Object.keys(bySeller).length);
-      setCount(document.getElementById("stMythics"), mythicCount);
-      document.getElementById("stHighest").textContent = "₹" + (highest || 0).toLocaleString("en-IN");
-
-      const ranked = Object.entries(bySeller)
-        .map(([sid, count]) => ({ sid, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-
-      if (!ranked.length) {
-        rankList.innerHTML = '<p class="empty">No sellers yet — be the first!</p>';
-        return;
-      }
-
-      const sellers = await Promise.all(ranked.map(async r => {
-        try {
-          const s = await (await fetch(MARKET_API + "/seller/" + r.sid)).json();
-          return { ...r, info: s };
-        } catch {
-          return { ...r, info: null };
-        }
-      }));
-
-      rankList.innerHTML = "";
-      sellers.forEach((s, i) => {
-        const top = i < 3 ? " top-" + (i + 1) : "";
-        const name = s.info?.name || ("Seller #" + s.sid);
-        const badge = s.info?.seller_verified ? "✔ Verified" : "New";
-        const rating = s.info ? (s.info.avg_rating + " ★ · " + s.info.review_count + " reviews") : "";
-        const sales = s.info?.total_sales || 0;
-        const div = document.createElement("div");
-        div.className = "rank-row reveal" + top;
-        div.innerHTML = `
-          <div class="rank-badge">${i + 1}</div>
-          <div class="rank-info">
-            <div class="name">${escapeHtml(name)} <span style="color:#00ffc6;font-size:.8rem">${escapeHtml(badge)}</span></div>
-            <div class="meta">${escapeHtml(rating)} · ${s.count} listing(s)</div>
-          </div>
-          <div class="rank-right">${sales} <small>sales</small></div>
-        `;
-        rankList.appendChild(div);
-      });
-      initRevealScan();
-    } catch (err) {
-      rankList.innerHTML = '<p class="empty">Leaderboard unavailable right now.</p>';
-    }
-  }
-
-  async function loadPopLeaderboard() {
-    const list = document.getElementById("popRankList");
-    try {
-      const res = await fetch(MARKET_API + "/popularity/leaderboard?limit=10");
-      const data = await res.json();
-      const rows = Array.isArray(data) ? data : [];
-      if (!rows.length) {
-        list.innerHTML = '<p class="empty">Abhi tak koi popularity boost nahi hua — pehle bano! 🔥</p>';
-        return;
-      }
-      list.innerHTML = "";
-      rows.forEach((r, i) => {
-        const top = i < 3 ? " top-" + (i + 1) : "";
-        const div = document.createElement("div");
-        div.className = "rank-row reveal" + top;
-        div.innerHTML = `
-          <div class="rank-badge">${i + 1}</div>
-          <div class="rank-info">
-            <div class="name">Player #${escapeHtml(r.user_id)}</div>
-            <div class="meta">${escapeHtml(r.boosts || 0)} boost(s) · ⚡ popularity</div>
-          </div>
-          <div class="rank-right"><span style="color:#ff9d3c">⚡ ${escapeHtml(r.total_points)}</span> <small>points</small></div>
-        `;
-        list.appendChild(div);
-      });
-      initRevealScan();
-    } catch {
-      list.innerHTML = '<p class="empty">Leaderboard unavailable right now.</p>';
-    }
-  }
-
-  function initRevealScan() {
-    if (!("IntersectionObserver" in window)) {
-      document.querySelectorAll(".reveal").forEach(el => el.classList.add("visible"));
-      return;
-    }
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(en => {
-        if (en.isIntersecting) { en.target.classList.add("visible"); io.unobserve(en.target); }
-      });
-    }, { threshold: 0.12 });
-    document.querySelectorAll(".rank-row:not(.visible)").forEach(el => io.observe(el));
-  }
-
-  loadStats();
-  loadPopLeaderboard();
-
-  const goBtn = document.getElementById("customBoostGo");
-  if (goBtn) {
-    goBtn.onclick = () => {
-      const name = document.getElementById("customBoostName").value.trim();
-      const pts = document.getElementById("customBoostPoints").value.trim();
-      if (!name) { alert("Pehle boost ka naam likho"); document.getElementById("customBoostName").focus(); return; }
-      if (!pts || Number(pts) < 1) { alert("Pehle valid points likho"); document.getElementById("customBoostPoints").focus(); return; }
-      location.href = "sell.html?cat=popularity&points=" + encodeURIComponent(pts) + "&title=" + encodeURIComponent(name);
-    };
-  }
-</script>
+<!-- Scripts -->
+<script src="js/theme.js"></script>
 <script src="assets/effects.js" defer></script>
 
-  <link rel="stylesheet" href="styles/responsive.css">
+<script>
+const MARKET_API = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[c]));
+}
+
+function setCount(el, val) {
+  el.setAttribute("data-count", val);
+  el.textContent = val;
+}
+
+async function loadStats() {
+  const rankList = document.getElementById("rankList");
+  try {
+    const res = await fetch(MARKET_API + "/listings");
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("bad payload");
+
+    const active = data.filter(l => String(l.status) === "available");
+
+    setCount(document.getElementById("stListings"), active.length);
+
+    const bySeller = {};
+    let mythicCount = 0;
+    let highest = 0;
+    for (const l of active) {
+      bySeller[l.seller_id] = (bySeller[l.seller_id] || 0) + 1;
+      try {
+        const myths = (typeof l.mythic_items === "string") ? JSON.parse(l.mythic_items || "[]") : (l.mythic_items || []);
+        mythicCount += Array.isArray(myths) ? myths.length : 0;
+      } catch { /* skip */ }
+      const price = Number(l.price || 0);
+      if (price > highest) highest = price;
+    }
+    setCount(document.getElementById("stSellers"), Object.keys(bySeller).length);
+    setCount(document.getElementById("stMythics"), mythicCount);
+    document.getElementById("stHighest").textContent = "₹" + (highest || 0).toLocaleString("en-IN");
+
+    const ranked = Object.entries(bySeller)
+      .map(([sid, count]) => ({ sid, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    if (!ranked.length) {
+      rankList.innerHTML = '<div class="glass" style="padding: 3rem; text-align: center; color: var(--text-secondary);">No sellers yet — be the first!</div>';
+      return;
+    }
+
+    const sellers = await Promise.all(ranked.map(async r => {
+      try {
+        const s = await (await fetch(MARKET_API + "/seller/" + r.sid)).json();
+        return { ...r, info: s };
+      } catch {
+        return { ...r, info: null };
+      }
+    }));
+
+    rankList.innerHTML = "";
+    sellers.forEach((s, i) => {
+      const top = i < 3 ? " top-" + (i + 1) : "";
+      const name = s.info?.name || ("Seller #" + s.sid);
+      const badge = s.info?.seller_verified ? "✔ Verified" : "New";
+      const rating = s.info ? (s.info.avg_rating + " ★ · " + s.info.review_count + " reviews") : "";
+      const sales = s.info?.total_sales || 0;
+      const div = document.createElement("div");
+      div.className = "rank-row glass" + top;
+      div.style.cssText = "display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; margin: 0.5rem; border-radius: var(--radius-lg); background: var(--bg-glass); border: 1px solid var(--border-subtle); transition: all var(--transition-fast);";
+      div.innerHTML = `
+        <div class="rank-badge" style="width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; font-weight: 800; background: var(--bg-tertiary); border: 2px solid var(--border-subtle); ${i < 3 ? 'border-color: var(--accent-' + ['primary','secondary','tertiary'][i] + '); color: var(--accent-' + ['primary','secondary','tertiary'][i] + '); box-shadow: var(--shadow-glow);' : ''}">${i + 1}</div>
+        <div class="rank-info" style="flex: 1; min-width: 0;">
+          <div class="name" style="font-weight: 700;">${escapeHtml(name)} <span style="color: var(--accent-tertiary); font-size: 0.8rem;">${escapeHtml(badge)}</span></div>
+          <div class="meta" style="font-size: 0.8rem; color: var(--text-secondary);">${escapeHtml(rating)} · ${s.count} listing(s)</div>
+        </div>
+        <div class="rank-right" style="text-align: right; font-weight: 700; color: var(--accent-gold);">${sales} <small style="display: block; font-weight: 400; opacity: 0.6; font-size: 0.7rem;">sales</small></div>
+      `;
+      rankList.appendChild(div);
+    });
+    initRevealScan();
+  } catch (err) {
+    rankList.innerHTML = '<div class="glass" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Leaderboard unavailable right now.</div>';
+  }
+}
+
+async function loadPopLeaderboard() {
+  const list = document.getElementById("popRankList");
+  try {
+    const res = await fetch(MARKET_API + "/popularity/leaderboard?limit=10");
+    const data = await res.json();
+    const rows = Array.isArray(data) ? data : [];
+    if (!rows.length) {
+      list.innerHTML = '<div class="glass" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Abhi tak koi popularity boost nahi hua — pehle bano! 🔥</div>';
+      return;
+    }
+    list.innerHTML = "";
+    rows.forEach((r, i) => {
+      const top = i < 3 ? " top-" + (i + 1) : "";
+      const div = document.createElement("div");
+      div.className = "rank-row glass" + top;
+      div.style.cssText = "display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; margin: 0.5rem; border-radius: var(--radius-lg); background: var(--bg-glass); border: 1px solid var(--border-subtle); transition: all var(--transition-fast);";
+      div.innerHTML = `
+        <div class="rank-badge" style="width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; font-weight: 800; background: var(--bg-tertiary); border: 2px solid var(--border-subtle); ${i < 3 ? 'border-color: var(--accent-' + ['primary','secondary','tertiary'][i] + '); color: var(--accent-' + ['primary','secondary','tertiary'][i] + '); box-shadow: var(--shadow-glow);' : ''}">${i + 1}</div>
+        <div class="rank-info" style="flex: 1; min-width: 0;">
+          <div class="name" style="font-weight: 700;">Player #${escapeHtml(r.user_id)}</div>
+          <div class="meta" style="font-size: 0.8rem; color: var(--text-secondary);">${escapeHtml(r.boosts || 0)} boost(s) · ⚡ popularity</div>
+        </div>
+        <div class="rank-right" style="text-align: right; font-weight: 700; color: var(--accent-secondary);"><span style="color: var(--accent-secondary);">⚡ ${escapeHtml(r.total_points)}</span> <small style="display: block; font-weight: 400; opacity: 0.6; font-size: 0.7rem;">points</small></div>
+      `;
+      list.appendChild(div);
+    });
+    initRevealScan();
+  } catch {
+    list.innerHTML = '<div class="glass" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Leaderboard unavailable right now.</div>';
+  }
+}
+
+function initRevealScan() {
+  if (!("IntersectionObserver" in window)) {
+    document.querySelectorAll(".rank-row").forEach(el => el.classList.add("visible"));
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add("visible"); en.target.style.transform = "translateX(0)"; en.target.style.opacity = "1"; io.unobserve(en.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".rank-row").forEach(el => {
+    el.style.opacity = "0";
+    el.style.transform = "translateX(-20px)";
+    el.style.transition = "all 0.5s ease";
+    io.observe(el);
+  });
+}
+
+loadStats();
+loadPopLeaderboard();
+
+const goBtn = document.getElementById("customBoostGo");
+if (goBtn) {
+  goBtn.onclick = () => {
+    const name = document.getElementById("customBoostName").value.trim();
+    const pts = document.getElementById("customBoostPoints").value.trim();
+    if (!name) { alert("Pehle boost ka naam likho"); document.getElementById("customBoostName").focus(); return; }
+    if (!pts || Number(pts) < 1) { alert("Pehle valid points likho"); document.getElementById("customBoostPoints").focus(); return; }
+    location.href = "sell.html?cat=popularity&points=" + encodeURIComponent(pts) + "&title=" + encodeURIComponent(name);
+  };
+}
+
+// Initialize auth buttons in navbar
+document.addEventListener('DOMContentLoaded', () => {
+  const authButtons = document.getElementById('authButtons');
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  
+  if (authButtons) {
+    if (token && user) {
+      authButtons.innerHTML = `
+        <div class="nav-dropdown" id="userDropdown">
+          <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span id="navUserName">${user.name || user.email}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+            <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+            <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+            <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+            <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+            <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+            <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+          </div>
+        </div>
+      `;
+      
+      // Dropdown toggle
+      const userMenuBtn = document.getElementById('userMenuBtn');
+      const userDropdownMenu = document.getElementById('userDropdownMenu');
+      const navLogoutBtn = document.getElementById('navLogoutBtn');
+      
+      if (userMenuBtn && userDropdownMenu) {
+        userMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = userDropdownMenu.style.opacity === '1';
+          userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+          userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+          userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+          userMenuBtn.setAttribute('aria-expanded', !isOpen);
+        });
+        
+        document.addEventListener('click', () => {
+          userDropdownMenu.style.opacity = '0';
+          userDropdownMenu.style.visibility = 'hidden';
+          userDropdownMenu.style.transform = 'translateY(-10px)';
+          userMenuBtn.setAttribute('aria-expanded', 'false');
+        });
+      }
+      
+      if (navLogoutBtn) {
+        navLogoutBtn.addEventListener('click', () => {
+          if (window.logout) window.logout();
+        });
+      }
+    } else {
+      authButtons.innerHTML = `
+        <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+        <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
+      `;
+    }
+    
+    // Mobile menu toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (navToggle && navLinks) {
+      navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  }
+});
+</script>
 </body>
 </html>

@@ -1,279 +1,615 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Admin Dashboard | BGMI Store</title>
-<link rel="stylesheet" href="assets/webfonts/poppins.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | BGMI Market</title>
+<meta name="description" content="Admin control panel for BGMI Market - Manage users, listings, KYC, payments, and platform settings.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
 <link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
+
+<!-- Theme Script (inline for instant theme apply) -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-  body { background:#0a0a12; color:#fff; min-height:100vh; }
-  .orb { position:fixed; border-radius:50%; filter:blur(100px); opacity:.3; z-index:0; animation:drift 20s infinite ease-in-out; }
-  .orb.a { width:440px; height:440px; background:#00ffc6; top:-140px; left:-140px; }
-  .orb.b { width:400px; height:400px; background:#8b5cf6; bottom:-120px; right:-120px; animation-delay:-8s; }
-  @keyframes drift { 0%,100%{transform:translate(0,0);} 50%{transform:translate(40px,-40px);} }
-
-  header {
-    position:sticky; top:0; z-index:10; backdrop-filter:blur(18px);
-    background:rgba(17,17,25,.75); border-bottom:1px solid #222;
-    padding:13px 25px; display:flex; justify-content:space-between; align-items:center;
-    gap:12px; flex-wrap:wrap;
+  .admin-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.25;
+    z-index: -1;
+    animation: adminDrift 25s infinite ease-in-out;
+    pointer-events: none;
   }
-  header h1 { font-size:21px; background:linear-gradient(90deg,#00ffc6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .head-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .who { font-size:.78rem; opacity:.75; text-align:right; }
-  .who b { color:#00ffc6; display:block; }
-  .btn { border:none; padding:8px 16px; border-radius:9px; cursor:pointer; font-weight:600; font-size:.82rem; transition:.3s; }
-  .btn.ghost { background:rgba(255,255,255,.07); color:#eee; border:1px solid #2a2a3a; }
-  .btn.ghost:hover { border-color:#00ffc6; color:#00ffc6; }
-  .btn.danger { background:crimson; color:#fff; }
-  .btn.danger:hover { box-shadow:0 0 16px rgba(220,20,60,.5); }
-
-  .wrap { position:relative; z-index:1; padding:22px; max-width:1280px; margin:0 auto; }
-  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:14px; }
-  .stat {
-    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
-    border-radius:16px; padding:15px; text-align:center; animation:pop .5s ease both;
+  .admin-orb.a { width: 500px; height: 500px; background: var(--accent-primary); top: -150px; left: -150px; }
+  .admin-orb.b { width: 450px; height: 450px; background: var(--accent-purple); bottom: -150px; right: -150px; animation-delay: -10s; }
+  .admin-orb.c { width: 300px; height: 300px; background: var(--accent-secondary); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -5s; opacity: 0.15; }
+  @keyframes adminDrift { 
+    0%,100% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+    25% { transform: translate(30px, -20px) scale(1.05); opacity: 0.3; }
+    50% { transform: translate(-20px, 30px) scale(0.95); opacity: 0.2; }
+    75% { transform: translate(10px, 40px) scale(1.02); opacity: 0.28; }
   }
-  .stat small { opacity:.55; font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; }
-  .stat .val { font-size:1.5rem; font-weight:700; margin-top:4px; color:#00ffc6; }
-  .stat.accent .val { color:#8b5cf6; }
-  .stat.warn .val { color:#ffd166; }
-  .stat.red .val { color:#f87171; }
 
-  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0; }
+  .stat-card {
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.5s ease backwards;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+  .stat-card:hover::before { opacity: 1; }
+  .stat-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+  }
+  .stat-card .val { font-size: 2rem; font-weight: 800; margin-top: 0.5rem; }
+  .stat-card.accent .val { color: var(--accent-purple); }
+  .stat-card.warn .val { color: var(--accent-gold); }
+  .stat-card.red .val { color: var(--accent-secondary); }
+  .stat-card.success .val { color: var(--accent-tertiary); }
+  .stat-card small { opacity: 0.55; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; display: block; }
+
   .tab {
-    padding:9px 16px; border-radius:12px; border:1px solid #2a2a3a; cursor:pointer;
-    background:rgba(255,255,255,.04); color:#ccc; font-weight:600; font-size:.85rem; transition:.3s;
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
   }
-  .tab:hover { border-color:#00ffc6; color:#00ffc6; }
-  .tab.active { background:linear-gradient(90deg,#00ffc6,#00b894); color:#062; border-color:transparent; }
+  .tab:hover { border-color: var(--border-primary); color: var(--accent-primary); background: var(--bg-card); }
+  .tab.active {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: var(--text-on-accent);
+    border-color: transparent;
+    box-shadow: var(--shadow-md), var(--shadow-glow);
+  }
 
-  .panel { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:18px; display:none; }
-  .panel.active { display:block; animation:fade .4s ease both; }
-  table { width:100%; border-collapse:collapse; font-size:.85rem; }
-  th { text-align:left; color:#00ffc6; opacity:.85; padding:10px 8px; border-bottom:1px solid #2a2a3a; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
-  td { padding:10px 8px; border-bottom:1px solid #1c1c28; vertical-align:middle; }
-  tr { transition:.2s; } tr:hover { background:rgba(255,255,255,.04); }
-  .mini { background:#16a34a; color:#fff; border:none; padding:4px 10px; border-radius:8px; cursor:pointer; font-size:.72rem; font-weight:600; transition:.2s; }
-  .mini.danger { background:crimson; }
-  .mini.warn { background:#d97706; }
-  .mini:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.4); }
-  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:.68rem; font-weight:700; }
-  .badge.green{background:rgba(34,197,94,.15);color:#4ade80}.badge.red{background:rgba(239,68,68,.15);color:#f87171}
-  .badge.yellow{background:rgba(255,183,3,.15);color:#ffd166}.badge.gray{background:rgba(148,163,184,.15);color:#cbd5e1}
-  .empty { opacity:.55; padding:18px 0; text-align:center; }
-  .ed-price { cursor:pointer; padding:2px 6px; border-radius:6px; transition:.2s; white-space:nowrap; }
-  .ed-price:hover { background:rgba(0,255,198,.12); box-shadow:0 0 0 1px rgba(0,255,198,.4); }
-  .price-edit { width:110px; padding:4px 8px; border-radius:7px; border:1px solid #00ffc6; background:#0a0a12; color:#fff; font-size:.82rem; outline:none; }
+  .panel {
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    display: none;
+    animation: fadeIn 0.35s ease both;
+  }
+  .panel.active { display: block; }
 
-  .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th { 
+    text-align: left; 
+    color: var(--accent-primary); 
+    opacity: 0.85; 
+    padding: 1rem 0.75rem; 
+    border-bottom: 1px solid var(--border-subtle); 
+    font-size: 0.6875rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.06em; 
+    white-space: nowrap;
+    background: rgba(0, 234, 255, 0.05);
+  }
+  td { padding: 1rem 0.75rem; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
+  tr { transition: all var(--transition-fast); }
+  tr:hover { background: rgba(255, 255, 255, 0.02); }
+  tr:hover td { border-color: var(--border-primary); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge.green { background: rgba(34, 197, 94, 0.15); color: var(--accent-tertiary); border: 1px solid rgba(34, 197, 94, 0.3); }
+  .badge.red { background: rgba(239, 68, 68, 0.15); color: var(--accent-secondary); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .badge.yellow { background: rgba(255, 183, 3, 0.15); color: var(--accent-gold); border: 1px solid rgba(255, 183, 3, 0.3); }
+  .badge.gray { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); border: 1px solid rgba(148, 163, 184, 0.3); }
+  .badge.purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+  .badge.blue { background: rgba(0, 234, 255, 0.15); color: var(--accent-primary); border: 1px solid rgba(0, 234, 255, 0.3); }
+
+  .btn-mini {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.75rem;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+  }
+  .btn-mini:hover { border-color: var(--border-primary); background: var(--bg-hover); transform: translateY(-1px); }
+  .btn-mini.danger:hover { border-color: var(--accent-secondary); background: rgba(255, 120, 0, 0.1); }
+  .btn-mini.warn:hover { border-color: var(--accent-gold); background: rgba(255, 183, 3, 0.1); }
+  .btn-mini.success:hover { border-color: var(--accent-tertiary); background: rgba(124, 255, 139, 0.1); }
+
   .toolbar input, .toolbar select {
-    background:rgba(255,255,255,.06); border:1px solid #2a2a3a; color:#fff;
-    padding:8px 14px; border-radius:10px; font-size:.85rem; outline:none; min-width:220px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    outline: none;
+    min-width: 220px;
+    transition: all var(--transition-fast);
   }
-  .toolbar input:focus { border-color:#00ffc6; }
-  .toolbar .spacer { flex:1; }
+  .toolbar input:focus, .toolbar select:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(0, 234, 255, 0.15); }
 
-  .feed { list-style:none; }
-  .feed li { display:flex; gap:12px; align-items:flex-start; padding:11px 8px; border-bottom:1px solid #1c1c28; font-size:.85rem; }
-  .feed .dot { width:10px; height:10px; border-radius:50%; margin-top:5px; flex:none; }
-  .feed .t { color:#00ffc6; font-weight:600; }
-  .feed .meta { opacity:.5; font-size:.72rem; }
-  .feed .badge { margin-left:auto; }
+  .feed { list-style: none; }
+  .feed li { 
+    display: flex; 
+    gap: 1rem; 
+    align-items: flex-start; 
+    padding: 1rem 0.5rem; 
+    border-bottom: 1px solid var(--border-subtle); 
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+  }
+  .feed li:hover { background: rgba(255, 255, 255, 0.02); padding-left: 0.5rem; }
+  .feed .dot { 
+    width: 10px; height: 10px; 
+    border-radius: 50%; 
+    margin-top: 0.5rem; 
+    flex: none; 
+    box-shadow: 0 0 12px currentColor;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .feed .t { color: var(--accent-primary); font-weight: 600; }
+  .feed .meta { opacity: 0.5; font-size: 0.7rem; }
+  .feed .badge { margin-left: auto; flex-shrink: 0; }
 
-  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
-  .kpi { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px 18px; }
-  .kpi b { font-size:1.3rem; color:#00ffc6; }
-  .kpi small { opacity:.55; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:4px; }
+  .kpi {
+    background: var(--bg-glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    transition: all var(--transition-base);
+  }
+  .kpi:hover { border-color: var(--border-primary); box-shadow: var(--shadow-md); }
+  .kpi b { font-size: 1.5rem; color: var(--accent-primary); }
+  .kpi small { opacity: 0.55; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 0.5rem; }
 
-  #toasts { position:fixed; right:18px; bottom:18px; z-index:99; display:flex; flex-direction:column; gap:10px; }
   .toast {
-    padding:12px 18px; border-radius:12px; background:rgba(20,20,30,.95); border:1px solid #333;
-    color:#fff; font-size:.85rem; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,.5);
-    animation:slideIn .3s ease both; max-width:340px;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(25px);
+    animation: toastIn 0.4s var(--transition-bounce) forwards;
+    max-width: 360px;
   }
-  .toast.ok { border-color:#22c55e; }
-  .toast.err { border-color:#ef4444; }
-  @keyframes slideIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:none} }
+  .toast.ok { border-left: 4px solid var(--accent-tertiary); }
+  .toast.err { border-left: 4px solid var(--accent-secondary); }
+  .toast.warn { border-left: 4px solid var(--accent-gold); }
 
-  @keyframes pop { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:none} }
-  @keyframes fade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
-  @media (max-width:900px){ .stats{grid-template-columns:1fr 1fr} .grid2{grid-template-columns:1fr} }
-  @media (max-width:520px){ .stats{grid-template-columns:1fr} .wrap{padding:14px} .toolbar input{min-width:100%} }
+  @keyframes toastIn { from { transform: translateX(120%) rotate(2deg); opacity: 0; } to { transform: translateX(0) rotate(0); opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } }
+
+  .price-edit {
+    width: 120px;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--accent-primary);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    outline: none;
+  }
+  .price-edit:focus { box-shadow: 0 0 0 3px rgba(0, 234, 255, 0.2); }
+
+  .ed-price {
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    background: rgba(0, 234, 255, 0.1);
+    color: var(--accent-primary);
+  }
+  .ed-price:hover { background: rgba(0, 234, 255, 0.2); box-shadow: 0 0 12px rgba(0, 234, 255, 0.3); }
+
+  @media (max-width: 1024px) { 
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+    .tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 0.5rem; }
+  }
+  @media (max-width: 640px) { 
+    .stats { grid-template-columns: 1fr; }
+    .wrap { padding: 1rem; }
+    .toolbar input, .toolbar select { min-width: 100%; }
+    .tab { padding: 0.625rem 1rem; font-size: 0.8125rem; }
+  }
 </style>
 </head>
 <body>
-<div class="orb a"></div><div class="orb b"></div>
+<!-- Particle Background -->
+<div class="particles" id="particles" aria-hidden="true"></div>
 
-<header>
-  <h1><span class="wiggle">👑</span> <span class="anim-gradient glitch" data-text="Admin Dashboard">Admin Dashboard</span></h1>
-  <div class="head-right">
-    <div class="who"><b id="whoEmail">admin</b>Super Admin</div>
-    <button class="btn ghost" onclick="refreshAll()">↻ Refresh</button>
-    <button class="btn danger" onclick="logout()">Logout</button>
-  </div>
-</header>
+<!-- Admin Background Orbs -->
+<div class="admin-orb a" aria-hidden="true"></div>
+<div class="admin-orb b" aria-hidden="true"></div>
+<div class="admin-orb c" aria-hidden="true"></div>
 
-<div class="marquee-wrap">
-  <div class="marquee-inner">
-    <span>👑 <b>ADMIN</b> Control Panel</span>
-    <span>🛡️ <b>SECURE</b> Access Only</span>
-    <span>📊 Live <b>MONITORING</b></span>
-    <span>🔥 All Systems <b>OPERATIONAL</b></span>
-  </div>
-</div>
-
-<div class="wrap">
-  <div class="stats">
-    <div class="stat"><small>Total Users</small><div class="val" id="stUsers">—</div></div>
-    <div class="stat"><small>Registered Today</small><div class="val" id="stToday">—</div></div>
-    <div class="stat red"><small>Banned</small><div class="val" id="stBanned">—</div></div>
-    <div class="stat accent"><small>Total Listings</small><div class="val" id="stListings">—</div></div>
-    <div class="stat warn"><small>Pending KYC</small><div class="val" id="stKyc">—</div></div>
-    <div class="stat warn"><small>Pending Payouts</small><div class="val" id="stWithdraw">—</div></div>
-    <div class="stat"><small>Open Chats</small><div class="val" id="stChats">—</div></div>
-    <div class="stat"><small>Admin Fees (₹)</small><div class="val" id="stEarnings">—</div></div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="overview">Overview</button>
-    <button class="tab" data-tab="users">Users</button>
-    <button class="tab" data-tab="listings">Listings</button>
-    <button class="tab" data-tab="kyc">KYC Queue</button>
-    <button class="tab" data-tab="sellers">Seller Verify</button>
-    <button class="tab" data-tab="payments">Payments</button>
-    <button class="tab" data-tab="withdrawals">Withdrawals</button>
-    <button class="tab" data-tab="chats">Chats</button>
-    <button class="tab" data-tab="activity">Activity</button>
-    <button class="tab" data-tab="settings">Settings</button>
-  </div>
-
-  <div class="panel active" id="tab-overview">
-    <div class="grid2">
-      <div class="kpi"><small>Total Platform Volume (paid)</small><b id="kVolume">₹0</b></div>
-      <div class="kpi"><small>Released to Sellers</small><b id="kReleased">₹0</b></div>
-      <div class="kpi"><small>Pending Payment Orders</small><b id="kPendingPay">0</b></div>
-      <div class="kpi"><small>Pending Withdrawal Amount</small><b id="kPendingWd">₹0</b></div>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
+    <span class="nav-brand-icon" aria-hidden="true">👑</span>
+    <span>Admin Dashboard</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks" style="gap: 1rem;">
+    <div class="who" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 0.75rem; opacity: 0.75; text-align: right;">
+      <span id="whoEmail" style="color: var(--accent-primary); font-weight: 700;">admin</span>
+      <span>Super Admin</span>
     </div>
-    <h3 style="margin-bottom:12px;font-size:.95rem;color:#8b5cf6;">Recent Activity</h3>
-    <ul class="feed" id="activityFeed"><li class="empty">Loading…</li></ul>
+    <button class="btn btn-ghost btn-sm" onclick="refreshAll()">↻ Refresh</button>
+    <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
   </div>
+</nav>
 
-  <div class="panel" id="tab-users">
-    <div class="toolbar">
-      <input id="userSearch" placeholder="🔍 Search email or username…" oninput="loadUsers()" />
-      <select id="userRoleFilter" onchange="loadUsers()">
-        <option value="">All roles</option><option value="admin">Admin</option>
-        <option value="seller">Seller</option><option value="user">User</option>
-      </select>
-      <div class="spacer"></div>
-      <button class="btn ghost" onclick="exportUsers()">⬇ Export CSV</button>
-    </div>
-    <table>
-      <thead><tr><th>ID</th><th>Email</th><th>Username</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-      <tbody id="usersBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="panel" id="tab-listings">
-    <div class="toolbar">
-      <input id="listingSearch" placeholder="🔍 Search title or UID…" oninput="loadListings()" />
-      <select id="listingStatusFilter" onchange="loadListings()">
-        <option value="">All statuses</option><option value="available">Available</option>
-        <option value="hidden">Hidden</option><option value="sold">Sold</option>
-      </select>
-      <div class="spacer"></div>
-      <button class="btn ghost" onclick="exportListings()">⬇ Export CSV</button>
-    </div>
-    <table>
-      <thead><tr><th>ID</th><th>Title</th><th>UID</th><th>Seller</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody id="listingsBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="panel" id="tab-kyc">
-    <table>
-      <thead><tr><th>Doc ID</th><th>User</th><th>Type</th><th>Status</th><th>Remarks</th><th>Actions</th></tr></thead>
-      <tbody id="kycBody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="panel" id="tab-sellers">
-    <div class="toolbar">
-      <select id="sellerStatusFilter" onchange="loadSellerVerifications()">
-        <option value="">All statuses</option><option value="pending">Pending</option>
-        <option value="approved">Approved</option><option value="rejected">Rejected</option>
-      </select>
-      <div class="spacer"></div>
-      <span style="font-size:.8rem;color:#94a3b8">Badges: <b style="color:#00ffc6">trusted</b> / <b style="color:#ffd166">gold</b> / <b style="color:#60a5fa">diamond</b></span>
-    </div>
-    <table>
-      <thead><tr><th>ID</th><th>User</th><th>Requested</th><th>Status</th><th>Badge</th><th>Reason</th><th>Reviewed</th><th>Actions</th></tr></thead>
-      <tbody id="sellersBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="panel" id="tab-payments">
-    <div class="toolbar"><div class="spacer"></div><button class="btn ghost" onclick="exportPayments()">⬇ Export CSV</button></div>
-    <table>
-      <thead><tr><th>Order</th><th>Buyer</th><th>Seller</th><th>Total</th><th>Fee</th><th>Seller Gets</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody id="paymentsBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="panel" id="tab-withdrawals">
-    <div class="toolbar">
-      <select id="wdFilter" onchange="loadWithdrawals()">
-        <option value="">All statuses</option><option value="pending">Pending</option>
-        <option value="processed">Processed</option><option value="rejected">Rejected</option>
-      </select>
-      <div class="spacer"></div>
-      <button class="btn ghost" onclick="exportWithdrawals()">⬇ Export CSV</button>
-    </div>
-    <table>
-      <thead><tr><th>ID</th><th>Seller</th><th>UPI</th><th>Amount</th><th>Status</th><th>Requested</th><th>Actions</th></tr></thead>
-      <tbody id="wdBody"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="panel" id="tab-chats">
-    <table>
-      <thead><tr><th>Room</th><th>Order</th><th>Buyer</th><th>Seller</th><th>Intent</th><th>Status</th><th>Msgs</th><th>Actions</th></tr></thead>
-      <tbody id="chatsBody"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="panel" id="tab-activity">
-    <ul class="feed" id="activityFeedFull"><li class="empty">Loading…</li></ul>
-  </div>
-
-  <div class="panel" id="tab-settings">
-    <h3 style="margin-bottom:14px;font-size:.95rem;color:#8b5cf6;">Platform UPI (admin fallback payee)</h3>
-    <p style="font-size:.82rem;opacity:.7;margin-bottom:16px;max-width:640px;line-height:1.6">
-      Jab seller ne apna UPI set nahi kiya hota, tab buyers ko ye platform UPI ID pay karni hoti hai
-      (escrow / admin fee). Ye settings DB me save hoti hain aur turant effect me aati hain.
-    </p>
-    <div class="settings-form" style="max-width:460px;display:flex;flex-direction:column;gap:14px;">
-      <div>
-        <label style="display:block;font-size:.8rem;opacity:.75;margin-bottom:6px">Platform UPI ID</label>
-        <input id="setUpiId" type="text" placeholder="yourname@upi" style="background:rgba(255,255,255,.06);border:1px solid #2a2a3a;color:#fff;padding:11px 14px;border-radius:10px;font-size:.9rem;outline:none;width:100%;box-sizing:border-box" />
+<main class="admin-page" role="main" style="flex: 1; padding: 2rem 1rem 4rem;">
+  <div class="wrap" style="position: relative; z-index: 1; width: 100%; max-width: 1400px; margin: 0 auto;">
+    
+    <!-- Marquee -->
+    <div class="marquee-wrap" style="margin-bottom: 2rem;">
+      <div class="marquee-inner">
+        <span>👑 <b>ADMIN</b> Control Panel</span>
+        <span>🛡️ <b>SECURE</b> Access Only</span>
+        <span>📊 Live <b>MONITORING</b></span>
+        <span>🔥 All Systems <b>OPERATIONAL</b></span>
       </div>
-      <div>
-        <label style="display:block;font-size:.8rem;opacity:.75;margin-bottom:6px">UPI Payee Name (as shown in UPI app)</label>
-        <input id="setUpiName" type="text" placeholder="BGMI Market" style="background:rgba(255,255,255,.06);border:1px solid #2a2a3a;color:#fff;padding:11px 14px;border-radius:10px;font-size:.9rem;outline:none;width:100%;box-sizing:border-box" />
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+      <div class="stat-card"><small>Total Users</small><div class="val" id="stUsers">—</div></div>
+      <div class="stat-card"><small>Registered Today</small><div class="val" id="stToday">—</div></div>
+      <div class="stat-card red"><small>Banned Users</small><div class="val" id="stBanned">—</div></div>
+      <div class="stat-card"><small>Total Listings</small><div class="val" id="stListings">—</div></div>
+      <div class="stat-card warn"><small>Pending KYC</small><div class="val" id="stKyc">—</div></div>
+      <div class="stat-card warn"><small>Pending Payouts</small><div class="val" id="stWithdraw">—</div></div>
+      <div class="stat-card"><small>Open Chats</small><div class="val" id="stChats">—</div></div>
+      <div class="stat-card accent"><small>Admin Fees (₹)</small><div class="val" id="stEarnings">—</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem;" role="tablist">
+      <button class="tab active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+      <button class="tab" data-tab="users" role="tab" aria-selected="false">Users</button>
+      <button class="tab" data-tab="listings" role="tab" aria-selected="false">Listings</button>
+      <button class="tab" data-tab="kyc" role="tab" aria-selected="false">KYC Queue</button>
+      <button class="tab" data-tab="sellers" role="tab" aria-selected="false">Seller Verify</button>
+      <button class="tab" data-tab="payments" role="tab" aria-selected="false">Payments</button>
+      <button class="tab" data-tab="withdrawals" role="tab" aria-selected="false">Withdrawals</button>
+      <button class="tab" data-tab="chats" role="tab" aria-selected="false">Chats</button>
+      <button class="tab" data-tab="activity" role="tab" aria-selected="false">Activity</button>
+      <button class="tab" data-tab="settings" role="tab" aria-selected="false">Settings</button>
+    </div>
+
+    <!-- Overview Panel -->
+    <div class="panel active" id="tab-overview" role="tabpanel">
+      <div class="grid2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="kpi"><small>Total Platform Volume (paid)</small><b id="kVolume">₹0</b></div>
+        <div class="kpi"><small>Released to Sellers</small><b id="kReleased">₹0</b></div>
+        <div class="kpi"><small>Pending Payment Orders</small><b id="kPendingPay">0</b></div>
+        <div class="kpi"><small>Pending Withdrawal Amount</small><b id="kPendingWd">₹0</b></div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn ghost" style="flex:1;min-height:44px" onclick="saveSettings()">💾 Save Settings</button>
-        <button class="btn ghost" style="flex:1;min-height:44px" onclick="loadSettings()">↻ Reload</button>
+      
+      <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--accent-purple);">Recent Activity</h3>
+      <ul class="feed" id="activityFeed">
+        <li class="glass" style="padding: 2rem; text-align: center; color: var(--text-secondary);">Loading…</li>
+      </ul>
+    </div>
+
+    <!-- Users Panel -->
+    <div class="panel" id="tab-users" role="tabpanel">
+      <div class="toolbar" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <input id="userSearch" placeholder="🔍 Search email or username…" oninput="loadUsers()" style="flex: 1; min-width: 250px;">
+        <select id="userRoleFilter" onchange="loadUsers()" style="min-width: 160px;">
+          <option value="">All roles</option>
+          <option value="admin">Admin</option>
+          <option value="seller">Seller</option>
+          <option value="user">User</option>
+        </select>
+        <div style="flex: 1;"></div>
+        <button class="btn btn-ghost btn-ripple" onclick="exportUsers()">⬇ Export CSV</button>
       </div>
-      <div id="settingsStatus" style="font-size:.8rem;opacity:.75"></div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Email</th><th>Username</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody">
+            <tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Listings Panel -->
+    <div class="panel" id="tab-listings" role="tabpanel">
+      <div class="toolbar" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <input id="listingSearch" placeholder="🔍 Search title or UID…" oninput="loadListings()" style="flex: 1; min-width: 250px;">
+        <select id="listingStatusFilter" onchange="loadListings()" style="min-width: 180px;">
+          <option value="">All statuses</option>
+          <option value="available">Available</option>
+          <option value="hidden">Hidden</option>
+          <option value="sold">Sold</option>
+        </select>
+        <div style="flex: 1;"></div>
+        <button class="btn btn-ghost btn-ripple" onclick="exportListings()">⬇ Export CSV</button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Title</th><th>UID</th><th>Seller</th><th>Price</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="listingsBody">
+            <tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- KYC Panel -->
+    <div class="panel" id="tab-kyc" role="tabpanel">
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Doc ID</th><th>User</th><th>Type</th><th>Status</th><th>Remarks</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="kycBody">
+            <tr><td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Seller Verifications Panel -->
+    <div class="panel" id="tab-sellers" role="tabpanel">
+      <div class="toolbar" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <select id="sellerStatusFilter" onchange="loadSellerVerifications()" style="min-width: 180px;">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <div style="flex: 1;"></div>
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">
+          Badges: 
+          <b style="color: var(--accent-tertiary);">trusted</b> / 
+          <b style="color: var(--accent-gold);">gold</b> / 
+          <b style="color: var(--accent-primary);">diamond</b>
+        </span>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>User</th><th>Requested</th><th>Status</th><th>Badge</th><th>Reason</th><th>Reviewed</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sellersBody">
+            <tr><td colspan="8" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payments Panel -->
+    <div class="panel" id="tab-payments" role="tabpanel">
+      <div class="toolbar" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <div style="flex: 1;"></div>
+        <button class="btn btn-ghost btn-ripple" onclick="exportPayments()">⬇ Export CSV</button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th><th>Buyer</th><th>Seller</th><th>Total</th><th>Fee</th><th>Seller Gets</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsBody">
+            <tr><td colspan="8" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Withdrawals Panel -->
+    <div class="panel" id="tab-withdrawals" role="tabpanel">
+      <div class="toolbar" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <select id="wdFilter" onchange="loadWithdrawals()" style="min-width: 180px;">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="processed">Processed</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <div style="flex: 1;"></div>
+        <button class="btn btn-ghost btn-ripple" onclick="exportWithdrawals()">⬇ Export CSV</button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Seller</th><th>UPI</th><th>Amount</th><th>Status</th><th>Requested</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="wdBody">
+            <tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Chats Panel -->
+    <div class="panel" id="tab-chats" role="tabpanel">
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Room</th><th>Order</th><th>Buyer</th><th>Seller</th><th>Intent</th><th>Status</th><th>Msgs</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="chatsBody">
+            <tr><td colspan="8" style="padding: 3rem; text-align: center; color: var(--text-secondary);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Activity Panel -->
+    <div class="panel" id="tab-activity" role="tabpanel">
+      <ul class="feed" id="activityFeedFull">
+        <li class="glass" style="padding: 2rem; text-align: center; color: var(--text-secondary);">Loading…</li>
+      </ul>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="panel" id="tab-settings" role="tabpanel">
+      <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--accent-purple);">Platform UPI (admin fallback payee)</h3>
+      <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 1.5rem; max-width: 640px; line-height: 1.7;">
+        When seller hasn't set their UPI, buyers pay this platform UPI ID (escrow / admin fee). 
+        Settings saved to DB and take effect immediately.
+      </p>
+      <div class="settings-form" style="max-width: 480px; display: flex; flex-direction: column; gap: 1.25rem;">
+        <div class="form-group">
+          <label class="label" for="setUpiId">Platform UPI ID</label>
+          <input id="setUpiId" type="text" class="input" placeholder="yourname@upi">
+        </div>
+        <div class="form-group">
+          <label class="label" for="setUpiName">UPI Payee Name (as shown in UPI app)</label>
+          <input id="setUpiName" type="text" class="input" placeholder="BGMI Market">
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-lg btn-ripple" style="flex: 1; min-height: 48px;" onclick="saveSettings()">💾 Save Settings</button>
+          <button class="btn btn-ghost btn-lg btn-ripple" style="flex: 1; min-height: 48px;" onclick="loadSettings()">↻ Reload</button>
+        </div>
+        <div id="settingsStatus" style="font-size: 0.875rem; opacity: 0.75; min-height: 1.5rem;"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Toast Container -->
+<div id="toasts" class="toast-container" style="position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem;" aria-live="polite"></div>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo" style="margin-top: auto;">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
     </div>
   </div>
-</div>
+</footer>
 
-<div id="toasts"></div>
+<!-- Scripts -->
+<script src="js/theme.js"></script>
+<script src="assets/effects.js" defer></script>
 
 <script>
 const GATEWAY = "https://bgmi-gateway.bgmi-gateway.workers.dev";
@@ -296,26 +632,31 @@ async function api(path, opts = {}) {
 }
 
 const fmt = n => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
 const statusBadge = s => {
-  const map = { available:"green", active:"green", approved:"green", paid:"green", released:"green", processed:"green", submitted:"yellow", pending:"yellow", requested:"yellow", half_paid:"yellow", created:"yellow", hidden:"red", banned:"red", rejected:"red", closed:"red", sold:"gray" };
+  const map = { 
+    available:"green", active:"green", approved:"green", paid:"green", released:"green", processed:"green", 
+    submitted:"yellow", pending:"yellow", requested:"yellow", half_paid:"yellow", created:"yellow", 
+    hidden:"red", banned:"red", rejected:"red", closed:"red", sold:"gray" 
+  };
   const c = map[s] || "gray";
   return `<span class="badge ${c}">${s || "—"}</span>`;
 };
 
-/* ---- TOASTS ---- */
 function toast(msg, type = "ok") {
   const el = document.createElement("div");
-  el.className = "toast " + (type === "err" ? "err" : "ok");
+  el.className = "toast " + (type === "err" ? "err" : type === "warn" ? "warn" : "ok");
   el.textContent = msg;
   document.getElementById("toasts").appendChild(el);
   setTimeout(() => el.remove(), 3500);
 }
 
-/* ---- TABS ---- */
+/* TABS */
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
-  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(x => { x.classList.remove("active"); x.setAttribute("aria-selected", "false"); });
   document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
   t.classList.add("active");
+  t.setAttribute("aria-selected", "true");
   document.getElementById("tab-" + t.dataset.tab).classList.add("active");
   if (t.dataset.tab === "overview") loadOverview();
   if (t.dataset.tab === "activity") loadActivity(true);
@@ -324,18 +665,21 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   if (t.dataset.tab === "settings") loadSettings();
 });
 
-function refreshAll() { loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); loadSellerVerifications(); toast("Dashboard refreshed"); }
+function refreshAll() { 
+  loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); loadSellerVerifications(); 
+  toast("Dashboard refreshed"); 
+}
 
-/* ---- SETTINGS ---- */
+/* SETTINGS */
 async function loadSettings() {
   const status = document.getElementById("settingsStatus");
   const { ok, data } = await api("wallet/admin/settings");
   if (ok && data) {
     document.getElementById("setUpiId").value = data.admin_upi_id || "";
     document.getElementById("setUpiName").value = data.admin_upi_name || "";
-    if (status) status.textContent = "Loaded. Ye UPI buyers ke paas fallback ke roop me jayega.";
+    if (status) { status.textContent = "Loaded. This UPI will be used as fallback for buyers."; status.style.color = "var(--accent-tertiary)"; }
   } else {
-    if (status) status.textContent = "Failed to load settings: " + ((data && data.error) || "unknown error");
+    if (status) { status.textContent = "Failed to load settings: " + ((data && data.error) || "unknown error"); status.style.color = "var(--accent-secondary)"; }
   }
 }
 
@@ -345,7 +689,7 @@ async function saveSettings() {
   if (!upi_id) return toast("Platform UPI ID required", "err");
   if (!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(upi_id)) return toast("Invalid UPI ID (use name@bank)", "err");
 
-  const btn = document.querySelector('#tab-settings button.btn');
+  const btn = document.querySelector('#tab-settings button.btn-primary');
   btn.disabled = true; btn.textContent = "Saving…";
   try {
     const { ok, data } = await api("wallet/admin/settings", {
@@ -354,14 +698,16 @@ async function saveSettings() {
     });
     if (!ok) throw new Error((data && data.message) || (data && data.error) || "Save failed");
     toast("Settings saved — " + (data.admin_upi_id || upi_id));
+    if (status) { status.textContent = "Settings saved successfully!"; status.style.color = "var(--accent-tertiary)"; }
   } catch (err) {
     toast(err.message, "err");
+    if (status) { status.textContent = err.message; status.style.color = "var(--accent-secondary)"; }
   } finally {
     btn.disabled = false; btn.textContent = "💾 Save Settings";
   }
 }
 
-/* ---- OVERVIEW ---- */
+/* OVERVIEW */
 async function loadOverview() {
   const [s, e, l, k, c] = await Promise.all([
     api("auth/admin/stats"),
@@ -390,27 +736,31 @@ async function loadOverview() {
 }
 
 function renderFeed(el, list) {
-  if (!list || !list.length) return el.innerHTML = `<li class="empty">No recent activity</li>`;
+  if (!list || !list.length) return el.innerHTML = `<li class="glass" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No recent activity</li>`;
   el.innerHTML = list.map(a => {
     const { icon, color, label } = activityMeta(a.type);
-    return `<li><span class="dot" style="background:${color}"></span>
-      <div><div><span class="t">${label}</span> <span class="meta">user #${esc(a.user_id)}</span></div>
-      <div class="meta">${esc(a.details || "")}</div></div>
-      <span class="badge gray">${esc((a.timestamp||"").slice(0,16).replace("T"," "))}</span></li>`;
+    return `<li>
+      <span class="dot" style="background:${color}"></span>
+      <div>
+        <div><span class="t">${label}</span> <span class="meta">user #${esc(a.user_id)}</span></div>
+        <div class="meta">${esc(a.details || "")}</div>
+      </div>
+      <span class="badge gray">${esc((a.timestamp||"").slice(0,16).replace("T"," "))}</span>
+    </li>`;
   }).join("");
 }
 
 function activityMeta(type) {
   const map = {
-    login_success: { label:"🔓 User logged in", color:"#22c55e" },
-    login_failed: { label:"⚠️ Failed login", color:"#f87171" },
-    register: { label:"✨ New user registered", color:"#00ffc6" },
-    admin_user_update: { label:"🛠 Admin updated user", color:"#8b5cf6" },
-    password_reset: { label:"🔑 Password reset", color:"#ffd166" },
-    profile_update: { label:"✏️ Profile updated", color:"#60a5fa" },
-    otp_request: { label:"📩 OTP requested", color:"#fb923c" }
+    login_success: { label:"🔓 User logged in", color:"var(--accent-tertiary)" },
+    login_failed: { label:"⚠️ Failed login", color:"var(--accent-secondary)" },
+    register: { label:"✨ New user registered", color:"var(--accent-primary)" },
+    admin_user_update: { label:"🛠 Admin updated user", color:"var(--accent-purple)" },
+    password_reset: { label:"🔑 Password reset", color:"var(--accent-gold)" },
+    profile_update: { label:"✏️ Profile updated", color:"var(--accent-primary)" },
+    otp_request: { label:"📩 OTP requested", color:"var(--accent-secondary)" }
   };
-  return map[type] || { label: type || "activity", color: "#94a3b8" };
+  return map[type] || { label: type || "activity", color: "var(--text-muted)" };
 }
 
 async function loadActivity(full = false) {
@@ -418,15 +768,15 @@ async function loadActivity(full = false) {
   if (ok) renderFeed(document.getElementById(full ? "activityFeedFull" : "activityFeed"), data.recent_activity || []);
 }
 
-/* ---- USERS ---- */
+/* USERS */
 async function loadUsers() {
   const q = document.getElementById("userSearch").value.trim();
   const roleF = document.getElementById("userRoleFilter").value;
   const { ok, data } = await api(`auth/admin/users?limit=200&q=${encodeURIComponent(q)}`);
   const body = document.getElementById("usersBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!ok) return body.innerHTML = `<tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
   const rows = (data || []).filter(u => !roleF || u.role === roleF);
-  if (!rows.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No users found</td></tr>`;
+  if (!rows.length) return body.innerHTML = `<tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No users found</td></tr>`;
   body.innerHTML = rows.map(u => `
     <tr>
       <td>${u.id}</td>
@@ -435,10 +785,10 @@ async function loadUsers() {
       <td>${u.role || "user"}</td>
       <td>${statusBadge(u.status)}</td>
       <td>${esc((u.created_at||"").slice(0,10))}</td>
-      <td style="white-space:nowrap">
-        ${u.role !== "admin" ? `<button class="mini" onclick="setRole(${u.id},'admin')">Make Admin</button>` : `<button class="mini warn" onclick="setRole(${u.id},'user')">Demote</button>`}
-        ${u.status !== "banned" ? `<button class="mini danger" onclick="setStatus(${u.id},'banned')">Ban</button>` : `<button class="mini" onclick="setStatus(${u.id},'active')">Unban</button>`}
-        <button class="mini danger" onclick="delUser(${u.id})">Delete</button>
+      <td style="white-space:nowrap; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        ${u.role !== "admin" ? `<button class="btn-mini" onclick="setRole(${u.id},'admin')">Make Admin</button>` : `<button class="btn-mini warn" onclick="setRole(${u.id},'user')">Demote</button>`}
+        ${u.status !== "banned" ? `<button class="btn-mini danger" onclick="setStatus(${u.id},'banned')">Ban</button>` : `<button class="btn-mini success" onclick="setStatus(${u.id},'active')">Unban</button>`}
+        <button class="btn-mini danger" onclick="delUser(${u.id})">Delete</button>
       </td>
     </tr>`).join("");
 }
@@ -463,18 +813,18 @@ function exportUsers() {
     (data||[]).map(u => [u.id, u.email, u.username, u.role, u.status, u.created_at])));
 }
 
-/* ---- LISTINGS ---- */
+/* LISTINGS */
 let _listings = [];
 async function loadListings() {
   const q = document.getElementById("listingSearch").value.trim().toLowerCase();
   const st = document.getElementById("listingStatusFilter").value;
   const { ok, data } = await api("market/admin/listings");
   const body = document.getElementById("listingsBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!ok) return body.innerHTML = `<tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
   _listings = (data || []).filter(l =>
     (!st || l.status === st) &&
     (!q || String(l.title).toLowerCase().includes(q) || String(l.uid).toLowerCase().includes(q)));
-  if (!_listings.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No listings found</td></tr>`;
+  if (!_listings.length) return body.innerHTML = `<tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No listings found</td></tr>`;
   body.innerHTML = _listings.map(l => `
     <tr>
       <td>${l.id}</td>
@@ -483,11 +833,11 @@ async function loadListings() {
       <td>${esc(l.seller_name || l.seller_id)}</td>
       <td><span class="ed-price" title="Click to edit price" onclick="editPrice(${l.id}, this)">✏️ ${fmt(l.price)}</span></td>
       <td>${statusBadge(l.status)}</td>
-      <td style="white-space:nowrap">
-        <button class="mini" onclick="moderate(${l.id},'available')">Show</button>
-        <button class="mini warn" onclick="moderate(${l.id},'hidden')">Hide</button>
-        <button class="mini" onclick="moderate(${l.id},'sold')">Sold</button>
-        <button class="mini danger" onclick="delListing(${l.id})">Delete</button>
+      <td style="white-space:nowrap; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="btn-mini success" onclick="moderate(${l.id},'available')">Show</button>
+        <button class="btn-mini warn" onclick="moderate(${l.id},'hidden')">Hide</button>
+        <button class="btn-mini" onclick="moderate(${l.id},'sold')">Mark Sold</button>
+        <button class="btn-mini danger" onclick="delListing(${l.id})">Delete</button>
       </td>
     </tr>`).join("");
 }
@@ -524,22 +874,22 @@ function exportListings() {
     _listings.map(l => [l.id, l.title, l.uid, l.seller_id, l.price, l.level, l.highest_rank, l.status]));
 }
 
-/* ---- KYC ---- */
+/* KYC */
 async function loadKyc() {
   const { ok, data } = await api("verify/admin/queue");
   const body = document.getElementById("kycBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="6" class="empty">Failed: ${data.error}</td></tr>`;
-  if (!data.length) return body.innerHTML = `<tr><td colspan="6" class="empty">No pending KYC</td></tr>`;
+  if (!ok) return body.innerHTML = `<tr><td colspan="6" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No pending KYC</td></tr>`;
   body.innerHTML = data.map(k => `
     <tr>
       <td>${k.id}</td>
-      <td>${esc(k.name || k.user_id)} <small>(${esc(k.user_id)})</small></td>
+      <td>${esc(k.name || k.user_id)} <small style="opacity:0.5">(${esc(k.user_id)})</small></td>
       <td>${esc(k.document_type || "")}</td>
       <td>${statusBadge(k.verification_status)}</td>
       <td>${esc(k.remarks || "")}</td>
-      <td>
-        <button class="mini" onclick="kycDecision(${k.id},'approved')">Approve</button>
-        <button class="mini danger" onclick="kycDecision(${k.id},'rejected')">Reject</button>
+      <td style="white-space:nowrap; display: flex; gap: 0.5rem;">
+        <button class="btn-mini success" onclick="kycDecision(${k.id},'approved')">Approve</button>
+        <button class="btn-mini danger" onclick="kycDecision(${k.id},'rejected')">Reject</button>
       </td>
     </tr>`).join("");
 }
@@ -549,14 +899,14 @@ async function kycDecision(id, decision) {
   toast(ok ? "KYC " + decision : "Failed", ok ? "ok" : "err"); loadKyc(); loadOverview();
 }
 
-/* ---- SELLER VERIFICATIONS ---- */
+/* SELLER VERIFICATIONS */
 async function loadSellerVerifications() {
   const st = document.getElementById("sellerStatusFilter").value;
   const { ok, data } = await api(`market/admin/seller-verifications${st ? "?status=" + st : ""}`);
   const body = document.getElementById("sellersBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="8" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!ok) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
   const list = Array.isArray(data) ? data : (data.value || []);
-  if (!list.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No seller verification requests</td></tr>`;
+  if (!list.length) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No seller verification requests</td></tr>`;
   body.innerHTML = list.map(v => `
     <tr>
       <td>${v.id}</td>
@@ -566,15 +916,15 @@ async function loadSellerVerifications() {
       <td>${esc(v.badge || "—")}</td>
       <td style="max-width:200px">${esc(v.reason || "—")}</td>
       <td>${esc((v.reviewed_at||"").slice(0,16).replace("T"," ") || "—")}</td>
-      <td style="white-space:nowrap">
+      <td style="white-space:nowrap; display: flex; gap: 0.5rem; flex-wrap: wrap;">
         ${v.status === "pending" ? `
-          <select id="badgeSel-${v.id}" style="padding:.3rem;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:#111b21;color:#fff;font-size:.8rem">
+          <select id="badgeSel-${v.id}" style="padding:0.4rem 0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-subtle);background:var(--bg-input);color:var(--text-primary);font-size:0.8rem;min-width:140px">
             <option value="trusted">✅ trusted</option>
             <option value="gold">🥇 gold</option>
             <option value="diamond">💎 diamond</option>
           </select>
-          <button class="mini" onclick="sellerDecision(${v.id},'approve')">Approve</button>
-          <button class="mini danger" onclick="sellerDecision(${v.id},'reject')">Reject</button>` : "—"}
+          <button class="btn-mini success" onclick="sellerDecision(${v.id},'approve')">Approve</button>
+          <button class="btn-mini danger" onclick="sellerDecision(${v.id},'reject')">Reject</button>` : "—"}
       </td>
     </tr>`).join("");
 }
@@ -591,12 +941,12 @@ async function sellerDecision(id, decision) {
   loadSellerVerifications(); loadOverview();
 }
 
-/* ---- PAYMENTS ---- */
+/* PAYMENTS */
 async function loadPayments() {
   const { ok, data } = await api("wallet/admin/payments");
   const body = document.getElementById("paymentsBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="8" class="empty">Failed: ${data.error}</td></tr>`;
-  if (!data.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No payments</td></tr>`;
+  if (!ok) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No payments</td></tr>`;
   body.innerHTML = data.map(p => `
     <tr>
       <td>${esc(p.order_id)}${p.utr ? `<br><small style="opacity:.55">UTR: ${esc(p.utr)}</small>` : ""}</td>
@@ -606,7 +956,7 @@ async function loadPayments() {
       <td>${fmt(p.admin_fee)}</td>
       <td>${fmt(p.seller_amount)}</td>
       <td>${statusBadge(p.status)}</td>
-      <td>${["submitted", "paid"].includes(p.status) ? `<button class="mini" onclick="release('${esc(p.order_id)}')">Verify &amp; Release</button>` : ""}</td>
+      <td>${["submitted", "paid"].includes(p.status) ? `<button class="btn-mini success" onclick="release('${esc(p.order_id)}')">Verify & Release</button>` : ""}</td>
     </tr>`).join("");
 }
 
@@ -622,14 +972,14 @@ function exportPayments() {
     (data||[]).map(p => [p.order_id, p.buyer_id, p.seller_id, p.payee_upi || "", p.total_amount, p.admin_fee, p.seller_amount, p.status, p.paid_at])));
 }
 
-/* ---- WITHDRAWALS ---- */
+/* WITHDRAWALS */
 async function loadWithdrawals() {
   const st = document.getElementById("wdFilter").value;
   const { ok, data } = await api(`wallet/admin/withdrawals${st ? "?status=" + st : ""}`);
   const body = document.getElementById("wdBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="7" class="empty">Failed: ${data.error}</td></tr>`;
+  if (!ok) return body.innerHTML = `<tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
   const list = Array.isArray(data) ? data : (data.value || []);
-  if (!list.length) return body.innerHTML = `<tr><td colspan="7" class="empty">No withdrawal requests</td></tr>`;
+  if (!list.length) return body.innerHTML = `<tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No withdrawal requests</td></tr>`;
   body.innerHTML = list.map(w => `
     <tr>
       <td>${w.id}</td>
@@ -638,9 +988,9 @@ async function loadWithdrawals() {
       <td>${fmt(w.amount)}</td>
       <td>${statusBadge(w.status)}</td>
       <td>${esc((w.created_at||"").slice(0,16).replace("T"," "))}</td>
-      <td style="white-space:nowrap">
-        ${w.status === "pending" ? `<button class="mini" onclick="wdAction(${w.id},'process')">Mark Paid</button>
-        <button class="mini danger" onclick="wdAction(${w.id},'reject')">Reject</button>` : "—"}
+      <td style="white-space:nowrap; display: flex; gap: 0.5rem;">
+        ${w.status === "pending" ? `<button class="btn-mini success" onclick="wdAction(${w.id},'process')">Mark Paid</button>
+        <button class="btn-mini danger" onclick="wdAction(${w.id},'reject')">Reject</button>` : "—"}
       </td>
     </tr>`).join("");
 }
@@ -659,12 +1009,12 @@ function exportWithdrawals() {
   });
 }
 
-/* ---- CHATS ---- */
+/* CHATS */
 async function loadChats() {
   const { ok, data } = await api("chat/admin/rooms");
   const body = document.getElementById("chatsBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="8" class="empty">Failed: ${data.error}</td></tr>`;
-  if (!data.length) return body.innerHTML = `<tr><td colspan="8" class="empty">No chat rooms</td></tr>`;
+  if (!ok) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
+  if (!data.length) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No chat rooms</td></tr>`;
   body.innerHTML = data.map(r => `
     <tr>
       <td>${esc(r.id)}</td>
@@ -674,7 +1024,7 @@ async function loadChats() {
       <td>${r.intent || "chat"}</td>
       <td>${statusBadge(r.status)}</td>
       <td>${r.message_count || 0}</td>
-      <td>${r.status !== "closed" ? `<button class="mini danger" onclick="closeRoom('${esc(r.id)}')">Close</button>` : ""}</td>
+      <td>${r.status !== "closed" ? `<button class="btn-mini danger" onclick="closeRoom('${esc(r.id)}')">Close</button>` : ""}</td>
     </tr>`).join("");
 }
 
@@ -683,7 +1033,7 @@ async function closeRoom(id) {
   toast(ok ? "Room closed" : "Failed", ok ? "ok" : "err"); loadChats(); loadOverview();
 }
 
-/* ---- CSV ---- */
+/* CSV */
 function downloadCSV(name, headers, rows) {
   const csv = [headers, ...rows].map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
@@ -693,15 +1043,13 @@ function downloadCSV(name, headers, rows) {
   URL.revokeObjectURL(a.href);
 }
 
-/* ---- HELPERS ---- */
-function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+/* HELPERS */
+function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[c])); }
 
-/* ---- INIT ---- */
+/* INIT */
 document.getElementById("whoEmail").textContent = user.email || "admin";
 loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); loadSellerVerifications();
 setInterval(() => { loadOverview(); loadChats(); loadKyc(); loadWithdrawals(); loadSellerVerifications(); }, 30000);
 </script>
-<script src="assets/effects.js" defer></script>
-  <link rel="stylesheet" href="styles/responsive.css">
 </body>
 </html>
