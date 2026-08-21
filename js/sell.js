@@ -10,7 +10,8 @@
   function getSession() {
     try {
       const token = localStorage.getItem("token");
-      const user = JSON.parse(localStorage.getItem("user") || "null");
+      let user = JSON.parse(localStorage.getItem("user") || "null");
+      if (token && !user) user = { name: "Player" };
       return token && user ? { token, user } : null;
     } catch {
       return null;
