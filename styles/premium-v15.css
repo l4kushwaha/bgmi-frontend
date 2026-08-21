@@ -1,0 +1,108 @@
+/* ===== PREMIUM V15 — Porsche-grade polish, contrast fixes, footer pages ===== */
+
+/* --- Global text contrast (glass backgrounds pe text saaf dikhe) --- */
+body, main, section, article { -webkit-font-smoothing: antialiased !important; }
+.fx-drawer a, .fx-drawer button, .nav-dropdown-item,
+.glass-panel p, .glass-panel span, .glass-panel li {
+  color: rgba(245, 246, 250, 0.95) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+}
+[data-theme="light"] .fx-drawer a, [data-theme="light"] .fx-drawer button,
+[data-theme="light"] .nav-dropdown-item,
+[data-theme="light"] .glass-panel p, [data-theme="light"] .glass-panel span,
+[data-theme="light"] .glass-panel li {
+  color: #17181c !important;
+  text-shadow: none !important;
+}
+p, li, td, small, label { line-height: 1.65 !important; }
+
+/* --- Buttons & inputs unified --- */
+button:not(.theme-toggle):not(.fx-auth-btn), .btn, input[type="submit"] {
+  transition: transform .12s ease, box-shadow .25s ease, filter .25s ease !important;
+}
+button:not(.theme-toggle):hover { filter: brightness(1.08); }
+
+/* --- Footer/static pages (help, faq, safety, privacy, terms, error) --- */
+main > h1:first-child, .page-title {
+  font-size: clamp(1.7rem, 3vw, 2.4rem) !important;
+  letter-spacing: -0.02em !important;
+  background: linear-gradient(90deg, var(--accent-primary, #FF4B2B), #FF416C) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  margin-bottom: .35em !important;
+}
+main h2 {
+  margin-top: 2em !important;
+  padding-bottom: .35em !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18) !important;
+  letter-spacing: -0.01em !important;
+}
+main ul, main ol { padding-left: 1.35em !important; }
+main li { margin: .5em 0 !important; }
+main a:not(.btn):not(.nav-link) { border-bottom: 1px dashed rgba(148,163,184,.4); }
+main a:not(.btn):not(.nav-link):hover { border-bottom-color: currentColor; }
+.faq-item, details, .help-card, .policy-section {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  border-radius: 14px !important;
+  padding: 1.1rem 1.3rem !important;
+  margin: .9rem 0 !important;
+  backdrop-filter: blur(8px) !important;
+  transition: transform .18s ease, border-color .18s ease !important;
+}
+.faq-item:hover, details:hover, .help-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 75, 43, 0.35) !important;
+}
+
+/* --- Marketplace cards: Flipkart/Amazon-grade --- */
+.listing-card, .product-card, .card {
+  transition: transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease !important;
+  will-change: transform;
+}
+.listing-card:hover, .product-card:hover {
+  transform: translateY(-6px) scale(1.012) !important;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 75, 43, 0.18) !important;
+  z-index: 2;
+}
+.listing-card img, .product-card img {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  width: 100%;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(135deg, #23252b, #17181c);
+}
+.price, .listing-price, .product-price {
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+}
+.mrp, .original-price, del {
+  opacity: .55;
+  font-size: .85em;
+  margin-left: .4em;
+}
+.discount-badge, .off-badge {
+  background: linear-gradient(90deg, #16a34a, #22c55e) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+  padding: .15rem .55rem !important;
+  font-size: .72rem !important;
+}
+.verified-badge, .assured {
+  color: #22c55e !important;
+  font-weight: 700 !important;
+}
+.rating-stars { color: #f59e0b !important; letter-spacing: 1px; }
+
+/* --- Scrollbar premium --- */
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 75, 43, 0.55); }
+::-webkit-scrollbar-track { background: transparent; }
