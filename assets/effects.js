@@ -1294,7 +1294,7 @@
   const safeInit = (fn) => { try { fn(); } catch (e) { console.warn('[effects]', e); } };
 
   function init() {
-    safeInit(initThemeBackground);
+    safeInit(typeof initThemeBackground === 'function' ? initThemeBackground : () => {});
     safeInit(initBackgroundSystem);
     
     if (!reducedMotion && !document.body.dataset.nofx) {
