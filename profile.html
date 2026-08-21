@@ -536,7 +536,7 @@ async function loadVerifyStatus() {
 }
 
 const esc = v => String(v ?? "").replace(/[&<>"']/g,
-  c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "'" }[c]));
+  c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 // COMMISSION
 async function loadCommission() {
