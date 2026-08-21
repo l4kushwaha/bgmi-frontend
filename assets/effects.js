@@ -1390,6 +1390,16 @@
     });
   }
 
+  // FX: navbar scrolled state (Porsche-style)
+  document.addEventListener('DOMContentLoaded', () => {
+    const nb = document.querySelector('.navbar');
+    if (!nb) return;
+    nb.dataset.fxNavbarScroll = '1';
+    const onS = () => nb.classList.toggle('scrolled', (window.scrollY || 0) > 40);
+    window.addEventListener('scroll', onS, { passive: true });
+    onS();
+  });
+
   // Start when DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

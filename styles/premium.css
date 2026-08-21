@@ -1963,3 +1963,19 @@ html{scroll-behavior:smooth}
 .nav-dropdown-item:hover{background:linear-gradient(90deg,rgba(0,212,255,.14),rgba(184,77,255,.08))!important;color:#fff!important;padding-left:1.15rem}
 #userMenuBtn{gap:.5rem;border-radius:999px;padding:.45rem .9rem;transition:background .3s}
 #userMenuBtn:hover{background:rgba(255,255,255,.07)}
+
+/* ================= V4 — PORSCHE.COM DESIGN LANGUAGE ================= */
+.navbar{transition:background .45s ease,box-shadow .45s ease,border-color .45s ease}
+.navbar.scrolled{background:linear-gradient(180deg,rgba(8,9,12,.92),rgba(8,9,12,.85))!important;box-shadow:0 20px 60px -24px rgba(0,0,0,.7)!important}
+h1,h2,h3{letter-spacing:-.035em!important}
+.hero-title,h1{font-weight:800!important}
+.btn{border-radius:6px!important;text-transform:uppercase;letter-spacing:.13em;font-size:.8rem;font-weight:700;padding:.85rem 1.9rem}
+.btn-sm{font-size:.72rem;padding:.6rem 1.3rem}
+.btn-lg{font-size:.86rem;padding:1rem 2.4rem}
+.btn-ghost,.btn-outline{background:transparent!important;border:1px solid currentColor;color:var(--text-primary)}
+.btn-ghost:hover,.btn-outline:hover{background:#fff!important;color:#0a0a0c!important;border-color:#fff}
+.card,.glass,.stat-card,.feature-card,.boost-card{border-radius:10px!important;border:1px solid rgba(255,255,255,.09)!important}
+.section-title,.footer h4{text-transform:uppercase;letter-spacing:.16em;font-size:.82rem!important;font-weight:700}
+a{scroll-margin-top:90px}
+.container,[class*="container"]{scroll-margin-top:90px}
+img{filter:saturate(1.04) contrast(1.02)}
