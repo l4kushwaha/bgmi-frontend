@@ -803,7 +803,7 @@
       if (e.target.matches('input, select, textarea')) {
         const target = e.target;
         target.style.transition = 'box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        target.style.boxShadow = '0 0 0 4px rgba(0, 234, 255, 0.25), 0 8px 32px rgba(0, 234, 255, 0.12), 0 0 0 1px var(--accent-primary)';
+        target.style.boxShadow = '0 0 0 4px rgba(0, 212, 255, 0.25), 0 8px 32px rgba(0, 212, 255, 0.12), 0 0 0 1px var(--accent-primary)';
         target.style.borderColor = 'var(--accent-primary)';
         target.style.transform = 'scale(1.005)';
       }
@@ -826,7 +826,7 @@
       card.addEventListener('mouseenter', () => {
         if (reducedMotion) return;
         card.style.transform = 'translateY(-10px) scale(1.005)';
-        card.style.boxShadow = 'var(--shadow-lg), var(--shadow-glow), 0 0 60px rgba(0, 234, 255, 0.15)';
+        card.style.boxShadow = 'var(--shadow-lg), var(--shadow-glow), 0 0 60px rgba(0, 212, 255, 0.15)';
         card.style.borderColor = 'var(--border-primary)';
         
         // Animate children with stagger
@@ -1291,32 +1291,47 @@
   }
 
   // ============ INITIALIZATION ============
+  const safeInit = (fn) => { try { fn(); } catch (e) { console.warn('[effects]', e); } };
+
   function init() {
-    initThemeBackground();
-    initBackgroundSystem();
+    safeInit(initThemeBackground);
+    safeInit(initBackgroundSystem);
     
     if (!reducedMotion && !document.body.dataset.nofx) {
-      initSmoothScroll();
-      initParallax();
-      initMagnetic();
-      init3DTilt();
-      initCursorOrb();
-      initScrollProgress();
-      initAdvancedParticles();
-      initScrollLinkedAnimations();
-      initNavScrollSpy();
-      initThemeTransition();
+      safeInit(initSmoothScroll);
+      safeInit(initParallax);
+      safeInit(initMagnetic);
+      safeInit(init3DTilt);
+      safeInit(initCursorOrb);
+      safeInit(initScrollProgress);
+      safeInit(initAdvancedParticles);
+      safeInit(initScrollLinkedAnimations);
+      safeInit(initNavScrollSpy);
+      safeInit(initThemeTransition);
     }
     
-    initScrollReveal();
-    initTextReveal();
-    initCountUp();
-    initImageLazyLoad();
-    initMicroInteractions();
-    initPageTransitions();
-    initStaggeredEntrance();
-    initHoverReveal();
-    initMorphingShapes();
+    safeInit(initScrollReveal);
+    safeInit(initTextReveal);
+    safeInit(initCountUp);
+    safeInit(initImageLazyLoad);
+    safeInit(initMicroInteractions);
+    safeInit(initPageTransitions);
+    safeInit(initStaggeredEntrance);
+    safeInit(initHoverReveal);
+    safeInit(initMorphingShapes);
+
+    // FAILSAFE: guarantee content is never stuck hidden
+    setTimeout(() => {
+      document.querySelectorAll('[data-reveal]:not(.revealed)').forEach(el => el.classList.add('revealed'));
+      document.querySelectorAll('.char-reveal, .word-reveal, .line-reveal').forEach(s => {
+        s.style.opacity = '1';
+        s.style.transform = 'translateY(0)';
+      });
+      document.querySelectorAll('[data-stagger-item]').forEach(el => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }, 1500);
     
     // Legacy compatibility
     initGlitch();
