@@ -1400,42 +1400,69 @@
     onS();
   });
 
-  // menu overlay + turant dikhne wala background
+  // menu drawer + right side profile/login buttons
   function initPorscheNav() {
     const nb = document.querySelector('.navbar');
     if (!nb || nb.dataset.fxPorscheNav) return;
     nb.dataset.fxPorscheNav = '1';
+    nb.classList.add('fx-clean');
 
-    // pehle chhoti image turant lagao, baad me HD aa jayega
+    // turant dikhne wala background (baad me HD load hota hai)
     const l1 = document.querySelector('.bg-layer');
     if (l1 && !l1.style.backgroundImage) {
       l1.style.backgroundImage = 'url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDtawYn04k-I3hWmV1aAtUFR6zZUhoe1PEwbeMa9_m7dg-TncuS5I8rA&s=10")';
     }
 
-    // MENU button
-    if (!nb.querySelector('.fx-menu-btn')) {
-      const btn = document.createElement('button');
-      btn.className = 'fx-menu-btn';
-      btn.type = 'button';
-      btn.setAttribute('aria-label', 'Open menu');
-      btn.innerHTML = '<i></i><i></i><i></i><span>Menu</span>';
-      nb.prepend(btn);
-      let ov = document.querySelector('.fx-mega');
-      if (!ov) {
-        ov = document.createElement('div');
-        ov.className = 'fx-mega';
-        const links = [...nb.querySelectorAll('.nav-links > a.nav-link')]
-          .map((a, i) => '<a href="' + a.getAttribute('href') + '" style="transition-delay:' + (i * 45) + 'ms">' + a.textContent.trim() + '</a>').join('');
-        ov.innerHTML = '<button class="fx-mega-close" aria-label="Close">×</button><nav class="fx-mega-nav">' + links + '</nav>';
-        document.body.appendChild(ov);
-        ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('a') || e.target.closest('.fx-mega-close')) { ov.classList.remove('open'); btn.classList.remove('active'); document.documentElement.style.overflow = ''; } });
-      }
-      btn.addEventListener('click', () => {
-        const open = ov.classList.toggle('open');
-        btn.classList.toggle('active', open);
-        document.documentElement.style.overflow = open ? 'hidden' : '';
-      });
-    }
+    // hamburger + Menu
+    const btn = document.createElement('button');
+    btn.className = 'fx-menu-btn';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Open menu');
+    btn.innerHTML = '<i></i><i></i><i></i><span>Menu</span>';
+    nb.prepend(btn);
+
+    // left drawer
+    const scrim = document.createElement('div');
+    scrim.className = 'fx-scrim';
+    const ov = document.createElement('div');
+    ov.className = 'fx-drawer';
+    const links = [...nb.querySelectorAll('.nav-links > a.nav-link')]
+      .map((a, i) => '<a href="' + a.getAttribute('href') + '" style="transition-delay:' + (80 + i * 45) + 'ms">' + a.textContent.trim() + '</a>').join('');
+    ov.innerHTML = '<button class="fx-drawer-close" aria-label="Close menu">\u00d7</button><nav>' + links + '</nav>';
+    document.body.appendChild(scrim);
+    document.body.appendChild(ov);
+
+    const closeDrawer = () => {
+      ov.classList.remove('open');
+      scrim.classList.remove('open');
+      btn.classList.remove('active');
+      document.documentElement.style.overflow = '';
+    };
+    btn.addEventListener('click', () => {
+      const open = ov.classList.toggle('open');
+      scrim.classList.toggle('open', open);
+      btn.classList.toggle('active', open);
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+    });
+    scrim.addEventListener('click', closeDrawer);
+    ov.querySelector('.fx-drawer-close').addEventListener('click', closeDrawer);
+    ov.querySelectorAll('nav a').forEach(a => a.addEventListener('click', closeDrawer));
+
+    // right side: profile/login/logout
+    const area = document.createElement('div');
+    area.className = 'fx-auth-area';
+    const loggedIn = !!(localStorage.getItem('token') || localStorage.getItem('user'));
+    area.innerHTML = loggedIn
+      ? '<a class="fx-auth-btn" href="profile.html">Profile</a><button type="button" class="fx-auth-btn" id="fxLogoutBtn">Logout</button>'
+      : '<a class="fx-auth-btn primaryb" href="login.html">Login</a>';
+    nb.appendChild(area);
+
+    const lo = area.querySelector('#fxLogoutBtn');
+    if (lo) lo.addEventListener('click', () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      location.href = 'index.html';
+    });
   }
   document.addEventListener('DOMContentLoaded', initPorscheNav);
 

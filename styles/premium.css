@@ -2024,3 +2024,44 @@ img{filter:saturate(1.04) contrast(1.02)}
 .social-row{display:flex;gap:.7rem;margin-top:1rem}
 .btn-social{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:.55rem;padding:.75rem .5rem;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-weight:600;font-size:.85rem;cursor:pointer;transition:background .25s,transform .25s,border-color .25s}
 .btn-social:hover{background:rgba(255,255,255,.13);transform:translateY(-2px);border-color:rgba(255,255,255,.3)}
+
+/* navbar sirf menu + profile wala */
+.fx-clean .nav-links { display: none !important; }
+.fx-drawer {
+  position: fixed; top: 0; left: 0; height: 100vh;
+  width: min(420px, 86vw);
+  background: rgba(10, 11, 14, 0.97);
+  backdrop-filter: blur(26px) saturate(160%);
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
+  z-index: 5001;
+  transform: translateX(-103%);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  padding: 96px 36px 36px;
+  display: flex; flex-direction: column;
+}
+.fx-drawer.open { transform: none; box-shadow: 60px 0 140px rgba(0, 0, 0, 0.55); }
+.fx-drawer nav { display: flex; flex-direction: column; gap: 0.35rem; overflow-y: auto; }
+.fx-drawer nav a {
+  font-size: clamp(1.35rem, 3vw, 1.9rem); font-weight: 800; letter-spacing: -0.02em;
+  color: #e8ebf0; text-decoration: none; padding: 0.4rem 0.7rem; border-radius: 12px;
+  opacity: 0; transform: translateX(-18px);
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), background 0.25s, padding-left 0.25s;
+}
+.fx-drawer.open nav a { opacity: 1; transform: none; }
+.fx-drawer nav a:hover { background: linear-gradient(90deg, rgba(0,212,255,0.16), rgba(184,77,255,0.08)); padding-left: 1.2rem; }
+.fx-drawer-close { position: absolute; top: 20px; right: 22px; background: none; border: 0; color: #fff; font-size: 2.2rem; cursor: pointer; line-height: 1; }
+.fx-scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 5000; opacity: 0; visibility: hidden; transition: opacity 0.4s, visibility 0.4s; }
+.fx-scrim.open { opacity: 1; visibility: visible; }
+.fx-auth-area { margin-left: auto; display: flex; gap: 0.55rem; align-items: center; }
+.fx-auth-btn {
+  padding: 0.52rem 1.2rem; border-radius: 6px; font-size: 0.76rem; font-weight: 700;
+  letter-spacing: 0.11em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.4); color: #fff; background: transparent;
+  transition: background 0.25s, color 0.25s;
+}
+.fx-auth-btn:hover { background: #fff; color: #0a0a0c; }
+.fx-auth-btn.primaryb { background: #fff; color: #0a0a0c; border-color: #fff; }
+.fx-auth-btn.primaryb:hover { background: transparent; color: #fff; }
+/* marketplace search/city/filter ek line me */
+#searchForm { display: flex !important; flex-direction: row !important; align-items: flex-end !important; justify-content: space-between !important; flex-wrap: wrap; gap: 1rem; }
+#searchForm > .form-group, #searchForm > div { flex: 1 1 180px; }
