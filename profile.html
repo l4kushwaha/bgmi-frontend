@@ -397,7 +397,8 @@ document.getElementById("avatar-input").onchange = async (e) => {
 /* LEVEL + XP */
 function renderLevel(pop, sales) {
   const lvl = Math.min(100, Math.max(1, 1 + Math.floor((pop + (sales || 0) * 1500) / 1500)));
-  document.getElementById("g-level")?.textContent = "LVL " + lvl;
+  const gLevel = document.getElementById("g-level");
+  if (gLevel) gLevel.textContent = "LVL " + lvl;
   document.getElementById("level-display").textContent = "LVL " + lvl;
   const fill = Math.min(100, ((pop + (sales || 0) * 1500) % 1500) / 15);
   document.getElementById("pop-bar").style.width = fill + "%";

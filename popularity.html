@@ -356,7 +356,7 @@
 const MARKET_API = "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
 
 function escapeHtml(s) {
-  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[c]));
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
 function setCount(el, val) {
