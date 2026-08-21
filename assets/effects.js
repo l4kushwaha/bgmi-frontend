@@ -1400,6 +1400,45 @@
     onS();
   });
 
+  // FX: Porsche-style mega menu + nav icons + instant bg base
+  function initPorscheNav() {
+    const nb = document.querySelector('.navbar');
+    if (!nb || nb.dataset.fxPorscheNav) return;
+    nb.dataset.fxPorscheNav = '1';
+
+    // Instant wallpaper base (loads in ms, upgraded by HD later)
+    const l1 = document.querySelector('.bg-layer');
+    if (l1 && !l1.style.backgroundImage) {
+      l1.style.backgroundImage = 'url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDtawYn04k-I3hWmV1aAtUFR6zZUhoe1PEwbeMa9_m7dg-TncuS5I8rA&s=10")';
+    }
+
+    // MENU button
+    if (!nb.querySelector('.fx-menu-btn')) {
+      const btn = document.createElement('button');
+      btn.className = 'fx-menu-btn';
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Open menu');
+      btn.innerHTML = '<i></i><i></i><i></i><span>Menu</span>';
+      nb.prepend(btn);
+      let ov = document.querySelector('.fx-mega');
+      if (!ov) {
+        ov = document.createElement('div');
+        ov.className = 'fx-mega';
+        const links = [...nb.querySelectorAll('.nav-links > a.nav-link')]
+          .map((a, i) => '<a href="' + a.getAttribute('href') + '" style="transition-delay:' + (i * 45) + 'ms">' + a.textContent.trim() + '</a>').join('');
+        ov.innerHTML = '<button class="fx-mega-close" aria-label="Close">×</button><nav class="fx-mega-nav">' + links + '</nav>';
+        document.body.appendChild(ov);
+        ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('a') || e.target.closest('.fx-mega-close')) { ov.classList.remove('open'); btn.classList.remove('active'); document.documentElement.style.overflow = ''; } });
+      }
+      btn.addEventListener('click', () => {
+        const open = ov.classList.toggle('open');
+        btn.classList.toggle('active', open);
+        document.documentElement.style.overflow = open ? 'hidden' : '';
+      });
+    }
+  }
+  document.addEventListener('DOMContentLoaded', initPorscheNav);
+
   // Start when DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

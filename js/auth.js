@@ -119,7 +119,7 @@
         location.href =
           user.role === "admin"
             ? "admin_dashboard.html"
-            : "index.html";
+            : (new URLSearchParams(location.search).get("redirect") || "index.html"); /*fxRedirect*/
       }, 800);
 
     } catch (err) {
