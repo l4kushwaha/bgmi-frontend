@@ -424,81 +424,58 @@
     } catch (e) {}
   });
 
-  // Initialize auth buttons in navbar
+  // Navbar auth buttons + mobile toggle
+  document.addEventListener('DOMContentLoaded', () => {
     const authButtons = document.getElementById('authButtons');
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem('user') || 'null'); } catch (e) {}
+
     if (authButtons) {
       if (token && user) {
         authButtons.innerHTML = `
           <div class="nav-dropdown" id="userDropdown">
-            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-              <span id="navUserName">${user.name || user.email}</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span id="navUserName">${(user.name || user.email || '').replace(/[<>&"]/g, '')}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
-            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
-              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
-              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
-              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
-              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
-              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
-              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu">
+              <a href="profile.html" class="nav-dropdown-item">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item">Chats</a>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" style="text-align:left;width:100%">Logout</button>
             </div>
-          </div>
-        `;
-        
+          </div>`;
         const userMenuBtn = document.getElementById('userMenuBtn');
         const userDropdownMenu = document.getElementById('userDropdownMenu');
-        const navLogoutBtn = document.getElementById('navLogoutBtn');
-        
         if (userMenuBtn && userDropdownMenu) {
-          userMenuBtn.addEventListener('click', (e) => {
+          userMenuBtn.addEventListener('click', e => {
             e.stopPropagation();
             const isOpen = userDropdownMenu.style.opacity === '1';
             userDropdownMenu.style.opacity = isOpen ? '0' : '1';
             userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
-            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
-            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+            userMenuBtn.setAttribute('aria-expanded', String(!isOpen));
           });
-          
           document.addEventListener('click', () => {
             userDropdownMenu.style.opacity = '0';
             userDropdownMenu.style.visibility = 'hidden';
-            userDropdownMenu.style.transform = 'translateY(-10px)';
-            userMenuBtn.setAttribute('aria-expanded', 'false');
           });
         }
-        
-        if (navLogoutBtn) {
-          navLogoutBtn.addEventListener('click', () => {
-            if (window.logout) window.logout();
-          });
-        }
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        if (navLogoutBtn) navLogoutBtn.addEventListener('click', () => { if (window.logout) window.logout(); });
       } else {
-        authButtons.innerHTML = `
-          <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
-          <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
-        `;
+        authButtons.innerHTML = '<a href="login.html" class="btn btn-ghost btn-sm">Sign In</a><a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>';
       }
-      
-      // Mobile menu toggle
       const navToggle = document.getElementById('navToggle');
       const navLinks = document.getElementById('navLinks');
-      if (navToggle && navLinks) {
-        navToggle.addEventListener('click', () => {
-          const isOpen = navLinks.classList.toggle('open');
-          navToggle.setAttribute('aria-expanded', isOpen);
-        });
-      }
+      if (navToggle && navLinks) navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', String(isOpen));
+      });
     }
   });
-</script>
+</script></script>
 </body>
 </html>

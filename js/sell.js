@@ -112,7 +112,7 @@
   }
 
   // Initial load
-  await loadPriceConfig();
+  (async () => { await loadPriceConfig(); })();
 
   // Periodic sync every 5 minutes to keep prices in sync with server
   priceConfigSyncInterval = setInterval(loadPriceConfig, 5 * 60 * 1000);
