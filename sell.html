@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <!-- Premium Styles -->
-<link rel="stylesheet" href="styles/premium.css?v=9">
+<link rel="stylesheet" href="styles/premium.css?v=10">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -373,7 +373,7 @@
 <script src="js/auth.js"></script>
 <script src="js/theme.js"></script>
 <script src="js/sell.js"></script>
-<script src="assets/effects.js?v=9" defer></script>
+<script src="assets/effects.js?v=10" defer></script>
 
 <script>
   // Initialize auth buttons in navbar
@@ -465,6 +465,25 @@
       });
     }
   });
+</script>
+<script>
+  // wallpaper har haal me dikhe (inline, cache-proof)
+  (function () {
+    function fxBg() {
+      if (document.querySelector(".bg-layer")) return;
+      var b = document.createElement("div");
+      b.className = "bg-layer";
+      b.style.cssText = "position:fixed;inset:0;z-index:-3;background-size:cover;background-position:center;background-image:url(https://picsum.photos/seed/" + (location.pathname.replace(/[^a-z]/g, "") || "home") + "/1600/900)";
+      var g = document.createElement("div");
+      g.className = "glass-layer";
+      g.style.cssText = "position:fixed;inset:0;z-index:-2;backdrop-filter:blur(13px) saturate(135%);background:rgba(9,10,13,0.16)";
+      document.body.prepend(g, b);
+    }
+    document.addEventListener("DOMContentLoaded", fxBg);
+    window.addEventListener("load", fxBg);
+    setTimeout(fxBg, 800);
+    setTimeout(fxBg, 2500);
+  })();
 </script>
 </body>
 </html>
