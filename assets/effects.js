@@ -1455,7 +1455,7 @@
       b.style.cssText = "position:fixed;inset:0;z-index:-3;background-size:cover;background-position:center;background-image:url(https://picsum.photos/seed/" + (location.pathname.replace(/[^a-z]/g, "") || "home") + "/1600/900)";
       const g = document.createElement("div");
       g.className = "glass-layer";
-      g.style.cssText = "position:fixed;inset:0;z-index:-2;backdrop-filter:blur(4px) saturate(125%);background:rgba(9,10,13,0.06)";
+      g.style.cssText = "position:fixed;inset:0;z-index:-2;backdrop-filter:blur(2px) saturate(118%);background:rgba(9,10,13,0.03)";
       document.body.prepend(g, b);
     }
 
@@ -1491,7 +1491,7 @@
     b.style.cssText = "position:fixed;inset:0;z-index:-3;background-size:cover;background-position:center;background-image:url(https://picsum.photos/seed/" + (location.pathname.replace(/[^a-z]/g, "") || "home") + "/1600/900)";
     const g = document.createElement("div");
     g.className = "glass-layer";
-    g.style.cssText = "position:fixed;inset:0;z-index:-2;backdrop-filter:blur(4px) saturate(125%);background:rgba(9,10,13,0.06)";
+    g.style.cssText = "position:fixed;inset:0;z-index:-2;backdrop-filter:blur(2px) saturate(118%);background:rgba(9,10,13,0.03)";
     document.body.prepend(g, b);
   }
 
