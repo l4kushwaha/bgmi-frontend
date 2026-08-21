@@ -25,7 +25,8 @@
   /* ===================== JWT HELPERS ===================== */
   function decodeJWT(token) {
     try {
-      return JSON.parse(atob(token.split(".")[1]));
+      const p = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(decodeURIComponent(escape(atob(p))));
     } catch {
       return null;
     }
