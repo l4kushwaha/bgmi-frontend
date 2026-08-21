@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy | BGMI Market</title>
+<meta name="description" content="BGMI Market Privacy Policy - How we collect, use, and protect your personal information.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
+
+<!-- Theme Script -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  .legal-page { min-height: 100vh; padding: 2rem 0 4rem; }
+  .legal-hero { text-align: center; padding: 4rem 2rem; }
+  .legal-hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+  .legal-hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+  .legal-content { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+  .legal-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2.5rem; margin-bottom: 1.5rem; }
+  .legal-section h2 { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--accent-primary); display: flex; align-items: center; gap: 0.75rem; }
+  .legal-section h2::before { content: ''; width: 4px; height: 28px; border-radius: 2px; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); }
+  .legal-section h3 { font-size: 1.125rem; margin: 2rem 0 1rem; color: var(--text-primary); }
+  .legal-section p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 1rem; }
+  .legal-section ul { margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); line-height: 1.8; }
+  .legal-section li { margin-bottom: 0.5rem; }
+  .legal-section a { color: var(--accent-primary); text-decoration: none; }
+  .legal-section a:hover { text-decoration: underline; }
+  .legal-section strong { color: var(--text-primary); }
+  .legal-section table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+  .legal-section th, .legal-section td { padding: 1rem; border: 1px solid var(--border-subtle); text-align: left; }
+  .legal-section th { background: var(--bg-tertiary); color: var(--accent-primary); font-weight: 600; }
+  .legal-section td { color: var(--text-secondary); }
+  .last-updated { text-align: right; color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem; padding: 0 1.5rem; }
+  .toc { background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2rem; margin-bottom: 2rem; position: sticky; top: 100px; }
+  .toc h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--accent-primary); }
+  .toc ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.5rem; }
+  .toc a { color: var(--text-secondary); text-decoration: none; padding: 0.5rem; border-radius: var(--radius-md); transition: all var(--transition-fast); display: block; }
+  .toc a:hover { color: var(--accent-primary); background: var(--bg-tertiary); }
+  .data-summary { background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(184, 77, 255, 0.1)); border: 1px solid var(--border-primary); border-radius: var(--radius-xl); padding: 2rem; margin: 2rem 0; }
+  .data-summary h3 { color: var(--accent-primary); margin-bottom: 1rem; }
+  .data-summary .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .data-summary .data-item { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.25rem; }
+  .data-summary .data-item strong { color: var(--text-primary); display: block; margin-bottom: 0.5rem; }
+  .data-summary .data-item span { color: var(--text-secondary); font-size: 0.9375rem; }
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" id="navAdminLink" style="display: none;">Admin</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    <div id="authButtons"></div>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<main class="legal-page" role="main">
+  <div class="container">
+    <section class="legal-hero" data-reveal="slide-up">
+      <h1 data-text-reveal="words" data-stagger="0.04">Privacy Policy</h1>
+      <p data-reveal="fade" data-reveal-delay="200">Your privacy matters. Here's how we handle your data.</p>
+    </section>
+
+    <p class="last-updated">Last updated: January 2025</p>
+
+    <nav class="toc" aria-label="Table of Contents" data-reveal="slide-up">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li><a href="#collection">1. Data We Collect</a></li>
+        <li><a href="#usage">2. How We Use Data</a></li>
+        <li><a href="#sharing">3. Data Sharing</a></li>
+        <li><a href="#storage">4. Data Storage & Security</a></li>
+        <li><a href="#rights">5. Your Rights</a></li>
+        <li><a href="#cookies">6. Cookies & Tracking</a></li>
+        <li><a href="#third-party">7. Third-Party Services</a></li>
+        <li><a href="#retention">8. Data Retention</a></li>
+        <li><a href="#children">9. Children's Privacy</a></li>
+        <li><a href="#changes">10. Policy Changes</a></li>
+        <li><a href="#contact">11. Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="data-summary" data-reveal="slide-up">
+      <h3>📊 Data Summary at a Glance</h3>
+      <div class="data-grid">
+        <div class="data-item"><strong>Account Data</strong><span>Email, username, hashed password, 2FA secret</span></div>
+        <div class="data-item"><strong>Profile Data</strong><span>Display name, avatar, bio, KYC documents (optional)</span></div>
+        <div class="data-item"><strong>Transaction Data</strong><span>Order history, UPI IDs, payment amounts, UTRs</span></div>
+        <div class="data-item"><strong>Chat Data</strong><span>Messages, voice notes, attachments between users</span></div>
+        <div class="data-item"><strong>Technical Data</strong><span>IP address, device info, browser, login timestamps</span></div>
+        <div class="data-item"><strong>Analytics</strong><span>Page views, clicks, feature usage (no personal IDs)</span></div>
+      </div>
+    </div>
+
+    <div class="legal-content">
+      <section class="legal-section" id="collection" data-reveal="slide-up">
+        <h2>1. Data We Collect</h2>
+        <h3>1.1 Account Information</h3>
+        <p>When you register: email address, chosen username, hashed password (bcrypt), and 2FA secret (if enabled).</p>
+        <h3>1.2 Profile Information</h3>
+        <p>Optional: display name, avatar, bio, city. For KYC verification: government ID documents (Aadhaar, PAN, etc.) - encrypted at rest.</p>
+        <h3>1.3 Transaction Data</h3>
+        <p>Order details, listing information, UPI IDs (seller & buyer), payment amounts, UTR numbers, timestamps, escrow status.</p>
+        <h3>1.4 Communications</h3>
+        <p>All chat messages, voice recordings, file attachments exchanged via platform chat. We do not read private chats unless a dispute is opened.</p>
+        <h3>1.5 Technical & Usage Data</h3>
+        <p>IP address, device fingerprint, browser user agent, operating system, referral source, page views, feature interactions, error logs.</p>
+      </section>
+
+      <section class="legal-section" id="usage" data-reveal="slide-up">
+        <h2>2. How We Use Your Data</h2>
+        <table>
+          <thead><tr><th>Purpose</th><th>Legal Basis</th></tr></thead>
+          <tbody>
+            <tr><td>Provide marketplace services (listings, escrow, chat)</td><td>Contract performance</td></tr>
+            <tr><td>Process UPI payments & withdrawals</td><td>Contract performance</td></tr>
+            <tr><td>Verify identity (KYC) for seller badges</td><td>Legitimate interest / Consent</td></tr>
+            <tr><td>Prevent fraud, spam, abuse</td><td>Legitimate interest</td></tr>
+            <tr><td>Resolve disputes between users</td><td>Contract performance / Legal obligation</td></tr>
+            <tr><td>Send transactional emails (OTP, receipts)</td><td>Contract performance</td></tr>
+            <tr><td>Improve platform (analytics, bug fixes)</td><td>Legitimate interest</td></tr>
+            <tr><td>Comply with legal requests</td><td>Legal obligation</td></tr>
+          </tbody>
+        </table>
+        <p>We do NOT sell your data. We do NOT use data for advertising. No tracking cookies.</p>
+      </section>
+
+      <section class="legal-section" id="sharing" data-reveal="slide-up">
+        <h2>3. Data Sharing</h2>
+        <h3>3.1 With Other Users</h3>
+        <p>Visible on your public profile: username, display name, avatar, bio, city, join date, ratings, badges. Hidden: email, UPI, KYC docs, IP, password.</p>
+        <h3>3.2 With Service Providers</h3>
+        <ul>
+          <li><strong>Cloudflare Workers:</strong> Hosting & API (processes data on our behalf)</li>
+          <li><strong>Email Service:</strong> Sends OTPs, notifications (only email & name)</li>
+          <li><strong>UPI Verification:</strong> Validates UPI IDs (only UPI string)</li>
+        </ul>
+        <p>All processors sign Data Processing Agreements. No data sold to third parties.</p>
+        <h3>3.3 Legal Requests</h3>
+        <p>We may disclose data if required by law, court order, or to protect rights/safety. We'll notify you unless legally prohibited.</p>
+      </section>
+
+      <section class="legal-section" id="storage" data-reveal="slide-up">
+        <h2>4. Data Storage & Security</h2>
+        <h3>4.1 Storage Location</h3>
+        <p>All data stored on Cloudflare Workers KV / D1 (India/Asia regions). Encrypted at rest (AES-256) and in transit (TLS 1.3).</p>
+        <h3>4.2 Security Measures</h3>
+        <ul>
+          <li>Passwords: bcrypt (cost factor 12)</li>
+          <li>JWT tokens: HS256, 15min access / 7day refresh</li>
+          <li>2FA: TOTP (RFC 6238)</li>
+          <li>KYC docs: Encrypted, access-logged, auto-deleted after verification</li>
+          <li>Rate limiting, WAF, DDoS protection via Cloudflare</li>
+        </ul>
+        <h3>4.3 Access Control</h3>
+        <p>Only authorized admins access user data for dispute resolution. All access logged. No third-party analytics (Google Analytics, etc.).</p>
+      </section>
+
+      <section class="legal-section" id="rights" data-reveal="slide-up">
+        <h2>5. Your Rights (Under Indian IT Act / GDPR Principles)</h2>
+        <ul>
+          <li><strong>Access:</strong> Request copy of your data via email</li>
+          <li><strong>Rectification:</strong> Update profile info anytime in settings</li>
+          <li><strong>Erasure:</strong> Delete account in Profile → Settings (irreversible)</li>
+          <li><strong>Portability:</strong> Export your data (CSV/JSON) from Profile</li>
+          <li><strong>Restriction:</strong> Request processing pause during disputes</li>
+          <li><strong>Objection:</strong> Opt out of analytics (email us)</li>
+          <li><strong>Withdraw Consent:</strong> For KYC, marketing (if any)</li>
+        </ul>
+        <p>Email <a href="mailto:lkushwaha6161@gmail.com">lkushwaha6161@gmail.com</a> to exercise rights. Response within 30 days.</p>
+      </section>
+
+      <section class="legal-section" id="cookies" data-reveal="slide-up">
+        <h2>6. Cookies & Tracking</h2>
+        <p><strong>We use zero tracking cookies.</strong> No Google Analytics, Meta Pixel, or third-party trackers.</p>
+        <h3>6.1 Essential Cookies (LocalStorage)</h3>
+        <ul>
+          <li><code>token</code>, <code>refresh_token</code> - Authentication (HttpOnly equivalent via secure storage)</li>
+          <li><code>user</code> - Cached profile for UI</li>
+          <li><code>bgmi-market-theme</code> - Dark/light preference</li>
+          <li><code>bgmi-visited</code> - First-visit flag for login flow</li>
+        </ul>
+        <h3>6.2 Session Storage</h3>
+        <p>Temporary UI state (open modals, form drafts). Cleared on tab close.</p>
+        <h3>6.3 You Control It</h3>
+        <p>Clear all data anytime: Browser settings → Site data → Delete. Or use "Delete Account" in Profile.</p>
+      </section>
+
+      <section class="legal-section" id="third-party" data-reveal="slide-up">
+        <h2>7. Third-Party Services</h2>
+        <table>
+          <thead><tr><th>Service</th><th>Purpose</th><th>Data Shared</th></tr></thead>
+          <tbody>
+            <tr><td>Cloudflare</td><td>Hosting, Workers, KV, D1</td><td>All platform data (processor)</td></tr>
+            <tr><td>Email Provider</td><td>OTP, notifications</td><td>Email, name, OTP code</td></tr>
+            <tr><td>Fonts (Google)</td><td>Inter, JetBrains Mono, Space Grotesk</td><td>IP address (cached, no cookies)</td></tr>
+            <tr><td>Unsplash</td><td>Background images</td><td>IP address (cached, no cookies)</td></tr>
+          </tbody>
+        </table>
+        <p>No social login (Google, Facebook, etc.). No payment gateways (direct UPI only).</p>
+      </section>
+
+      <section class="legal-section" id="retention" data-reveal="slide-up">
+        <h2>8. Data Retention</h2>
+        <table>
+          <thead><tr><th>Data Type</th><th>Retention Period</th></tr></thead>
+          <tbody>
+            <tr><td>Account & Profile</td><td>Until account deletion + 30 days</td></tr>
+            <tr><td>Transaction Records</td><td>7 years (financial regulations)</td></tr>
+            <tr><td>Chat Messages</td><td>Until account deletion or 2 years</td></tr>
+            <tr><td>KYC Documents</td><td>Deleted immediately after verification</td></tr>
+            <tr><td>Login/Access Logs</td><td>90 days</td></tr>
+            <tr><td>Analytics (aggregated)</td><td>Indefinite (no personal IDs)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="legal-section" id="children" data-reveal="slide-up">
+        <h2>9. Children's Privacy</h2>
+        <p>The Platform is not directed to children under 18. We do not knowingly collect data from minors. If you're a parent and believe your child provided data, contact us for immediate deletion.</p>
+      </section>
+
+      <section class="legal-section" id="changes" data-reveal="slide-up">
+        <h2>10. Policy Changes</h2>
+        <p>We may update this Policy. Material changes: notified via email & platform banner 30 days prior. Continued use = acceptance. Check this page periodically.</p>
+      </section>
+
+      <section class="legal-section" id="contact" data-reveal="slide-up">
+        <h2>11. Contact</h2>
+        <p>Privacy questions, data requests, or concerns:</p>
+        <p><strong>Email:</strong> <a href="mailto:lkushwaha6161@gmail.com">lkushwaha6161@gmail.com</a></p>
+        <p><strong>Subject line:</strong> "Privacy Request - [Your Username]"</p>
+        <p>We respond within 30 days. Include verification (email/username) for data requests.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="mailto:lkushwaha6161@gmail.com">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/theme.js"></script>
+<script src="assets/effects.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        if (navLogoutBtn) navLogoutBtn.addEventListener('click', () => { if (window.logout) window.logout(); });
+      } else {
+        authButtons.innerHTML = `<a href="login.html" class="btn btn-ghost btn-sm">Sign In</a><a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>`;
+      }
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+  });
+</script>
+</body>
+</html>

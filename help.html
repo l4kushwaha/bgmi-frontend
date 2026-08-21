@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help Center | BGMI Market</title>
+<meta name="description" content="BGMI Market Help Center - Find answers to common questions about buying, selling, payments, and account management.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
+
+<!-- Theme Script -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  .help-page { min-height: 100vh; padding: 2rem 0 4rem; }
+  .help-hero { text-align: center; padding: 4rem 2rem; position: relative; }
+  .help-hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+  .help-hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+  .search-box { max-width: 640px; margin: 2rem auto 0; position: relative; }
+  .search-box input { width: 100%; padding: 1.25rem 1.5rem 1.25rem 3.5rem; font-size: 1.125rem; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-full); color: var(--text-primary); transition: all var(--transition-base); }
+  .search-box input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.15); }
+  .search-box svg { position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; color: var(--text-muted); }
+  .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1200px; margin: 3rem auto 0; padding: 0 1.5rem; }
+  .category-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2rem; transition: all var(--transition-base); cursor: pointer; position: relative; overflow: hidden; }
+  .category-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary)); opacity: 0; transition: opacity var(--transition-base); }
+  .category-card:hover { border-color: var(--border-primary); box-shadow: var(--shadow-lg), var(--shadow-glow); transform: translateY(-6px); }
+  .category-card:hover::before { opacity: 1; }
+  .category-icon { width: 56px; height: 56px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3); }
+  .category-card:nth-child(2) .category-icon { background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary)); box-shadow: 0 8px 24px rgba(255, 107, 0, 0.3); }
+  .category-card:nth-child(3) .category-icon { background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-primary)); box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3); }
+  .category-card:nth-child(4) .category-icon { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); box-shadow: 0 8px 24px rgba(184, 77, 255, 0.3); }
+  .category-card:nth-child(5) .category-icon { background: linear-gradient(135deg, var(--accent-gold), #e6ac00); box-shadow: 0 8px 24px rgba(255, 200, 0, 0.3); }
+  .category-card:nth-child(6) .category-icon { background: linear-gradient(135deg, var(--accent-pink), var(--accent-secondary)); box-shadow: 0 8px 24px rgba(236, 72, 153, 0.3); }
+  .category-card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+  .category-card p { color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.6; }
+  .popular-articles { max-width: 1200px; margin: 4rem auto 0; padding: 0 1.5rem; }
+  .section-title { font-size: 1.75rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-primary), transparent); }
+  .article-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; }
+  .article-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 1.75rem; transition: all var(--transition-base); }
+  .article-card:hover { border-color: var(--border-primary); box-shadow: var(--shadow-md); transform: translateY(-4px); }
+  .article-card h4 { font-size: 1.125rem; margin-bottom: 0.75rem; color: var(--text-primary); }
+  .article-card p { color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.7; margin-bottom: 1rem; }
+  .article-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .article-tag { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.25rem 0.625rem; border-radius: var(--radius-full); background: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-muted); }
+  .contact-support { max-width: 1200px; margin: 4rem auto 0; padding: 0 1.5rem; text-align: center; }
+  .contact-card { background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(184, 77, 255, 0.1)); border: 1px solid var(--border-primary); border-radius: var(--radius-xl); padding: 3rem 2rem; }
+  .contact-card h3 { font-size: 1.75rem; margin-bottom: 1rem; }
+  .contact-card p { color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem; }
+  .contact-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" id="navAdminLink" style="display: none;">Admin</a>
+    
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    
+    <!-- Auth Buttons -->
+    <div id="authButtons"></div>
+  </div>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<main class="help-page" role="main">
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="help-hero" aria-labelledby="help-title" data-reveal="slide-up">
+      <h1 id="help-title" data-text-reveal="words" data-stagger="0.04">Help Center</h1>
+      <p data-reveal="fade" data-reveal-delay="200">Find answers, learn how to trade safely, and get the most out of BGMI Market.</p>
+      
+      <div class="search-box" data-reveal="slide-up" data-reveal-delay="300">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input type="search" id="helpSearch" placeholder="Search help articles..." aria-label="Search help articles" autocomplete="off">
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section aria-labelledby="categories-title" data-reveal="slide-up" data-reveal-delay="100">
+      <h2 id="categories-title" class="section-title">Browse by Category</h2>
+      
+      <div class="categories" data-stagger data-stagger-delay="80">
+        <article class="category-card" data-stagger-item onclick="location.href='faq.html#buying'">
+          <div class="category-icon" aria-hidden="true">🛒</div>
+          <h3>Buying Accounts</h3>
+          <p>How to browse, verify sellers, make payments, and receive your account securely.</p>
+        </article>
+        
+        <article class="category-card" data-stagger-item onclick="location.href='faq.html#selling'">
+          <div class="category-icon" aria-hidden="true">💰</div>
+          <h3>Selling Accounts</h3>
+          <p>Create listings, set prices, verify your account, and get paid via UPI.</p>
+        </article>
+        
+        <article class="category-card" data-stagger-item onclick="location.href='faq.html#payments'">
+          <div class="category-icon" aria-hidden="true">💳</div>
+          <h3>Payments & Escrow</h3>
+          <p>Direct UPI payments, escrow protection, fee structure, and refund policies.</p>
+        </article>
+        
+        <article class="category-card" data-stagger-item onclick="location.href='faq.html#popularity'">
+          <div class="category-icon" aria-hidden="true">🔥</div>
+          <h3>Popularity Boosts</h3>
+          <p>Buy/sell BGMI popularity points, leaderboard mechanics, and exact in-game values.</p>
+        </article>
+        
+        <article class="category-card" data-stagger-item onclick="location.href='meetups.html'">
+          <div class="category-icon" aria-hidden="true">🤝</div>
+          <h3>Real Meetups</h3>
+          <p>City-wise seller search, safe meeting spots, and in-person verification process.</p>
+        </article>
+        
+        <article class="category-card" data-stagger-item onclick="location.href='faq.html#account'">
+          <div class="category-icon" aria-hidden="true">👤</div>
+          <h3>Account & Security</h3>
+          <p>KYC verification, 2FA, password reset, banned accounts, and privacy settings.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Popular Articles -->
+    <section class="popular-articles" data-reveal="slide-up" data-reveal-delay="200">
+      <h2 class="section-title">Popular Articles</h2>
+      
+      <div class="article-grid" data-stagger data-stagger-delay="80">
+        <article class="article-card" data-stagger-item>
+          <h4>How does escrow protection work?</h4>
+          <p>Your payment is held securely until you confirm account delivery. Admin verifies UTR before releasing funds to seller.</p>
+          <div class="article-tags">
+            <span class="article-tag">Escrow</span>
+            <span class="article-tag">Security</span>
+            <span class="article-tag">Payments</span>
+          </div>
+        </article>
+        
+        <article class="article-card" data-stagger-item>
+          <h4>What are the platform fees?</h4>
+          <p>10% platform fee on all transactions. No hidden charges, no gateway fees. Direct UPI to seller or platform fallback.</p>
+          <div class="article-tags">
+            <span class="article-tag">Fees</span>
+            <span class="article-tag">UPI</span>
+            <span class="article-tag">Transparent</span>
+          </div>
+        </article>
+        
+        <article class="article-card" data-stagger-item>
+          <h4>How to become a verified seller?</h4>
+          <p>Complete KYC verification, maintain good ratings, and apply for trusted/gold/diamond badges through seller verification.</p>
+          <div class="article-tags">
+            <span class="article-tag">KYC</span>
+            <span class="article-tag">Verification</span>
+            <span class="article-tag">Badges</span>
+          </div>
+        </article>
+        
+        <article class="article-card" data-stagger-item>
+          <h4>Buying popularity points safely</h4>
+          <p>Enter target UID, choose package, pay via UPI. Points credited directly in-game. No account sharing required.</p>
+          <div class="article-tags">
+            <span class="article-tag">Popularity</span>
+            <span class="article-tag">Safe</span>
+            <span class="article-tag">In-Game</span>
+          </div>
+        </article>
+        
+        <article class="article-card" data-stagger-item>
+          <h4>Meeting sellers in person</h4>
+          <p>Use city filters to find local sellers. Meet at public places (malls, metro stations, police stations). Never send money in advance.</p>
+          <div class="article-tags">
+            <span class="article-tag">Meetups</span>
+            <span class="article-tag">Safety</span>
+            <span class="article-tag">Local</span>
+          </div>
+        </article>
+        
+        <article class="article-card" data-stagger-item>
+          <h4>Account recovery & 2FA setup</h4>
+          <p>Enable 2FA in profile settings. Forgot password? Use email OTP. Banned accounts can be appealed via support.</p>
+          <div class="article-tags">
+            <span class="article-tag">Security</span>
+            <span class="article-tag">2FA</span>
+            <span class="article-tag">Recovery</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Contact Support -->
+    <section class="contact-support" data-reveal="slide-up" data-reveal-delay="300">
+      <div class="contact-card">
+        <h3>Still Need Help?</h3>
+        <p>Our support team is available to assist you with any issues not covered here.</p>
+        <div class="contact-btns">
+          <a href="mailto:lkushwaha6161@gmail.com" class="btn btn-primary btn-lg btn-ripple" data-magnetic="0.25">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            Email Support
+          </a>
+          <a href="chat.html" class="btn btn-outline btn-lg btn-ripple" data-magnetic="0.25">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            Live Chat
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="mailto:lkushwaha6161@gmail.com">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Scripts -->
+<script src="js/auth.js"></script>
+<script src="js/theme.js"></script>
+<script src="assets/effects.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize auth buttons in navbar
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        
+        if (navLogoutBtn) {
+          navLogoutBtn.addEventListener('click', () => {
+            if (window.logout) window.logout();
+          });
+        }
+      } else {
+        authButtons.innerHTML = `
+          <a href="login.html" class="btn btn-ghost btn-sm">Sign In</a>
+          <a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>
+        `;
+      }
+      
+      // Mobile menu toggle
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById('helpSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.category-card, .article-card').forEach(card => {
+          const text = card.textContent.toLowerCase();
+          card.style.display = text.includes(query) ? '' : 'none';
+        });
+      });
+    }
+  });
+</script>
+</body>
+</html>

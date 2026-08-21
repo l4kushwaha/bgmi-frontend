@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ | BGMI Market</title>
+<meta name="description" content="Frequently Asked Questions about BGMI Market - Buying, selling, payments, escrow, popularity, meetups, and account security.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
+
+<!-- Theme Script -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  .faq-page { min-height: 100vh; padding: 2rem 0 4rem; }
+  .faq-hero { text-align: center; padding: 4rem 2rem; }
+  .faq-hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+  .faq-hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+  .faq-nav { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin: 2rem 0 3rem; padding: 0 1.5rem; }
+  .faq-nav-btn { padding: 0.75rem 1.5rem; border-radius: var(--radius-full); border: 1px solid var(--border-subtle); background: var(--bg-glass); backdrop-filter: blur(10px); color: var(--text-secondary); font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all var(--transition-fast); white-space: nowrap; }
+  .faq-nav-btn:hover { border-color: var(--border-primary); color: var(--accent-primary); background: var(--bg-card); }
+  .faq-nav-btn.active { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: var(--text-on-accent); border-color: transparent; box-shadow: var(--shadow-md), var(--shadow-glow); }
+  .faq-section { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+  .faq-section[id] { scroll-margin-top: 100px; }
+  .faq-category { margin-bottom: 3rem; }
+  .faq-category-title { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; color: var(--accent-primary); }
+  .faq-category-title::before { content: ''; width: 4px; height: 28px; border-radius: 2px; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); }
+  .accordion { border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--bg-card); overflow: hidden; margin-bottom: 1rem; transition: all var(--transition-base); }
+  .accordion:hover { border-color: var(--border-primary); box-shadow: var(--shadow-md); }
+  .accordion summary { padding: 1.5rem; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 1rem; color: var(--text-primary); transition: all var(--transition-fast); }
+  .accordion summary::-webkit-details-marker { display: none; }
+  .accordion summary::after { content: ''; width: 24px; height: 24px; border-radius: var(--radius-full); background: var(--bg-tertiary); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 1rem; transition: all var(--transition-base); }
+  .accordion summary::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+  .accordion[open] summary::after { transform: rotate(180deg); background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23050912' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); }
+  .accordion summary:hover { color: var(--accent-primary); }
+  .accordion-content { padding: 0 1.5rem 1.5rem; color: var(--text-secondary); line-height: 1.8; animation: slideDown 0.3s ease; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .accordion-content p { margin-bottom: 1rem; }
+  .accordion-content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+  .accordion-content li { margin-bottom: 0.5rem; }
+  .accordion-content a { color: var(--accent-primary); text-decoration: none; }
+  .accordion-content a:hover { text-decoration: underline; }
+  .contact-cta { text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(184, 77, 255, 0.1)); border: 1px solid var(--border-primary); border-radius: var(--radius-xl); margin-top: 3rem; }
+  .contact-cta h3 { font-size: 1.75rem; margin-bottom: 1rem; }
+  .contact-cta p { color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem; }
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" id="navAdminLink" style="display: none;">Admin</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    <div id="authButtons"></div>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<main class="faq-page" role="main">
+  <div class="container">
+    <section class="faq-hero" data-reveal="slide-up">
+      <h1 data-text-reveal="words" data-stagger="0.04">Frequently Asked Questions</h1>
+      <p data-reveal="fade" data-reveal-delay="200">Quick answers to common questions about buying, selling, and trading on BGMI Market.</p>
+    </section>
+
+    <nav class="faq-nav" aria-label="FAQ Categories" data-reveal="slide-up" data-reveal-delay="300">
+      <button class="faq-nav-btn active" data-category="all">All</button>
+      <button class="faq-nav-btn" data-category="buying">🛒 Buying</button>
+      <button class="faq-nav-btn" data-category="selling">💰 Selling</button>
+      <button class="faq-nav-btn" data-category="payments">💳 Payments</button>
+      <button class="faq-nav-btn" data-category="popularity">🔥 Popularity</button>
+      <button class="faq-nav-btn" data-category="meetups">🤝 Meetups</button>
+      <button class="faq-nav-btn" data-category="account">👤 Account</button>
+    </nav>
+
+    <div class="faq-section">
+      <section class="faq-category" id="buying" data-category="buying" data-reveal="slide-up" data-stagger-item>
+        <h2 class="faq-category-title">Buying Accounts</h2>
+        <details class="accordion">
+          <summary>How do I buy a BGMI account?</summary>
+          <div class="accordion-content">
+            <p>Browse the <a href="marketplace.html">Marketplace</a>, use filters to find accounts matching your criteria (rank, UC, skins, level), click "Buy Now" on a listing, choose delivery method (Online UPI or Meetup), complete payment via UPI, and wait for seller to deliver credentials. Escrow protects your payment until delivery is confirmed.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>How do I verify a seller is legitimate?</summary>
+          <div class="accordion-content">
+            <p>Look for verification badges: <strong>✅ Trusted</strong> (KYC verified), <strong>🥇 Gold</strong> (10+ successful sales), <strong>💎 Diamond</strong> (50+ sales, 4.8+ rating). Check seller profile for ratings, reviews, join date, and response time. Only buy from verified sellers for maximum safety.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>What if the account details don't match the listing?</summary>
+          <div class="accordion-content">
+            <p>Do not confirm delivery. Open a dispute in the order chat. Admin will verify the account against the listing. If details don't match, you get a full refund. Never confirm delivery until you've verified everything in-game.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Can I filter by city for local meetups?</summary>
+          <div class="accordion-content">
+            <p>Yes! Use the city search filter on Marketplace or go to <a href="meetups.html">Meetups</a> page. Enter your city to find sellers nearby. Meet at public places like malls, metro stations, or police stations for maximum safety.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="faq-category" id="selling" data-category="selling" data-reveal="slide-up" data-stagger-item>
+        <h2 class="faq-category-title">Selling Accounts</h2>
+        <details class="accordion">
+          <summary>How do I list my BGMI account for sale?</summary>
+          <div class="accordion-content">
+            <p>Go to <a href="sell.html">Sell</a> page, choose "Sell Account", fill in account details (UID, rank, level, UC, skins, achievements), upload screenshots, set your price, add UPI ID for payments, and submit. Listings go live after quick review.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>When do I get paid?</summary>
+          <div class="accordion-content">
+            <p>After buyer confirms delivery (or admin verifies UTR for online payments), funds are released instantly to your wallet. Withdraw to your UPI anytime - processed within 24 hours. 10% platform fee deducted automatically.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Do I need KYC to sell?</summary>
+          <div class="accordion-content">
+            <p>Basic selling works without KYC, but verified sellers get <strong>Trusted badge</strong>, higher buyer trust, and faster sales. Complete KYC in Profile → Verification for best results.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>How do I increase my seller rating?</summary>
+          <div class="accordion-content">
+            <p>Deliver accounts quickly, provide accurate descriptions, respond fast to buyer messages, and maintain 100% successful transactions. After 10+ sales with 4.5+ rating, apply for Gold badge. 50+ sales with 4.8+ rating for Diamond.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="faq-category" id="payments" data-category="payments" data-reveal="slide-up" data-stagger-item>
+        <h2 class="faq-category-title">Payments & Escrow</h2>
+        <details class="accordion">
+          <summary>What payment methods are accepted?</summary>
+          <div class="accordion-content">
+            <p><strong>Direct UPI only</strong> - PhonePe, Google Pay, Paytm, BHIM, or any UPI app. No cards, wallets, or net banking. This keeps fees at 10% only (no gateway charges). Buyer pays seller's UPI directly or platform fallback UPI.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>How does escrow work?</summary>
+          <div class="accordion-content">
+            <p><strong>Online:</strong> Buyer pays → funds held in escrow → seller delivers → buyer confirms → admin verifies UTR → funds released to seller.<br><strong>Meetup:</strong> Buyer & seller meet → buyer inspects account → buyer pays cash/UPI directly → both confirm → order completes.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>What if I sent money but didn't receive the account?</summary>
+          <div class="accordion-content">
+            <p>Don't confirm delivery. Open dispute in order chat. Admin will investigate - check UTR, verify seller delivered credentials. If seller didn't deliver, you get full refund. If seller delivered but you didn't check, admin mediates.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Are there any hidden fees?</summary>
+          <div class="accordion-content">
+            <p>No. <strong>10% platform fee only</strong>. No payment gateway fees, no withdrawal fees, no listing fees. What you see is what you pay. Seller receives 90% of sale price.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="faq-category" id="popularity" data-category="popularity" data-reveal="slide-up" data-stagger-item>
+        <h2 class="faq-category-title">Popularity Boosts</h2>
+        <details class="accordion">
+          <summary>What are popularity points?</summary>
+          <div class="accordion-content">
+            <p>BGMI popularity points show on your profile. Higher points = higher leaderboard rank. Points earned by receiving likes from other players. We sell real in-game popularity - exact values credited to your UID.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>How does buying popularity work?</summary>
+          <div class="accordion-content">
+            <p>On <a href="popularity.html">Popularity</a> page, choose package, enter your BGMI UID, pay via UPI. Our system credits points directly in-game within minutes. No account login needed - just your UID.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Is it safe? Will my account get banned?</summary>
+          <div class="accordion-content">
+            <p>We use legitimate methods - real players liking your profile. No bots, no exploits. Thousands of players use this safely. However, use at your own discretion. No reports of bans from our service.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Can I sell my popularity points?</summary>
+          <div class="accordion-content">
+            <p>Yes! On <a href="sell.html">Sell</a> page, choose "Sell Popularity", set your UID and price per 1000 points. Buyers purchase, you receive payment. Popularity transferred via in-game likes.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="faq-category" id="meetups" data-category="meetups" data-reveal="slide-up" data-stagger-item>
+        <h2 class="faq-category-title">Real Meetups</h2>
+        <details class="accordion">
+          <summary>How do meetups work?</summary>
+          <div class="accordion-content">
+            <p>Find seller in your city → request meetup with date/time/location → seller accepts → meet at public place → buyer inspects account on seller's device → buyer pays cash/UPI directly → both confirm in app. Safest method - no online payment risk.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Where should we meet?</summary>
+          <div class="accordion-content">
+            <p><strong>Safe locations:</strong> Shopping malls (food court), metro stations, police stations, bank branches, crowded cafes. <strong>Avoid:</strong> Isolated areas, private residences, ATMs at night. Always meet during daytime.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>What if seller doesn't show up?</summary>
+          <div class="accordion-content">
+            <p>Meetup request expires after set time. No money exchanged since payment happens at meetup. You can leave feedback. Repeated no-shows get seller flagged.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="faq-category" id="account" data-category="account" data-reveal="slide-up" data-stagger-item>
+        <h2 class="faq-category-title">Account & Security</h2>
+        <details class="accordion">
+          <summary>How do I enable 2FA?</summary>
+          <div class="accordion-content">
+            <p>Go to <a href="profile.html">Profile</a> → Security → Enable 2FA. Uses TOTP (Google Authenticator, Authy). Backup codes provided. Highly recommended for all users.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Forgot password?</summary>
+          <div class="accordion-content">
+            <p>Click "Forgot Password" on <a href="login.html">Login</a> page. Enter email → receive OTP → set new password. Or go directly to <a href="forgot_password.html">Forgot Password</a> page.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>My account was banned. Can I appeal?</summary>
+          <div class="accordion-content">
+            <p>Contact support at <a href="mailto:lkushwaha6161@gmail.com">lkushwaha6161@gmail.com</a> with your user ID, email, and reason for appeal. Admin reviews within 48 hours. Fraud, scams, or TOS violations = permanent ban.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>How do I delete my account?</summary>
+          <div class="accordion-content">
+            <p>Go to Profile → Settings → Delete Account. Enter password to confirm. All data permanently removed. Cannot be undone. Active orders must be completed first.</p>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>Is my data private?</summary>
+          <div class="accordion-content">
+            <p>Yes. See <a href="privacy.html">Privacy Policy</a>. We collect minimal data (email, username, UPI for payments). Never share with third parties. No tracking cookies. Data encrypted at rest.</p>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <div class="contact-cta" data-reveal="slide-up">
+      <h3>Still Have Questions?</h3>
+      <p>Our support team typically responds within a few hours.</p>
+      <a href="mailto:lkushwaha6161@gmail.com" class="btn btn-primary btn-lg btn-ripple" data-magnetic="0.25">Email Support</a>
+    </div>
+  </div>
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="mailto:lkushwaha6161@gmail.com">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/theme.js"></script>
+<script src="assets/effects.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        if (navLogoutBtn) navLogoutBtn.addEventListener('click', () => { if (window.logout) window.logout(); });
+      } else {
+        authButtons.innerHTML = `<a href="login.html" class="btn btn-ghost btn-sm">Sign In</a><a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>`;
+      }
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+    
+    // Category filter
+    const navBtns = document.querySelectorAll('.faq-nav-btn');
+    const categories = document.querySelectorAll('.faq-category');
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        navBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.category;
+        categories.forEach(c => {
+          c.style.display = (cat === 'all' || c.dataset.category === cat) ? '' : 'none';
+        });
+      });
+    });
+    
+    // Deep link to category
+    const hash = location.hash.slice(1);
+    if (hash) {
+      const btn = document.querySelector(`.faq-nav-btn[data-category="${hash}"]`);
+      if (btn) btn.click();
+      const section = document.getElementById(hash);
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+</script>
+</body>
+</html>

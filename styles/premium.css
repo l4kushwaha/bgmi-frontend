@@ -4,38 +4,38 @@
    ===================================================== */
 
 :root {
-  /* Dark theme (default) */
-  --bg-primary: #050912;
-  --bg-secondary: #0a0f1a;
-  --bg-tertiary: #111827;
-  --bg-card: rgba(17, 24, 39, 0.9);
-  --bg-glass: rgba(5, 9, 18, 0.8);
-  --bg-input: #111827;
-  --bg-hover: #1e293b;
+  /* Dark theme (default) - Porsche Carbon Fiber */
+  --bg-primary: #0a0a0c;
+  --bg-secondary: #111114;
+  --bg-tertiary: #1a1a1e;
+  --bg-card: rgba(26, 26, 30, 0.95);
+  --bg-glass: rgba(10, 10, 12, 0.85);
+  --bg-input: #1a1a1e;
+  --bg-hover: #232328;
   
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-on-accent: #050912;
+  --text-primary: #fafafa;
+  --text-secondary: #a0a0a5;
+  --text-muted: #6a6a70;
+  --text-on-accent: #0a0a0c;
   
-  --accent-primary: #00eaff;
-  --accent-secondary: #ff7800;
-  --accent-tertiary: #7cff8b;
-  --accent-gold: #ffd700;
-  --accent-purple: #a855f7;
+  --accent-primary: #00d4ff;
+  --accent-secondary: #ff6b00;
+  --accent-tertiary: #00ff88;
+  --accent-gold: #ffc800;
+  --accent-purple: #b84dff;
   --accent-pink: #ec4899;
   
-  --border-primary: rgba(0, 234, 255, 0.4);
-  --border-secondary: rgba(255, 120, 0, 0.4);
-  --border-subtle: rgba(148, 163, 184, 0.12);
+  --border-primary: rgba(0, 212, 255, 0.4);
+  --border-secondary: rgba(255, 107, 0, 0.4);
+  --border-subtle: rgba(160, 160, 165, 0.1);
   
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 32px rgba(0, 234, 255, 0.3);
-  --shadow-glow-warm: 0 0 32px rgba(255, 120, 0, 0.3);
-  --shadow-glow-success: 0 0 32px rgba(124, 255, 139, 0.3);
-  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 32px rgba(0, 212, 255, 0.35);
+  --shadow-glow-warm: 0 0 32px rgba(255, 107, 0, 0.35);
+  --shadow-glow-success: 0 0 32px rgba(0, 255, 136, 0.35);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.2);
   
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -61,8 +61,8 @@
   --shadow-ambient: 0 2px 8px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1);
   --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.2), 0 16px 48px rgba(0, 0, 0, 0.15);
   --shadow-floating: 0 24px 64px rgba(0, 0, 0, 0.25), 0 32px 80px rgba(0, 0, 0, 0.2);
-  --shadow-glow-intense: 0 0 64px rgba(0, 234, 255, 0.4), 0 0 128px rgba(0, 234, 255, 0.2);
-  --shadow-glow-warm-intense: 0 0 64px rgba(255, 120, 0, 0.4), 0 0 128px rgba(255, 120, 0, 0.2);
+  --shadow-glow-intense: 0 0 64px rgba(0, 212, 255, 0.4), 0 0 128px rgba(0, 212, 255, 0.2);
+  --shadow-glow-warm-intense: 0 0 64px rgba(255, 107, 0, 0.4), 0 0 128px rgba(255, 107, 0, 0.2);
   
   --blur-sm: 8px;
   --blur-md: 16px;
@@ -76,38 +76,39 @@
   --z-cursor: 9999;
 }
 
-/* Light theme */
+/* Light theme - Porsche Silver */
 [data-theme="light"] {
-  --bg-primary: #f8fafc;
+  --bg-primary: #f5f5f7;
   --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --bg-glass: rgba(248, 250, 252, 0.9);
-  --bg-input: #f1f5f9;
-  --bg-hover: #e2e8f0;
+  --bg-tertiary: #eaeaed;
+  --bg-card: rgba(255, 255, 255, 0.98);
+  --bg-glass: rgba(245, 245, 247, 0.9);
+  --bg-input: #eaeaed;
+  --bg-hover: #d1d1d6;
   
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-muted: #86868b;
   --text-on-accent: #ffffff;
   
-  --accent-primary: #00b4d8;
-  --accent-secondary: #e85d04;
-  --accent-tertiary: #16a34a;
-  --accent-gold: #ca8a04;
-  --accent-purple: #9333ea;
-  --accent-pink: #db2777;
+  --accent-primary: #007aff;
+  --accent-secondary: #ff6b00;
+  --accent-tertiary: #34c759;
+  --accent-gold: #c89600;
+  --accent-purple: #af52de;
+  --accent-pink: #d63384;
   
-  --border-primary: rgba(0, 180, 216, 0.5);
-  --border-secondary: rgba(232, 93, 4, 0.5);
-  --border-subtle: rgba(71, 85, 105, 0.1);
+  --border-primary: rgba(0, 122, 255, 0.5);
+  --border-secondary: rgba(255, 107, 0, 0.5);
+  --border-subtle: rgba(110, 110, 115, 0.1);
   
-  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.1);
-  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.15);
-  --shadow-lg: 0 16px 48px rgba(15, 23, 42, 0.2);
-  --shadow-glow: 0 0 32px rgba(0, 180, 216, 0.35);
-  --shadow-glow-warm: 0 0 32px rgba(232, 93, 4, 0.35);
-  --shadow-glow-success: 0 0 32px rgba(22, 163, 74, 0.35);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+  --shadow-glow: 0 0 32px rgba(0, 122, 255, 0.4);
+  --shadow-glow-warm: 0 0 32px rgba(255, 107, 0, 0.4);
+  --shadow-glow-success: 0 0 32px rgba(52, 199, 89, 0.4);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 @font-face {
@@ -129,16 +130,29 @@
     https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1920&q=80,
     https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&q=80;
   
-  --bg-overlay-dark: linear-gradient(135deg, rgba(5,9,18,0.85), rgba(10,15,26,0.9), rgba(5,9,18,0.85));
-  --bg-overlay-light: linear-gradient(135deg, rgba(248,250,252,0.7), rgba(241,245,249,0.8), rgba(248,250,252,0.7));
-  --glass-bg: rgba(255,255,255,0.05);
-  --glass-border: rgba(255,255,255,0.1);
-  --glass-highlight: rgba(255,255,255,0.15);
+  /* CSS Fallback - visible immediately while images load */
+  --bg-fallback-dark: 
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0, 212, 255, 0.18), transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(255, 107, 0, 0.12), transparent 50%),
+    radial-gradient(ellipse 100% 50% at 50% 50%, rgba(184, 77, 255, 0.1), transparent 70%),
+    linear-gradient(180deg, #0a0a0c 0%, #111114 50%, #0a0a0c 100%);
+  
+  --bg-fallback-light: 
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0, 122, 255, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(255, 107, 0, 0.1), transparent 50%),
+    radial-gradient(ellipse 100% 50% at 50% 50%, rgba(175, 82, 222, 0.08), transparent 70%),
+    linear-gradient(180deg, #f5f5f7 0%, #ffffff 50%, #f5f5f7 100%);
+  
+  --bg-overlay-dark: linear-gradient(135deg, rgba(10,10,12,0.85), rgba(17,17,20,0.9), rgba(10,10,12,0.85));
+  --bg-overlay-light: linear-gradient(135deg, rgba(245,245,247,0.7), rgba(255,255,255,0.8), rgba(245,245,247,0.7));
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-highlight: rgba(255,255,255,0.12);
 }
 
 [data-theme="light"] {
   --glass-bg: rgba(255,255,255,0.15);
-  --glass-border: rgba(0,0,0,0.08);
+  --glass-border: rgba(0,0,0,0.06);
   --glass-highlight: rgba(255,255,255,0.3);
 }
 
@@ -249,7 +263,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: var(--bg-primary);
+  background: var(--bg-fallback-dark);
   color: var(--text-primary);
   line-height: 1.65;
   min-height: 100vh;
@@ -269,33 +283,31 @@ body::after {
 }
 
 body::before {
-  background: 
-    radial-gradient(ellipse 100% 80% at 20% -10%, rgba(0, 234, 255, 0.12), transparent 60%),
-    radial-gradient(ellipse 80% 60% at 120% 110%, rgba(255, 120, 0, 0.08), transparent 50%),
-    radial-gradient(ellipse 60% 40% at -20% 50%, rgba(168, 85, 247, 0.06), transparent 40%);
+  background: var(--bg-fallback-dark);
   animation: bgDrift 25s ease-in-out infinite alternate;
 }
 
 body::after {
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(0, 234, 255, 0.03) 1px, transparent 1px),
-    radial-gradient(circle at 75% 75%, rgba(255, 120, 0, 0.02) 1px, transparent 1px);
+    radial-gradient(circle at 25% 25%, rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(255, 107, 0, 0.02) 1px, transparent 1px);
   background-size: 80px 80px, 120px 120px;
   animation: patternDrift 30s linear infinite;
   opacity: 0.4;
 }
 
+[data-theme="light"] body {
+  background: var(--bg-fallback-light);
+}
+
 [data-theme="light"] body::before {
-  background: 
-    radial-gradient(ellipse 100% 80% at 20% -10%, rgba(0, 180, 216, 0.08), transparent 60%),
-    radial-gradient(ellipse 80% 60% at 120% 110%, rgba(232, 93, 4, 0.06), transparent 50%),
-    radial-gradient(ellipse 60% 40% at -20% 50%, rgba(147, 51, 234, 0.04), transparent 40%);
+  background: var(--bg-fallback-light);
 }
 
 [data-theme="light"] body::after {
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(0, 180, 216, 0.02) 1px, transparent 1px),
-    radial-gradient(circle at 75% 75%, rgba(232, 93, 4, 0.015) 1px, transparent 1px);
+    radial-gradient(circle at 25% 25%, rgba(0, 122, 255, 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(255, 107, 0, 0.015) 1px, transparent 1px);
 }
 
 [data-theme="light"] body::before {

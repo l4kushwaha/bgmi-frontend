@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service | BGMI Market</title>
+<meta name="description" content="BGMI Market Terms of Service - Rules, policies, and legal terms for using the marketplace.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
+
+<!-- Theme Script -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  .legal-page { min-height: 100vh; padding: 2rem 0 4rem; }
+  .legal-hero { text-align: center; padding: 4rem 2rem; }
+  .legal-hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+  .legal-hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+  .legal-content { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+  .legal-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2.5rem; margin-bottom: 1.5rem; }
+  .legal-section h2 { font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--accent-primary); display: flex; align-items: center; gap: 0.75rem; }
+  .legal-section h2::before { content: ''; width: 4px; height: 28px; border-radius: 2px; background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary)); }
+  .legal-section h3 { font-size: 1.125rem; margin: 2rem 0 1rem; color: var(--text-primary); }
+  .legal-section p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 1rem; }
+  .legal-section ul { margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); line-height: 1.8; }
+  .legal-section li { margin-bottom: 0.5rem; }
+  .legal-section a { color: var(--accent-primary); text-decoration: none; }
+  .legal-section a:hover { text-decoration: underline; }
+  .legal-section strong { color: var(--text-primary); }
+  .last-updated { text-align: right; color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem; padding: 0 1.5rem; }
+  .toc { background: var(--bg-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2rem; margin-bottom: 2rem; position: sticky; top: 100px; }
+  .toc h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--accent-primary); }
+  .toc ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; }
+  .toc a { color: var(--text-secondary); text-decoration: none; padding: 0.5rem; border-radius: var(--radius-md); transition: all var(--transition-fast); display: block; }
+  .toc a:hover { color: var(--accent-primary); background: var(--bg-tertiary); }
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" id="navAdminLink" style="display: none;">Admin</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    <div id="authButtons"></div>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<main class="legal-page" role="main">
+  <div class="container">
+    <section class="legal-hero" data-reveal="slide-up">
+      <h1 data-text-reveal="words" data-stagger="0.04">Terms of Service</h1>
+      <p data-reveal="fade" data-reveal-delay="200">Please read these terms carefully before using BGMI Market.</p>
+    </section>
+
+    <p class="last-updated">Last updated: January 2025</p>
+
+    <nav class="toc" aria-label="Table of Contents" data-reveal="slide-up">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li><a href="#acceptance">1. Acceptance of Terms</a></li>
+        <li><a href="#accounts">2. User Accounts</a></li>
+        <li><a href="#buying-selling">3. Buying & Selling</a></li>
+        <li><a href="#payments">4. Payments & Fees</a></li>
+        <li><a href="#escrow">5. Escrow & Disputes</a></li>
+        <li><a href="#conduct">6. Prohibited Conduct</a></li>
+        <li><a href="#ip">7. Intellectual Property</a></li>
+        <li><a href="#disclaimer">8. Disclaimers</a></li>
+        <li><a href="#limitation">9. Limitation of Liability</a></li>
+        <li><a href="#termination">10. Termination</a></li>
+        <li><a href="#governing">11. Governing Law</a></li>
+        <li><a href="#changes">12. Changes to Terms</a></li>
+        <li><a href="#contact">13. Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="legal-content">
+      <section class="legal-section" id="acceptance" data-reveal="slide-up">
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using BGMI Market ("the Platform", "we", "us", "our"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part, you may not use the Platform.</p>
+        <p>These Terms apply to all visitors, users, buyers, sellers, and others who access or use the Platform.</p>
+      </section>
+
+      <section class="legal-section" id="accounts" data-reveal="slide-up">
+        <h2>2. User Accounts</h2>
+        <h3>2.1 Registration</h3>
+        <p>You must provide accurate, current, and complete information during registration. You are responsible for maintaining the confidentiality of your account and password.</p>
+        <h3>2.2 Eligibility</h3>
+        <p>You must be at least 18 years old to use this Platform. By registering, you represent and warrant that you meet this requirement.</p>
+        <h3>2.3 Account Security</h3>
+        <p>Enable two-factor authentication (2FA) for added security. Notify us immediately of any unauthorized use. We are not liable for losses from compromised accounts.</p>
+        <h3>2.4 Verification</h3>
+        <p>KYC verification is optional but required for Trusted/Gold/Diamond seller badges. We may request identity documents at any time.</p>
+      </section>
+
+      <section class="legal-section" id="buying-selling" data-reveal="slide-up">
+        <h2>3. Buying & Selling</h2>
+        <h3>3.1 Listings</h3>
+        <p>Sellers are responsible for accurate descriptions. Misleading listings will be removed. BGMI Market does not verify account details before listing - buyers must verify upon delivery.</p>
+        <h3>3.2 Delivery</h3>
+        <p>Online: Seller delivers credentials via platform chat after payment verification. Meetup: In-person at agreed public location.</p>
+        <h3>3.3 Confirmation</h3>
+        <p>Buyers must confirm delivery only after verifying the account in-game. Once confirmed, the transaction is final.</p>
+      </section>
+
+      <section class="legal-section" id="payments" data-reveal="slide-up">
+        <h2>4. Payments & Fees</h2>
+        <h3>4.1 Platform Fee</h3>
+        <p>A 10% platform fee applies to all successful transactions. This fee covers escrow, platform maintenance, and support. No hidden fees.</p>
+        <h3>4.2 Payment Method</h3>
+        <p>Direct UPI only (PhonePe, Google Pay, Paytm, BHIM, etc.). No credit cards, wallets, or bank transfers.</p>
+        <h3>4.3 Withdrawals</h3>
+        <p>Sellers can withdraw earnings to their registered UPI. Processed within 24 hours. Minimum withdrawal: ₹100.</p>
+      </section>
+
+      <section class="legal-section" id="escrow" data-reveal="slide-up">
+        <h2>5. Escrow & Disputes</h2>
+        <h3>5.1 Escrow Protection</h3>
+        <p>Funds are held in escrow until buyer confirms delivery or admin verifies UTR. Protects both parties.</p>
+        <h3>5.2 Dispute Resolution</h3>
+        <p>Either party may open a dispute. Admin reviews evidence (UTRs, chat logs, screenshots) and decides within 48 hours. Decision is final.</p>
+        <h3>5.3 Refunds</h3>
+        <p>Full refund if: account doesn't match listing, seller fails to deliver, account banned/restricted at time of sale.</p>
+      </section>
+
+      <section class="legal-section" id="conduct" data-reveal="slide-up">
+        <h2>6. Prohibited Conduct</h2>
+        <p>You agree not to:</p>
+        <ul>
+          <li>Engage in fraud, scams, or deceptive practices</li>
+          <li>Sell hacked, stolen, or banned accounts</li>
+          <li>Use bots, scripts, or automated tools</li>
+          <li>Harass, threaten, or abuse other users</li>
+          <li>Attempt to bypass security measures</li>
+          <li>Conduct transactions outside the Platform</li>
+          <li>Share false information or fake screenshots</li>
+          <li>Violate any applicable laws or regulations</li>
+        </ul>
+        <p>Violations result in immediate account suspension and potential legal action.</p>
+      </section>
+
+      <section class="legal-section" id="ip" data-reveal="slide-up">
+        <h2>7. Intellectual Property</h2>
+        <p>The Platform and its content (design, code, logos, text) are owned by BGMI Market. "BGMI" and related marks are trademarks of Krafton Inc. We are not affiliated with Krafton Inc.</p>
+        <p>User-generated content (listings, chats, reviews) remains your property but you grant us a license to display it on the Platform.</p>
+      </section>
+
+      <section class="legal-section" id="disclaimer" data-reveal="slide-up">
+        <h2>8. Disclaimers</h2>
+        <p>The Platform is provided "as is" and "as available" without warranties of any kind. We do not warrant that:</p>
+        <ul>
+          <li>The Platform will be uninterrupted or error-free</li>
+          <li>Account details in listings are accurate (seller's responsibility)</li>
+          <li>Transactions will be risk-free</li>
+          <li>Third-party services (UPI, BGMI servers) will function perfectly</li>
+        </ul>
+      </section>
+
+      <section class="legal-section" id="limitation" data-reveal="slide-up">
+        <h2>9. Limitation of Liability</h2>
+        <p>To the maximum extent permitted by law, BGMI Market shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or goodwill, arising from your use of the Platform.</p>
+        <p>Our total liability shall not exceed the fees you paid to us in the 12 months preceding the claim.</p>
+      </section>
+
+      <section class="legal-section" id="termination" data-reveal="slide-up">
+        <h2>10. Termination</h2>
+        <p>We may terminate or suspend your account immediately, without prior notice, for violation of these Terms. Upon termination, your right to use the Platform ceases. Provisions that should survive termination will survive.</p>
+      </section>
+
+      <section class="legal-section" id="governing" data-reveal="slide-up">
+        <h2>11. Governing Law</h2>
+        <p>These Terms are governed by the laws of India. Disputes shall be resolved in the courts of [Your City/State], India.</p>
+      </section>
+
+      <section class="legal-section" id="changes" data-reveal="slide-up">
+        <h2>12. Changes to Terms</h2>
+        <p>We may modify these Terms at any time. Changes take effect immediately upon posting. Continued use constitutes acceptance. We'll notify users of material changes via email or platform notification.</p>
+      </section>
+
+      <section class="legal-section" id="contact" data-reveal="slide-up">
+        <h2>13. Contact</h2>
+        <p>Questions about these Terms? Contact us at:</p>
+        <p><strong>Email:</strong> <a href="mailto:lkushwaha6161@gmail.com">lkushwaha6161@gmail.com</a></p>
+        <p><strong>Instagram:</strong> <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer">@am_sillent_hunter</a></p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="mailto:lkushwaha6161@gmail.com">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/theme.js"></script>
+<script src="assets/effects.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        if (navLogoutBtn) navLogoutBtn.addEventListener('click', () => { if (window.logout) window.logout(); });
+      } else {
+        authButtons.innerHTML = `<a href="login.html" class="btn btn-ghost btn-sm">Sign In</a><a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>`;
+      }
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+  });
+</script>
+</body>
+</html>

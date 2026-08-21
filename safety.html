@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safety Guide | BGMI Market</title>
+<meta name="description" content="BGMI Market Safety Guide - Learn how to trade safely, avoid scams, verify sellers, use escrow, and meet securely.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium Styles -->
+<link rel="stylesheet" href="styles/premium.css">
+<link rel="stylesheet" href="assets/effects.css">
+<link rel="stylesheet" href="styles/responsive.css">
+
+<!-- Theme Script -->
+<script>
+  (function() {
+    try {
+      var theme = localStorage.getItem('bgmi-market-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  .safety-page { min-height: 100vh; padding: 2rem 0 4rem; }
+  .safety-hero { text-align: center; padding: 4rem 2rem; }
+  .safety-hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 1rem; }
+  .safety-hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+  .safety-grid { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; }
+  .safety-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2rem; transition: all var(--transition-base); position: relative; overflow: hidden; }
+  .safety-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary)); opacity: 0; transition: opacity var(--transition-base); }
+  .safety-card:hover { border-color: var(--border-primary); box-shadow: var(--shadow-lg), var(--shadow-glow); transform: translateY(-6px); }
+  .safety-card:hover::before { opacity: 1; }
+  .safety-icon { width: 64px; height: 64px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3); }
+  .safety-card:nth-child(2) .safety-icon { background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary)); box-shadow: 0 8px 24px rgba(255, 107, 0, 0.3); }
+  .safety-card:nth-child(3) .safety-icon { background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-primary)); box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3); }
+  .safety-card:nth-child(4) .safety-icon { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); box-shadow: 0 8px 24px rgba(184, 77, 255, 0.3); }
+  .safety-card:nth-child(5) .safety-icon { background: linear-gradient(135deg, var(--accent-gold), #e6ac00); box-shadow: 0 8px 24px rgba(255, 200, 0, 0.3); }
+  .safety-card:nth-child(6) .safety-icon { background: linear-gradient(135deg, var(--accent-pink), var(--accent-secondary)); box-shadow: 0 8px 24px rgba(236, 72, 153, 0.3); }
+  .safety-card h3 { font-size: 1.375rem; margin-bottom: 1rem; }
+  .safety-card ul { list-style: none; }
+  .safety-card li { padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: flex-start; gap: 0.75rem; color: var(--text-secondary); line-height: 1.6; }
+  .safety-card li:last-child { border-bottom: none; }
+  .safety-card li::before { content: '✓'; color: var(--accent-tertiary); font-weight: 700; flex-shrink: 0; margin-top: 0.125rem; }
+  .warning-box { background: linear-gradient(135deg, rgba(255, 107, 0, 0.15), rgba(236, 72, 153, 0.1)); border: 1px solid var(--accent-secondary); border-radius: var(--radius-xl); padding: 2rem; margin: 2rem 0; max-width: 1200px; margin-left: auto; margin-right: auto; padding: 0 1.5rem; }
+  .warning-box h3 { color: var(--accent-secondary); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .warning-box ul { list-style: none; }
+  .warning-box li { padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 107, 0, 0.2); display: flex; align-items: flex-start; gap: 0.75rem; color: var(--text-secondary); }
+  .warning-box li:last-child { border-bottom: none; }
+  .warning-box li::before { content: '⚠'; flex-shrink: 0; }
+  .checklist { max-width: 1200px; margin: 2rem auto 0; padding: 0 1.5rem; }
+  .checklist h2 { font-size: 1.75rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+  .checklist h2::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-primary), transparent); }
+  .checklist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+  .checklist-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 1.75rem; }
+  .checklist-card h4 { font-size: 1.125rem; margin-bottom: 1rem; color: var(--accent-primary); }
+  .checklist-card label { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; cursor: pointer; color: var(--text-secondary); transition: color var(--transition-fast); }
+  .checklist-card label:hover { color: var(--text-primary); }
+  .checklist-card input[type="checkbox"] { width: 20px; height: 20px; border-radius: var(--radius-sm); border: 2px solid var(--border-subtle); background: var(--bg-input); appearance: none; cursor: pointer; transition: all var(--transition-fast); position: relative; }
+  .checklist-card input[type="checkbox"]:checked { background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary)); border-color: transparent; }
+  .checklist-card input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px; border: solid var(--text-on-accent); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .emergency { text-align: center; padding: 3rem 2rem; background: linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(236, 72, 153, 0.1)); border: 1px solid var(--accent-secondary); border-radius: var(--radius-xl); margin: 3rem auto 0; max-width: 1200px; }
+  .emergency h3 { font-size: 1.75rem; margin-bottom: 1rem; color: var(--accent-secondary); }
+  .emergency p { color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem; }
+</style>
+</head>
+<body>
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-brand" aria-label="BGMI Market Home" data-magnetic="0.2">
+    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span>BGMI Market</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="marketplace.html" class="nav-link">Marketplace</a>
+    <a href="sell.html" class="nav-link">Sell</a>
+    <a href="popularity.html" class="nav-link">Popularity</a>
+    <a href="meetups.html" class="nav-link">Meetups</a>
+    <a href="wallet.html" class="nav-link">Wallet</a>
+    <a href="chat.html" class="nav-link">Chats</a>
+    <a href="profile.html" class="nav-link">Profile</a>
+    <a href="admin_dashboard.html" class="nav-link" id="navAdminLink" style="display: none;">Admin</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" type="button" data-magnetic="0.3">
+      <span class="toggle-track" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
+    </button>
+    <div id="authButtons"></div>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<main class="safety-page" role="main">
+  <div class="container">
+    <section class="safety-hero" data-reveal="slide-up">
+      <h1 data-text-reveal="words" data-stagger="0.04">Safety Guide</h1>
+      <p data-reveal="fade" data-reveal-delay="200">Trade with confidence. Follow these guidelines to protect yourself from scams and fraud.</p>
+    </section>
+
+    <div class="warning-box" data-reveal="slide-up" data-reveal-delay="100">
+      <h3>⚠ Golden Rules - Never Break These</h3>
+      <ul>
+        <li><strong>Never pay outside the platform.</strong> No direct UPI to seller before escrow, no crypto, no bank transfers to personal accounts.</li>
+        <li><strong>Never share your BGMI account credentials</strong> before payment is secured in escrow or you're at a meetup inspecting the account.</li>
+        <li><strong>Never confirm delivery</strong> until you've logged in and verified everything (rank, UC, skins, email access).</li>
+        <li><strong>Never rush.</strong> Scammers create urgency. Take your time to verify.</li>
+        <li><strong>Never meet at isolated locations.</strong> Only public places during daytime.</li>
+      </ul>
+    </div>
+
+    <div class="safety-grid">
+      <article class="safety-card" data-reveal="slide-up" data-stagger-item>
+        <div class="safety-icon" aria-hidden="true">🛡️</div>
+        <h3>Before You Buy</h3>
+        <ul>
+          <li>Check seller verification badge (Trusted/Gold/Diamond)</li>
+          <li>Read all reviews and ratings on seller profile</li>
+          <li>Verify account details match screenshots</li>
+          <li>Ask for recent gameplay video if unsure</li>
+          <li>Use platform chat for all communication</li>
+          <li>Confirm seller has valid UPI ID listed</li>
+        </ul>
+      </article>
+
+      <article class="safety-card" data-reveal="slide-up" data-stagger-item>
+        <div class="safety-icon" aria-hidden="true">💳</div>
+        <h3>Payment Safety</h3>
+        <ul>
+          <li>Always use platform escrow for online deals</li>
+          <li>Pay only to seller's listed UPI or platform fallback</li>
+          <li>Save UTR screenshot immediately after payment</li>
+          <li>Never send "advance" or "token" money</li>
+          <li>Don't pay via QR codes from chat images</li>
+          <li>Report payment issues instantly in order chat</li>
+        </ul>
+      </article>
+
+      <article class="safety-card" data-reveal="slide-up" data-stagger-item>
+        <div class="safety-icon" aria-hidden="true">🔍</div>
+        <h3>Account Verification</h3>
+        <ul>
+          <li>Log in and check: Rank, Level, UC, Skins, Achievements</li>
+          <li>Verify email is unlinked or accessible</li>
+          <li>Check for banned/restricted status in-game</li>
+          <li>Test login from different device if possible</li>
+          <li>Change password & enable 2FA immediately</li>
+          <li>Unlink seller's social accounts if any</li>
+        </ul>
+      </article>
+
+      <article class="safety-card" data-reveal="slide-up" data-stagger-item>
+        <div class="safety-icon" aria-hidden="true">🤝</div>
+        <h3>Meetup Safety</h3>
+        <ul>
+          <li>Meet at: Malls, Metro stations, Police stations, Banks</li>
+          <li>Daytime only (10 AM - 6 PM)</li>
+          <li>Bring a friend if possible</li>
+          <li>Inspect account on seller's device before paying</li>
+          <li>Pay cash or UPI only after verification</li>
+          <li>Both confirm in app before leaving</li>
+        </ul>
+      </article>
+
+      <article class="safety-card" data-reveal="slide-up" data-stagger-item>
+        <div class="safety-icon" aria-hidden="true">📱</div>
+        <h3>Communication Security</h3>
+        <ul>
+          <li>Keep all chat on platform - don't move to WhatsApp/Telegram</li>
+          <li>Use in-app voice messages for clarity</li>
+          <li>Screenshot important agreements</li>
+          <li>Report suspicious links or requests</li>
+          <li>Don't share OTPs with anyone</li>
+          <li>Verify admin identity - they never ask for passwords</li>
+        </ul>
+      </article>
+
+      <article class="safety-card" data-reveal="slide-up" data-stagger-item>
+        <div class="safety-icon" aria-hidden="true">🚨</div>
+        <h3>Red Flags - Walk Away If:</h3>
+        <ul>
+          <li>Seller refuses escrow or meetup</li>
+          <li>Price too good to be true (90% off)</li>
+          <li>Pushes for quick decision/urgency</li>
+          <li>Asks for payment to different UPI</li>
+          <li>No screenshots or blurry images</li>
+          <li>New account with expensive listings</li>
+          <li>Refuses to show account live</li>
+        </ul>
+      </article>
+    </div>
+
+    <section class="checklist" data-reveal="slide-up" data-reveal-delay="200">
+      <h2>Pre-Trade Checklist</h2>
+      <div class="checklist-grid">
+        <article class="checklist-card">
+          <h4>🛒 Buyer Checklist</h4>
+          <label><input type="checkbox"> Seller has verification badge</label>
+          <label><input type="checkbox"> Read 3+ recent reviews</label>
+          <label><input type="checkbox"> Account details match listing</label>
+          <label><input type="checkbox"> Screenshots are clear & recent</label>
+          <label><input type="checkbox"> Communication only on platform</label>
+          <label><input type="checkbox"> Using escrow (online) or meetup</label>
+          <label><input type="checkbox"> UTR saved after payment</label>
+          <label><input type="checkbox"> Verified account in-game</label>
+          <label><input type="checkbox"> Changed password & 2FA enabled</label>
+          <label><input type="checkbox"> Confirmed delivery only after check</label>
+        </article>
+        <article class="checklist-card">
+          <h4>💰 Seller Checklist</h4>
+          <label><input type="checkbox"> KYC completed for Trusted badge</label>
+          <label><input type="checkbox"> Accurate account description</label>
+          <label><input type="checkbox"> Clear screenshots uploaded</label>
+          <label><input type="checkbox"> Valid UPI ID added</label>
+          <label><input type="checkbox"> Respond to buyers within 1 hour</label>
+          <label><input type="checkbox"> Deliver credentials promptly</label>
+          <label><input type="checkbox"> Use platform chat only</label>
+          <label><input type="checkbox"> Don't share credentials before payment</label>
+          <label><input type="checkbox"> Withdraw earnings regularly</label>
+          <label><input type="checkbox"> Maintain 4.5+ rating</label>
+        </article>
+        <article class="checklist-card">
+          <h4>🤝 Meetup Checklist</h4>
+          <label><input type="checkbox"> Public location chosen</label>
+          <label><input type="checkbox"> Daytime meeting scheduled</label>
+          <label><input type="checkbox"> Friend informed of location</label>
+          <label><input type="checkbox"> Phone charged for UPI/calls</label>
+          <label><input type="checkbox"> Seller shows account on their device</label>
+          <label><input type="checkbox"> You verify rank, UC, skins live</label>
+          <label><input type="checkbox"> Pay only after verification</label>
+          <label><input type="checkbox"> Both confirm in app</label>
+          <label><input type="checkbox"> Exchange contact for follow-up</label>
+          <label><input type="checkbox"> Leave honest review</label>
+        </article>
+      </div>
+    </section>
+
+    <div class="emergency" data-reveal="slide-up" data-reveal-delay="300">
+      <h3>🚨 Scammed? Act Fast</h3>
+      <p>Don't panic. We can help if you act quickly.</p>
+      <a href="mailto:lkushwaha6161@gmail.com" class="btn btn-secondary btn-lg btn-ripple" data-magnetic="0.25">Report Scam Now</a>
+      <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-muted);">Include: Order ID, Seller username, UTR screenshots, Chat screenshots, What happened</p>
+    </div>
+  </div>
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo" aria-label="BGMI Market Home" data-magnetic="0.15">
+        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span>BGMI Market</span>
+      </a>
+      <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
+      <div class="footer-social" style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+        <a href="https://instagram.com/am_sillent_hunter" target="_blank" rel="noopener noreferrer" class="footer-social-link inline" data-magnetic="0.2" aria-label="Follow us on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          <span style="font-size: 0.8rem; font-weight: 500;">@am_sillent_hunter</span>
+        </a>
+      </div>
+    </div>
+    <nav class="footer-section" aria-label="Quick Links">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="sell.html">Sell Account</a></li>
+        <li><a href="help.html">Help Center</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-section" aria-label="Support">
+      <h4>Support</h4>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="safety.html">Safety Guide</a></li>
+        <li><a href="mailto:lkushwaha6161@gmail.com">Contact Us</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-badges">
+      <span class="footer-badge verified">✅ Verified Sellers</span>
+      <span class="footer-badge secure">🔒 Secure Escrow</span>
+      <span class="footer-badge upi">💳 Direct UPI</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/theme.js"></script>
+<script src="assets/effects.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const authButtons = document.getElementById('authButtons');
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    
+    if (authButtons) {
+      if (token && user) {
+        authButtons.innerHTML = `
+          <div class="nav-dropdown" id="userDropdown">
+            <button class="nav-link" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span id="navUserName">${user.name || user.email}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="nav-dropdown-menu" id="userDropdownMenu" role="menu" aria-label="User menu">
+              <a href="profile.html" class="nav-dropdown-item" role="menuitem">Profile</a>
+              <a href="wallet.html" class="nav-dropdown-item" role="menuitem">Wallet</a>
+              <a href="chat.html" class="nav-dropdown-item" role="menuitem">Chats</a>
+              <div class="nav-dropdown-divider" id="guestDivider" style="display: none;"></div>
+              <a href="admin_dashboard.html" class="nav-dropdown-item" role="menuitem" id="navAdminLink" style="display: ${user.role === 'admin' ? 'flex' : 'none'}">Admin Dashboard</a>
+              <button class="nav-dropdown-item" id="navLogoutBtn" role="menuitem" style="text-align: left; width: 100%;">Logout</button>
+            </div>
+          </div>
+        `;
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        if (userMenuBtn && userDropdownMenu) {
+          userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = userDropdownMenu.style.opacity === '1';
+            userDropdownMenu.style.opacity = isOpen ? '0' : '1';
+            userDropdownMenu.style.visibility = isOpen ? 'hidden' : 'visible';
+            userDropdownMenu.style.transform = isOpen ? 'translateY(-10px)' : 'translateY(0)';
+            userMenuBtn.setAttribute('aria-expanded', !isOpen);
+          });
+          document.addEventListener('click', () => {
+            userDropdownMenu.style.opacity = '0';
+            userDropdownMenu.style.visibility = 'hidden';
+            userDropdownMenu.style.transform = 'translateY(-10px)';
+            userMenuBtn.setAttribute('aria-expanded', 'false');
+          });
+        }
+        if (navLogoutBtn) navLogoutBtn.addEventListener('click', () => { if (window.logout) window.logout(); });
+      } else {
+        authButtons.innerHTML = `<a href="login.html" class="btn btn-ghost btn-sm">Sign In</a><a href="login.html" class="btn btn-primary btn-sm btn-ripple">Get Started</a>`;
+      }
+      const navToggle = document.getElementById('navToggle');
+      const navLinks = document.getElementById('navLinks');
+      if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+          const isOpen = navLinks.classList.toggle('open');
+          navToggle.setAttribute('aria-expanded', isOpen);
+        });
+      }
+    }
+  });
+</script>
+</body>
+</html>
