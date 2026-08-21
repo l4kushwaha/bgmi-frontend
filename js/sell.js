@@ -182,6 +182,7 @@
     secAccount.classList.toggle("hidden-sec", cat !== "account");
     secItems.classList.toggle("hidden-sec", cat !== "account");
     secPopularity.classList.toggle("hidden-sec", cat !== "popularity");
+    document.querySelectorAll(".form-section").forEach(sec => { if (sec.hasAttribute("hidden")) sec.hidden = sec.classList.contains("hidden-sec"); });
     const titleEl = document.querySelector(".title");
     if (cat === "popularity") {
       titleEl.textContent = "Sell Your Popularity";
