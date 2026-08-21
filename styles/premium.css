@@ -2111,3 +2111,11 @@ body::before {
 @media (max-width: 768px) {
   body::before { background-image: url("https://picsum.photos/seed/bgmi-market-m/900/1600") !important; }
 }
+
+/* fx-wall-clear: wallpaper ekdum clear */
+.glass-layer {
+  backdrop-filter: blur(4px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(4px) saturate(125%) !important;
+  background: rgba(9, 10, 13, 0.06) !important;
+}
+.bg-layer { filter: saturate(1.22) contrast(1.08) !important; }
