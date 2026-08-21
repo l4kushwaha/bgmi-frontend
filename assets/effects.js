@@ -33,7 +33,7 @@
   let targetScrollY = 0;
   let scrollVelocity = 0;
   let lastScrollY = 0;
-  const SMOOTH_SCROLL_ENABLED = !reducedMotion && !smallScreen;
+  const SMOOTH_SCROLL_ENABLED = false; // Disabled by default - breaks too many layouts
   const SCROLL_EASE = 0.075; // Porsche-like smoothness
 
   function initSmoothScroll() {
@@ -1117,38 +1117,76 @@
     const shuffled = [...bgImages].sort(() => Math.random() - 0.5);
     const selectedImages = shuffled.slice(0, 2);
     
+    let loadedCount = 0;
+    
     // Create background layers
     const layer1 = document.createElement('div');
     layer1.className = 'bg-layer';
-    layer1.style.backgroundImage = `url("${selectedImages[0]}")`;
     layer1.style.willChange = 'opacity, transform';
     
     const layer2 = document.createElement('div');
     layer2.className = 'bg-layer';
-    layer2.style.backgroundImage = `url("${selectedImages[1]}")`;
     layer2.style.opacity = '0';
     layer2.style.willChange = 'opacity, transform';
     
     // Add crossfade animation to layer2
     layer2.style.animation = 'bgCrossfade 35s ease-in-out infinite alternate';
     
-    document.body.insertBefore(layer1, document.body.firstChild);
-    document.body.insertBefore(layer2, document.body.firstChild);
+    // Load images with error handling and fallback
+    function loadImageWithFallback(url, layer, isFirst) {
+      const img = new Image();
+      img.onload = () => {
+        layer.style.backgroundImage = `url("${url}")`;
+        loadedCount++;
+        if (loadedCount === 2) {
+          // Both images loaded, insert layers
+          document.body.insertBefore(layer1, document.body.firstChild);
+          document.body.insertBefore(layer2, document.body.firstChild);
+          
+          // Create glass layer (iOS 26 style frosted glass overlay)
+          const glassLayer = document.createElement('div');
+          glassLayer.className = 'glass-layer';
+          glassLayer.style.willChange = 'backdrop-filter';
+          document.body.insertBefore(glassLayer, document.body.firstChild);
+          
+          // Create mesh gradient
+          const meshGradient = document.createElement('div');
+          meshGradient.className = 'mesh-gradient';
+          meshGradient.style.willChange = 'transform, opacity';
+          document.body.insertBefore(meshGradient, document.body.firstChild);
+          
+          // Create floating glass shards
+          createGlassShards();
+        }
+      };
+      img.onerror = () => {
+        // Fallback to gradient if image fails
+        layer.style.backgroundImage = isFirst 
+          ? 'linear-gradient(135deg, rgba(0, 234, 255, 0.15), transparent 50%), linear-gradient(135deg, rgba(255, 120, 0, 0.1), transparent 50%)'
+          : 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), transparent 50%), linear-gradient(135deg, rgba(255, 215, 0, 0.1), transparent 50%)';
+        loadedCount++;
+        if (loadedCount === 2) {
+          document.body.insertBefore(layer1, document.body.firstChild);
+          document.body.insertBefore(layer2, document.body.firstChild);
+          
+          const glassLayer = document.createElement('div');
+          glassLayer.className = 'glass-layer';
+          glassLayer.style.willChange = 'backdrop-filter';
+          document.body.insertBefore(glassLayer, document.body.firstChild);
+          
+          const meshGradient = document.createElement('div');
+          meshGradient.className = 'mesh-gradient';
+          meshGradient.style.willChange = 'transform, opacity';
+          document.body.insertBefore(meshGradient, document.body.firstChild);
+          
+          createGlassShards();
+        }
+      };
+      img.src = url;
+    }
     
-    // Create glass layer (iOS 26 style frosted glass overlay)
-    const glassLayer = document.createElement('div');
-    glassLayer.className = 'glass-layer';
-    glassLayer.style.willChange = 'backdrop-filter';
-    document.body.insertBefore(glassLayer, document.body.firstChild);
-    
-    // Create mesh gradient
-    const meshGradient = document.createElement('div');
-    meshGradient.className = 'mesh-gradient';
-    meshGradient.style.willChange = 'transform, opacity';
-    document.body.insertBefore(meshGradient, document.body.firstChild);
-    
-    // Create floating glass shards
-    createGlassShards();
+    loadImageWithFallback(selectedImages[0], layer1, true);
+    loadImageWithFallback(selectedImages[1], layer2, false);
   }
   
   function createGlassShards() {
