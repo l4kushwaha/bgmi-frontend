@@ -2065,3 +2065,12 @@ img{filter:saturate(1.04) contrast(1.02)}
 /* marketplace search/city/filter ek line me */
 #searchForm { display: flex !important; flex-direction: row !important; align-items: flex-end !important; justify-content: space-between !important; flex-wrap: wrap; gap: 1rem; }
 #searchForm > .form-group, #searchForm > div { flex: 1 1 180px; }
+
+/* wallpaper saaf dikhe */
+.bg-layer { opacity: 1 !important; filter: saturate(1.18) contrast(1.07) brightness(0.94); }
+.glass-layer {
+  backdrop-filter: blur(13px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(13px) saturate(135%) !important;
+  background: rgba(9, 10, 13, 0.16) !important;
+}
+body > main, main { position: relative; z-index: 1; }

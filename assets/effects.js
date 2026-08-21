@@ -1410,7 +1410,7 @@
     // turant dikhne wala background (baad me HD load hota hai)
     const l1 = document.querySelector('.bg-layer');
     if (l1 && !l1.style.backgroundImage) {
-      l1.style.backgroundImage = 'url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDtawYn04k-I3hWmV1aAtUFR6zZUhoe1PEwbeMa9_m7dg-TncuS5I8rA&s=10")';
+      l1.style.backgroundImage = 'url("https://picsum.photos/seed/' + (location.pathname.replace(/[^a-z]/g, '') || 'home') + '/1600/900")';
     }
 
     // hamburger + Menu
