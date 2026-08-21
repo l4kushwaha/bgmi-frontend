@@ -1101,16 +1101,45 @@
   function initBackgroundSystem() {
     if (document.body.dataset.nofx) return;
     
-    // Parse the bg-images CSS variable
-    const bgImagesVar = getComputedStyle(document.documentElement).getPropertyValue('--bg-images').trim();
-    if (!bgImagesVar) return;
-    
-    // Extract URLs from the comma-separated list
-    const bgImages = bgImagesVar
-      .split(',')
-      .map(url => url.trim().replace(/^["']|["']$/g, ''))
-      .filter(url => url.length > 0);
-    
+    // Per-page curated wallpapers (verified URLs)
+    const U = (u) => u;
+    const PAGE_BG = {
+      index: [
+        "https://www.xtrafondos.com/wallpapers/pubg-mobile-blood-raven-x-suit-set-skin-outfit-8145.jpg",
+        "https://wallpaperaccess.com/full/9950190.jpg",
+        "https://wallpapercave.com/wp/wp15280640.jpg",
+        "https://i.ytimg.com/vi/T54D_gTij3o/maxresdefault.jpg",
+        "https://preview.redd.it/upcoming-honor-suit-v0-f0wtura8fdlf1.jpeg?width=1080&crop=smart&auto=webp&s=0550346aee6ba60b8db4db2519f2d0dda72a79d5",
+        "https://i0.wp.com/shop-blogs.rooter.gg/wp-content/uploads/2026/02/Wildsoul-Warden-set-in-BGMI.webp?fit=1376%2C700&ssl=1"
+      ],
+      marketplace: [
+        "https://wallpaperaccess.com/full/11137957.jpg",
+        "https://images.hdqwalls.com/wallpapers/pubg-x-spiderman-1m.jpg",
+        "https://wallpaperaccess.com/full/9471241.jpg",
+        "https://c4.wallpaperflare.com/wallpaper/816/114/355/honor-of-kings-game-characters-hd-wallpaper-preview.jpg"
+      ],
+      sell: [
+        "https://c4.wallpaperflare.com/wallpaper/816/114/355/honor-of-kings-game-characters-hd-wallpaper-preview.jpg",
+        "https://images.hdqwalls.com/wallpapers/bthumb/devious-cybercat-in-pubg-tl.jpg",
+        "https://4kwallpapers.com/images/walls/thumbs_2t/7318.jpg"
+      ],
+      login: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToxu42fr0YYF4xv082E3uawtjg7O0HSHvCiZUCnVlDcoiA5VdosyMRXpJ6&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREgB7tCEVk6uT5rJJs6NFNed-1R5ttw_GwZ3NSQQ6QE2lVzfd-mVZ0x-c&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDtawYn04k-I3hWmV1aAtUFR6zZUhoe1PEwbeMa9_m7dg-TncuS5I8rA&s=10"
+      ],
+      popularity: [
+        "https://images.hdqwalls.com/wallpapers/pubg-x-spiderman-1m.jpg",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS94KIkWG67yNTJS8w4g4uZY_3-ikQwIFNHbleCZEPvWh1RaMPD3Dpd2X_N&s=10",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQIo_IcPEk-Zgb-zMeUo8fnxBMuADrHQp0KAgmPkgg9_zKF1mOsdixKEQg&s=10"
+      ]
+    };
+    PAGE_BG.forgot_password = PAGE_BG.login;
+    PAGE_BG.default = [...PAGE_BG.index, ...PAGE_BG.marketplace];
+
+    const pageKey = ((location.pathname.split('/').pop() || 'index.html').replace(/\.html?$/i, '')) || 'index';
+    const bgImages = PAGE_BG[pageKey] || PAGE_BG.default;
+
     if (!bgImages.length) return;
     
     // Select 2 random images for this session
@@ -1320,18 +1349,17 @@
     safeInit(initHoverReveal);
     safeInit(initMorphingShapes);
 
-    // FAILSAFE: guarantee content is never stuck hidden
+    // FAILSAFE: rescue stuck-hidden elements IN VIEWPORT only (below-fold keeps scroll animations)
+    const inView = el => { const r = el.getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; };
     setTimeout(() => {
-      document.querySelectorAll('[data-reveal]:not(.revealed)').forEach(el => el.classList.add('revealed'));
-      document.querySelectorAll('.char-reveal, .word-reveal, .line-reveal').forEach(s => {
-        s.style.opacity = '1';
-        s.style.transform = 'translateY(0)';
-      });
-      document.querySelectorAll('[data-stagger-item]').forEach(el => {
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-      });
-    }, 1500);
+      document.querySelectorAll('[data-reveal]:not(.revealed)').forEach(el => { if (inView(el)) el.classList.add('revealed'); });
+      document.querySelectorAll('.char-reveal, .word-reveal, .line-reveal').forEach(s => { if (inView(s)) { s.style.opacity = '1'; s.style.transform = 'translateY(0)'; } });
+      document.querySelectorAll('[data-stagger-item]').forEach(el => { if (inView(el)) { el.style.opacity = '1'; el.style.transform = 'none'; } });
+    }, 1600);
+    // Late safety net for observer edge-cases (still only in-viewport)
+    setTimeout(() => {
+      document.querySelectorAll('[data-reveal]:not(.revealed)').forEach(el => { if (inView(el)) el.classList.add('revealed'); });
+    }, 6000);
     
     // Legacy compatibility
     initGlitch();

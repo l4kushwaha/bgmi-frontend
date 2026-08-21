@@ -1918,3 +1918,17 @@ img[data-src].loaded {
   body { background: white; color: black; }
   .glass, .glass-strong, .glass-card, .card { background: white; border: 1px solid #ddd; box-shadow: none; }
 }
+
+/* ================= FX POLISH v2 (Porsche-level site-wide) ================= */
+html{scroll-behavior:smooth}
+::selection{background:rgba(0,212,255,.32);color:#fff}
+.btn{position:relative;overflow:hidden}
+.btn::after{content:"";position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-20deg);transition:left .65s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.btn:hover::after{left:150%}
+.navbar{backdrop-filter:saturate(170%) blur(22px);-webkit-backdrop-filter:saturate(170%) blur(22px)}
+.glass,.card,.stat-card,.feature-card,.boost-card{transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .5s ease,border-color .3s ease}
+.footer{backdrop-filter:blur(14px)}
+@media(prefers-reduced-motion:no-preference){
+  .hero-badge,.badge{transition:transform .3s cubic-bezier(.22,1,.36,1)}
+  .hero-badge:hover,.badge:hover{transform:translateY(-2px) scale(1.03)}
+}

@@ -178,6 +178,7 @@
     category = cat;
     catAccount.classList.toggle("active", cat === "account");
     catPopularity.classList.toggle("active", cat === "popularity");
+    const _cb = catAccount.parentElement; if (_cb) _cb.classList.toggle("pop-active", cat === "popularity");
     secAccount.classList.toggle("hidden-sec", cat !== "account");
     secItems.classList.toggle("hidden-sec", cat !== "account");
     secPopularity.classList.toggle("hidden-sec", cat !== "popularity");

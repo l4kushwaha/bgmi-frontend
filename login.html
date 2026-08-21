@@ -272,111 +272,104 @@
   </button>
 </nav>
 
+
+<style id="fxAuthStyle">
+  .fx-auth-slider{position:relative;width:min(880px,94vw);min-height:560px;margin:2.5rem auto 5rem;background:rgba(15,16,22,.74);backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);border-radius:30px;border:1px solid rgba(255,255,255,.09);box-shadow:0 40px 120px rgba(0,0,0,.55),0 0 80px rgba(0,212,255,.07);overflow:hidden;font-family:'Inter',sans-serif}
+  .fx-form{position:absolute;top:0;left:0;height:100%;width:50%;display:flex;flex-direction:column;justify-content:center;padding:0 54px;transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .5s ease}
+  .fx-form form{display:flex;flex-direction:column}
+  .fx-form h1{margin:0 0 .35rem;font-size:1.7rem;color:#fff;letter-spacing:-.02em}
+  .fx-sub{font-size:.82rem;color:var(--text-muted,#9aa3b2);margin-bottom:1.4rem}
+  .fx-form input{width:100%;margin:.4rem 0;padding:.95rem 1.15rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:14px;color:#fff;font-size:.95rem;outline:none;transition:border-color .25s,box-shadow .25s,background .25s}
+  .fx-form input::placeholder{color:#7d8595}
+  .fx-form input:focus{border-color:rgba(0,212,255,.7);box-shadow:0 0 0 4px rgba(0,212,255,.14);background:rgba(255,255,255,.08)}
+  .fx-link{font-size:.8rem;color:var(--accent-primary,#00D4FF);text-decoration:none;margin:.6rem 0 0;text-align:right}
+  .fx-btn{margin-top:1.15rem;padding:.95rem;border:none;border-radius:999px;background:linear-gradient(135deg,#00D4FF,#7A5CFF);color:#04121a;font-weight:800;font-size:.95rem;letter-spacing:.4px;cursor:pointer;box-shadow:0 12px 34px rgba(0,212,255,.35);transition:transform .18s ease,box-shadow .3s ease}
+  .fx-btn:hover{transform:translateY(-2px);box-shadow:0 16px 44px rgba(122,92,255,.45)}
+  .fx-btn:active{transform:scale(.97)}
+  .fx-alt{font-size:.82rem;color:var(--text-secondary,#aab3c5);margin-top:1.3rem}
+  .fx-alt a{color:var(--accent-primary,#00D4FF);font-weight:600;text-decoration:none}
+  .fx-signin{z-index:2}
+  .fx-signup{opacity:0;z-index:1}
+  .fx-auth-slider.right-panel-active .fx-signin{transform:translateX(100%)}
+  .fx-auth-slider.right-panel-active .fx-signup{transform:translateX(100%);opacity:1;z-index:5;animation:fxShow .6s}
+  @keyframes fxShow{0%,49.99%{opacity:0;z-index:1}50%,100%{opacity:1;z-index:5}}
+  .fx-overlay{position:absolute;top:0;left:50%;width:50%;height:100%;overflow:hidden;z-index:100;transition:transform .7s cubic-bezier(.22,1,.36,1)}
+  .fx-auth-slider.right-panel-active .fx-overlay{transform:translateX(-100%)}
+  .fx-overlay-inner{position:relative;left:-100%;height:100%;width:200%;background:linear-gradient(125deg,#00D4FF 0%,#7A5CFF 48%,#FF6B00 115%);transform:translateX(0);transition:transform .7s cubic-bezier(.22,1,.36,1)}
+  .fx-auth-slider.right-panel-active .fx-overlay-inner{transform:translateX(50%)}
+  .fx-panel{position:absolute;top:0;height:100%;width:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 46px;text-align:center;color:#fff}
+  .fx-panel h1{font-size:clamp(1.5rem,2.6vw,2.1rem);margin:0 0 .8rem;letter-spacing:-.02em;text-shadow:0 4px 24px rgba(0,0,0,.25)}
+  .fx-panel p{font-size:.92rem;line-height:1.75;opacity:.94;margin:0 0 1.8rem}
+  .fx-left{transform:translateX(-22%);transition:transform .7s cubic-bezier(.22,1,.36,1)}
+  .fx-right{right:0;transform:translateX(0);transition:transform .7s cubic-bezier(.22,1,.36,1)}
+  .fx-auth-slider.right-panel-active .fx-left{transform:translateX(0)}
+  .fx-auth-slider.right-panel-active .fx-right{transform:translateX(22%)}
+  .fx-ghost{background:transparent;border:2px solid #fff;color:#fff;border-radius:999px;padding:.8rem 2.6rem;font-weight:800;font-size:.9rem;cursor:pointer;transition:all .28s ease;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .fx-ghost:hover{background:#fff;color:#131417;transform:translateY(-2px)}
+  .fx-verify{position:absolute;inset:0;z-index:300;background:rgba(11,12,17,.96);backdrop-filter:blur(12px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem;text-align:center}
+  .fx-verify h1{color:#fff;margin:0 0 .5rem}
+  .fx-verify p{color:var(--text-secondary,#aab3c5);margin:0 0 1.2rem}
+  .fx-verify input#verify-otp{text-align:center;letter-spacing:.55rem;font-size:1.3rem;font-weight:800;max-width:260px;margin:0 auto;width:100%}
+  .fx-verify form{display:flex;flex-direction:column;width:100%;max-width:320px}
+  @media(max-width:820px){
+    .fx-overlay{display:none}
+    .fx-auth-slider{min-height:0;display:block;padding:.5rem 0 1rem}
+    .fx-form{position:relative;width:100%;height:auto;padding:1.6rem 1.4rem;transform:none!important;opacity:1!important;animation:none!important}
+    .fx-signup{border-bottom:1px solid rgba(255,255,255,.07)}
+    .fx-auth-slider.right-panel-active .fx-signup{order:-1}
+  }
+</style>
 <main class="auth-page" role="main">
-  <div class="auth-container" data-reveal="zoom" data-reveal-delay="100">
-    <!-- Auth Header -->
-    <header class="auth-header">
-      <div class="auth-icon" aria-hidden="true">🔐</div>
-      <h1 id="authTitle" data-text-reveal="words" data-stagger="0.04">Welcome Back</h1>
-      <p id="authSubtitle">Sign in to access your account, manage listings, and track orders.</p>
-    </header>
-
-    <!-- Form Panels -->
-    <div class="auth-form">
-      <!-- LOGIN PANEL -->
-      <div class="form-panel active" id="loginPanel">
-        <form onsubmit="event.preventDefault(); loginUser();" novalidate>
-          <div class="form-group" data-reveal="slide-up" data-reveal-delay="100">
-            <label class="label" for="login-email">Email Address</label>
-            <input type="email" id="login-email" class="input" required autocomplete="email" placeholder="Enter your email">
-          </div>
-
-          <div class="form-group" data-reveal="slide-up" data-reveal-delay="150">
-            <label class="label" for="login-password">Password</label>
-            <input type="password" id="login-password" class="input" required autocomplete="current-password" placeholder="Enter your password">
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-submit btn-ripple" data-magnetic="0.25">
-            <span>Sign In</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-              <polyline points="10 17 15 12 10 7"/>
-              <line x1="15" y1="12" x2="3" y2="12"/>
-            </svg>
-          </button>
-        </form>
-
-        <div class="panel-toggle">
-          <p>New to BGMI Market?</p>
-          <a href="#" class="register-trigger" id="showRegister" data-magnetic="0.2">Create Account</a>
+  <div class="fx-auth-slider" id="fxAuthSlider">
+    <!-- SIGN UP -->
+    <div class="fx-form fx-signup" id="registerPanel">
+      <form onsubmit="event.preventDefault(); registerUser();" novalidate>
+        <h1>Create Account</h1>
+        <span class="fx-sub">Join BGMI Market — trade securely 🎮</span>
+        <input type="text" id="register-name" placeholder="Username (3-20 chars)" required minlength="3" maxlength="20" autocomplete="username">
+        <input type="email" id="register-email" placeholder="Email address" required autocomplete="email">
+        <input type="password" id="register-password" placeholder="Password (min 8 chars)" required minlength="8" maxlength="128" autocomplete="new-password">
+        <button type="submit" class="fx-btn">Sign Up →</button>
+      </form>
+      <p class="fx-alt">Already registered? <a href="#" id="showLogin">Sign In</a></p>
+    </div>
+    <!-- SIGN IN -->
+    <div class="fx-form fx-signin" id="loginPanel">
+      <form onsubmit="event.preventDefault(); loginUser();" novalidate>
+        <h1>Welcome Back</h1>
+        <span class="fx-sub">Sign in to continue trading</span>
+        <input type="email" id="login-email" placeholder="Email address" required autocomplete="email">
+        <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+        <a class="fx-link" href="forgot_password.html">Forgot password?</a>
+        <button type="submit" class="fx-btn">Sign In →</button>
+      </form>
+      <p class="fx-alt">New here? <a href="#" id="showRegister">Create Account</a></p>
+    </div>
+    <!-- SLIDING OVERLAY -->
+    <div class="fx-overlay">
+      <div class="fx-overlay-inner">
+        <div class="fx-panel fx-left">
+          <h1>Welcome Back! ⚡</h1>
+          <p>Login karo aur apni listings, wallet aur chats manage karo.</p>
+          <button class="fx-ghost" id="goLoginBtn">Sign In</button>
+        </div>
+        <div class="fx-panel fx-right">
+          <h1>Hello, Gamer! 👋</h1>
+          <p>Account banake BGMI trading ki journey shuru karo — secure escrow ke saath.</p>
+          <button class="fx-ghost" id="goRegisterBtn">Create Account</button>
         </div>
       </div>
-
-      <!-- REGISTER PANEL -->
-      <div class="form-panel" id="registerPanel">
-        <form onsubmit="event.preventDefault(); registerUser();" novalidate>
-          <div class="form-group" data-reveal="slide-up" data-reveal-delay="100">
-            <label class="label" for="register-name">Username</label>
-            <input type="text" id="register-name" class="input" required autocomplete="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_ ]{3,20}" placeholder="Choose a username">
-          </div>
-
-          <div class="form-group" data-reveal="slide-up" data-reveal-delay="150">
-            <label class="label" for="register-email">Email Address</label>
-            <input type="email" id="register-email" class="input" required autocomplete="email" placeholder="Enter your email">
-          </div>
-
-          <div class="form-group" data-reveal="slide-up" data-reveal-delay="200">
-            <label class="label" for="register-password">Password</label>
-            <input type="password" id="register-password" class="input" required autocomplete="new-password" minlength="8" maxlength="128" placeholder="Create a password">
-            <div class="password-requirements" aria-live="polite" style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-muted);">
-              <span>Min 8 characters</span>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-submit btn-ripple" data-magnetic="0.25">
-            <span>Create Account</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <line x1="19" y1="8" x2="19" y2="14"/>
-              <line x1="22" y1="11" x2="16" y2="11"/>
-            </svg>
-          </button>
-        </form>
-
-        <div class="panel-toggle">
-          <p>Already have an account?</p>
-          <a href="#" class="login-trigger" id="showLogin" data-magnetic="0.2">Sign In</a>
-        </div>
-      </div>
-
-      <!-- EMAIL VERIFICATION (SIGNUP OTP) -->
-      <div class="form-panel" id="verifyPanel" role="dialog" aria-labelledby="verifyTitle" aria-modal="true">
-        <header class="auth-header">
-          <div class="auth-icon" aria-hidden="true">📩</div>
-          <h1>Verify Your Email</h1>
-          <p>Enter the 6-digit OTP sent to <b id="verifyEmail"></b></p>
-        </header>
-
-        <form onsubmit="event.preventDefault(); verifyEmail();" novalidate>
-          <input type="hidden" id="verify-email-store">
-          
-          <div class="form-group" data-reveal="slide-up" data-reveal-delay="100">
-            <label class="label" for="verify-otp">OTP Code</label>
-            <input type="text" id="verify-otp" class="input" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit OTP" required autocomplete="one-time-code" pattern="\d{6}" style="text-align: center; letter-spacing: 0.5rem; font-size: 1.25rem; font-weight: 700;">
-          </div>
-          
-          <button type="submit" class="btn btn-primary btn-submit btn-ripple" data-magnetic="0.25">
-            Verify & Continue
-          </button>
-        </form>
-
-        <div class="panel-toggle">
-          <a href="#" id="resendVerifyLink" onclick="event.preventDefault(); resendVerification();" data-magnetic="0.2">Resend OTP</a>
-          <span style="color: var(--text-muted);">·</span>
-          <a href="#" onclick="event.preventDefault(); closeVerify();" data-magnetic="0.2">Back to Login</a>
-        </div>
-      </div>
+    </div>
+    <!-- VERIFY OTP COVER -->
+    <div class="fx-verify" id="verifyPanel" role="dialog" aria-modal="true" aria-labelledby="verifyTitle" style="display:none;">
+      <h1 id="verifyTitle">Verify Your Email 📩</h1>
+      <p>6-digit OTP bheja gaya hai <b id="verifyEmail"></b> pe</p>
+      <form onsubmit="event.preventDefault(); verifyEmail();" novalidate>
+        <input type="hidden" id="verify-email-store">
+        <input type="text" id="verify-otp" inputmode="numeric" maxlength="6" placeholder="••••••" required autocomplete="one-time-code">
+        <button type="submit" class="fx-btn">Verify & Continue</button>
+      </form>
+      <p class="fx-alt"><a href="#" id="resendVerifyLink" onclick="event.preventDefault(); resendVerification();">Resend OTP</a> &nbsp;·&nbsp; <a href="#" onclick="event.preventDefault(); closeVerify();">← Back</a></p>
     </div>
   </div>
 </main>
@@ -415,62 +408,23 @@
 <script src="assets/effects.js" defer></script>
 
 <script>
-  // Panel toggle handlers
+  // Sliding panel controls
   document.addEventListener('DOMContentLoaded', () => {
-const loginPanel = document.getElementById('loginPanel');
-    const registerPanel = document.getElementById('registerPanel');
-    const verifyPanel = document.getElementById('verifyPanel');
-    const authTitle = document.getElementById('authTitle');
-    const authSubtitle = document.getElementById('authSubtitle');
-    const authIcon = document.querySelector('.auth-icon');
-    
-    const hasSession = localStorage.getItem('token') || localStorage.getItem('user');
-    const hasVisited = localStorage.getItem('bgmi-visited');
-    
-    function showPanel(panel) {
-      [loginPanel, registerPanel, verifyPanel].forEach(p => p.classList.remove('active'));
-      panel.classList.add('active');
-      
-      if (panel === loginPanel) {
-        authTitle.textContent = 'Welcome Back';
-        authSubtitle.textContent = 'Sign in to access your account, manage listings, and track orders.';
-        authIcon.textContent = '🔐';
-      } else if (panel === registerPanel) {
-        authTitle.textContent = 'Create Account';
-        authSubtitle.textContent = 'Join BGMI Market to start buying and selling securely.';
-        authIcon.textContent = '🚀';
-      } else if (panel === verifyPanel) {
-        authTitle.textContent = 'Verify Your Email';
-        authSubtitle.textContent = 'Enter the 6-digit OTP sent to your email.';
-        authIcon.textContent = '📩';
+    const slider = document.getElementById('fxAuthSlider');
+    const openReg = () => slider && slider.classList.add('right-panel-active');
+    const openLog = () => slider && slider.classList.remove('right-panel-active');
+    ['goRegister', 'showRegister'].forEach(id => document.getElementById(id)?.addEventListener('click', e => { e.preventDefault(); openReg(); }));
+    ['goLogin', 'showLogin'].forEach(id => document.getElementById(id)?.addEventListener('click', e => { e.preventDefault(); openLog(); }));
+    try {
+      const hasSession = localStorage.getItem('token') || localStorage.getItem('user');
+      if (!hasSession && !localStorage.getItem('bgmi-visited')) {
+        openReg();
+        localStorage.setItem('bgmi-visited', 'true');
       }
-    }
-    
-    if (!hasSession && !hasVisited) {
-      showPanel(registerPanel);
-      localStorage.setItem('bgmi-visited', 'true');
-    } else {
-      showPanel(loginPanel);
-    }
-    
-    const registerTrigger = document.getElementById('showRegister');
-    const loginTrigger = document.getElementById('showLogin');
-    
-    if (registerTrigger) {
-      registerTrigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPanel(registerPanel);
-      });
-    }
-    
-    if (loginTrigger) {
-      loginTrigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPanel(loginPanel);
-      });
-    }
-    
-    // Initialize auth buttons in navbar
+    } catch (e) {}
+  });
+
+  // Initialize auth buttons in navbar
     const authButtons = document.getElementById('authButtons');
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || 'null');
