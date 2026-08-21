@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+<script>
+  // sirf admin ko andar aane do (fxAdminGuard)
+  (function () {
+    var u = {};
+    try { u = JSON.parse(localStorage.getItem("user") || "{}"); } catch (e) {}
+    if (!localStorage.getItem("token") || u.role !== "admin") {
+      location.href = "index.html";
+    }
+  })();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard | BGMI Market</title>
