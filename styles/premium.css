@@ -2099,3 +2099,15 @@ body::before {
 @media (max-width: 768px) {
   body::before { background-image: url("https://picsum.photos/seed/bgmi-market-m/900/1600"); }
 }
+
+/* fx-wall-important: kisi bhi CSS ko override karke wallpaper dikhao */
+body::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -3 !important;
+  background: url("https://picsum.photos/seed/bgmi-market/1600/900") center/cover no-repeat !important;
+}
+@media (max-width: 768px) {
+  body::before { background-image: url("https://picsum.photos/seed/bgmi-market-m/900/1600") !important; }
+}
