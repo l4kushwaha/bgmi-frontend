@@ -1919,7 +1919,6 @@ img[data-src].loaded {
   .glass, .glass-strong, .glass-card, .card { background: white; border: 1px solid #ddd; box-shadow: none; }
 }
 
-/* ================= FX POLISH v2 (Porsche-level site-wide) ================= */
 html{scroll-behavior:smooth}
 ::selection{background:rgba(0,212,255,.32);color:#fff}
 .btn{position:relative;overflow:hidden}
@@ -1933,7 +1932,6 @@ html{scroll-behavior:smooth}
   .hero-badge:hover,.badge:hover{transform:translateY(-2px) scale(1.03)}
 }
 
-/* ================= PORSCHE V3 — NAVBAR & GLOBAL LUXURY ================= */
 .navbar{
   position:sticky;top:0;z-index:1000;
   background:linear-gradient(180deg,rgba(10,11,14,.82),rgba(10,11,14,.68))!important;
@@ -1964,7 +1962,7 @@ html{scroll-behavior:smooth}
 #userMenuBtn{gap:.5rem;border-radius:999px;padding:.45rem .9rem;transition:background .3s}
 #userMenuBtn:hover{background:rgba(255,255,255,.07)}
 
-/* ================= V4 — PORSCHE.COM DESIGN LANGUAGE ================= */
+/* extra styling */
 .navbar{transition:background .45s ease,box-shadow .45s ease,border-color .45s ease}
 .navbar.scrolled{background:linear-gradient(180deg,rgba(8,9,12,.92),rgba(8,9,12,.85))!important;box-shadow:0 20px 60px -24px rgba(0,0,0,.7)!important}
 h1,h2,h3{letter-spacing:-.035em!important}
@@ -1980,11 +1978,11 @@ a{scroll-margin-top:90px}
 .container,[class*="container"]{scroll-margin-top:90px}
 img{filter:saturate(1.04) contrast(1.02)}
 
-/* ================= V5 — PORSCHE SYSTEM (menu/footer/toggle/chat) ================= */
-/* Glass layer: show wallpapers through */
+/* extra styling */
+/* wallpaper thoda soft dikhe */
 .glass-layer{backdrop-filter:blur(22px) saturate(150%)!important;-webkit-backdrop-filter:blur(22px) saturate(150%)!important;background:rgba(9,10,13,.30)!important}
 .bg-layer{filter:saturate(1.12) contrast(1.05)}
-/* MENU BUTTON */
+/* hamburger button */
 .fx-menu-btn{display:inline-flex!important;align-items:center;gap:.55rem;background:transparent;border:0;color:#fff;font-weight:600;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:.6rem .8rem;margin-right:.75rem;border-radius:8px;transition:background .3s}
 .fx-menu-btn:hover{background:rgba(255,255,255,.08)}
 .fx-menu-btn i{width:17px;height:2px;background:#fff;border-radius:2px;display:block;margin:2.5px 0;transition:.35s cubic-bezier(.22,1,.36,1)}
@@ -1992,7 +1990,7 @@ img{filter:saturate(1.04) contrast(1.02)}
 .fx-menu-btn.active i:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
 .fx-menu-btn.active i:nth-child(2){opacity:0}
 .fx-menu-btn.active i:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
-/* MEGA MENU OVERLAY */
+/* fullscreen menu */
 .fx-mega{position:fixed;inset:0;z-index:5000;background:rgba(7,8,11,.92);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s;display:flex;align-items:center;justify-content:center}
 .fx-mega.open{opacity:1;visibility:visible}
 .fx-mega-close{position:absolute;top:26px;right:34px;font-size:2.6rem;line-height:1;color:#fff;background:none;border:0;cursor:pointer;opacity:.75;transition:.25s}
@@ -2001,28 +1999,28 @@ img{filter:saturate(1.04) contrast(1.02)}
 .fx-mega-nav a{color:#e8ebf0;text-decoration:none;font-size:clamp(1.6rem,4vw,2.7rem);font-weight:800;letter-spacing:-.03em;padding:.28rem .8rem;border-radius:12px;opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1),color .25s,background .25s}
 .fx-mega.open .fx-mega-nav a{opacity:1;transform:none}
 .fx-mega-nav a:hover{color:#fff;background:linear-gradient(90deg,rgba(0,212,255,.16),rgba(184,77,255,.10));padding-left:1.4rem}
-/* FOOTER — Porsche restraint */
+/* footer */
 .footer{border-top:1px solid rgba(255,255,255,.07)!important}
 .footer h4{text-transform:uppercase!important;letter-spacing:.18em!important;font-size:.72rem!important;color:var(--text-muted)!important;margin-bottom:1.1rem!important}
 .footer-links a{font-size:.9rem;transition:color .25s,padding-left .3s cubic-bezier(.22,1,.36,1)}
 .footer-links a:hover{color:#fff;padding-left:.35rem}
 .footer-copyright{letter-spacing:.04em}
-/* THEME TOGGLE */
+/* dark/light switch */
 .theme-toggle .toggle-thumb{transition:transform .4s cubic-bezier(.22,1,.36,1)!important}
-/* CHAT BUBBLES */
+/* chat messages */
 .chat-message,.msg,.message{border-radius:16px!important}
-/* LOGIN SLIDER: active form always above overlay */
+/* login panel upar rahe */
 .fx-auth-slider:not(.right-panel-active) .fx-signin{z-index:200}
 .fx-auth-slider.right-panel-active .fx-signup{z-index:200}
 
-/* ================= V6 — RESTORE GLASS, SOCIAL LOGIN, FIXES ================= */
-/* Restore frosted-glass cards (undo v4 flattening) */
+/* extra styling */
+/* glass cards wapas */
 .card,.glass,.stat-card,.feature-card,.boost-card{border-radius:22px!important;border:1px solid rgba(255,255,255,.14)!important;background:rgba(15,17,23,.58)!important;backdrop-filter:blur(26px) saturate(160%)!important;-webkit-backdrop-filter:blur(26px) saturate(160%)!important}
 .glass-layer{background:rgba(9,10,13,.38)!important}
-/* Sell section toggle insurance */
+/* section show/hide fix */
 .fx-sec:not(.hidden-sec){display:block!important}
 .fx-sec.hidden-sec{display:none!important}
-/* Social buttons */
+/* google / facebook login buttons */
 .social-row{display:flex;gap:.7rem;margin-top:1rem}
 .btn-social{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:.55rem;padding:.75rem .5rem;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-weight:600;font-size:.85rem;cursor:pointer;transition:background .25s,transform .25s,border-color .25s}
 .btn-social:hover{background:rgba(255,255,255,.13);transform:translateY(-2px);border-color:rgba(255,255,255,.3)}

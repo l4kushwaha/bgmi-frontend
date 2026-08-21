@@ -119,7 +119,7 @@
         location.href =
           user.role === "admin"
             ? "admin_dashboard.html"
-            : (new URLSearchParams(location.search).get("redirect") || "index.html"); /*fxRedirect*/
+            : (new URLSearchParams(location.search).get("redirect") || "index.html");
       }, 800);
 
     } catch (err) {
@@ -362,7 +362,7 @@ async function resetPassword() {
   }
 }
 
-  /* ===================== EXPORT ===================== */
+  // bahar expose karo
   window.loginUser = loginUser;
   window.registerUser = registerUser;
   window.logout = logout;
@@ -379,7 +379,7 @@ async function resetPassword() {
 
 
 
-  /* ==== SOCIAL LOGIN (OAuth scaffold) ==== */
+  // google/facebook se login
   async function socialLogin(provider) {
     try {
       showToast(`${provider === "google" ? "Google" : "Facebook"} login setup in progress — email/password use karein`, "info");

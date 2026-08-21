@@ -1390,7 +1390,7 @@
     });
   }
 
-  // FX: navbar scrolled state (Porsche-style)
+  // scroll karne pe navbar me halka shadow
   document.addEventListener('DOMContentLoaded', () => {
     const nb = document.querySelector('.navbar');
     if (!nb) return;
@@ -1400,13 +1400,13 @@
     onS();
   });
 
-  // FX: Porsche-style mega menu + nav icons + instant bg base
+  // menu overlay + turant dikhne wala background
   function initPorscheNav() {
     const nb = document.querySelector('.navbar');
     if (!nb || nb.dataset.fxPorscheNav) return;
     nb.dataset.fxPorscheNav = '1';
 
-    // Instant wallpaper base (loads in ms, upgraded by HD later)
+    // pehle chhoti image turant lagao, baad me HD aa jayega
     const l1 = document.querySelector('.bg-layer');
     if (l1 && !l1.style.backgroundImage) {
       l1.style.backgroundImage = 'url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDtawYn04k-I3hWmV1aAtUFR6zZUhoe1PEwbeMa9_m7dg-TncuS5I8rA&s=10")';
