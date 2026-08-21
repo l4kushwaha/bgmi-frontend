@@ -56,9 +56,12 @@
     return data;
   }
 
+  let _refreshInFlight = null;
   async function refreshAccessToken() {
+  if (_refreshInFlight) return _refreshInFlight;
+  _refreshInFlight = (async () => {
   const refreshToken = localStorage.getItem("refresh_token");
-  if (!refreshToken) throw new Error("No refresh token");
+  if (!refreshToken) throw Object.assign(new Error("No refresh token"), { status: 401 });
 
   const res = await fetch(`${AUTH_API}/refresh`, {
     method: "POST",
@@ -66,7 +69,7 @@
     body: JSON.stringify({ refresh_token: refreshToken })
   });
 
-  if (!res.ok) throw new Error("Refresh failed");
+  if (!res.ok) throw Object.assign(new Error("Refresh failed"), { status: res.status });
 
   const data = await res.json();
   localStorage.setItem("token", data.access_token);
@@ -82,6 +85,8 @@
   localStorage.setItem("user", JSON.stringify(user));
 
   return data.access_token;
+  })().finally(() => { _refreshInFlight = null; });
+  return _refreshInFlight;
 }
 
   /* ===================== LOGIN ===================== */
@@ -277,9 +282,9 @@
 }
 
 
-  /* ===================== AUTO REFRESH ===================== */
+  /* ===================== AUTO REFRESH (smart) ===================== */
 window.addEventListener("load", async () => {
-  // ❌ skip refresh on auth pages
+  // skip refresh on auth pages
   if (
     location.pathname.includes("login") ||
     location.pathname.includes("register") ||
@@ -289,10 +294,19 @@ window.addEventListener("load", async () => {
   }
 
   const refreshToken = localStorage.getItem("refresh_token");
-  if (refreshToken) {
-    try {
-      await refreshAccessToken();
-    } catch {
+  if (!refreshToken) return;
+
+  // Sirf tab refresh karo jab access token missing ho ya 10 min me expire hone wala ho
+  const token = localStorage.getItem("token");
+  const payload = token ? decodeJWT(token) : null;
+  const expiresAt = payload?.exp ? payload.exp * 1000 : 0;
+  if (expiresAt - Date.now() > 10 * 60 * 1000) return;
+
+  try {
+    await refreshAccessToken();
+  } catch (err) {
+    // Sirf definitive rejection pe logout — network errors pe user logged-in rahega
+    if (err && err.status === 401) {
       localStorage.clear();
       location.href = "login.html";
     }

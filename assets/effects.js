@@ -1479,6 +1479,7 @@
     if (lo) lo.addEventListener('click', () => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('refresh_token');
       location.href = 'index.html';
     });
   }
