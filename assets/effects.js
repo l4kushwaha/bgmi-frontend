@@ -1468,6 +1468,13 @@
       : '<a class="fx-auth-btn primaryb" href="login.html">Login</a>';
     nb.appendChild(area);
 
+    // purana theme toggle yahan shift kar do (fxThemeMove)
+    const oldToggle = document.getElementById('themeToggle');
+    if (oldToggle) {
+      oldToggle.style.marginRight = '0.4rem';
+      area.insertBefore(oldToggle, area.firstChild);
+    }
+
     const lo = area.querySelector('#fxLogoutBtn');
     if (lo) lo.addEventListener('click', () => {
       localStorage.removeItem('token');
