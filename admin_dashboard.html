@@ -830,7 +830,7 @@ async function loadUsers() {
       <td style="white-space:nowrap; display: flex; gap: 0.5rem; flex-wrap: wrap;">
         ${u.role !== "admin" ? `<button class="btn-mini" onclick="setRole(${u.id},'admin')">Make Admin</button>` : `<button class="btn-mini warn" onclick="setRole(${u.id},'user')">Demote</button>`}
         ${u.status !== "banned" ? `<button class="btn-mini danger" onclick="setStatus(${u.id},'banned')">Ban</button>` : `<button class="btn-mini success" onclick="setStatus(${u.id},'active')">Unban</button>`}
-        <button class="btn-mini danger" onclick="delUser(${u.id})">Delete</button>
+        <button class="btn-mini" onclick="viewKyc(${u.id})">KYC</button> <button class="btn-mini danger" onclick="delUser(${u.id})">Delete</button>
       </td>
     </tr>`).join("");
 }
@@ -1092,6 +1092,38 @@ function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&","<":
 document.getElementById("whoEmail").textContent = user.email || "admin";
 loadOverview(); loadUsers(); loadListings(); loadKyc(); loadPayments(); loadChats(); loadWithdrawals(); loadSellerVerifications();
 setInterval(() => { loadOverview(); loadChats(); loadKyc(); loadWithdrawals(); loadSellerVerifications(); }, 30000);
-</script>
+
+async function viewKyc(id){
+  let ov=document.getElementById("kycOv");
+  if(!ov){
+    ov=document.createElement("div");ov.className="vd-modal";ov.id="kycOv";
+    ov.innerHTML='<div class="vd-box"><button class="vd-close" onclick="document.getElementById(\'kycOv\').classList.remove(\'open\')">×</button><div id="kycBody"></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener("click",e=>{if(e.target===ov)ov.classList.remove("open");});
+  }
+  const b=document.getElementById("kycBody");
+  b.innerHTML="<h3>User #"+id+" — Verification</h3><p>Loading…</p>";
+  ov.classList.add("open");
+  const V="https://verification_service.bgmi-gateway.workers.dev";
+  const M="https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
+  const [pr,br]=await Promise.allSettled([
+    api("verify/profile/"+id.replace ? id : id),
+    fetch(M+"/admin/sellers/"+id+"/badge",{headers:{Authorization:"Bearer "+token}}).then(r=>r.json())
+  ]);
+  let prof=null;
+  try{prof=(await (await fetch(V+"/profile/"+id,{headers:{Authorization:"Bearer "+token}})).json());}catch(e){}
+  let badge="--";try{badge=(br.status==="fulfilled"?(br.value.badge||br.value.message||"--"):"--");}catch(e){}
+  const p=prof&&prof.profile||{},k=prof&&prof.kyc;
+  const rows=[["Name",p.name],["Bio",p.bio],["UPI",p.upi_id],["Instagram",p.instagram],["Facebook",p.facebook],
+    ["KYC Document",k&&(k.document_type)],["KYC Status",k&&(k.verification_status)],["Confidence",k&&k.confidence!=null?Math.round(k.confidence*100)+"%":null],
+    ["KYC Remarks",k&&k.remarks],["KYC Date",k&&k.created_at]];
+  let h="<h3>User #"+id+" — Verification & KYC</h3><div style=\"margin:8px 0\"><span class='badge-chip'>Badge: "+badge+"</span></div>";
+  h+="<table style=\"width:100%;font-size:.88rem\">";
+  rows.forEach(([k2,v])=>{h+="<tr><td style=\"padding:6px 8px;color:#8a94a3;width:40%\">"+k2+"</td><td style=\"padding:6px 8px;font-weight:600\">"+(v?v:"—")+"</td></tr>";});
+  h+="</table>";
+  h+=!k?"<p style=\"color:#8a94a3;margin-top:10px\">No KYC submitted yet.</p>":"";
+  b.innerHTML=h;
+}
+</s
 </body>
 </html>
