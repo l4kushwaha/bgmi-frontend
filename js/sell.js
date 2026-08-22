@@ -281,7 +281,7 @@
         images
       };
     } else {
-      if (!/^\d{1,12}$/.test(uid)) return showToast("Enter a valid BGMI UID (digits only)", true);
+      if (uid && !/^\d{1,12}$/.test(uid)) return showToast("UID galat hai � digits only (ya khali chhod do)", true);
       if (!title) return showToast("Account title is required", true);
 
       let price = Number(document.getElementById("price").value);
