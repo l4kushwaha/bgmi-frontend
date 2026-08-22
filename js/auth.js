@@ -345,6 +345,7 @@ async function sendResetLink() {
       showToast("Backup code: " + data.dev_otp, "success");
     } else {
       showToast(data.message || "OTP sent to email", "success");
+    if (window.showResetStep2) window.showResetStep2();
     }
   } catch (err) {
     showToast(err.message || "Failed to send OTP", "error");
