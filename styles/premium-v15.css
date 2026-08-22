@@ -405,3 +405,15 @@ body:has(.chat-panel){background:#121212!important;color:#fff}
 .chat-input input,.chat-input textarea{background:#2a2a2a!important;border:1px solid transparent!important;color:#fff!important;border-radius:20px!important}
 .chat-input input::placeholder{color:#888}
 .chat-input button{background:#e53935!important;color:#fff!important;border-radius:50%!important;width:42px;height:42px;padding:0!important;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+
+/* ===== V27: PROFILE REFERENCE STYLE ===== */
+.profile-page .glass{background:#1e1e1e!important;border:1px solid #333!important;border-radius:12px!important}
+.avatar-ring{background:conic-gradient(from 0deg,#e53935,#ff7a45,#ffb199,#e53935)!important;animation:none!important}
+.status-tags span,.status-tags .tag{background:rgba(229,57,53,.12)!important;color:#ff8a80!important;border:1px solid rgba(229,57,53,.35)!important;border-radius:14px;padding:5px 12px;font-size:.78rem}
+.stats-grid>div{background:#2a2a2a!important;border-radius:10px!important;border:none!important}
+.stats-grid>div:hover{transform:translateY(-3px)}
+.profile-page .input,.profile-page select.input{background:#2a2a2a!important;border:1px solid transparent!important;color:#fff!important;border-radius:8px!important}
+.profile-page .input:focus{border-color:#e53935!important}
+.profile-page .label{color:#aaa!important}
+.profile-page .btn-primary{background:#e53935!important;box-shadow:none!important}
+[data-theme="dark"] .profile-page .glass{background:#1e1e1e!important}
