@@ -51,15 +51,59 @@
     });
   }
 
+  function applyWatermark(file, callback) {
+    const un = (session.user && (session.user.username || session.user.name)) || "Seller";
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const img = new Image();
+      img.onload = function () {
+        try {
+          const maxW = 1600;
+          const scale = Math.min(1, maxW / img.width);
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          ctx.save();
+          ctx.globalAlpha = 0.38;
+          ctx.fillStyle = "#ffffff";
+          ctx.strokeStyle = "rgba(0,0,0,.35)";
+          ctx.font = "bold " + Math.max(22, Math.round(canvas.width / 26)) + "px Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate(-Math.PI / 6);
+          const text = "ELEGENT-KART VERIFIED - @" + un;
+          const stepX = Math.max(320, canvas.width / 3);
+          const stepY = Math.max(140, canvas.height / 5);
+          for (let y = -canvas.height; y <= canvas.height; y += stepY) {
+            for (let x = -canvas.width; x <= canvas.width; x += stepX) {
+              ctx.lineWidth = 2;
+              ctx.strokeText(text, x, y);
+              ctx.fillText(text, x, y);
+            }
+          }
+          ctx.restore();
+          callback(canvas.toDataURL("image/jpeg", 0.85));
+        } catch (err) {
+          console.error("watermark failed", err);
+          callback(event.target.result);
+        }
+      };
+      img.onerror = () => callback(event.target.result);
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
   function handleFiles(files) {
     [...files].forEach(f => {
       if (!f.type.startsWith("image/")) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        images.push(e.target.result);
+      applyWatermark(f, durl => {
+        images.push(durl);
         renderPreview();
-      };
-      reader.readAsDataURL(f);
+      });
     });
   }
 

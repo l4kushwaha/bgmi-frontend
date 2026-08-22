@@ -123,4 +123,66 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
+
+  /* ---- Anti-tamper guard (Inspect-Element price/balance faking) ---- */
+  window.__appRender = false;
+  var TAMPER_CONTAINERS = ["#items-container", "#withdrawalsList", ".stats-grid", "#greetBadge"];
+  function restoreSecureState() {
+    try {
+      window.__appRender = true;
+      if (typeof renderList === "function" && typeof allItems !== "undefined" && allItems) renderList();
+      if (typeof loadWalletData === "function") loadWalletData();
+      tick();
+      setTimeout(function () { window.__appRender = false; }, 120);
+    } catch (e) { window.__appRender = false; }
+  }
+  var __tamperObs = null;
+  function initGuard() {
+    if (/chat\.html|admin_dashboard/i.test(location.pathname)) return;
+    if (__tamperObs) return;
+    __tamperObs = new MutationObserver(function (muts) {
+      if (window.__appRender) return;
+      for (var i = 0; i < muts.length; i++) {
+        var m = muts[i];
+        if (m.type === "childList" || m.type === "characterData" || m.type === "attributes") {
+          console.warn("Security Alert: Unauthorized DOM modification detected!");
+          restoreSecureState();
+          break;
+        }
+      }
+    });
+    TAMPER_CONTAINERS.forEach(function (sel) {
+      document.querySelectorAll(sel).forEach(function (el) {
+        try { __tamperObs.observe(el, { childList: true, subtree: true, characterData: true, attributes: true }); } catch (e) {}
+      });
+    });
+  }
+
+  /* ---- Mobile floating bottom dock ---- */
+  var DOCK = [
+    ["index.html", "\uD83C\uDFE0", "Home"],
+    ["marketplace.html", "\uD83D\uDED2", "Market"],
+    ["sell.html", "\u2795", "Sell", "center"],
+    ["chat.html", "\uD83D\uDCAC", "Chats"],
+    ["profile.html", "\uD83D\uDC64", "Profile"]
+  ];
+  function buildDock() {
+    if (document.querySelector(".mobile-bottom-dock")) return;
+    if (/admin_dashboard/i.test(location.pathname)) return;
+    var nav = document.createElement("nav");
+    nav.className = "mobile-bottom-dock";
+    nav.setAttribute("aria-label", "Mobile navigation");
+    var path = location.pathname.split("/").pop() || "index.html";
+    DOCK.forEach(function (d) {
+      var a = document.createElement("a");
+      a.href = d[0];
+      a.className = "dock-item" + (d[3] ? " " + d[3] : "") + (path === d[0] ? " active" : "");
+      if (path === d[0]) a.setAttribute("aria-current", "page");
+      a.innerHTML = '<span class="di-ic">' + d[1] + '</span><span class="di-tx">' + d[2] + "</span>";
+      nav.appendChild(a);
+    });
+    document.body.appendChild(nav);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { initGuard(); buildDock(); });
+  else { initGuard(); buildDock(); }
 })();
