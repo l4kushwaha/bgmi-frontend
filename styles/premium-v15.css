@@ -380,3 +380,28 @@ main>section:nth-of-type(5) .glass h3{color:#fff}
 .kh-banner a{display:inline-block;margin:8px;padding:12px 26px;background:#fff;color:#5b548a;border-radius:20px;font-weight:700;text-decoration:none;transition:transform .25s ease}
 .kh-banner a:hover{transform:translateY(-2px)}
 .kh-banner a.alt{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.55)}
+
+/* ===== V26: CHAT REFERENCE STYLE (#121212 / #1e1e1e / #e53935) ===== */
+body:has(.chat-panel){background:#121212!important;color:#fff}
+.chat-list{background:#1e1e1e!important;border-radius:12px!important;padding:18px!important;border-color:#333!important}
+.chat-panel{background:#1e1e1e!important;border-color:#333!important;border-radius:12px!important}
+.chat-header{background:#1e1e1e!important;border-bottom:1px solid #333!important}
+/* contacts */
+.chat-item{border-bottom:1px solid #333!important;border-radius:0!important;padding:13px 10px!important}
+.chat-item.active{background:#262626!important;border-left:3px solid #e53935}
+.chat-title{color:#fff}
+.chat-preview{color:#aaa!important;font-size:.8rem}
+.chat-meta{color:#e53935!important}
+/* bubbles */
+.message.sent{background:#e53935!important;box-shadow:none!important;margin-left:auto}
+.message.received{background:#2a2a2a!important;border-color:transparent!important;color:#fff!important;margin-right:auto}
+.message.system{color:#777!important}
+.g-body{background:#2a2a2a!important;color:#fff}
+.g-msg.mine .g-body{background:#e53935!important}
+.ch-pill{background:#2a2a2a!important;border-color:#333!important;color:#ccc!important}
+.ch-pill.active{background:#e53935!important;border-color:#e53935!important;color:#fff!important}
+/* input bar */
+.chat-input{background:#1e1e1e!important;border-top:1px solid #333!important}
+.chat-input input,.chat-input textarea{background:#2a2a2a!important;border:1px solid transparent!important;color:#fff!important;border-radius:20px!important}
+.chat-input input::placeholder{color:#888}
+.chat-input button{background:#e53935!important;color:#fff!important;border-radius:50%!important;width:42px;height:42px;padding:0!important;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
