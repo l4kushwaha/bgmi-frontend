@@ -342,3 +342,19 @@ main>section:nth-of-type(5) h2::after{background:linear-gradient(90deg,var(--pk)
 main>section:nth-of-type(5) .text-secondary{color:#c9cfd6!important}
 main>section:nth-of-type(5) .glass{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.12)!important}
 main>section:nth-of-type(5) .glass h3{color:#fff}
+
+/* ===== V24: SOLEX MARKETPLACE STRUCTURE ===== */
+.top-strip{background:#0b0d10;color:#fff;text-align:center;padding:9px 12px;font-size:.82rem;letter-spacing:.02em}
+[data-theme="light"] .top-strip{background:#111318}
+.cat-chips-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:26px 16px 6px}
+.cat-chip-btn{padding:10px 22px;border-radius:20px;border:1.5px solid #d8dde4;background:#fff;color:#0b0d10;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .25s ease}
+.cat-chip-btn:hover{border-color:var(--pk,#ff2d78);color:var(--pk,#ff2d78);transform:translateY(-2px)}
+.cat-chip-btn.sale-chip{background:#0b0d10;color:#fff;border-color:#0b0d10}
+.cat-chip-btn.sale-chip:hover{background:var(--or,#ff7a1a);color:#fff;border-color:var(--or)}
+[data-theme="dark"] .cat-chip-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:#eef1f4}
+.sale-band{background:#0b0d10!important;color:#fff!important;text-align:center;padding:76px 20px;margin-top:44px}
+.sale-band h2{font-size:2.1rem;margin-bottom:12px;color:#fff}
+.sale-band h2::after{content:"";display:block;width:56px;height:3px;border-radius:99px;background:linear-gradient(90deg,var(--pk),var(--or));margin:12px auto 0}
+.sale-band p{margin-bottom:24px;color:#c9cfd6}
+.sale-btn{display:inline-block;padding:13px 28px;background:#fff;color:#0b0d10;border-radius:20px;font-weight:700;text-decoration:none;transition:transform .25s ease,box-shadow .25s ease}
+.sale-btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px -8px rgba(255,45,120,.5)}

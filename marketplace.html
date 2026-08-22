@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=14">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=23">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=24">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -117,6 +117,9 @@
 </nav>
 
 <main id="mainContent" role="main">
+  <!-- Announcement strip (SoleX-style top banner) -->
+  <div class="top-strip" role="status">Verified sellers &amp; secure escrow | Popularity boosts delivered in 30 min</div>
+
   <!-- Hero Section -->
   <section class="hero" style="min-height: 50vh; padding: 3rem 2rem;" aria-labelledby="marketplace-title">
     <div class="hero-content">
@@ -141,6 +144,19 @@
           </svg>
         </a>
       </div>
+    </div>
+  </section>
+
+  <!-- Category quick chips (SoleX "Shop by Category") -->
+  <section class="section" style="padding-top: 2rem; padding-bottom: 0;">
+    <h2 class="sec-title">Shop by Category</h2>
+    <div class="cat-chips-row">
+      <button type="button" class="cat-chip-btn" onclick="quickFilter('')">All</button>
+      <button type="button" class="cat-chip-btn" onclick="quickFilter('account')">Accounts</button>
+      <button type="button" class="cat-chip-btn" onclick="quickFilter('popularity')">Popularity</button>
+      <button type="button" class="cat-chip-btn" onclick="quickFilter('meetup')">Meetup</button>
+      <button type="button" class="cat-chip-btn" onclick="quickFilter('new')">Newest</button>
+      <button type="button" class="cat-chip-btn sale-chip" onclick="quickFilter('price_low')">Best Price</button>
     </div>
   </section>
 
@@ -195,6 +211,13 @@
         </button>
       </div>
     </div>
+  </section>
+
+  <!-- Sale band (SoleX-style) -->
+  <section class="sale-band">
+    <h2>Only 2.5% Platform Commission</h2>
+    <p>Sellers keep more. Buyers pay less. Every trade escrow-protected.</p>
+    <a href="sell.html" class="sale-btn">Start Selling</a>
   </section>
 </main>
 
@@ -549,6 +572,15 @@
   load(function(){scan();setTimeout(scan,1500);});
   new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
 })();
+</script>
+<script>
+function quickFilter(v){
+  var sel=document.getElementById('filter');
+  if(!sel)return;
+  sel.value=v;
+  var f=document.getElementById('searchForm');
+  if(f){f.dispatchEvent(new Event('submit'));}
+}
 </script>
 </body>
 </html>
