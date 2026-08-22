@@ -563,3 +563,12 @@ section.section{padding-top:clamp(1.3rem,3vw,2.1rem)!important;padding-bottom:cl
 .stepper button:hover{background:rgba(127,127,140,.14)}
 .stepper input{width:56px!important;text-align:center;border:none!important;padding:9px 0!important;-moz-appearance:textfield}
 .stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+
+/* ===== V32: STATIC LABELS (no float overlap anywhere) ===== */
+.f-input{position:static!important;display:block;margin:0!important;padding:0!important}
+.f-input label,.f-input .label{position:static!important;display:block!important;transform:none!important;top:auto!important;left:auto!important;font-size:.82rem!important;color:var(--text-secondary,#565b63)!important;margin:0 0 6px!important;opacity:1!important;visibility:visible!important}
+.f-input input,.f-input select{padding:12px 14px!important;margin-top:0!important}
+.form-group .label{position:static!important;transform:none!important}
+input::placeholder,textarea::placeholder{color:#9aa0a8!important;opacity:1!important}
+input:focus::placeholder{color:#b6bcc4!important}

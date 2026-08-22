@@ -37,7 +37,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=31">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=32">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -649,8 +649,24 @@ if (!token || !user || user.role !== "admin") {
 
 function logout() { localStorage.clear(); location.href = "login.html"; }
 
+const SVC = {
+  auth: "https://auth-service.bgmi-gateway.workers.dev/api",
+  market: "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api",
+  verify: "https://verification_service.bgmi-gateway.workers.dev",
+  chat: "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat",
+  wallet: "https://bgmi-marketplace.bgmi-gateway.workers.dev"
+};
 async function api(path, opts = {}) {
-  const res = await fetch(`${GATEWAY}/api/${path}`, {
+  const pre = path.split("/")[0];
+  const rest = path.slice(pre.length);
+  let url;
+  if (pre === "auth") url = SVC.auth + rest;
+  else if (pre === "market") url = SVC.market + rest;
+  else if (pre === "verify") url = SVC.verify + rest;
+  else if (pre === "chat") url = SVC.chat + rest.replace("admin/", "admin/");
+  else if (pre === "wallet") url = SVC.wallet + "/api" + rest;
+  else url = GATEWAY + "/api/" + path;
+  const res = await fetch(url, {
     ...opts,
     headers: { "Content-Type": "application/json", Authorization: "Bearer " + token, ...(opts.headers||{}) }
   });

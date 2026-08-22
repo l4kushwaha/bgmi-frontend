@@ -13,7 +13,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=31">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=32">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -484,22 +484,11 @@
 </script>
 <script id="fl-init">
 (function(){
-document.querySelectorAll('.form-group').forEach(function(g){
-  var i=g.querySelector('input.input:not([type=file]),select.input');
-  var l=g.querySelector('label.label');
-  if(!i||!l||g.querySelector('.f-input'))return;
-  if(i.tagName==='INPUT'&&i.type!=='number')i.setAttribute('placeholder',' ');
-  var d=document.createElement('div');d.className='f-input';
-  g.insertBefore(d,i);d.appendChild(i);
-  var nl=l.cloneNode(true);d.appendChild(nl);l.style.display='none';
-  if(i.tagName==='SELECT'){var f=function(){i.classList.toggle('has-val',!!i.value)};i.addEventListener('change',f);f();}
-});
-// number steppers
 document.querySelectorAll('input[type="number"]').forEach(function(inp){
   if(inp.closest('.stepper'))return;
   var w=document.createElement('div');w.className='stepper';
   inp.parentNode.insertBefore(w,inp);
-  var m=document.createElement('button');m.type='button';m.textContent='−';
+  var m=document.createElement('button');m.type='button';m.textContent='\u2212';
   var p=document.createElement('button');p.type='button';p.textContent='+';
   w.appendChild(m);w.appendChild(inp);w.appendChild(p);
   m.onclick=function(){inp.stepDown();inp.dispatchEvent(new Event('change'));};
