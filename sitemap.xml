@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://bgmi-frontend.vercel.app/index.html</loc><lastmod>2026-08-22</lastmod><priority>1.0</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/marketplace.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/sell.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/popularity.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/login.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/forgot_password.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/contact.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/faq.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/help.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/safety.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/privacy.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/terms.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+  <url><loc>https://bgmi-frontend.vercel.app/meetups.html</loc><lastmod>2026-08-22</lastmod><priority>0.8</priority></url>
+</urlset>

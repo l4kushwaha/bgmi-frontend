@@ -51,14 +51,14 @@
   Storage.prototype.setItem = function (k, v) {
     if (ENC_KEYS.indexOf(k) > -1 && typeof v === "string" && typeof CryptoJS !== "undefined") {
       var c = enc(v);
-      if (c !== null && c.slice(0, 7) === CT_PREFIX) { _set.call(this, k, c); return; }
+      if (c !== null && c.slice(0, CT_PREFIX.length) === CT_PREFIX) { _set.call(this, k, c); return; }
     }
     _set.call(this, k, v);
   };
   Storage.prototype.getItem = function (k) {
     var raw = _get.call(this, k);
     if (raw === null || ENC_KEYS.indexOf(k) === -1 || typeof CryptoJS === "undefined") return raw;
-    if (raw.slice(0, 7) === CT_PREFIX) {
+    if (raw.slice(0, CT_PREFIX.length) === CT_PREFIX) {
       var p = dec(raw);
       return p === null ? raw : p;
     }

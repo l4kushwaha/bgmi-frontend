@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /admin_dashboard.html
+Sitemap: https://bgmi-frontend.vercel.app/sitemap.xml
