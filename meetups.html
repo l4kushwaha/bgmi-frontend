@@ -289,5 +289,6 @@ window.addEventListener("error",function(e){if(document.getElementById("gbanner"
 /* shared nav drawer + dynamic year */
 (function(){var nt=document.getElementById("navToggle"),nl=document.getElementById("navLinks");if(nt&&nl){var ov=document.createElement("div");ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .28s;z-index:99997";document.body.appendChild(ov);function cls(){nl.classList.remove("open");ov.style.opacity="0";nt.setAttribute("aria-expanded","false")}nt.addEventListener("click",function(e){e.stopPropagation();var o=!nl.classList.contains("open");nl.classList.toggle("open",o);ov.style.opacity=o?"1":"0";ov.style.pointerEvents=o?"auto":"none";nt.setAttribute("aria-expanded",o)});ov.addEventListener("click",cls);document.addEventListener("keydown",function(e){if(e.key==="Escape")cls()});nl.addEventListener("click",function(e){if(e.target.closest(".nav-link"))cls()});}var y=new Date().getFullYear();document.querySelectorAll(".footer-copyright").forEach(function(el){el.innerHTML=el.innerHTML.replace(/20\d\d/,y)});})();
 </script>
+<script src="js/lang.js?v=1" defer></script>
 </body>
 </html>
