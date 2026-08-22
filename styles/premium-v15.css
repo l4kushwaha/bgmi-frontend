@@ -449,3 +449,29 @@ body:has(.chat-panel){background:#121212!important;color:#fff}
 [data-theme="light"] .top-strip{background:#101218!important;color:#fff!important}
 [data-theme="light"] .sale-band{background:#101218!important}
 [data-theme="light"] .kh-banner{background:#101218!important}
+
+/* ===== V29: COMPACT MOBILE LAYOUT (kill dead top space) ===== */
+@media (max-width:768px){
+  .navbar{padding:8px 12px!important;flex-wrap:nowrap!important;gap:8px!important}
+  .navbar .nav-toggle{display:none!important}
+  .nav-brand{font-size:1.05rem!important;height:auto!important}
+  .nav-brand img{max-height:30px!important;width:auto!important}
+  .fx-auth-area{margin-left:auto}
+  .fx-auth-area a,.fx-auth-area button{padding:7px 12px!important;font-size:.8rem!important}
+  /* hero compression */
+  .hero{min-height:auto!important;padding:38px 16px 30px!important}
+  .hero h1{font-size:clamp(1.6rem,8vw,2.3rem)!important}
+  .hero-subtitle{font-size:.95rem!important;margin-bottom:1.2rem!important}
+  .kh-hero{padding:40px 16px 34px!important;border-radius:0 0 16px 16px!important}
+  .sale-band{padding:46px 16px!important;margin-top:28px!important}
+  .kh-banner{padding:40px 16px!important;margin-top:26px!important}
+  section.section{padding-top:2rem!important;padding-bottom:2rem!important}
+  .cat-chips-row{gap:9px;padding:18px 10px 4px}
+  .cat-chip-btn{padding:8px 15px;font-size:.8rem}
+  .top-strip{padding:7px 10px;font-size:.72rem}
+  /* footer tightening */
+  .footer{padding:34px 16px 22px!important}
+  .footer-grid{gap:14px!important}
+  /* stats/cards breathe less */
+  .stats-grid{grid-template-columns:repeat(3,1fr)!important;gap:.5rem!important}
+}
