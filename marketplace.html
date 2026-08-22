@@ -13,7 +13,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=41">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=42">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -455,7 +455,7 @@
 
 <!-- Scripts -->
 <script src="js/theme.js"></script>
-<script src="js/marketplace.js?v=43"></script>
+<script src="js/marketplace.js?v=44"></script>
 <script src="js/upi.js"></script>
 <script src="assets/effects.js?v=11" defer></script>
 
@@ -664,17 +664,7 @@ function sellerPop(sid,badge){
     document.getElementById('spBody').innerHTML=vb;
   }).catch(function(){document.getElementById('spBody').textContent='Could not load reviews.';});
 }
-function wire(){document.querySelectorAll('.item-card').forEach(function(c){
-  if(c.querySelector('.view-details-btn'))return;
-  var b=document.createElement('button');b.className='btn btn-outline view-details-btn';
-  b.style.cssText='width:100%;margin-top:10px;padding:9px;font-weight:700';
-  b.textContent='View Details';b.onclick=function(ev){ev.stopPropagation();openFor(c);};
-  c.appendChild(b);
-  var s=document.createElement('div');s.className='badge-chip seller-badge';s.style.cssText='position:absolute;top:10px;left:10px;z-index:2';
-  if(!c.querySelector('.seller-badge')){c.style.position='relative';c.insertBefore(s,c.firstChild);}
-});}
-new MutationObserver(wire).observe(document.body,{childList:true,subtree:true});
-wire();
+
 })();
 </script>
 <script>
