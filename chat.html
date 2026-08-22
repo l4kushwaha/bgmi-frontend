@@ -13,7 +13,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=29">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=30">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -340,6 +340,33 @@
       }
     }
   });
+</script>
+<script>
+(function(){
+var T=[
+{n:'Mono',sw:'linear-gradient(135deg,#5b51d8,#c13584)',bg:'',g:'linear-gradient(135deg,#5b51d8,#c13584)'},
+{n:'Aurora',sw:'linear-gradient(135deg,#000428,#004e92)',bg:'linear-gradient(160deg,#000428,#004e92)',g:'linear-gradient(135deg,#00c6ff,#0072ff)'},
+{n:'Sunset',sw:'linear-gradient(135deg,#ff9966,#ff5e62)',bg:'linear-gradient(160deg,#ff9966,#ff5e62)',g:'#ffffff'},
+{n:'Mint',sw:'linear-gradient(135deg,#43e97b,#38f9d7)',bg:'linear-gradient(160deg,#43e97b,#38f9d7)',g:'#111111'},
+{n:'Night',sw:'linear-gradient(135deg,#232526,#414345)',bg:'linear-gradient(160deg,#232526,#414345)',g:'linear-gradient(135deg,#f953c6,#b91d73)'}
+];
+var root=document.documentElement,pop=null;
+function apply(t,i){root.style.setProperty('--ig-chat-bg',t.bg);root.style.setProperty('--ig-bubble',t.g);try{localStorage.setItem('ig-chat-theme',''+i)}catch(e){}
+ if(pop){for(var j=0;j<pop.children.length;j++){pop.children[j].classList.toggle('sel',j===i);}}}
+function build(){
+ var hd=document.querySelector('.chat-header');if(!hd)return;
+ pop=document.createElement('div');pop.className='ig-theme-pop';
+ var saved=-1;try{saved=parseInt(localStorage.getItem('ig-chat-theme'))}catch(e){}
+ T.forEach(function(t,i){var s=document.createElement('span');s.className='ig-swatch'+(i===saved?' sel':'');s.style.background=t.sw;s.title=t.n;s.onclick=function(){apply(t,i)};pop.appendChild(s);});
+ hd.appendChild(pop);
+ var btn=document.createElement('button');btn.className='ig-theme-btn';btn.type='button';btn.title='Chat theme';btn.setAttribute('aria-label','Change chat theme');btn.textContent='\uD83C\uDFA8';
+ btn.addEventListener('click',function(e){e.stopPropagation();pop.classList.toggle('open');});
+ document.addEventListener('click',function(){pop.classList.remove('open');});
+ var row=hd.querySelector('div[style*="display:flex"]')||hd;row.insertBefore(btn,row.firstChild);
+ if(saved>=0&&saved<T.length)apply(T[saved],saved);
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',build);}else{build();}
+})();
 </script>
 </body>
 </html>

@@ -475,3 +475,43 @@ body:has(.chat-panel){background:#121212!important;color:#fff}
   /* stats/cards breathe less */
   .stats-grid{grid-template-columns:repeat(3,1fr)!important;gap:.5rem!important}
 }
+
+/* ===== V30: UNIFIED RHYTHM + INSTAGRAM DM CHAT ===== */
+main{padding-top:0!important}
+section.section{padding-top:clamp(1.3rem,3vw,2.1rem)!important;padding-bottom:clamp(1.3rem,3vw,2.1rem)!important}
+.sec-title,.section-title{margin-bottom:1rem!important}
+.glass{padding:1.15rem!important}
+@media(min-width:769px){
+  .hero{min-height:auto!important;padding:52px 24px 44px!important}
+  .kh-hero{padding:46px 20px 42px!important}
+  .sale-band{padding:56px 20px!important;margin-top:32px!important}
+  .kh-banner{padding:46px 20px!important;margin-top:30px!important}
+}
+@media(max-width:768px){
+  .navbar{padding:6px 10px!important}
+  .top-strip{font-size:.68rem!important;padding:6px 8px!important}
+  .hero{padding:24px 14px 18px!important}
+  .hero-badge{margin-bottom:.7rem!important}
+  .hero-actions{margin-top:.9rem!important}
+  .cat-chips-row{padding-top:12px}
+  .faq-item{padding:15px 16px!important}
+}
+/* --- IG DM bubbles --- */
+.chat-header{position:relative;padding:11px 14px!important}
+#globalBox,#privateBox{background:var(--ig-chat-bg,transparent)}
+.message.sent,.g-msg.mine .g-body{background:var(--ig-bubble,linear-gradient(135deg,#5b51d8,#c13584))!important;border-radius:22px 22px 6px 22px!important;color:#fff!important}
+.message.received,.g-msg:not(.mine) .g-body{background:#efefef!important;color:#111!important;border-radius:22px 22px 22px 6px!important;border:none!important}
+[data-theme="dark"] .message.received,[data-theme="dark"] .g-msg:not(.mine) .g-body{background:#262626!important;color:#fff!important}
+.chat-input input[type="text"]{border-radius:22px!important;background:#efefef!important;color:#111!important;border:none!important;padding:12px 18px!important}
+[data-theme="dark"] .chat-input input[type="text"]{background:#262626!important;color:#fff!important}
+.chat-input .icon-btn{background:transparent!important;color:inherit!important;width:42px;height:42px;border-radius:50%!important;font-size:1.25rem;display:flex;align-items:center;justify-content:center}
+#sendBtn{border-radius:22px!important;padding:11px 20px!important;background:linear-gradient(135deg,#5b51d8,#c13584)!important;border:none!important;box-shadow:none!important}
+/* --- theme picker --- */
+.ig-theme-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;font-size:1.15rem;cursor:pointer;color:inherit;transition:transform .18s ease}
+.ig-theme-btn:hover{transform:scale(1.1)}
+.ig-theme-pop{position:absolute;top:52px;right:8px;z-index:60;display:none;flex-wrap:wrap;gap:8px;max-width:200px;padding:14px;background:#fff;border:1px solid #e2e5ea;border-radius:16px;box-shadow:0 16px 40px -10px rgba(10,12,18,.28)}
+.ig-theme-pop.open{display:flex}
+.ig-swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:transform .18s ease}
+.ig-swatch:hover{transform:scale(1.15)}
+.ig-swatch.sel{border-color:#c13584;box-shadow:0 0 0 2px rgba(193,53,132,.25)}
+[data-theme="dark"] .ig-theme-pop{background:#16161a;border-color:#2b2b31}
