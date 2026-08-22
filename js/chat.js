@@ -7,7 +7,7 @@
 
   if (!token || !user) {
     alert("Login required");
-    location.href = "/login";
+    location.href = "login.html";
     return;
   }
 
@@ -93,7 +93,7 @@
     if (r.status === 401) {
       alert("Session expired. Please login again.");
       localStorage.clear();
-      location.href = "/login";
+      location.href = "login.html";
       throw new Error("unauthorized");
     }
     return r;
