@@ -291,7 +291,17 @@ document.getElementById("mu-submit").onclick = async () => {
   }
 };
 
+function renderSkeletons(){
+  const g=document.getElementById('items-container');
+  if(!g||g.children.length)return;
+  for(let i=0;i<8;i++){
+    const sk=document.createElement('div');sk.className='sk-card';
+    sk.innerHTML='<div class="sk-img"></div><div class="sk-body"><div class="sk-line"></div><div class="sk-line w60"></div><div class="sk-line w40"></div><div class="sk-btn"></div></div>';
+    g.appendChild(sk);
+  }
+}
 async function loadListings() {
+  renderSkeletons();
   const s = session();
   const res = await fetch(`${API_URL}/listings`, {
     headers: s ? { Authorization: `Bearer ${s.token}` } : {}

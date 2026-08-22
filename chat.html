@@ -4,12 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chat | BGMI Market</title>
+  <meta property="og:title" content="Chat | BGMI Market">
+  <meta property="og:description" content="Buy & sell gaming accounts securely with escrow protection.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bgmi-frontend.vercel.app/chat.html">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&h=630&fit=crop&q=70&auto=format">
+  <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="styles/premium.css?v=28">
-<link rel="stylesheet" href="styles/premium-v15.css?v=45">
+<link rel="stylesheet" href="styles/premium-v15.css?v=46">
 <style>
 *{box-sizing:border-box}
 body{background:var(--bg-primary);color:var(--text-primary);margin:0;font-family:Inter,sans-serif}
-.chat-wrap{display:flex;height:calc(100vh - 60px);max-width:1250px;margin:0 auto;border-left:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle)}
+.chat-wrap{display:flex;height:calc(100dvh - 58px);max-width:1250px;margin:0 auto;border-left:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle)}
 .sidebar{width:330px;border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;background:var(--bg-card)}
 .main{flex:1;display:flex;flex-direction:column;position:relative}
 #pillsBox{display:flex;gap:6px;padding:10px 12px}
@@ -123,6 +129,10 @@ body{background:var(--bg-primary);color:var(--text-primary);margin:0;font-family
 <script src="assets/effects.js?v=11" defer></script>
 <script>
 window.addEventListener("error",function(e){if(document.getElementById("gbanner"))return;var b=document.createElement("div");b.id="gbanner";b.style.cssText="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#2a1218;color:#ffb4c0;border:1px solid #ff2d7855;padding:10px 18px;border-radius:12px;z-index:99999;font-size:.85rem";b.textContent="Kuch galat ho gaya � page reload karke try karo.";document.body.appendChild(b);});
+</script>
+<script>
+/* shared nav drawer + dynamic year */
+(function(){var nt=document.getElementById("navToggle"),nl=document.getElementById("navLinks");if(nt&&nl){var ov=document.createElement("div");ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .28s;z-index:99997";document.body.appendChild(ov);function cls(){nl.classList.remove("open");ov.style.opacity="0";nt.setAttribute("aria-expanded","false")}nt.addEventListener("click",function(e){e.stopPropagation();var o=!nl.classList.contains("open");nl.classList.toggle("open",o);ov.style.opacity=o?"1":"0";ov.style.pointerEvents=o?"auto":"none";nt.setAttribute("aria-expanded",o)});ov.addEventListener("click",cls);document.addEventListener("keydown",function(e){if(e.key==="Escape")cls()});nl.addEventListener("click",function(e){if(e.target.closest(".nav-link"))cls()});}var y=new Date().getFullYear();document.querySelectorAll(".footer-copyright").forEach(function(el){el.innerHTML=el.innerHTML.replace(/20\d\d/,y)});})();
 </script>
 </body>
 </html>
