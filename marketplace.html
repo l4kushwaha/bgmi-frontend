@@ -519,35 +519,37 @@
 <script>
 (function(){
   var MAP={new:'New',verified:'Verified',veteran:'Veteran',trusted:'Trusted',elite:'Elite',gold:'Gold'};
-  var seen={};
+  var SELLERS=null,LISTINGS=null;
+  function load(cb){
+    var done=0;
+    function fin(){ if(++done===2) cb(); }
+    fetch('https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/sellers?limit=100').then(function(r){return r.json();}).then(function(d){SELLERS=(Array.isArray(d)?d:d.sellers)||[];fin();}).catch(fin);
+    fetch('https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/listings?limit=100').then(function(r){return r.json();}).then(function(d){LISTINGS=(Array.isArray(d)?d:(d.listings||[]));fin();}).catch(fin);
+  }
   function stamp(card){
     if(card.dataset.badged)return;
-    var btn=card.querySelector('.buy-btn');
-    if(!btn)return;
-    var m=(btn.getAttribute('onclick')||'').match(/startBuy\(\d+,\s*"?(\d+)/);
+    if(!SELLERS||!LISTINGS)return;
+    var m=(card.querySelector('.d-meta')||{textContent:''}).textContent.match(/Listing\s*#(\d+)/);
     if(!m)return;
-    var sid=m[1];
-    fetch('https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/sellers?limit=100')
-      .then(function(r){return r.json();})
-      .then(function(list){
-        list=(Array.isArray(list)?list:list.sellers)||[];
-        var s=list.find(function(x){return String(x.user_id)===sid;});
-        if(!s||!s.badge||!MAP[s.badge])return;
-        card.dataset.badged='1';
-        var chip=document.createElement('span');
-        chip.className='badge-chip badge-'+s.badge;
-        chip.textContent=(s.badge==='gold'||s.badge==='verified')?'\u2605 '+MAP[s.badge]:MAP[s.badge];
-        var anchor=card.querySelector('.cat-chip');
-        if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(chip,anchor.nextSibling);
-        var st=document.createElement('span');
-        st.style.cssText='font-size:.68rem;color:#fbbf24;margin-left:.4rem';
-        st.textContent='\u2605 '+(s.avg_rating||'0')+' ('+(s.review_count||0)+')';
-        chip.parentNode.appendChild(st);
-      }).catch(function(){});
+    var item=LISTINGS.find(function(x){return String(x.id)===m[1];});
+    if(!item)return;
+    var sid=String(item.seller_id);
+    var s=SELLERS.find(function(x){return String(x.user_id)===sid;});
+    card.dataset.badged='1';
+    if(!s||!s.badge||!MAP[s.badge])return;
+    var chip=document.createElement('span');
+    chip.className='badge-chip badge-'+s.badge;
+    chip.textContent=(s.badge==='gold'||s.badge==='verified')?'\u2605 '+MAP[s.badge]:MAP[s.badge];
+    var anchor=card.querySelector('.cat-chip');
+    if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(chip,anchor.nextSibling);
+    var st=document.createElement('span');
+    st.style.cssText='font-size:.68rem;color:#fbbf24;margin-left:.4rem';
+    st.textContent='\u2605 '+(s.avg_rating||'0')+' ('+(s.review_count||0)+')';
+    chip.parentNode.appendChild(st);
   }
   function scan(){document.querySelectorAll('.item-card').forEach(stamp);}
+  load(function(){scan();setTimeout(scan,1500);});
   new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
-  setTimeout(scan,2500);setTimeout(scan,5000);
 })();
 </script>
 </body>
