@@ -95,7 +95,7 @@
     try {
       const rt = localStorage.getItem("refresh_token");
       if (!rt) return false;
-      const r = await fetch(`${AUTH_API}/refresh`, {
+      const r = await fetch("https://auth-service.bgmi-gateway.workers.dev/api/auth/refresh", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh_token: rt })
