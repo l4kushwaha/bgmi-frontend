@@ -1091,7 +1091,7 @@ function downloadCSV(name, headers, rows) {
 }
 
 /* HELPERS */
-function esc(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&","<":"<",">":">",'"':""","'":"'" }[c])); }
+function esc(v){ return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch])); }
 
 /* INIT */
 document.getElementById("whoEmail").textContent = user.email || "admin";
