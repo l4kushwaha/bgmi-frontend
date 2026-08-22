@@ -515,3 +515,51 @@ section.section{padding-top:clamp(1.3rem,3vw,2.1rem)!important;padding-bottom:cl
 .ig-swatch:hover{transform:scale(1.15)}
 .ig-swatch.sel{border-color:#c13584;box-shadow:0 0 0 2px rgba(193,53,132,.25)}
 [data-theme="dark"] .ig-theme-pop{background:#16161a;border-color:#2b2b31}
+
+/* ===== V31: CAROUSEL + LIGHTBOX + DESKTOP TIGHTEN ===== */
+@media(min-width:769px){
+  .navbar{padding:8px 20px!important}
+  .hero{padding:34px 24px 28px!important}
+  .kh-hero{padding:30px 20px 26px!important}
+  section.section{padding-top:1.7rem!important;padding-bottom:1.7rem!important}
+  .sale-band{margin-top:22px!important;padding:44px 20px!important}
+}
+/* uniform gallery */
+.images-gallery{position:relative!important;aspect-ratio:4/3!important;height:auto!important;overflow:hidden!important;cursor:pointer!important;background:#101014}
+.images-gallery img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;opacity:0!important;transition:opacity .55s ease!important;margin:0!important}
+.images-gallery img.active{opacity:1!important}
+.item-card:hover .images-gallery img.active{transform:scale(1.04);transition:opacity .55s ease,transform 6s ease}
+/* lightbox */
+#lbOverlay{position:fixed;inset:0;z-index:9999;background:rgba(5,5,8,.95);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+#lbOverlay.open{display:flex}
+#lbOverlay img{max-width:90vw;max-height:86vh;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.65)}
+#lbOverlay button{position:absolute;background:rgba(255,255,255,.09);border:none;color:#fff;font-size:1.9rem;width:52px;height:52px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s ease,transform .2s ease}
+#lbOverlay button:hover{background:rgba(255,255,255,.24);transform:scale(1.06)}
+.lb-x{top:16px;right:16px}.lb-prev{left:16px;top:50%;transform:translateY(-50%)}.lb-next{right:16px;top:50%;transform:translateY(-50%)}
+.lb-count{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:.9rem;background:rgba(255,255,255,.12);padding:6px 14px;border-radius:14px}
+@media(max-width:600px){.lb-prev{left:6px}.lb-next{right:6px}#lbOverlay button{width:44px;height:44px;font-size:1.5rem}}
+/* view details modal */
+.vd-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(5,5,8,.72);backdrop-filter:blur(4px);padding:18px}
+.vd-modal.open{display:flex}
+.vd-box{background:var(--bg-card,#fff);border:1px solid var(--border-subtle,#e2e5ea);border-radius:18px;max-width:520px;width:100%;max-height:84vh;overflow-y:auto;padding:22px 22px 18px;color:var(--text-primary)}
+[data-theme="dark"] .vd-box{background:#121216}
+.vd-box h3{margin-bottom:.4rem;font-size:1.25rem}
+.vd-price{font-size:1.5rem;font-weight:800;color:var(--pk,#ff2d78);margin:.3rem 0 .8rem}
+.vd-sec{margin-bottom:.85rem}
+.vd-sec b{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted,#8a94a3);margin-bottom:.25rem}
+.vd-seller{display:flex;align-items:center;gap:10px;background:rgba(127,127,140,.08);border-radius:12px;padding:10px 12px;margin-bottom:1rem;cursor:pointer}
+.vd-seller:hover{background:rgba(127,127,140,.15)}
+.badge-chip{font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:10px;background:linear-gradient(135deg,#f7971e,#ffd200);color:#111}
+.verified-tick{color:#00c853;font-weight:800}
+.vd-close{float:right;background:none;border:none;font-size:1.4rem;cursor:pointer;color:inherit}
+/* floating labels */
+.f-input{position:relative;margin-top:4px}
+.f-input input,.f-input select{width:100%;padding:20px 13px 8px!important;border-radius:10px}
+.f-input label{position:absolute;left:13px;top:50%;transform:translateY(-50%);pointer-events:none;color:#8a94a3;transition:all .18s ease;font-size:.92rem}
+.f-input input:focus+label,.f-input input:not(:placeholder-shown)+label,.f-input select:focus+label,.f-input select.has-val+label{top:11px;font-size:.7rem;color:var(--pk,#ff2d78)}
+/* number stepper */
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--border-subtle,#d8dbe1);border-radius:12px;overflow:hidden;background:var(--bg-card,#fff)}
+.stepper button{width:38px;height:40px;border:none;background:transparent;color:inherit;font-size:1.15rem;cursor:pointer}
+.stepper button:hover{background:rgba(127,127,140,.14)}
+.stepper input{width:56px!important;text-align:center;border:none!important;padding:9px 0!important;-moz-appearance:textfield}
+.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}

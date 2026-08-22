@@ -13,7 +13,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=30">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=31">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -131,17 +131,13 @@
           </div>
           <div class="form-group" data-reveal="slide-up" data-reveal-delay="350">
             <label class="label" for="rank">Highest Rank</label>
-            <input type="text" id="rank" class="input" placeholder="e.g. Ace / Conqueror" autocomplete="off" list="rankList">
-            <datalist id="rankList">
-              <option value="Bronze">Bronze</option>
-              <option value="Silver">Silver</option>
-              <option value="Gold">Gold</option>
-              <option value="Platinum">Platinum</option>
-              <option value="Diamond">Diamond</option>
-              <option value="Crown">Crown</option>
-              <option value="Ace">Ace</option>
-              <option value="Conqueror">Conqueror</option>
-            </datalist>
+            <select id="rank" name="rank" class="input select" aria-label="Highest Rank">
+              <option value="">Select rank</option>
+              <option>Bronze</option><option>Silver</option><option>Gold</option>
+              <option>Platinum</option><option>Diamond</option><option>Crown</option>
+              <option>Ace</option><option>Ace Master</option><option>Ace Dominator</option>
+              <option>Ace Conqueror</option>
+            </select>
           </div>
         </div>
       </section>
@@ -485,6 +481,31 @@
     setTimeout(fxBg, 800);
     setTimeout(fxBg, 2500);
   })();
+</script>
+<script id="fl-init">
+(function(){
+document.querySelectorAll('.form-group').forEach(function(g){
+  var i=g.querySelector('input.input:not([type=file]),select.input');
+  var l=g.querySelector('label.label');
+  if(!i||!l||g.querySelector('.f-input'))return;
+  if(i.tagName==='INPUT'&&i.type!=='number')i.setAttribute('placeholder',' ');
+  var d=document.createElement('div');d.className='f-input';
+  g.insertBefore(d,i);d.appendChild(i);
+  var nl=l.cloneNode(true);d.appendChild(nl);l.style.display='none';
+  if(i.tagName==='SELECT'){var f=function(){i.classList.toggle('has-val',!!i.value)};i.addEventListener('change',f);f();}
+});
+// number steppers
+document.querySelectorAll('input[type="number"]').forEach(function(inp){
+  if(inp.closest('.stepper'))return;
+  var w=document.createElement('div');w.className='stepper';
+  inp.parentNode.insertBefore(w,inp);
+  var m=document.createElement('button');m.type='button';m.textContent='−';
+  var p=document.createElement('button');p.type='button';p.textContent='+';
+  w.appendChild(m);w.appendChild(inp);w.appendChild(p);
+  m.onclick=function(){inp.stepDown();inp.dispatchEvent(new Event('change'));};
+  p.onclick=function(){inp.stepUp();inp.dispatchEvent(new Event('change'));};
+});
+})();
 </script>
 </body>
 </html>
