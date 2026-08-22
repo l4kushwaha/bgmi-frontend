@@ -315,3 +315,7 @@ body{color:#0b0d10}
 [data-theme="dark"] .chat-item.active{background:linear-gradient(90deg,rgba(255,45,120,.15),rgba(255,122,26,.1));border-color:rgba(255,45,120,.35)}
 .d-price{background:linear-gradient(90deg,#c2185b,#ff7a1a)!important;-webkit-background-clip:text;background-clip:text}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,45,120,.45),rgba(255,122,26,.45))}
+
+/* V22 FIXES: privacy overflow + chat resilience */
+#page-privacy,.privacy-wrap,[data-page="privacy"]{overflow-x:hidden}
+html,body{max-width:100%;overflow-x:clip}

@@ -88,13 +88,49 @@
   ];
 
   /* ================= SAFE FETCH ================= */
+  let _refreshing = false;
+  async function tryRefresh() {
+    if (_refreshing) return false;
+    _refreshing = true;
+    try {
+      const rt = localStorage.getItem("refresh_token");
+      if (!rt) return false;
+      const r = await fetch(`${AUTH_API}/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: rt })
+      });
+      if (!r.ok) return false;
+      const d = await r.json();
+      if (d.access_token) {
+        localStorage.setItem("token", d.access_token);
+        localStorage.setItem("access_token", d.access_token);
+        if (d.refresh_token) localStorage.setItem("refresh_token", d.refresh_token);
+        return true;
+      }
+      return false;
+    } catch { return false; } finally { _refreshing = false; }
+  }
   async function safeFetch(url, options = {}) {
-    const r = await fetch(url, options);
+    const opt = { ...options };
+    if (opt.headers && opt.headers.Authorization) {
+      opt.headers = { ...opt.headers, Authorization: "Bearer " + (localStorage.getItem("access_token") || localStorage.getItem("token")) };
+    }
+    let r = await fetch(url, opt);
     if (r.status === 401) {
-      alert("Session expired. Please login again.");
-      localStorage.clear();
-      location.href = "login.html";
-      throw new Error("unauthorized");
+      const ok = await tryRefresh();
+      if (ok) {
+        if (opt.headers && opt.headers.Authorization) {
+          opt.headers = { ...opt.headers, Authorization: "Bearer " + localStorage.getItem("access_token") };
+        }
+        r = await fetch(url, opt);
+      }
+      if (r.status === 401) {
+        alert("Session expired. Please login again.");
+        localStorage.clear();
+        location.href = "login.html";
+        throw new Error("unauthorized");
+      }
     }
     return r;
   }
