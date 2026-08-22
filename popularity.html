@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="js/app.js?v=1"></script>
 <title>Popularity | BGMI Market</title>
   <meta property="og:title" content="Popularity | BGMI Market">
   <meta property="og:description" content="BGMI Popularity Leaderboard, live market stats, and exact boost price list. Track top sellers and popularity points.">
@@ -19,7 +21,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=46">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=47">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -647,7 +649,8 @@ window.addEventListener("error",function(e){if(document.getElementById("gbanner"
     {n:"Helicopter",e:"🚁",pop:125000,price:4999},
     {n:"Lion",e:"🦁",pop:300000,price:9999}
   ];
-  var cart={},cards=document.querySelectorAll(".boost-grid .boost-card");
+  var cart={};try{var _pc=JSON.parse(localStorage.getItem("pop_cart")||"null");if(_pc&&typeof _pc==="object"){for(var _k in _pc)cart[_k]=_pc[_k];}}catch(e){}
+  var cards=document.querySelectorAll(".boost-grid .boost-card");
   var fab=document.getElementById("pcFab"),ov=document.getElementById("pcOv"),dw=document.getElementById("pcDrawer");
   function money(x){return x.toLocaleString("en-IN")}
   CFG.forEach(function(cfg,i){
@@ -657,11 +660,12 @@ window.addEventListener("error",function(e){if(document.getElementById("gbanner"
     var pop=c.querySelector(".b-pop");if(pop&&pop.parentNode===c)c.insertBefore(pr,pop.nextSibling);else c.appendChild(pr);
     var tap=document.createElement("div");tap.className="pc-tap";tap.textContent="TAP TO ADD +";c.appendChild(tap);
     var bd=document.createElement("div");bd.className="pc-badge";bd.style.display="none";c.appendChild(bd);
-    c.addEventListener("click",function(){add(i,1)});
+    c.addEventListener("click",function(){add(i,1);rSoon();});
   });
-  function add(i,d){cart[i]=(cart[i]||0)+d;if(cart[i]<1)delete cart[i];render()}
-  function setQ(i,q){if(q<1)delete cart[i];else cart[i]=q;render()}
+  function add(i,d){cart[i]=(cart[i]||0)+d;if(cart[i]<1)delete cart[i];}
+  function setQ(i,q){if(q<1)delete cart[i];else cart[i]=q;}
   function totals(){var s=0,p=0,n=0;for(var k in cart){s+=CFG[k].price*cart[k];p+=CFG[k].pop*cart[k];n+=cart[k]}return{s:s,p:p,n:n,f:Math.round(s*10)/100,t:s+Math.round(s*10)/100}}
+  var _rt=null;function rSoon(){clearTimeout(_rt);_rt=setTimeout(render,150);}
   function render(){
     var L=document.getElementById("pcList");L.innerHTML="";
     var any=false;
@@ -679,13 +683,14 @@ window.addEventListener("error",function(e){if(document.getElementById("gbanner"
     document.getElementById("pcPop").textContent=money(t.p);
     document.getElementById("pcCount").textContent=t.n;
     document.getElementById("pcFabTotal").textContent=money(t.t);
+    try{localStorage.setItem("pop_cart",JSON.stringify(cart))}catch(e){}
     CFG.forEach(function(c,i){var q=cart[i]||0;c.el.classList.toggle("pc-sel",q>0);var b=c.el.querySelector(".pc-badge");b.style.display=q?"flex":"none";b.textContent="×"+q});
     document.getElementById("pcPay").style.display="none";
   }
   document.getElementById("pcList").addEventListener("click",function(e){
     var b=e.target.closest("button[data-a]");if(!b)return;
     e.stopPropagation();var i=+b.dataset.i,a=b.dataset.a;
-    if(a==="+")add(i,1);else if(a==="-")add(i,-1);else setQ(i,0);
+    if(a==="+")add(i,1);else if(a==="-")add(i,-1);else setQ(i,0);rSoon();
   });
   function open(o){dw.classList.toggle("open",o);ov.classList.toggle("on",o)}
   fab.addEventListener("click",function(){open(true)});

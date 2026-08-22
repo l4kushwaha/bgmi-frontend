@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="js/app.js?v=1"></script>
 <title>Sell BGMI Account | BGMI Market</title>
   <meta property="og:title" content="Sell BGMI Account | BGMI Market">
   <meta property="og:description" content="Sell your BGMI account securely. Direct UPI payments, verified buyers, instant payouts.">
@@ -19,7 +21,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=46">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=47">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -498,7 +500,10 @@ window.addEventListener("error",function(e){if(document.getElementById("gbanner"
 </script>
 <script>
 /* input sanitizers */
-(function(){var lv=document.getElementById("level");if(lv)lv.addEventListener("input",function(){var v=parseInt(this.value,10);if(!isNaN(v)){if(v<0)this.value=0;if(v>100)this.value=100;}});var pr=document.getElementById("price");if(pr)pr.addEventListener("input",function(){var v=parseFloat(this.value);if(!isNaN(v)&&v<1)this.value=1;});})();
+(function(){var lv=document.getElementById("level");
+ if(lv){lv.addEventListener("keydown",function(e){if([".","e","E","+","-"].indexOf(e.key)>-1)e.preventDefault();});
+ lv.addEventListener("input",function(){this.value=this.value.replace(/[^0-9]/g,"").slice(0,3);var v=parseInt(this.value,10);if(!isNaN(v)){if(v>100)this.value=100;}else if(this.value!==""){this.value="";}});lv.step="1";}
+ var pr=document.getElementById("price");if(pr)pr.addEventListener("input",function(){var v=parseFloat(this.value);if(!isNaN(v)&&v<1)this.value=1;});})();
 </script>
 <span data-clampguard="1"></span><script>
 /* shared nav drawer + dynamic year */

@@ -829,3 +829,9 @@ html[data-theme="light"] input,html[data-theme="light"] select,html[data-theme="
   .nav-link{font-size:1.02rem;padding:11px 10px;border-radius:12px;width:100%}
   .nav-link:hover{background:rgba(255,255,255,.05)}
 }
+
+
+/* ===== V47: GREETING PILL ===== */
+#greetBadge{transition:transform .2s}
+#greetBadge:hover{transform:translateY(-1px)}
+@media(max-width:1180px){#greetBadge{display:none!important}}
