@@ -364,6 +364,7 @@
       <button class="tab" data-tab="withdrawals" role="tab" aria-selected="false">Withdrawals</button>
       <button class="tab" data-tab="chats" role="tab" aria-selected="false">Chats</button>
       <button class="tab" data-tab="activity" role="tab" aria-selected="false">Activity</button>
+      <button class="tab" data-tab="prices" role="tab" aria-selected="false">Prices</button>
       <button class="tab" data-tab="settings" role="tab" aria-selected="false">Settings</button>
     </div>
 
@@ -553,7 +554,14 @@
     </div>
 
     <!-- Settings Panel -->
-    <div class="panel" id="tab-settings" role="tabpanel">
+    <div class="panel" id="tab-prices">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <h2>Estimate Price Config</h2>
+          <button class="btn btn-primary btn-sm" onclick="savePrices()">?? Save All</button>
+        </div>
+        <div id="priceBody" class="glass" style="padding:1rem">Loading�</div>
+      </div>
+      <div class="panel" id="tab-settings" role="tabpanel">
       <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--accent-purple);">Platform UPI (admin fallback payee)</h3>
       <p style="font-size: 0.875rem; opacity: 0.7; margin-bottom: 1.5rem; max-width: 640px; line-height: 1.7;">
         When seller hasn't set their UPI, buyers pay this platform UPI ID (escrow / admin fee). 
@@ -708,6 +716,7 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   if (t.dataset.tab === "listings") loadListings();
   if (t.dataset.tab === "kyc") loadKyc();
   if (t.dataset.tab === "chats") loadChats();
+  if (t.dataset.tab === "prices") loadPrices();
   if (t.dataset.tab === "settings") loadSettings();
 });
 
@@ -951,29 +960,49 @@ async function loadSellerVerifications() {
   const st = document.getElementById("sellerStatusFilter").value;
   const { ok, data } = await api(`market/admin/seller-verifications${st ? "?status=" + st : ""}`);
   const body = document.getElementById("sellersBody");
-  if (!ok) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--accent-secondary);">Failed: ${data.error}</td></tr>`;
+  if (!ok) return body.innerHTML = '<tr><td colspan="8">Failed: '+((data&&data.error)||'?')+'</td></tr>';
   const list = Array.isArray(data) ? data : (data.value || []);
-  if (!list.length) return body.innerHTML = `<tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--text-secondary);">No seller verification requests</td></tr>`;
+  if (!list.length) return body.innerHTML = '<tr><td colspan="8">No seller verification requests</td></tr>';
   body.innerHTML = list.map(v => `
     <tr>
-      <td>${v.id}</td>
-      <td>${esc(v.user_id)}</td>
+      <td>${v.id}</td><td>${esc(v.user_id)}</td>
       <td>${esc((v.created_at||"").slice(0,16).replace("T"," "))}</td>
       <td>${statusBadge(v.status)}</td>
-      <td>${esc(v.badge || "—")}</td>
-      <td style="max-width:200px">${esc(v.reason || "—")}</td>
-      <td>${esc((v.reviewed_at||"").slice(0,16).replace("T"," ") || "—")}</td>
-      <td style="white-space:nowrap; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        ${v.status === "pending" ? `
-          <select id="badgeSel-${v.id}" style="padding:0.4rem 0.75rem;border-radius:var(--radius-md);border:1px solid var(--border-subtle);background:var(--bg-input);color:var(--text-primary);font-size:0.8rem;min-width:140px">
-            <option value="trusted">✅ trusted</option>
-            <option value="gold">🥇 gold</option>
-            <option value="diamond">💎 diamond</option>
-          </select>
-          <button class="btn-mini success" onclick="sellerDecision(${v.id},'approve')">Approve</button>
-          <button class="btn-mini danger" onclick="sellerDecision(${v.id},'reject')">Reject</button>` : "—"}
+      <td>${esc(v.badge || "")}</td>
+      <td style="max-width:180px">${esc(v.reason || "")}</td>
+      <td>${v.status==="pending"? `<button class="btn-mini success" onclick="sellerDecision(${v.id},'approved')">Approve</button> <button class="btn-mini danger" onclick="sellerDecision(${v.id},'rejected')">Reject</button>` : "�"}</td>
+      <td style="white-space:nowrap">
+        <select id="bsel-${v.id}" class="btn-mini" style="min-width:110px">
+          <option value="">badge�</option>
+          <option value="trusted">trusted</option><option value="gold">gold</option><option value="diamond">diamond</option><option value="verified">verified</option>
+        </select>
+        <button class="btn-mini" onclick="setBadge(${v.id})">Set</button>
+        <button class="btn-mini warn" onclick="setStatus(${v.user_id},'banned')">Deactivate</button>
+        <button class="btn-mini success" onclick="setStatus(${v.user_id},'active')">Activate</button>
       </td>
     </tr>`).join("");
+}
+
+async function setBadge(id){
+  const val=document.getElementById("bsel-"+id).value;
+  if(!val)return toast("Badge select karo","warn");
+  const {ok}=await api("market/admin/sellers/"+id+"/badge",{method:"POST",body:JSON.stringify({badge:val})});
+  toast(ok?"Badge set: "+val:"Failed",ok?"ok":"err"); loadSellerVerifications();
+}
+
+async function loadPrices(){
+  const {ok,data}=await api("market/price-config");
+  const el=document.getElementById("priceBody");
+  if(!ok||!data)return el.innerHTML="Failed to load";
+  const entries=Object.entries(data).filter(([k])=>k!=="updated_at");
+  el.innerHTML='<table><thead><tr><th>Key</th><th>Price (?)</th></tr></thead><tbody>'+
+   entries.map(([k,v])=>'<tr><td>'+k+'</td><td><input id="pc-'+k+'" type="number" min="0" value="'+Number(v)+'" style="width:130px;padding:8px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary)"></td></tr>').join("")+'</tbody></table>';
+}
+async function savePrices(){
+  const cfg={};
+  document.querySelectorAll("[id^='pc-']").forEach(i=>cfg[i.id.slice(3)]=Number(i.value));
+  const {ok,data}=await api("market/admin/price-config",{method:"PUT",body:JSON.stringify({config:cfg})});
+  toast(ok?"Prices saved":"Failed: "+((data&&data.error)||""),ok?"ok":"err");
 }
 
 async function sellerDecision(id, decision) {
@@ -1130,6 +1159,9 @@ async function viewKyc(id){
   b.innerHTML=h;
 }
 refreshAll();
+</script>
+<script>
+window.addEventListener("error",function(e){if(document.getElementById("gbanner"))return;var b=document.createElement("div");b.id="gbanner";b.style.cssText="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#2a1218;color:#ffb4c0;border:1px solid #ff2d7855;padding:10px 18px;border-radius:12px;z-index:99999;font-size:.85rem";b.textContent="Kuch galat ho gaya � page reload karke try karo.";document.body.appendChild(b);});
 </script>
 </body>
 </html>

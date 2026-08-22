@@ -730,5 +730,8 @@ loadProfile();
     setTimeout(fxBg, 2500);
   })();
 </script>
+<script>
+window.addEventListener("error",function(e){if(document.getElementById("gbanner"))return;var b=document.createElement("div");b.id="gbanner";b.style.cssText="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#2a1218;color:#ffb4c0;border:1px solid #ff2d7855;padding:10px 18px;border-radius:12px;z-index:99999;font-size:.85rem";b.textContent="Kuch galat ho gaya � page reload karke try karo.";document.body.appendChild(b);});
+</script>
 </body>
 </html>

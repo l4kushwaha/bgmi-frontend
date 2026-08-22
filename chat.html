@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat | BGMI Market</title>
+<link rel="stylesheet" href="styles/premium.css?v=28">
+<link rel="stylesheet" href="styles/premium-v15.css?v=37">
+<style>
+*{box-sizing:border-box}
+body{background:var(--bg-primary);color:var(--text-primary);margin:0;font-family:Inter,sans-serif}
+.chat-wrap{display:flex;height:calc(100vh - 60px);max-width:1250px;margin:0 auto;border-left:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle)}
+.sidebar{width:330px;border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;background:var(--bg-card)}
+.main{flex:1;display:flex;flex-direction:column;position:relative}
+#pillsBox{display:flex;gap:6px;padding:10px 12px}
+.pill{flex:1;padding:8px 0;border-radius:999px;border:1px solid var(--border-subtle);background:transparent;color:var(--text-secondary);font-weight:600;font-size:.85rem;cursor:pointer;transition:all .2s}
+.pill.active{background:linear-gradient(135deg,var(--accent-primary),var(--accent-tertiary));color:#fff;border-color:transparent}
+#searchChats{margin:0 12px 8px;padding:9px 14px;border-radius:999px;background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary)}
+#onlineStatus{padding:2px 14px 8px;font-size:.72rem;color:var(--text-secondary)}
+#chatList{overflow-y:auto;flex:1}
+#chatList>div{padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid var(--border-subtle);transition:background .15s}
+#chatList>div:hover,#chatList>div.sel{background:var(--bg-input)}
+#chatStatus{padding:13px 16px;font-weight:700;border-bottom:1px solid var(--border-subtle);background:var(--bg-card);position:sticky;top:0;z-index:5}
+#waitingBox{padding:0 14px}
+/* ===== bubbles ===== */
+#globalBox,#privateBox,#chatBox{scrollbar-width:thin}
+#globalBox.open{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:14px 10px;background:
+ radial-gradient(circle at 20% 20%,rgba(255,45,120,.04),transparent 40%),
+ radial-gradient(circle at 80% 80%,rgba(122,26,255,.04),transparent 40%),var(--bg-primary)}
+.g-msg{display:flex;gap:9px;margin:7px 6px;max-width:78%;align-items:flex-end}
+.g-msg.mine{align-self:flex-end;flex-direction:row-reverse}
+.g-avatar{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent-tertiary),var(--accent-purple,#7a1aff));font-size:.9rem}
+.g-body{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px 16px 16px 4px;padding:8px 12px 6px;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.g-msg.mine .g-body{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:#fff;border:none;border-radius:16px 16px 4px 16px}
+.g-name{font-size:.74rem;font-weight:800;color:var(--accent-tertiary);margin-right:8px}
+.g-msg.mine .g-name{color:rgba(255,255,255,.85)}
+.g-time{font-size:.64rem;opacity:.55}
+.g-text{font-size:.93rem;line-height:1.35;word-break:break-word;margin-top:2px}
+/* private */
+#privateBox{flex:1;overflow-y:auto;display:none;flex-direction:column;padding:14px 10px;background:
+ radial-gradient(circle at 70% 30%,rgba(255,45,120,.05),transparent 45%),
+ radial-gradient(circle at 25% 75%,rgba(122,26,255,.05),transparent 45%),var(--bg-primary)}
+.message{max-width:72%;padding:9px 13px;font-size:.94rem;line-height:1.38;margin:5px 12px;word-break:break-word;box-shadow:0 1px 2px rgba(0,0,0,.22);animation:pop .18s ease}
+@keyframes pop{from{transform:scale(.96);opacity:.4}to{transform:scale(1);opacity:1}}
+.message.sent{align-self:flex-end;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:#fff;border-radius:16px 16px 4px 16px}
+.message.received{align-self:flex-start;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px 16px 16px 4px}
+.message.system{align-self:center;background:rgba(128,128,128,.18);color:var(--text-secondary);font-size:.78rem;border-radius:999px;padding:5px 14px;box-shadow:none;text-align:center}
+.chat-image{max-width:250px;border-radius:12px;display:block}
+.message audio{width:230px;display:block}
+/* input bar */
+#msgForm{display:flex;gap:7px;padding:10px 12px;background:var(--bg-card);border-top:1px solid var(--border-subtle);align-items:center}
+#messageInput{flex:1;padding:12px 18px;border-radius:999px;background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary);outline:none;font-size:.95rem}
+#messageInput:focus{border-color:var(--accent-primary)}
+#msgForm button{width:42px;height:42px;border-radius:50%;border:1px solid var(--border-subtle);background:var(--bg-input);color:var(--text-primary);cursor:pointer;font-size:1rem;flex:none;transition:all .2s}
+#msgForm button:hover{border-color:var(--accent-primary);transform:translateY(-1px)}
+#sendBtn{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary))!important;color:#fff;border:none!important;width:auto!important;border-radius:999px!important;padding:0 20px!important;font-weight:700}
+#micBtn.rec{background:#ef4444!important;color:#fff!important;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.6}}
+.effects-pop{position:absolute;bottom:76px;right:90px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:8px;display:none;gap:6px;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.effects-pop.open{display:flex}
+.eff-chip{padding:6px 12px;border-radius:999px;background:var(--bg-input);border:1px solid var(--border-subtle);cursor:pointer;font-size:.8rem}
+.eff-chip.sel{background:var(--accent-primary);color:#fff}
+@media(max-width:768px){.sidebar{width:112px}.sidebar .pill{font-size:.72rem}#searchChats::placeholder{color:transparent}.message{max-width:84%}}
+</style>
+</head>
+<body>
+<nav class="navbar"><div class="nav-inner">
+<a class="nav-logo" href="index.html">BGMI Market</a>
+<div style="flex:1"></div>
+<a href="marketplace.html" class="btn btn-ghost btn-sm">Market</a>
+</div></nav>
+<div class="chat-wrap">
+<aside class="sidebar">
+<div id="pillsBox" style="display:flex;gap:8px;padding:10px">
+<button id="tabGlobal" class="pill active">Global</button>
+<button id="tabChats" class="pill">Chats</button>
+</div>
+<input id="searchChats" placeholder="Search�" style="display:none;margin:8px;padding:8px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary)">
+<div id="onlineStatus" style="padding:4px 10px;font-size:.72rem;color:var(--text-secondary)">�</div>
+<div id="chatList" style="overflow-y:auto;flex:1"></div>
+</aside>
+<section class="main">
+<div id="chatStatus" style="padding:10px 14px;border-bottom:1px solid var(--border-subtle)">Select a chat</div>
+<div id="waitingBox"></div>
+<div id="globalBox" class="open" style="overflow-y:auto;flex:1;display:flex;flex-direction:column">
+<div id="gEmpty" style="text-align:center;color:var(--text-secondary);margin-top:40%">No messages yet. Say hi!</div>
+</div>
+<div id="privateBox" style="display:none;flex:1;overflow-y:auto">
+<button id="exitPrivate" style="display:none;align-self:flex-start;margin:8px" class="btn btn-ghost btn-sm">? Exit</button>
+<div id="buyBox" style="display:none;margin:8px"></div>
+<div id="chatBox" style="display:flex;flex-direction:column;flex:1"></div>
+</div>
+<form id="msgForm" style="display:flex;gap:8px;padding:10px;border-top:1px solid var(--border-subtle)">
+<input id="messageInput" placeholder="Message�" autocomplete="off" style="flex:1;padding:11px 14px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary)">
+<button type="button" id="imgBtn" style="display:none">??</button>
+<input type="file" id="imageInput" accept="image/*" hidden>
+<button type="button" id="micBtn">??</button>
+<button type="button" id="effBtn">?</button>
+<div id="effectsPop" class="effects-pop" style="display:none;position:absolute;bottom:70px"></div>
+<button type="button" id="callAudioBtn" style="display:none">??</button>
+<button type="button" id="callVideoBtn" style="display:none">??</button>
+<button id="sendBtn" class="btn btn-primary btn-sm">Send</button>
+</form>
+</section>
+</div>
+<audio id="notifySound" preload="none"></audio>
+<script src="js/auth.js?v=15"></script>
+<script src="js/theme.js"></script>
+<script src="js/chat.js?v=17"></script>
+<script src="assets/effects.js?v=11" defer></script>
+<script>
+window.addEventListener("error",function(e){if(document.getElementById("gbanner"))return;var b=document.createElement("div");b.id="gbanner";b.style.cssText="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#2a1218;color:#ffb4c0;border:1px solid #ff2d7855;padding:10px 18px;border-radius:12px;z-index:99999;font-size:.85rem";b.textContent="Kuch galat ho gaya � page reload karke try karo.";document.body.appendChild(b);});
+</script>
+</body>
+</html>
