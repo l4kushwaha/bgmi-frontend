@@ -1024,3 +1024,10 @@ filterSelect?.addEventListener("change", renderList);
 
 loadListings();
 })();
+/* ==== T&C GATE: every buy goes through disclaimer ==== */
+(function(){
+  var core = typeof startBuy === "function" ? startBuy : null;
+  if (!core || !window.tncGate) return;
+  var wrapped = function () { var args = arguments; window.tncGate(function (ok) { if (ok) core.apply(null, args); }); };
+  try { startBuy = wrapped; window.startBuy = wrapped; } catch (e) {}
+})();

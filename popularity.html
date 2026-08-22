@@ -719,5 +719,37 @@ window.addEventListener("error",function(e){if(document.getElementById("gbanner"
 /* shared nav drawer + dynamic year */
 (function(){var nt=document.getElementById("navToggle"),nl=document.getElementById("navLinks");if(nt&&nl){var ov=document.createElement("div");ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .28s;z-index:99997";document.body.appendChild(ov);function cls(){nl.classList.remove("open");ov.style.opacity="0";nt.setAttribute("aria-expanded","false")}nt.addEventListener("click",function(e){e.stopPropagation();var o=!nl.classList.contains("open");nl.classList.toggle("open",o);ov.style.opacity=o?"1":"0";ov.style.pointerEvents=o?"auto":"none";nt.setAttribute("aria-expanded",o)});ov.addEventListener("click",cls);document.addEventListener("keydown",function(e){if(e.key==="Escape")cls()});nl.addEventListener("click",function(e){if(e.target.closest(".nav-link"))cls()});}var y=new Date().getFullYear();document.querySelectorAll(".footer-copyright").forEach(function(el){el.innerHTML=el.innerHTML.replace(/20\d\d/,y)});})();
 </script>
+
+<script>
+(function(){
+var ov=document.createElement('div');ov.id='tnc-gate-bg';
+ov.style.cssText='position:fixed;inset:0;background:rgba(2,6,23,.82);backdrop-filter:blur(6px);z-index:99999;display:none;align-items:center;justify-content:center;padding:18px';
+ov.innerHTML='<div style="max-width:540px;width:100%;background:rgba(13,18,32,.98);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:24px;color:#e2e8f0;font-family:inherit">'
++'<h3 style="margin:0 0 10px;font-size:1.08rem;color:#fff">\u26A0\uFE0F Payment Disclaimer</h3>'
++'<p style="font-size:.82rem;opacity:.8;line-height:1.55;margin:0 0 12px">Direct payments to sellers are <b style="color:#ffb86b">at your own risk</b>. Elegent-Kart is only a listing platform and is <b>not responsible</b> for any scam, fraud, or financial loss. Deals are strictly between buyer and seller.</p>'
++'<label style="display:flex;gap:10px;align-items:flex-start;font-size:.84rem;line-height:1.5;cursor:pointer;background:rgba(255,255,255,.04);padding:10px 12px;border-radius:10px"><input type="checkbox" id="tncAck" style="margin-top:3px;transform:scale(1.25);accent-color:#ff7a1a"> <span>I have read and accept the <a href="terms.html" target="_blank" style="color:#ff7a1a;text-decoration:underline">Terms &amp; Conditions</a>, including the <b>Payments At Your Own Risk</b> clause. My payment is voluntary.</span></label>'
++'<div style="display:flex;gap:10px;margin-top:16px"><button id="tncGo" disabled style="flex:1;padding:11px;border:none;border-radius:10px;font-weight:800;cursor:not-allowed;background:linear-gradient(135deg,#ff2d78,#ff7a1a);color:#fff;opacity:.45">Continue to Payment</button><button id="tncNo" style="flex:0 0 auto;padding:11px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#cbd5e1;cursor:pointer;font-weight:600">Cancel</button></div></div>';
+document.body.appendChild(ov);
+var cb=document.getElementById('tncAck'),go=document.getElementById('tncGo');
+cb.addEventListener('change',function(){go.disabled=!cb.checked;go.style.opacity=cb.checked?'1':'.45';go.style.cursor=cb.checked?'pointer':'not-allowed';});
+document.getElementById('tncNo').addEventListener('click',function(){ov.style.display='none';if(ov.__cb)ov.__cb(false);});
+go.addEventListener('click',function(){ov.style.display='none';if(ov.__cb)ov.__cb(true);});
+window.tncGate=function(done){cb.checked=false;go.disabled=true;go.style.opacity='.45';go.style.cursor='not-allowed';ov.__cb=done;ov.style.display='flex';};
+})();
+</script>
+<script>
+(function(){
+  function arm(){
+    var go=document.getElementById("pcGo");
+    if(!go||go.dataset.tcg)return;go.dataset.tcg="1";
+    var old=go.onclick;
+    go.addEventListener("click",function(){
+      if(typeof window.tncGate!=="function")return;
+      window.tncGate(function(ok){ if(ok&&old)old.call(go); });
+    },true);
+  }
+  arm();setInterval(arm,1500);
+})();
+</script>
 </body>
 </html>
