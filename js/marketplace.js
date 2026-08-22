@@ -43,8 +43,8 @@ const session = () => {
 };
 
 const isOwner = item =>
-  session() &&
-  (String(session().user.seller_id) === String(item.seller_id) ||
+  !!session() &&
+  (String(session().user.seller_id ?? session().user.id) === String(item.seller_id) ||
    session().user.role === "admin");
 
 const stars = r =>
