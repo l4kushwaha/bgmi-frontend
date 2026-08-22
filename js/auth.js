@@ -336,17 +336,8 @@ async function sendResetLink() {
       body: JSON.stringify({ email })
     });
 
-    if (data && data.dev_otp) {
-      const otpInput = document.getElementById("resetToken");
-      if (otpInput) {
-        otpInput.value = data.dev_otp;
-        document.getElementById("newPassword")?.focus();
-      }
-      showToast("Backup code: " + data.dev_otp, "success");
-    } else {
-      showToast(data.message || "OTP sent to email", "success");
+    showToast(data.message || "OTP sent to email", "success");
     if (window.showResetStep2) window.showResetStep2();
-    }
   } catch (err) {
     showToast(err.message || "Failed to send OTP", "error");
   } finally {
@@ -369,8 +360,9 @@ async function resetPassword() {
     await apiFetch(`${AUTH_API}/reset-password`, {
       method: "POST",
       body: JSON.stringify({
+        email: (document.getElementById("email")?.value || "").trim(),
         otp,
-        new_password: newPassword // ✅ FIX
+        new_password: newPassword
       })
     });
 

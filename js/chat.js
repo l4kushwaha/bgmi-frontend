@@ -75,7 +75,7 @@ async function e2eEnc(room,text){
     b.set(iv); b.set(new Uint8Array(ct), iv.length);
     let s="";for(let i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);
     return "enc1:"+btoa(s);
-  }catch(e){ return text; }
+  }catch(e){ throw new Error("e2e_encrypt_failed"); }
 }
 async function e2eDec(room,t){
   try{
@@ -515,9 +515,18 @@ let activeRoom = null;
   async function sendMessage(msg, type = "text", media = null, media_type = null) {
     if (!activeRoom || (!msg && !media) || !canSend) return;
 
+    let enc;
+    try {
+      enc = await e2eEnc(activeRoom, msg || "");
+      if (enc && enc.indexOf("enc1:") !== 0) throw new Error("encryption_failed");
+    } catch (e) {
+      alert("Encryption failed — message NOT sent (privacy protected).");
+      return;
+    }
+
     const body = {
       room_id: activeRoom,
-      message: await e2eEnc(activeRoom, msg || ""),
+      message: enc,
       type,
       sensitive: false,
       effect: selectedEffect || undefined
