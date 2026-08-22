@@ -660,3 +660,9 @@ tr:hover td{background:rgba(255,255,255,.03)}
   th,td{padding:9px 8px;font-size:.8rem}
   table{display:block;overflow-x:auto;white-space:nowrap}
 }
+
+/* ===== V37: PROFILE HERO SAFETY ===== */
+#profile-name{position:static!important;overflow:visible!important}
+#profile-name::before,#profile-name::after{display:none!important}
+.profile-top,.profile-hero,.avatar-section{flex-wrap:wrap!important;gap:14px!important;align-items:center!important}
+img.avatar,.profile-avatar{flex:none!important;position:relative!important;z-index:1!important}

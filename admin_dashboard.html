@@ -37,7 +37,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=36">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=37">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -652,7 +652,7 @@ function logout() { localStorage.clear(); location.href = "login.html"; }
 const SVC = {
   auth: "https://auth-service.bgmi-gateway.workers.dev/api",
   market: "https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api",
-  verify: "https://verification_service.bgmi-gateway.workers.dev",
+  verify: "https://verification-service.bgmi-gateway.workers.dev",
   chat: "https://bgmi_chat_service.bgmi-gateway.workers.dev/api/chat",
   wallet: "https://bgmi-marketplace.bgmi-gateway.workers.dev"
 };
@@ -704,6 +704,10 @@ document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
   if (t.dataset.tab === "activity") loadActivity(true);
   if (t.dataset.tab === "withdrawals") loadWithdrawals();
   if (t.dataset.tab === "sellers") loadSellerVerifications();
+  if (t.dataset.tab === "users") loadUsers();
+  if (t.dataset.tab === "listings") loadListings();
+  if (t.dataset.tab === "kyc") loadKyc();
+  if (t.dataset.tab === "chats") loadChats();
   if (t.dataset.tab === "settings") loadSettings();
 });
 
@@ -726,6 +730,7 @@ async function loadSettings() {
 }
 
 async function saveSettings() {
+  const status = document.getElementById("settingsStatus");
   const upi_id = document.getElementById("setUpiId").value.trim();
   const upi_name = document.getElementById("setUpiName").value.trim();
   if (!upi_id) return toast("Platform UPI ID required", "err");
@@ -1104,7 +1109,7 @@ async function viewKyc(id){
   const b=document.getElementById("kycBody");
   b.innerHTML="<h3>User #"+id+" — Verification</h3><p>Loading…</p>";
   ov.classList.add("open");
-  const V="https://verification_service.bgmi-gateway.workers.dev";
+  const V="https://verification-service.bgmi-gateway.workers.dev";
   const M="https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api";
   const [pr,br]=await Promise.allSettled([
     api("verify/profile/"+id.replace ? id : id),
@@ -1124,6 +1129,7 @@ async function viewKyc(id){
   h+=!k?"<p style=\"color:#8a94a3;margin-top:10px\">No KYC submitted yet.</p>":"";
   b.innerHTML=h;
 }
-</s
+refreshAll();
+</script>
 </body>
 </html>

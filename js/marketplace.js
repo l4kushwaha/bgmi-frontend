@@ -775,7 +775,7 @@ window.openSellerProfile = async sellerId => {
   try {
     const token = localStorage.getItem("token") || "";
     const r = await fetch(
-      "https://verification_service.bgmi-gateway.workers.dev/profile/" + sellerId,
+      "https://verification-service.bgmi-gateway.workers.dev/profile/" + sellerId,
       { headers: token ? { Authorization: "Bearer " + token } : {} }
     );
     const p = (await r.json()).profile || {};
