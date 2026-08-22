@@ -69,7 +69,7 @@
   function migrate() {
     ENC_KEYS.forEach(function (k) {
       var raw = _get.call(localStorage, k);
-      if (raw && raw.slice(0, 7) !== CT_PREFIX && typeof CryptoJS !== "undefined") {
+      if (raw && raw.slice(0, CT_PREFIX.length) !== CT_PREFIX && typeof CryptoJS !== "undefined") {
         var c = enc(raw);
         if (c !== null) _set.call(localStorage, k, c);
       }
