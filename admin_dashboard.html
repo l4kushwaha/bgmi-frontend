@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+<style>html.admin-pending body{visibility:hidden!important}</style>
 <script>
   // sirf admin ko andar aane do (fxAdminGuard)
   (function () {
+    document.documentElement.classList.add("admin-pending");
+    function kick(){ location.replace("index.html"); }
+    var t = localStorage.getItem("token");
     var u = {};
     try { u = JSON.parse(localStorage.getItem("user") || "{}"); } catch (e) {}
-    if (!localStorage.getItem("token") || u.role !== "admin") {
-      location.href = "index.html";
-    }
+    if (!t || u.role !== "admin") { kick(); return; }
+    fetch("https://auth-service.bgmi-gateway.workers.dev/api/auth/me", {
+      headers: { Authorization: "Bearer " + t }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var me = d.user || (d.data && d.data.user) || d;
+      if (me && me.role === "admin") {
+        document.documentElement.classList.remove("admin-pending");
+      } else { kick(); }
+    })
+    .catch(kick);
   })();
 </script>
 
@@ -23,8 +36,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <!-- Premium Styles -->
-<link rel="stylesheet" href="styles/premium.css?v=14">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=27">
+<link rel="stylesheet" href="styles/premium.css?v=28">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=28">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 

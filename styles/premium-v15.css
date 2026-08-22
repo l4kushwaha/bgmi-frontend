@@ -417,3 +417,35 @@ body:has(.chat-panel){background:#121212!important;color:#fff}
 .profile-page .label{color:#aaa!important}
 .profile-page .btn-primary{background:#e53935!important;box-shadow:none!important}
 [data-theme="dark"] .profile-page .glass{background:#1e1e1e!important}
+
+
+/* ===== V28: TRUE THEME CONTRAST + VISIBILITY FIX ===== */
+/* --- LIGHT: pure white --- */
+[data-theme="light"] body{background:#ffffff!important;color:#050507!important}
+[data-theme="light"] .glass,[data-theme="light"] .card,[data-theme="light"] .item-card,[data-theme="light"] .chat-list,[data-theme="light"] .chat-panel,[data-theme="light"] .chat-header,[data-theme="light"] .chat-input,[data-theme="light"] .profile-page .glass,[data-theme="light"] .faq-item,[data-theme="light"] .stats-grid>div{background:#ffffff!important;border-color:#e2e5ea!important;color:#0c0d10!important;box-shadow:0 2px 10px rgba(15,18,25,.06)!important}
+[data-theme="light"] .input,[data-theme="light"] select.input,[data-theme="light"] textarea,[data-theme="light"] .chat-input input,[data-theme="light"] .profile-page .input{background:#f4f5f7!important;border:1px solid #d8dbe1!important;color:#0a0b0d!important;border-radius:8px!important}
+[data-theme="light"] p,[data-theme="light"] li,[data-theme="light"] td,[data-theme="light"] th,[data-theme="light"] span:not(.cat-chip):not([class*="badge"]){color:#17181c}
+[data-theme="light"] .hero-subtitle,[data-theme="light"] .section-subtitle,[data-theme="light"] .muted,[data-theme="light"] .prose p{color:#3c4046!important}
+[data-theme="light"] .navbar{background:rgba(255,255,255,.92)!important;border-bottom-color:#e6e8ec!important}
+[data-theme="light"] .nav-link,[data-theme="light"] .nav-dropdown-item,[data-theme="light"] .fx-drawer a{color:#101116!important}
+[data-theme="light"] .nav-dropdown-menu,[data-theme="light"] .fx-drawer{background:#ffffff!important;border:1px solid #e2e5ea!important;box-shadow:0 14px 40px -12px rgba(10,12,18,.22)!important}
+[data-theme="light"] .footer{background:#ffffff!important;color:#14161a!important;border-top:1px solid #e6e8ec}
+[data-theme="light"] .footer a,[data-theme="light"] .footer p{color:#33373d!important}
+[data-theme="light"] .stat-label,[data-theme="light"] .label{color:#454a52!important}
+
+/* --- DARK: true black --- */
+[data-theme="dark"] body,body{background:#000000!important;color:#f4f5f7!important}
+[data-theme="dark"] .glass,[data-theme="dark"] .card,[data-theme="dark"] .item-card{background:#0e0e11!important;border-color:#23252b!important}
+[data-theme="dark"] .nav-dropdown-menu,[data-theme="dark"] .fx-drawer{background:#101013!important;border:1px solid #26282e!important}
+[data-theme="dark"] .nav-link,[data-theme="dark"] .nav-dropdown-item,[data-theme="dark"] .fx-drawer a{color:#eceef2!important}
+[data-theme="dark"] .footer{background:#000000!important;border-top:1px solid #1c1e23}
+[data-theme="dark"] .footer a{color:#b9bec7!important}
+
+/* --- MENU VISIBILITY (both) --- */
+.nav-dropdown-menu{z-index:1000}
+.nav-dropdown-item:hover{background:rgba(127,127,140,.12)}
+
+/* --- REFERENCE PAGES: scope hardcoded dark to dark theme only --- */
+[data-theme="light"] .top-strip{background:#101218!important;color:#fff!important}
+[data-theme="light"] .sale-band{background:#101218!important}
+[data-theme="light"] .kh-banner{background:#101218!important}
