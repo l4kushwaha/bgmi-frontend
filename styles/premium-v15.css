@@ -178,3 +178,85 @@ html:not([data-theme="light"]) .toggle-thumb {
 .badge-trusted{color:#4ade80;border-color:#4ade8066;background:#4ade801f}
 .badge-elite{color:#c084fc;border-color:#c084fc66;background:#c084fc1f}
 .badge-gold{color:#fbbf24;border-color:#fbbf2488;background:linear-gradient(135deg,#fbbf2422,#f59e0b33);box-shadow:0 0 12px rgba(251,191,36,.25)}
+
+/* ===== V18: INSTAGRAM-STYLE CHAT + SELL TOGGLE + GLOBAL POLISH ===== */
+/* --- Instagram DM layout --- */
+.chat-panel{display:flex;flex-direction:column;height:calc(100vh - 140px);max-height:860px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:20px;overflow:hidden;box-shadow:0 20px 50px -20px rgba(0,0,0,.5)}
+.chat-header{position:relative;display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;background:rgba(255,255,255,.03);backdrop-filter:blur(18px);border-bottom:1px solid var(--border-subtle);z-index:5}
+.chat-messages{flex:1;overflow-y:auto;padding:1.1rem 1rem .6rem;display:flex;flex-direction:column;gap:.4rem;scroll-behavior:smooth}
+.chat-input{display:flex;gap:.6rem;padding:.8rem 1rem;border-top:1px solid var(--border-subtle);background:rgba(255,255,255,.02);align-items:center}
+.chat-input input,.chat-input textarea{flex:1;background:rgba(255,255,255,.06)!important;border:1px solid var(--border-subtle)!important;border-radius:999px!important;padding:.7rem 1.1rem!important;font-size:.95rem;color:var(--text-primary)}
+.chat-input input:focus{border-color:var(--accent-primary)!important;box-shadow:0 0 0 3px rgba(0,212,255,.12)}
+.chat-input button{border-radius:999px!important;min-height:44px;padding:0 1.3rem;font-weight:700}
+/* bubbles */
+.message{max-width:72%;padding:.62rem .95rem;border-radius:20px;font-size:.94rem;line-height:1.45;position:relative;animation:bubbleIn .28s cubic-bezier(.22,1,.36,1);word-break:break-word}
+@keyframes bubbleIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+.message.sent{align-self:flex-end;background:linear-gradient(135deg,#3797f0,#8134af);color:#fff!important;border-bottom-right-radius:6px;box-shadow:0 6px 18px -6px rgba(55,151,240,.45)}
+.message.received{align-self:flex-start;background:rgba(255,255,255,.08);color:var(--text-primary);border:1px solid var(--border-subtle);border-bottom-left-radius:6px}
+.message.system{align-self:center;background:none;color:var(--text-secondary);font-size:.78rem;padding:.2rem}
+.message .chat-image{max-width:220px;border-radius:14px;margin-top:.35rem;display:block}
+.message.sent a{color:#d3f0ff}
+/* date/time meta inside bubbles */
+.message .msg-time{display:block;font-size:.66rem;opacity:.65;margin-top:.25rem;text-align:right}
+/* conversation list items */
+.chat-item{display:flex;flex-direction:column;gap:.15rem;padding:.85rem 1rem;border-radius:14px;cursor:pointer;transition:background .25s ease;border:1px solid transparent}
+.chat-item:hover{background:rgba(255,255,255,.05)}
+.chat-item.active{background:linear-gradient(90deg,rgba(55,151,240,.16),rgba(129,52,175,.12));border-color:rgba(55,151,240,.35)}
+.chat-title{font-weight:700;font-size:.92rem}
+.chat-preview{font-size:.82rem;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-meta{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-primary)}
+/* global chat pills */
+.ch-pill{border-radius:999px;padding:.4rem 1rem;font-size:.8rem;font-weight:600;border:1px solid var(--border-subtle);background:transparent;color:var(--text-secondary);transition:all .25s ease}
+.ch-pill.active{background:linear-gradient(135deg,#3797f0,#8134af);color:#fff;border-color:transparent;box-shadow:0 6px 16px -6px rgba(55,151,240,.5)}
+.g-msg{display:flex;gap:.55rem;padding:.28rem 0}
+.g-msg.mine .g-body{margin-left:auto;background:linear-gradient(135deg,#3797f0,#8134af);color:#fff}
+.g-body{background:rgba(255,255,255,.07);border-radius:16px 16px 16px 5px;padding:.5rem .85rem;max-width:80%}
+.g-name{font-weight:700;font-size:.78rem;margin-right:.5rem}
+.g-time{font-size:.66rem;opacity:.6}
+.g-text{font-size:.92rem}
+.g-avatar{width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,#ffb84d,#ff5e62);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0}
+/* --- SELL PAGE: obvious category switch + panel transitions --- */
+.cat-toggle,.cat-buttons{box-shadow:0 10px 30px -12px rgba(0,212,255,.35),inset 0 0 0 1px var(--border-subtle)}
+.cat-btn{transition:color .35s ease,transform .2s ease}
+.cat-btn:active{transform:scale(.97)}
+.hidden-sec{display:none!important}
+section:not(.hidden-sec){animation:panelSwap .5s cubic-bezier(.22,1,.36,1)}
+@keyframes panelSwap{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.sec-popularity h3,.sec-popularity label{color:var(--accent-orange,#FF6B00)}
+#secPopularity{border:1px dashed rgba(255,138,0,.45);border-radius:16px;padding:1.2rem;background:linear-gradient(180deg,rgba(255,107,0,.06),transparent)}
+#secAccount,#secItems{border:1px dashed rgba(0,212,255,.35);border-radius:16px;padding:1.2rem;background:linear-gradient(180deg,rgba(0,212,255,.05),transparent)}
+/* --- GLOBAL PREMIUM POLISH --- */
+main{min-height:60vh}
+.btn{transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .25s ease,filter .25s ease}
+.btn:hover{transform:translateY(-2px)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(0,212,255,.4),rgba(129,52,175,.4));border-radius:99px}
+input.input:focus,textarea.input:focus,select.input:focus{outline:none;border-color:var(--accent-primary);box-shadow:0 0 0 3px rgba(0,212,255,.12)}
+.price-box{letter-spacing:-.02em}
+
+/* ===== V19: REFERENCE LAYOUT LANGUAGE (clean sections + soft cards) ===== */
+/* centered section rhythm like InteriorStudio ref */
+main > section, .section-block{padding:56px 20px;text-align:center}
+main > section h2, .sec-title{font-size:1.9rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.6rem;position:relative;display:inline-block}
+main > section h2::after, .sec-title::after{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-10px;width:56px;height:3px;border-radius:99px;background:linear-gradient(90deg,var(--accent-primary),var(--accent-purple,#8134af))}
+.sec-sub{font-size:1.05rem;color:var(--text-secondary);max-width:560px;margin:22px auto 28px}
+/* soft shadow cards (ref: 0 2px 5px rgba(0,0,0,.1), radius 6) */
+.soft-card{background:var(--bg-card);border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.08);border:1px solid var(--border-subtle)}
+.item-card,.category-card,.mu-card,.faq-item{box-shadow:0 2px 6px rgba(0,0,0,.07)!important}
+.item-card:hover{transform:translateY(-6px)!important}
+/* grid rhythm */
+.grid{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:24px}
+.grid>*{flex:0 1 260px}
+/* hero band (light contrast band like ref .hero) */
+.hero-band{background:linear-gradient(180deg,rgba(0,212,255,.06),rgba(129,52,175,.05));border-radius:22px;margin:18px auto;max-width:1200px;padding:64px 24px;text-align:center}
+.hero-band h1{font-size:clamp(1.9rem,5vw,3rem);font-weight:900;letter-spacing:-.03em;line-height:1.15}
+.hero-band p{font-size:1.15rem;color:var(--text-secondary);margin:16px auto 26px;max-width:520px}
+.hero-band .btn{padding:13px 30px;border-radius:8px;font-weight:700}
+/* category trio */
+.category{background:var(--bg-card);padding:24px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.08);border:1px solid var(--border-subtle);text-align:center;width:230px;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease}
+.category:hover{transform:translateY(-6px);box-shadow:0 14px 30px -12px rgba(0,0,0,.25)}
+.category h3{margin-bottom:12px;font-size:1.05rem}
+.category button{padding:9px 18px;border:none;border-radius:6px;background:var(--accent-primary);color:#04121c;font-weight:700;cursor:pointer}
+/* footer like ref: solid dark band, centered */
+footer.site-footer,footer{background:#101418!important;color:#d7dde3!important;text-align:center;padding:26px 20px!important}
+footer a{color:#9fe8ff}
+[data-theme="light"] footer{background:#171b21!important;color:#e8edf2!important}
