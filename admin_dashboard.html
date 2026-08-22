@@ -660,7 +660,7 @@ async function api(path, opts = {}) {
   const pre = path.split("/")[0];
   const rest = path.slice(pre.length);
   let url;
-  if (pre === "auth") url = SVC.auth + rest;
+  if (pre === "auth") url = SVC.auth + "/auth" + rest;
   else if (pre === "market") url = SVC.market + rest;
   else if (pre === "verify") url = SVC.verify + rest;
   else if (pre === "chat") url = SVC.chat + rest.replace("admin/", "admin/");
