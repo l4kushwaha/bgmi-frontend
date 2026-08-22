@@ -699,6 +699,12 @@ cb.addEventListener('change',function(){go.disabled=!cb.checked;go.style.opacity
 document.getElementById('tncNo').addEventListener('click',function(){ov.style.display='none';if(ov.__cb)ov.__cb(false);});
 go.addEventListener('click',function(){ov.style.display='none';if(ov.__cb)ov.__cb(true);});
 window.tncGate=function(done){cb.checked=false;go.disabled=true;go.style.opacity='.45';go.style.cursor='not-allowed';ov.__cb=done;ov.style.display='flex';};
+document.addEventListener('click',function(e){
+ var t=e.target&&e.target.closest?e.target.closest('.buy-btn,[onclick*="startBuy"]'):null;
+ if(!t||t.dataset.tncDone)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ window.tncGate(function(ok){ if(ok){ t.dataset.tncDone='1'; t.click(); setTimeout(function(){delete t.dataset.tncDone;},4000);} });
+},true);/* __tncClickHook */
 })();
 </script>
 <script src="js/lang.js?v=1" defer></script>
