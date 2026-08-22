@@ -572,3 +572,12 @@ section.section{padding-top:clamp(1.3rem,3vw,2.1rem)!important;padding-bottom:cl
 .form-group .label{position:static!important;transform:none!important}
 input::placeholder,textarea::placeholder{color:#9aa0a8!important;opacity:1!important}
 input:focus::placeholder{color:#b6bcc4!important}
+
+
+/* ===== V33: FORM SANITY (labels above, text inside box) ===== */
+.form-group{display:block!important}
+.form-group .label{position:static!important;display:block!important;transform:none!important;margin-bottom:.45rem!important;font-size:.85rem!important;top:auto!important;left:auto!important}
+.form-group .input,.form-group select,.form-group textarea{padding-top:12px!important;padding-bottom:12px!important;line-height:1.4!important;height:auto!important}
+.f-input label,.f-input .label{position:static!important;display:block!important;transform:none!important;font-size:.85rem!important;margin:0 0 .45rem!important;color:var(--text-secondary)!important}
+.f-input input,.f-input select{padding:12px 14px!important}
+input,select,textarea{overflow:visible}

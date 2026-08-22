@@ -56,7 +56,39 @@
 
   /* ================= STATE ================= */
   let chats = [];
-  let activeRoom = null;
+  
+/* ================= E2E ENCRYPTION (private rooms) ================= */
+const E2E_SALT = "BGMIMKT::e2e::v1::";
+let _e2eKeys = {};
+async function e2eKey(room){
+  if(_e2eKeys[room]) return _e2eKeys[room];
+  const raw = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(E2E_SALT + room));
+  const k = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["encrypt","decrypt"]);
+  _e2eKeys[room] = k; return k;
+}
+async function e2eEnc(room,text){
+  try{
+    const k = await e2eKey(room);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({name:"AES-GCM",iv},k,new TextEncoder().encode(text));
+    const b = new Uint8Array(iv.length + ct.byteLength);
+    b.set(iv); b.set(new Uint8Array(ct), iv.length);
+    let s="";for(let i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);
+    return "enc1:"+btoa(s);
+  }catch(e){ return text; }
+}
+async function e2eDec(room,t){
+  try{
+    if(!t || t.indexOf("enc1:")!==0) return t;
+    const bin = atob(t.slice(5));
+    const b = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+    const k = await e2eKey(room);
+    const pt = await crypto.subtle.decrypt({name:"AES-GCM",iv:b.slice(0,12)},k,b.slice(12));
+    return new TextDecoder().decode(pt);
+  }catch(e){ return "\ud83d\udd10 [encrypted]"; }
+}
+let activeRoom = null;
   let lastCount = 0;
   let canSend = false;
   let mode = "global";           // global | chats
@@ -441,7 +473,10 @@
     lastCount = msgs.length;
 
     chatBox.innerHTML = "";
-    msgs.forEach(m => chatBox.appendChild(renderPrivateMsg(m)));
+    for (const m of msgs) {
+      if (m.type !== "system" && m.type !== "image" && m.ciphertext) m.ciphertext = await e2eDec(activeRoom, m.ciphertext);
+      chatBox.appendChild(renderPrivateMsg(m));
+    }
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
@@ -482,7 +517,7 @@
 
     const body = {
       room_id: activeRoom,
-      message: msg || "",
+      message: await e2eEnc(activeRoom, msg || ""),
       type,
       sensitive: false,
       effect: selectedEffect || undefined
