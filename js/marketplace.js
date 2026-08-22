@@ -373,6 +373,8 @@ function renderCard(item) {
   images.forEach((img, i) => {
     const imgEl = document.createElement("img");
     imgEl.src = esc(img);
+    imgEl.loading = "lazy";
+    imgEl.decoding = "async";
     imgEl.className = i === 0 ? "active" : "";
     gallery.appendChild(imgEl);
   });
