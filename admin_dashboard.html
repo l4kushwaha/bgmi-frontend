@@ -664,7 +664,7 @@ async function api(path, opts = {}) {
   else if (pre === "market") url = SVC.market + rest;
   else if (pre === "verify") url = SVC.verify + rest;
   else if (pre === "chat") url = SVC.chat + rest.replace("admin/", "admin/");
-  else if (pre === "wallet") url = SVC.wallet + "/api" + rest;
+  else if (pre === "wallet") url = SVC.wallet + rest;
   else url = GATEWAY + "/api/" + path;
   const res = await fetch(url, {
     ...opts,
