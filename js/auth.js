@@ -178,11 +178,14 @@
   function showVerifyPanel(email) {
     const panel = document.getElementById("verifyPanel");
     if (!panel) return;
-    document.getElementById("verifyEmail").textContent = email;
-    document.getElementById("verify-email-store").value = email;
-    document.getElementById("verify-otp").value = "";
+    const hint = document.getElementById("verifyEmailHint");
+    if (hint) hint.textContent = "6-digit OTP " + email + " par bheja gaya hai";
+    const store = document.getElementById("verify-email-store");
+    if (store) store.value = email;
+    const otpInput = document.getElementById("verify-otp");
+    if (otpInput) otpInput.value = "";
     panel.style.display = "block";
-    document.getElementById("verify-otp").focus();
+    if (otpInput) otpInput.focus();
   }
 
   function closeVerify() {
