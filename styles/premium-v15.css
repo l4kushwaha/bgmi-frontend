@@ -581,3 +581,36 @@ input:focus::placeholder{color:#b6bcc4!important}
 .f-input label,.f-input .label{position:static!important;display:block!important;transform:none!important;font-size:.85rem!important;margin:0 0 .45rem!important;color:var(--text-secondary)!important}
 .f-input input,.f-input select{padding:12px 14px!important}
 input,select,textarea{overflow:visible}
+
+/* ===== V34: UNIVERSAL CONTRAST + RESPONSIVE POLISH ===== */
+/* --- text always readable regardless of background --- */
+body{background:var(--bg-primary);color:var(--text-primary)}
+.glass,.card,.item-card,.vd-box,.chat-list,.chat-panel,.faq-item,.stats-grid>div{background-clip:padding-box}
+[data-theme="light"] .glass,[data-theme="light"] .card,[data-theme="light"] .item-card{background:#ffffff!important;color:#0c0d10!important}
+[data-theme="dark"] .glass,[data-theme="dark"] .card,[data-theme="dark"] .item-card{background:#0e0e11!important;color:#f2f4f7!important}
+.hero-band *,.kh-banner *,.sale-band *,.top-strip *,.kh-hero *{color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+.btn-primary,.hero-band .btn,#sendBtn{color:#fff!important}
+.btn-outline{border:1.5px solid currentColor}
+a{color:inherit}
+.cat-chip.acc{background:rgba(0,120,255,.14);color:#3b82f6!important}
+.cat-chip.pop{background:rgba(236,72,153,.14);color:#ec4899!important}
+[data-theme="dark"] .cat-chip.acc{color:#7ab8ff!important}
+.badge-chip{color:#111!important}
+table td,table th{color:var(--text-primary)!important}
+/* --- responsive grids --- */
+@media(max-width:1024px){
+  .stats-grid{grid-template-columns:repeat(3,1fr)}
+  #mainContent .container{padding-left:16px;padding-right:16px}
+}
+@media(min-width:1025px){
+  #mainContent>.container,#mainContent>section>.container{max-width:1180px;margin:0 auto}
+  .item-grid,[class*="listing-grid"]{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)!important}
+  h1{font-size:clamp(1.45rem,7vw,2rem)}
+  .btn-lg{min-height:46px;font-size:.95rem}
+  table{font-size:.8rem}
+}
+img,video{max-width:100%}
+*{scrollbar-width:thin}
