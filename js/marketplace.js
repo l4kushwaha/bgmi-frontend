@@ -342,6 +342,7 @@ function renderCard(item) {
   const images = safeArray(item.images);
   const card = document.createElement("div");
   card.className = "item-card reveal card-in";
+  card.dataset.sellerId = String(item.seller_id ?? "");
   card.dataset.delay = String((item.id || 0) % 4);
   card.dataset.i = String(((item.id || 0) % 8) + 1);
 

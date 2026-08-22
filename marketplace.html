@@ -528,12 +528,9 @@
   }
   function stamp(card){
     if(card.dataset.badged)return;
-    if(!SELLERS||!LISTINGS)return;
-    var m=(card.querySelector('.d-meta')||{textContent:''}).textContent.match(/Listing\s*#(\d+)/);
-    if(!m)return;
-    var item=LISTINGS.find(function(x){return String(x.id)===m[1];});
-    if(!item)return;
-    var sid=String(item.seller_id);
+    if(!SELLERS)return;
+    var sid=String(card.dataset.sellerId||'');
+    if(!sid)return;
     var s=SELLERS.find(function(x){return String(x.user_id)===sid;});
     card.dataset.badged='1';
     if(!s||!s.badge||!MAP[s.badge])return;
@@ -542,6 +539,7 @@
     chip.textContent=(s.badge==='gold'||s.badge==='verified')?'\u2605 '+MAP[s.badge]:MAP[s.badge];
     var anchor=card.querySelector('.cat-chip');
     if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(chip,anchor.nextSibling);
+    else card.querySelector('.card-content').appendChild(chip);
     var st=document.createElement('span');
     st.style.cssText='font-size:.68rem;color:#fbbf24;margin-left:.4rem';
     st.textContent='\u2605 '+(s.avg_rating||'0')+' ('+(s.review_count||0)+')';
