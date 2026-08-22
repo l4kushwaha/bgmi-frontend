@@ -770,3 +770,33 @@ input:focus,select:focus,textarea:focus{outline:none!important;border-color:var(
  .chat-wrap{height:calc(100dvh - 58px)}
  #messageInput{font-size:16px!important}
 }
+
+/* ============================================================
+   V45 � PREMIUM ULTRA (2026): aurora bg, sheen buttons, glass nav,
+   gradient headings, layered cards, light-theme parity
+   ============================================================ */
+@keyframes auroraDrift{0%{transform:translate(-8%,-6%) scale(1)}33%{transform:translate(6%,4%) scale(1.12)}66%{transform:translate(-4%,8%) scale(.95)}100%{transform:translate(-8%,-6%) scale(1)}}
+body::before{content:"";position:fixed;inset:-20%;z-index:-2;pointer-events:none;background:
+ radial-gradient(38% 32% at 18% 22%,rgba(255,45,120,.10),transparent 60%),
+ radial-gradient(34% 30% at 82% 30%,rgba(122,26,255,.09),transparent 60%),
+ radial-gradient(40% 36% at 55% 88%,rgba(255,122,26,.08),transparent 60%);
+ animation:auroraDrift 22s ease-in-out infinite;filter:blur(30px)}
+html[data-theme="light"] body::before{opacity:.5}
+@keyframes sheen{0%{left:-70%}100%{left:130%}}
+.btn-primary,.view-btn,#sendBtn{position:relative;overflow:hidden}
+.btn-primary::after,.view-btn::after{content:"";position:absolute;top:0;left:-70%;width:55%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg)}
+.btn-primary:hover::after,.view-btn:hover::after{animation:sheen .7s ease forwards}
+.navbar{background:color-mix(in srgb,var(--bg-card) 72%,transparent)!important;backdrop-filter:blur(18px) saturate(1.3)!important;border-bottom:1px solid rgba(255,255,255,.07)!important}
+.nav-brand,.nav-logo{font-weight:900!important;letter-spacing:-.02em!important;background:linear-gradient(92deg,#fff 20%,#ff2d78 55%,#ff7a1a 85%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+h1,h2,h3,.sec-title,.hero h1{letter-spacing:-.025em!important}
+.hero h1,.error-code{background:linear-gradient(94deg,var(--text-primary) 15%,var(--accent-primary) 55%,var(--accent-secondary) 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.glass,.card,.item-card,.panel{box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 24px 50px -28px rgba(0,0,0,.65)!important}
+.item-card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(140deg,rgba(255,45,120,.35),transparent 32%,transparent 68%,rgba(255,122,26,.28));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;pointer-events:none;z-index:1}
+.item-card:hover::before{opacity:1}
+table tbody tr{transition:background .16s}
+tbody tr:hover td{background:rgba(255,255,255,.035)!important}
+a.nav-link,.nav-dropdown-item{transition:color .2s,background .2s!important}
+input,select,textarea{border-radius:12px!important;background:color-mix(in srgb,var(--bg-input) 88%,transparent)!important;backdrop-filter:blur(6px)}
+footer{border-top:1px solid var(--border-subtle)!important;background:linear-gradient(180deg,transparent,rgba(255,255,255,.02))}
+.badge{font-weight:700!important;letter-spacing:.03em!important;padding:4px 11px!important;border-radius:999px!important}
+@media(prefers-reduced-motion:reduce){body::before{animation:none}}
