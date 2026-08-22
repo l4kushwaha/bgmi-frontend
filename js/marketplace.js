@@ -495,6 +495,21 @@ function renderCard(item) {
     deleteBtn.textContent = "Delete";
     deleteBtn.onclick = () => deleteListing(item.id);
     cardActions.appendChild(deleteBtn);
+
+    const soldBtn = document.createElement("button");
+    soldBtn.className = "btn outline sold-btn";
+    const wasSold = item.status === "sold";
+    soldBtn.textContent = wasSold ? "\u21ba Available" : "\u2705 Mark as Sold";
+    soldBtn.onclick = async () => {
+      const r = await fetch(`${API_URL}/listings/${item.id}`,{
+        method:"PATCH",
+        headers:{ Authorization:`Bearer ${session().token}`, "Content-Type":"application/json" },
+        body: JSON.stringify({ status: wasSold ? "available" : "sold" })
+      });
+      showToast(r.ok ? (wasSold ? "Marked available" : "Marked as SOLD") : "Status update failed");
+      if(r.ok){ item.status = wasSold ? "available" : "sold"; loadListings(); }
+    };
+    cardActions.appendChild(soldBtn);
   } else {
     const buyBtn = document.createElement("button");
     buyBtn.className = "btn buy-btn";
