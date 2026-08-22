@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=14">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=16">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=17">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -34,7 +34,7 @@
 <!-- Navigation -->
 <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
   <a href="index.html" class="nav-brand" aria-label="BGMI Market Home">
-    <span class="nav-brand-icon" aria-hidden="true">🎮</span>
+    <span class="nav-brand-icon" aria-hidden="true">ðŸŽ®</span>
     <span>BGMI Market</span>
   </a>
   
@@ -121,8 +121,8 @@
   <section class="hero" style="min-height: 50vh; padding: 3rem 2rem;" aria-labelledby="marketplace-title">
     <div class="hero-content">
       <div class="hero-badge animate-fade-in">
-        <span aria-hidden="true">🔥</span>
-        <span>Verified Sellers · Secure Escrow · Direct UPI</span>
+        <span aria-hidden="true">ðŸ”¥</span>
+        <span>Verified Sellers Â· Secure Escrow Â· Direct UPI</span>
       </div>
       
       <h1 id="marketplace-title" class="animate-slide-up stagger-1">
@@ -163,12 +163,12 @@
             <label class="label" for="filter">Filter</label>
             <select id="filter" class="input select" aria-label="Filter listings">
               <option value="">All Listings</option>
-              <option value="account">🎮 Accounts</option>
-              <option value="popularity">🔥 Popularity</option>
-              <option value="meetup">🤝 Meetup Available</option>
+              <option value="account">ðŸŽ® Accounts</option>
+              <option value="popularity">ðŸ”¥ Popularity</option>
+              <option value="meetup">ðŸ¤ Meetup Available</option>
               <option value="own">My Listings</option>
-              <option value="price_low">Price: Low → High</option>
-              <option value="price_high">Price: High → Low</option>
+              <option value="price_low">Price: Low â†’ High</option>
+              <option value="price_high">Price: High â†’ Low</option>
               <option value="new">Newest First</option>
             </select>
           </div>
@@ -249,7 +249,7 @@
         </svg>
       </button>
     </div>
-    <div class="modal-body" id="details-content">Loading…</div>
+    <div class="modal-body" id="details-content">Loadingâ€¦</div>
   </div>
 </div>
 
@@ -257,7 +257,7 @@
 <div id="meetup-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="meetupModalTitle" aria-modal="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 id="meetupModalTitle" class="modal-title">🤝 Request Real Meetup</h3>
+      <h3 id="meetupModalTitle" class="modal-title">ðŸ¤ Request Real Meetup</h3>
       <button class="modal-close" onclick="closeMeetup()" aria-label="Close meetup modal">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -267,7 +267,7 @@
     </div>
     <div class="modal-body">
       <p id="meetup-listing-info" style="opacity: 0.8; font-size: 0.875rem; margin-bottom: 1rem;"></p>
-      <p style="font-size: 0.75rem; color: var(--accent-secondary); margin-bottom: 1rem;">⚠️ Meet in public places (mall, metro, police station). Never send money in advance.</p>
+      <p style="font-size: 0.75rem; color: var(--accent-secondary); margin-bottom: 1rem;">âš ï¸ Meet in public places (mall, metro, police station). Never send money in advance.</p>
       
       <div class="form-group">
         <label class="label" for="mu-city">Your City</label>
@@ -309,7 +309,7 @@
 <div id="buyopts-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="buyoptsTitle" aria-modal="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 id="buyoptsTitle" class="modal-title">🛒 How to Buy?</h3>
+      <h3 id="buyoptsTitle" class="modal-title">ðŸ›’ How to Buy?</h3>
       <button class="modal-close" onclick="resolveBuyOptions(null)" aria-label="Close buy options">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -323,13 +323,13 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
         </svg>
-        Online Delivery — Direct UPI Payment
+        Online Delivery â€” Direct UPI Payment
       </button>
       <button class="btn btn-secondary btn-ripple w-full mb-2" id="buyopts-meetup">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
         </svg>
-        Meetup — Real Meeting (Safer)
+        Meetup â€” Real Meeting (Safer)
       </button>
       <p id="buyopts-hint" style="font-size: 0.75rem; opacity: 0.6; margin-bottom: 1rem;">If seller has meetup enabled, real meeting is more trusted. Online = direct UPI payment.</p>
       <button class="btn btn-ghost w-full" id="buyopts-cancel">Cancel</button>
@@ -341,7 +341,7 @@
 <div id="target-modal-bg" class="modal-overlay" role="dialog" aria-labelledby="targetTitle" aria-modal="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 id="targetTitle" class="modal-title">🎯 Target BGMI UID</h3>
+      <h3 id="targetTitle" class="modal-title">ðŸŽ¯ Target BGMI UID</h3>
       <button class="modal-close" onclick="resolveTargetUid(null)" aria-label="Close target UID">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -396,7 +396,7 @@
   <div class="footer-grid">
     <div class="footer-brand">
       <a href="index.html" class="footer-logo" aria-label="BGMI Market Home">
-        <span class="footer-logo-icon" aria-hidden="true">🎮</span>
+        <span class="footer-logo-icon" aria-hidden="true">ðŸŽ®</span>
         <span>BGMI Market</span>
       </a>
       <p class="footer-tagline">Secure marketplace for buying and selling BGMI accounts.</p>
@@ -421,11 +421,11 @@
     </nav>
   </div>
   <div class="footer-bottom">
-    <div class="footer-copyright">© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
+    <div class="footer-copyright">Â© 2025 BGMI Market. Not affiliated with Krafton Inc.</div>
     <div class="footer-badges">
-      <span class="footer-badge verified">✅ Verified Sellers</span>
-      <span class="footer-badge secure">🔒 Secure Escrow</span>
-      <span class="footer-badge upi">💳 Direct UPI</span>
+      <span class="footer-badge verified">âœ… Verified Sellers</span>
+      <span class="footer-badge secure">ðŸ”’ Secure Escrow</span>
+      <span class="footer-badge upi">ðŸ’³ Direct UPI</span>
     </div>
   </div>
 </footer>
@@ -515,6 +515,40 @@
       });
     }
   });
+</script>
+<script>
+(function(){
+  var MAP={new:'New',verified:'Verified',veteran:'Veteran',trusted:'Trusted',elite:'Elite',gold:'Gold'};
+  var seen={};
+  function stamp(card){
+    if(card.dataset.badged)return;
+    var btn=card.querySelector('.buy-btn');
+    if(!btn)return;
+    var m=(btn.getAttribute('onclick')||'').match(/startBuy\(\d+,\s*"?(\d+)/);
+    if(!m)return;
+    var sid=m[1];
+    fetch('https://bgmi_marketplace_service.bgmi-gateway.workers.dev/api/sellers?limit=100')
+      .then(function(r){return r.json();})
+      .then(function(list){
+        list=(Array.isArray(list)?list:list.sellers)||[];
+        var s=list.find(function(x){return String(x.user_id)===sid;});
+        if(!s||!s.badge||!MAP[s.badge])return;
+        card.dataset.badged='1';
+        var chip=document.createElement('span');
+        chip.className='badge-chip badge-'+s.badge;
+        chip.textContent=(s.badge==='gold'||s.badge==='verified')?'\u2605 '+MAP[s.badge]:MAP[s.badge];
+        var anchor=card.querySelector('.cat-chip');
+        if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(chip,anchor.nextSibling);
+        var st=document.createElement('span');
+        st.style.cssText='font-size:.68rem;color:#fbbf24;margin-left:.4rem';
+        st.textContent='\u2605 '+(s.avg_rating||'0')+' ('+(s.review_count||0)+')';
+        chip.parentNode.appendChild(st);
+      }).catch(function(){});
+  }
+  function scan(){document.querySelectorAll('.item-card').forEach(stamp);}
+  new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
+  setTimeout(scan,2500);setTimeout(scan,5000);
+})();
 </script>
 </body>
 </html>

@@ -13,7 +13,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=14">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=16">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=17">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -30,7 +30,7 @@
   .cat-buttons,.category-buttons,[role="radiogroup"]{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:.4rem;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:999px;padding:.4rem;max-width:520px}
   .cat-buttons::before,.category-buttons::before{content:"";position:absolute;top:.4rem;left:.4rem;width:calc(50% - .6rem);height:calc(100% - .8rem);border-radius:999px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-purple));transition:transform .55s cubic-bezier(.22,1,.36,1);box-shadow:0 10px 30px rgba(0,212,255,.35);pointer-events:none}
   .cat-buttons.pop-active::before,.category-buttons.pop-active::before{transform:translateX(calc(100% + .4rem));background:linear-gradient(135deg,var(--accent-orange,#FF6B00),var(--accent-pink))}
-  .cat-btn{position:relative;z-index:1;background:transparent!important;border:none!important;box-shadow:none!important;color:var(--text-secondary);transition:color .35s ease;border-radius:999px}
+  .cat-btn{position:relative;z-index:1;background:transparent!important;border:none!important;box-shadow:none!important;color:var(--text-secondary);transition:color .35s ease;border-radius:999px;padding:.65rem 1rem;font-size:1rem;min-height:44px}
   .cat-btn.active{color:#06131c;font-weight:800}
   .form-section{animation:fxSecIn .65s cubic-bezier(.22,1,.36,1)}
   @keyframes fxSecIn{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:none}}
