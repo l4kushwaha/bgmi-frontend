@@ -397,34 +397,27 @@ function renderCard(item) {
   const titleEl = document.createElement("strong");
   titleEl.textContent = esc(item.title);
   cardContent.appendChild(titleEl);
-  cardContent.appendChild(document.createElement("br"));
+  
 
   if (isPopularity) {
     const popPoints = document.createElement("span");
     popPoints.className = "pop-points";
     popPoints.textContent = `⚡ ${esc(item.points || 0)} Popularity Points`;
     cardContent.appendChild(popPoints);
-    cardContent.appendChild(document.createElement("br"));
+    
     if (item.delivery_time) {
       const dTime = document.createElement("span");
       dTime.className = "d-time";
       dTime.textContent = `🚚 Delivery: ${esc(item.delivery_time)}`;
       cardContent.appendChild(dTime);
-      cardContent.appendChild(document.createElement("br"));
+      
     }
   } else {
-    const uidEl = document.createElement("span");
-    uidEl.textContent = `UID: ${esc(item.uid)}`;
-    cardContent.appendChild(uidEl);
-    cardContent.appendChild(document.createElement("br"));
-    const levelEl = document.createElement("span");
-    levelEl.textContent = `Level: ${esc(item.level)}`;
-    cardContent.appendChild(levelEl);
-    cardContent.appendChild(document.createElement("br"));
-    const rankEl = document.createElement("span");
-    rankEl.textContent = `Rank: ${esc(item.highest_rank || "-")}`;
-    cardContent.appendChild(rankEl);
-    cardContent.appendChild(document.createElement("br"));
+    const chips=document.createElement("div");
+    chips.className="mini-chips";
+    chips.innerHTML=[["UID",item.uid],["Lv",item.level],["Rank",item.highest_rank]].filter(x=>x[1]).map(x=>'<span><b>'+x[0]+'</b> '+esc(x[1])+'</span>').join("");
+    cardContent.appendChild(chips);
+    
   }
 
   if (item.seller_city || item.city) {
@@ -461,7 +454,7 @@ function renderCard(item) {
         span.textContent = ` ${d.value}`;
         cardContent.appendChild(strong);
         cardContent.appendChild(span);
-        cardContent.appendChild(document.createElement("br"));
+        
       }
     });
   }

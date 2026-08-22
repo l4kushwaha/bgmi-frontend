@@ -37,7 +37,7 @@
 
 <!-- Premium Styles -->
 <link rel="stylesheet" href="styles/premium.css?v=28">
-  <link rel="stylesheet" href="styles/premium-v15.css?v=37">
+  <link rel="stylesheet" href="styles/premium-v15.css?v=38">
 <link rel="stylesheet" href="assets/effects.css">
 <link rel="stylesheet" href="styles/responsive.css">
 
@@ -921,8 +921,10 @@ async function moderate(id, status) {
 }
 async function delListing(id) {
   if (!confirm(`Delete listing #${id} permanently?`)) return;
-  const { ok } = await api(`market/listings/${id}`, { method: "DELETE" });
-  toast(ok ? "Listing deleted" : "Delete failed", ok ? "ok" : "err"); loadListings(); loadOverview();
+  const r = await fetch(SVC.market + "/listings/" + id, { method:"DELETE", headers:{ Authorization:"Bearer "+token } }).catch(()=>null);
+  toast(!r ? "Network error" : r.ok ? "Listing deleted" : r.status===404 ? "Already deleted" : "Failed ("+r.status+")", r&&r.ok?"ok":r&&r.status===404?"warn":"err");
+  document.querySelectorAll("#listingsBody tr").forEach(tr=>{if(tr.dataset.id==String(id))tr.remove();});
+  loadListings(); loadOverview();
 }
 
 function exportListings() {

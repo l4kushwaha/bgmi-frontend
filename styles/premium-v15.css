@@ -666,3 +666,19 @@ tr:hover td{background:rgba(255,255,255,.03)}
 #profile-name::before,#profile-name::after{display:none!important}
 .profile-top,.profile-hero,.avatar-section{flex-wrap:wrap!important;gap:14px!important;align-items:center!important}
 img.avatar,.profile-avatar{flex:none!important;position:relative!important;z-index:1!important}
+
+
+/* ===== V38: COMPACT CARDS + RESPONSIVE ===== */
+.item-card .card-content{padding:10px 12px!important;line-height:1.4!important;font-size:.85rem!important}
+.item-card h3,.item-card .title{font-size:.95rem!important;margin:.2rem 0!important;line-height:1.25!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mini-chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.mini-chips span{font-size:.68rem;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--border-subtle)}
+.mini-chips b{opacity:.65;font-weight:600;margin-right:2px}
+.city-badge,.meetup-badge{font-size:.66rem!important;padding:2px 8px!important;margin-right:4px}
+.price{margin-top:6px!important}
+.card-actions{flex-wrap:wrap;gap:6px!important;padding:8px 10px!important}
+.card-actions .btn{font-size:.74rem!important;padding:7px 11px!important;flex:1 1 auto;min-width:86px;text-align:center}
+@media(max-width:520px){
+  .item-card{border-radius:14px}
+  .card-actions .btn{min-width:calc(50% - 4px)}
+}
