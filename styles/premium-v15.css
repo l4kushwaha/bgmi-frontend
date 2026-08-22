@@ -260,3 +260,28 @@ main > section h2::after, .sec-title::after{content:"";position:absolute;left:50
 footer.site-footer,footer{background:#101418!important;color:#d7dde3!important;text-align:center;padding:26px 20px!important}
 footer a{color:#9fe8ff}
 [data-theme="light"] footer{background:#171b21!important;color:#e8edf2!important}
+
+/* ===== V20: REFERENCE DESIGN TOKENS (#5b548a purple x #00feba mint) ===== */
+:root{--ref-purple:#5b548a;--ref-mint:#00feba}
+/* pill buttons like ref */
+.btn,.hero-band .btn{border-radius:25px!important}
+.btn-primary,.hero-band .btn{background:linear-gradient(135deg,var(--ref-mint),var(--ref-purple))!important;color:#fff!important;border:none!important;box-shadow:0 6px 18px -6px rgba(91,84,138,.5)}
+.btn-primary:hover,.hero-band .btn:hover{filter:brightness(1.07)}
+nav a.highlight,.fx-drawer a.highlight{background:var(--ref-purple)!important;color:#fff!important;padding:8px 14px;border-radius:20px}
+.nav-link:hover{color:var(--ref-purple)!important}
+[data-theme="light"] .nav-link:hover{color:var(--ref-purple)}
+/* hero gradient band exactly like ref */
+.hero-band{background:linear-gradient(135deg,var(--ref-mint),var(--ref-purple))!important;border-radius:0!important;max-width:none!important;margin:0!important;padding:90px 20px!important;color:#fff}
+.hero-band p{color:rgba(255,255,255,.92)!important}
+.hero-band h1{text-shadow:0 3px 14px rgba(0,0,0,.18)}
+/* cards: ref radius 12, hover -5px, colored headings */
+.item-card,.category,.mu-card,.soft-card{border-radius:12px!important}
+.category h3,.item h4,.sec-title,h2{color:var(--ref-purple)}
+[data-theme="dark"] .category h3,[data-theme="dark"] .d-hero h3{color:#cfc9f2}
+/* category/item action pills */
+.category button,.item button{border-radius:20px!important;background:var(--ref-mint)!important;color:#083b33!important;font-weight:700;border:none}
+.grid>.item>button,.view-btn{background:var(--ref-purple)!important;color:#fff!important;border-radius:20px!important}
+.buy-btn{background:linear-gradient(135deg,var(--ref-mint),var(--ref-purple))!important;color:#fff!important;box-shadow:0 10px 26px -8px rgba(0,254,186,.35)!important}
+/* section headings spacing like ref (32px, mb 30) */
+main>section h2,.sec-title{font-size:2rem;margin-bottom:30px}
+main>section,.collections,.arrivals,.section-block{padding:60px 20px}
